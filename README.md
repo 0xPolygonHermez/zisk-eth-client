@@ -30,7 +30,7 @@ You can also enable the keccak precompile by uncommenting the following line in 
 tiny-keccak = { git = "https://github.com/0xPolygonHermez/tiny-keccak", branch = "edu/zisk" }
 
 ```
-### Generating Input Block Files
+### Generating input block files
 To generate additional input block files, you can use the [rsp](https://github.com/succinctlabs/rsp) tool:
 ```bash
 rsp --block-number 18884864 --cache-dir ./data --rpc-url <RPC_URL>
