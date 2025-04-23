@@ -7,9 +7,49 @@ default-run = "zisk-eth-client"
 
 [dependencies]
 bincode = "1.3.3"
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch ="pre-develop-0.4.0"}
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git" }
 rsp-client-executor ={ git = "https://github.com/succinctlabs/rsp.git", rev="249b34ee0c5307b59dc48f1f45a474b04669c6c4" }
 serde_with = "3.11.0"
 
 [patch.crates-io]
 tiny-keccak = { git = "https://github.com/0xPolygonHermez/zisk-patch-tiny-keccak.git", branch = "zisk" }
+
+# Reth patches
+[patch."https://github.com/sp1-patches/reth"]
+reth-revm = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-primitives = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-ethereum-forks = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-blockchain-tree-api = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-primitives-traits = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-errors = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-chainspec = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-fs-util = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-prune-types = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-execution-types = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-execution-errors = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-evm-ethereum = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-evm-optimism = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-trie = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-consensus = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+reth-storage-errors = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git" }
+
+# Reth local patches
+# [patch."https://github.com/sp1-patches/reth"]
+# reth-revm = { path = "../zisk-patch-reth/crates/revm" }
+# reth-primitives = { path = "../zisk-patch-reth/crates/primitives" }
+# reth-ethereum-forks = { path = "../zisk-patch-reth/crates/ethereum-forks" }
+# reth-blockchain-tree-api = { path = "../zisk-patch-reth/crates/blockchain-tree-api" }
+# reth-evm = { path = "../zisk-patch-reth/crates/evm" }
+# reth-primitives-traits = { path = "../zisk-patch-reth/crates/primitives-traits" }
+# reth-errors = { path = "../zisk-patch-reth/crates/errors" }
+# reth-chainspec = { path = "../zisk-patch-reth/crates/chainspec" }
+# reth-fs-util = { path = "../zisk-patch-reth/crates/fs-util" }
+# reth-prune-types = { path = "../zisk-patch-reth/crates/prune/types" }
+# reth-execution-types = { path = "../zisk-patch-reth/crates/evm/execution-types" }
+# reth-execution-errors = { path = "../zisk-patch-reth/crates/evm/execution-errors" }
+# reth-evm-ethereum = { path = "../zisk-patch-reth/crates/ethereum/evm" }
+# reth-evm-optimism = { path = "../zisk-patch-reth/crates/optimism/evm" }
+# reth-trie = { path = "../zisk-patch-reth/crates/trie/trie" }
+# reth-consensus = { path = "../zisk-patch-reth/crates/consensus/consensus" }
+# reth-storage-errors = { path = "../zisk-patch-reth/crates/storage/errors" }
