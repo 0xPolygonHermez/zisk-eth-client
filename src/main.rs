@@ -19,7 +19,7 @@ fn main() {
 
     // Execute the block.
     let executor = EthClientExecutor::eth(
-        Arc::new((&input.genesis).try_into().unwrap()),
+        Arc::new((&input.genesis).try_into().expect("Failed to convert genesis block into the required type")),
         input.custom_beneficiary,
     );
     let header = executor.execute(input).expect("failed to execute client");
