@@ -1,24 +1,28 @@
 #![no_main]
 ziskos::entrypoint!(main);
 
-use rsp_client_executor::io::ClientExecutorInput;
-use rsp_client_executor::*;
+use rsp_client_executor::{
+    executor::EthClientExecutor,
+    io::EthClientExecutorInput,
+};
+use std::sync::Arc;
 use ziskos::{read_input, set_output};
 
 fn main() {
     // Get the input slice from ziskos
     let input  = read_input();
     
-    let input = bincode::deserialize::<ClientExecutorInput>(&input).unwrap();
+    let input = bincode::deserialize::<EthClientExecutorInput>(&input).unwrap();
     let block_number = input.current_block.number;
 
-    println!("executing block {}", block_number);
+    println!("Executing block {}", block_number);
 
     // Execute the block.
-    let executor = ClientExecutor;
-    let header = executor
-        .execute::<EthereumVariant>(input)
-        .expect("failed to execute client");
+    let executor = EthClientExecutor::eth(
+        Arc::new((&input.genesis).try_into().expect("Failed to convert genesis block into the required type")),
+        input.custom_beneficiary,
+    );
+    let header = executor.execute(input).expect("Failed to execute client");
 
     // Calculate block hash    
     let block_hash = header.hash_slow();
@@ -30,5 +34,5 @@ fn main() {
     }
       
     // Print block number and calculated hash  
-    println!("block number: {}, hash: {}\n", block_number, block_hash);
+    println!("Block number: {}, hash: {}\n", block_number, block_hash);
 }
