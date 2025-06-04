@@ -8,7 +8,7 @@ default-run = "zisk-eth-client"
 bincode = "1.3.3"
 rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git" }
 
-# ziskos = https://github.com/0xPolygonHermez/zisk.git
+# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.9.0" }
 # Local development
 ziskos = { path = "../../zisk/ziskos/entrypoint" }
 

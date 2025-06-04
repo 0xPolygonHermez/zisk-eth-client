@@ -15,14 +15,14 @@ fn main() {
     let input = bincode::deserialize::<EthClientExecutorInput>(&input).unwrap();
     let block_number = input.current_block.number;
 
-    println!("executing block {}", block_number);
+    println!("Executing block {}", block_number);
 
     // Execute the block.
     let executor = EthClientExecutor::eth(
         Arc::new((&input.genesis).try_into().expect("Failed to convert genesis block into the required type")),
         input.custom_beneficiary,
     );
-    let header = executor.execute(input).expect("failed to execute client");
+    let header = executor.execute(input).expect("Failed to execute client");
 
     // Calculate block hash    
     let block_hash = header.hash_slow();
@@ -34,5 +34,5 @@ fn main() {
     }
       
     // Print block number and calculated hash  
-    println!("block number: {}, hash: {}\n", block_number, block_hash);
+    println!("Block number: {}, hash: {}\n", block_number, block_hash);
 }
