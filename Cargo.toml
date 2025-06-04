@@ -17,9 +17,11 @@ ziskos = { path = "../../zisk/ziskos/entrypoint" }
 # sha2 = 
 # sha3 = 
 # k256 = 
+# bn =
 # sp1_bls12_381 = 
 # Local development
 sha2 = { path = "../zisk-patch-sha2/sha2" }
 sha3 = { path = "../zisk-patch-sha3/sha3" }
 k256 = { path = "../zisk-patch-elliptic-curves/k256" }
-bls = { path = "../zisk-patch-bls12_381", package = "sp1_bls12_381" }
+bn = { path = "../zisk-patch-bn", package = "substrate-bn" }
+sp1_bls12_381 = { path = "../zisk-patch-bls12_381" }
