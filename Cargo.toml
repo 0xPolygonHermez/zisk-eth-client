@@ -14,12 +14,10 @@ ziskos = { path = "../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
 # TODO: Add real URLs
-# sha2 = 
 # sha3 = 
 # k256 = 
 # sp1_bls12_381 = 
 # Local development
-sha2 = { path = "../zisk-patch-sha2/sha2" }
 sha3 = { path = "../zisk-patch-sha3/sha3" }
 k256 = { path = "../zisk-patch-elliptic-curves/k256" }
 sp1_bls12_381 = { path = "../zisk-patch-bls12_381" }
