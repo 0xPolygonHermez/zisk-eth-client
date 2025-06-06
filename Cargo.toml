@@ -6,6 +6,7 @@ resolver = "2"
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
+default-run = "input-gen"
 
 [workspace.dependencies]
 alloy-json-rpc = { version = "0.14.0", default-features = false }
