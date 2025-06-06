@@ -1,0 +1,23 @@
+[package]
+name = "zisk-eth-client"
+description = ""
+edition = "2021"
+[workspace.package]
+
+[dependencies]
+bincode = "1.3.3"
+rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "24dee6c7bb4081f44e7d232fc924a9e419ee4c88" }
+
+# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.9.0" }
+# Local development
+ziskos = { path = "../../../zisk/ziskos/entrypoint" }
+
+[patch.crates-io]
+# TODO: Add real URLs
+# sha3 = 
+# k256 = 
+# sp1_bls12_381 = 
+# Local development
+sha3 = { path = "../zisk-patch-sha3/sha3" }
+k256 = { path = "../zisk-patch-elliptic-curves/k256" }
+sp1_bls12_381 = { path = "../zisk-patch-bls12_381" }

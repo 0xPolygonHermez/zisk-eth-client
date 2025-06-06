@@ -1,31 +1,43 @@
-## Zisk Ethereum Client
+# Zisk Ethereum Client
 
-### Description
-In the `data` folder, you will find example input files for Ethereum blocks. To run a specific block in the Zisk emulator, copy the `<block_number>.bin` file into the `build/input.bin` directory and execute one of the following commands:
-```bash
-cargo-zisk run --release -m -s
-```
-or 
-```bash
-ziskemu -i build/input.bin -x -m -e target/riscv64ima-polygon-ziskos-elf/release/zisk-eth-client
-```
+## Build the ELF File
 
-#### Note:
-Block `18884865` contains too many steps, which may cause the following error:
-```bash
-Error during emulation: EmulationNoCompleted
-Error: Error executing Run command
+To build the `zisk-eth-client` ELF file, run the following commands:
 
-Caused by:
-    Cargo run command failed with status exit status: 1
-```
-To resolve this, increase the number of steps (`-n`) when running `ziskemu`:
 ```bash
-ziskemu -i build/input.bin -x -m -e target/riscv64ima-polygon-ziskos-elf/release/zisk-eth-block -n 10000000000
+cd bin/client
+cargo-zisk build --release
 ```
 
-### Generating input block files
-To generate additional input block files, you can use the [rsp](https://github.com/succinctlabs/rsp) tool:
+This will generate the ELF file at the following path:  
+`./target/release/zisk-eth-client`
+
+## Execute
+
+Inside the `data` folder, you will find sample input files for Ethereum blocks. To execute a specific block in the Zisk emulator, run one of the following commands:
+
 ```bash
-rsp --block-number 18884864 --cache-dir ./data --rpc-url <RPC_URL>
+cargo-zisk run --release -i ./data/16424145.bin
 ```
+
+or
+
+```bash
+ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-eth-client -i ./data/16424145.bin
+```
+
+## Generate Input Block Files
+
+To generate input files for additional Ethereum blocks, you can use the `input-gen` tool. For example, to generate an input file for block `22075730`, run:
+
+```bash
+cargo run --release --bin=input-gen -- -b 22075730 -r <RPC_URL>
+```
+
+Replace `<RPC_URL>` with the URL of an Ethereum Mainnet RPC node.
+
+The command will create a file named `22075730_xxx_yy.bin` in the `input` folder (by default), where:
+- `xxx` is the number of transactions in the block  
+- `yy` is the gas used in megagas (MGas)
+
+To specify a different output folder, use the `-i` flag.
