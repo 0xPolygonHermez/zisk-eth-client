@@ -18,6 +18,6 @@ ziskos = { path = "../../../zisk/ziskos/entrypoint" }
 # k256 = 
 # sp1_bls12_381 = 
 # Local development
-sha3 = { path = "../zisk-patch-sha3/sha3" }
-k256 = { path = "../zisk-patch-elliptic-curves/k256" }
-sp1_bls12_381 = { path = "../zisk-patch-bls12_381" }
+sha3 = { path = "../../../zisk-patch-sha3/sha3" }
+k256 = { path = "../../../zisk-patch-elliptic-curves/k256" }
+sp1_bls12_381 = { path = "../../../zisk-patch-bls12_381" }

@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use rsp_host_executor::EthHostExecutor;
 use rsp_primitives::genesis::Genesis;
 use rsp_provider::create_provider;
@@ -9,10 +9,18 @@ use tracing_subscriber::{
 };
 use url::Url;
 
+#[derive(Debug, Clone, ValueEnum)]
+pub enum Network {
+    Mainnet,
+    Sepolia,
+}
 #[derive(Debug, Clone, Parser)]
 pub struct InputGenArgs {
     #[clap(long, short)]
     pub block_number: u64,
+
+    #[clap(long, short, value_enum)]
+    pub network: Option<Network>,
 
     #[clap(long, short)]
     pub rpc_url: String,
@@ -47,7 +55,17 @@ async fn main() -> eyre::Result<()> {
             .expect("Invalid RPC URL"),
     );
     let rpc_db = RpcDb::new(provider.clone(), args.block_number - 1);
-    let genesis = Genesis::Mainnet;
+    let genesis = match args.network {
+        Some(Network::Mainnet) => {
+            Genesis::Mainnet
+        }
+        Some(Network::Sepolia) => {
+            Genesis::Sepolia
+        }
+        None => {
+            Genesis::Mainnet
+        }
+    };
 
     let executor = EthHostExecutor::eth(
         Arc::new(
@@ -70,7 +88,7 @@ async fn main() -> eyre::Result<()> {
     }
 
     // Save the input to a file
-    let mgas = input.current_block.header.gas_used / 1_000_000;
+    let mgas = (input.current_block.header.gas_used + 999_999) / 1_000_000;
     let input_path = input_folder.join(format!(
         "{}_{}_{}.bin",
         args.block_number,
