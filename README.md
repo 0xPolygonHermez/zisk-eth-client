@@ -17,13 +17,13 @@ This will generate the ELF file at the following path:
 Inside the `data` folder, you will find sample input files for Ethereum blocks. To execute a specific block in the Zisk emulator, run one of the following commands:
 
 ```bash
-cargo-zisk run --release -i ./data/16424145.bin
+cargo-zisk run --release -i ./inputs/22767493_185_14.bin
 ```
 
 or
 
 ```bash
-ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-eth-client -i ./data/16424145.bin
+ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-eth-client -i ./inputs/22767493_185_14.bin
 ```
 
 ## Generate Input Block Files

@@ -49,20 +49,22 @@ async fn main() -> eyre::Result<()> {
     let rpc_db = RpcDb::new(provider.clone(), args.block_number - 1);
     let genesis = Genesis::Mainnet;
 
-    // Execute the block.
     let executor = EthHostExecutor::eth(
         Arc::new(
             (&genesis).try_into().expect("Failed to convert genesis block into the required type"),
         ),
         None,
     );
+    
+    let start_time = std::time::Instant::now();
+
     let input = executor
         .execute(args.block_number, &rpc_db, &provider, genesis.clone(), None, false)
         .await
         .expect("Failed to execute client");
 
     // Create the input directory if it does not exist.
-    let input_folder = args.input_dir.unwrap_or("input".into());
+    let input_folder = args.input_dir.unwrap_or("inputs".into());
     if !input_folder.exists() {
         std::fs::create_dir_all(&input_folder)?;
     }
@@ -80,11 +82,12 @@ async fn main() -> eyre::Result<()> {
     bincode::serialize_into(&mut cache_file, &input)?;
 
     println!(
-        "Input file for block {} ({} txs, {} mgas) saved to {}",
+        "Input file for block {} ({} txs, {} mgas) saved to {}, time: {} ms",
         args.block_number,
         input.current_block.body.transactions.len(),
         mgas,
-        input_path.to_string_lossy()
+        input_path.to_string_lossy(),
+        start_time.elapsed().as_millis()
     );
 
     Ok(())
