@@ -24,6 +24,10 @@ rsp-host-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "24
 rsp-primitives = { git = "https://github.com/succinctlabs/rsp.git", rev = "24dee6c7bb4081f44e7d232fc924a9e419ee4c88" }
 rsp-provider = { git = "https://github.com/succinctlabs/rsp.git", rev = "24dee6c7bb4081f44e7d232fc924a9e419ee4c88" }
 rsp-rpc-db = { git = "https://github.com/succinctlabs/rsp.git", rev = "24dee6c7bb4081f44e7d232fc924a9e419ee4c88" }
+# rsp-host-executor = { path = "../rsp" }
+# rsp-primitives = { path = "../rsp" }
+# rsp-provider = { path = "../rsp" }
+# rsp-rpc-db = { path = "../rsp" }
 tokio = { version = "1.21", default-features = false, features = [
     "rt",
     "rt-multi-thread",

@@ -14,11 +14,7 @@ fn main() {
     let input = bincode::deserialize::<EthClientExecutorInput>(&input).unwrap();
     let block_number = input.current_block.number;
 
-    let network = match input.network {
-        rsp_client_executor::Network::Mainnet => "Mainnet",
-        rsp_client_executor::Network::Sepolia => "Sepolia",
-    };
-    println!("Executing {} block {}", network, block_number);
+    println!("Executing {} block", block_number);
 
     // Execute the block.
     let executor = EthClientExecutor::eth(
