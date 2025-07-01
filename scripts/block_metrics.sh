@@ -88,7 +88,7 @@ while true; do
                 rm -f "${OUTPUT_ERR_FOLDER}/${block_num}.err"
             fi
 
-            file=$(find -maxdepth 1 -type f -name "${block_num}.csv" | head -n 1)
+            file=$(find . -maxdepth 1 -type f -name "${block_num}.csv" | head -n 1)
             if [[ -f "$file" ]]; then
                 awk -F, -v ts="$timestamp_fmt" -v blk="$block_num" -v txs="$txs" -v mgas="$mgas" '
                 BEGIN {
