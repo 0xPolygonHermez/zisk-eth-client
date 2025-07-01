@@ -65,7 +65,7 @@ while true; do
             elapsed=$((end_time - start_time))
             echo "Input file for block $block_num generated in $elapsed seconds"
 
-            input_file=$(find $INPUTS_PATH -maxdepth 1 -type f -name "${block_num}_*.bin" | head -n 1)
+            input_file=$(find "$INPUTS_PATH" -maxdepth 1 -type f -name "${block_num}_*.bin" | head -n 1)
             if [[ -f "$input_file" ]]; then
                 filename=$(basename "$input_file")
                 if [[ $filename =~ ${block_num}_([0-9]+)_([0-9]+)\.bin ]]; then
