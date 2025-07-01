@@ -91,23 +91,34 @@ while true; do
             file=$(find -maxdepth 1 -type f -name "${block_num}.csv" | head -n 1)
             if [[ -f "$file" ]]; then
                 awk -F, -v ts="$timestamp_fmt" -v blk="$block_num" -v txs="$txs" -v mgas="$mgas" '
-                BEGIN { OFS="," }
-                NR == 2 { version=$1 }
-                tolower($4)=="main" { main_count=$5; main_area=$6 }
-                tolower($4)=="rom" { rom_count=$5; rom_area=$6 }
-                tolower($4)=="mem" { mem_count=$5; mem_area=$6 }
-                tolower($4)=="romdata" { romdata_count=$5; romdata_area=$6 }
-                tolower($4)=="inputdata" { inputdata_count=$5; inputdata_area=$6 }
-                tolower($4)=="memalign" { memalign_count=$5; memalign_area=$6 }
-                tolower($4)=="memalignrom" { memalignrom_count=$5; memalignrom_area=$6 }
-                tolower($4)=="arith" { arith_count=$5; arith_area=$6 }
-                tolower($4)=="arithtable" { arithtable_count=$5; arithtable_area=$6 }
-                tolower($4)=="arithrangetable" { arithrangetable_count=$5; arithrangetable_area=$6 }
-                tolower($4)=="aritheq" { aritheq_count=$5; aritheq_area=$6 }
-                tolower($4)=="aritheqlttable" { aritheqlttable_count=$5; aritheqlttable_area=$6 }
-                tolower($4)=="binary" { binary_count=$5; binary_area=$6 }
-                tolower($4)=="binaryadd" { binaryadd_count=$5; binaryadd_area=$6 }
-                tolower($4)=="binarytable" { binarytable_count=$5; binarytable_area=$6 }
+                BEGIN {
+                    OFS = ",";
+                    sections["main"] = "main";
+                    sections["rom"] = "rom";
+                    sections["mem"] = "mem";
+                    sections["romdata"] = "romdata";
+                    sections["inputdata"] = "inputdata";
+                    sections["memalign"] = "memalign";
+                    sections["memalignrom"] = "memalignrom";
+                    sections["arith"] = "arith";
+                    sections["arithtable"] = "arithtable";
+                    sections["arithrangetable"] = "arithrangetable";
+                    sections["aritheq"] = "aritheq";
+                    sections["aritheqlttable"] = "aritheqlttable";
+                    sections["binary"] = "binary";
+                    sections["binaryadd"] = "binaryadd";
+                    sections["binarytable"] = "binarytable";
+                }
+                NR == 2 { version = $1 }
+                {
+                    section = tolower($4);
+                    if (section in sections) {
+                        count_var = sections[section] "_count";
+                        area_var = sections[section] "_area";
+                        eval(count_var " = $5");
+                        eval(area_var " = $6");
+                    }
+                }
                 tolower($4)=="binaryextension" { binaryextension_count=$5; binaryextension_area=$6 }
                 tolower($4)=="binaryextensiontable" { binaryextensiontable_count=$5; binaryextensiontable_area=$6 }
                 tolower($4)=="keccakf" { keccakf_count=$5; keccakf_area=$6 }
