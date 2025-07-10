@@ -11,15 +11,17 @@ rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "
 
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git" }
 # Local development
-# ziskos = { path = "../../../zisk/ziskos/entrypoint" }
+# ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
 sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", branch = "zisk-patch-sha2/v0.10.9" }
 sha3 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", branch = "zisk-patch-sha3/v0.10.8" }
 k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", branch = "zisk-patch-k256/v0.13.4" }
+bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", branch = "zisk-patch-bn/v0.6.0", package = "substrate-bn" }
 sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12_381.git", branch = "zisk-patch/v0.8.0" }
 # Local development
 # sha2 = { path = "../../../zisk-patch-sha2/sha2" }
 # sha3 = { path = "../../../zisk-patch-sha3/sha3" }
 # k256 = { path = "../../../zisk-patch-elliptic-curves/k256" }
+# bn = { path = "../../../zisk-patch-bn", package = "substrate-bn" }
 # sp1_bls12_381 = { path = "../../../zisk-patch-bls12_381" }
