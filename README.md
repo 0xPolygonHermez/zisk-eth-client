@@ -10,7 +10,7 @@ cargo-zisk build --release
 ```
 
 This will generate the ELF file at the following path:  
-`./target/release/zisk-eth-client`
+`./target/riscv64ima-zisk-zkvm-elf/release/zisk-eth-client`
 
 ## Execute
 
