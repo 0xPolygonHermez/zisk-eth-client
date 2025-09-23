@@ -2,7 +2,6 @@ use clap::{Parser, ValueEnum};
 use rsp_host_executor::EthHostExecutor;
 use rsp_primitives::genesis::Genesis;
 use rsp_provider::create_provider;
-use rsp_rpc_db::RpcDb;
 use std::{path::PathBuf, sync::Arc};
 use tracing_subscriber::{
     filter::EnvFilter, fmt, prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt,
@@ -49,12 +48,12 @@ async fn main() -> eyre::Result<()> {
 
     println!("Generating input file fo block {}", args.block_number);
 
-    // Create the RPC provider and database.
+    // Create the RPC provider
     let provider = create_provider(
         Url::parse(args.rpc_url.as_str())
             .expect("Invalid RPC URL"),
     );
-    let rpc_db = RpcDb::new(provider.clone(), args.block_number - 1);
+
     let genesis = match args.network {
         Some(Network::Mainnet) => {
             Genesis::Mainnet
@@ -77,7 +76,7 @@ async fn main() -> eyre::Result<()> {
     let start_time = std::time::Instant::now();
 
     let input = executor
-        .execute(args.block_number, &rpc_db, &provider, genesis.clone(), None, false)
+        .execute(args.block_number, &provider, genesis.clone(), None, false)
         .await
         .expect("Failed to execute client");
 
