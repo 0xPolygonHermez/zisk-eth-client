@@ -1,0 +1,20 @@
+[build]
+rustflags = [
+#    "-C", "llvm-args=--disable-ppc-preinc",
+#    "-C", "llvm-args=-disable-speculation",
+#    "-C", "llvm-args=-disable-loop-peeling",
+#    "-C", "llvm-args=-disable-vectorization",
+#    "-C", "llvm-args=-print-pass-names",
+#    "-C", "llvm-args=--help",
+]
+
+[target.riscv64ima-zisk-zkvm-elf]
+rustflags = [
+#   "-C", "llvm-args=--disable-ppc-preinc",
+#    "-C", "llvm-args=--disable-ppc-ilp-pref",
+#    "-C", "llvm-args=--disable-ppc-unaligned",
+#   "-C", "llvm-args=--help-list-hidden",
+#   "-C", "llvm-args=--avoid-speculation",
+#    "-C", "llvm-args=-disable-speculation",
+#    "-C", "llvm-args=-disable-loop-peeling"
+]
