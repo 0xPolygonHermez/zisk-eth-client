@@ -1,6 +1,7 @@
 [package]
 name = "zisk-eth-client"
 description = ""
+version = "0.3.0"
 edition = "2021"
 
 [workspace.package]
@@ -17,19 +18,19 @@ serde = "=1.0.219" # Does not compile with a newer version TODO: CHECK
 rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "24dee6c7bb4081f44e7d232fc924a9e419ee4c88" }
 # rsp-client-executor = { path = "../../../rsp/crates/executor/client" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.12.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.12.0" }
 # Local development
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
 sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha2-0.10.9-zisk-0.12.0" }
-sha3 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha3-0.10.8-zisk-0.11.0" }
+sha3 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha3-0.10.8-zisk-0.12.0" }
 k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", tag = "patch-k256-0.13.4-zisk-0.12.0" }
 bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", tag = "patch-0.6.0-zisk-0.12.0", package = "substrate-bn" }
 # KZG Precompile
 kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg.git", tag = "patch-0.2.7-zisk-0.12.0" }
 sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", tag = "patch-0.8.0-zisk-0.12.0" }
-# BLS12-381 Precompiles
+# # BLS12-381 Precompiles
 ark-bls12-381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
 ark-ec = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
 ark-ff = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
