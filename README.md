@@ -28,12 +28,12 @@ Sample input files for Ethereum blocks are provided in the `inputs` folder.
 
 To run a block in the ZisK emulator, use:
 ```bash
-cargo-zisk run --release -i ./inputs/22767493_185_14.bin
+cargo-zisk run --release -i ../../inputs/22767493_185_15.bin
 ```
 
 Or, directly via the `ziskemu` tool:
 ```bash
-ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-eth-client -i ./inputs/22767493_185_14.bin
+ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-eth-client -i ../../inputs/22767493_185_15.bin
 ```
 
 ## Generate Input Block Files
@@ -47,11 +47,10 @@ cargo run --release -- -b 22767493 -r <RPC_URL>
 Replace `<RPC_URL>` with the URL of an Ethereum Mainnet RPC endpoint.
 
 The command will create a file named `22767493_xxx_yy.bin` in the `inputs` folder (by default), where:
-- `xxx` is the number of transactions in the block  
+- `xxx` is the number of transactions in the block
 - `yy` is the gas used in megagas (MGas)
 
 To place the file elsewhere, use the `-i` flag:
 ```bash
 cargo run --release -- -b 22767493 -r <RPC_URL> -i ./my_inputs
 ```
-
