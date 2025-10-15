@@ -11,46 +11,61 @@ It allows you to build, run, and test Ethereum block execution inside the ZisK e
 
 ## Build the Client ELF
 
-To build the `zisk-eth-client` ELF binary:
+There are tu guest client implementations: `zec-rsp-client` based on [RSP](https://github.com/succinctlabs/rsp) and `zec-zeth-client` based on [Zeth](https://github.com/boundless-xyz/zeth)
+
+To build `zec-rsp-client` ELF binary:
 ```bash
-cd bin/client
+cd bin/client/rsp
 cargo-zisk build --release
 ```
 
 The compiled ELF will be generated at:
 ```bash
-./target/riscv64ima-zisk-zkvm-elf/release/zisk-eth-client
+./target/riscv64ima-zisk-zkvm-elf/release/zec-rsp-client
+```
+
+To build `zec-zeth-client` ELF binary:
+```bash
+cd bin/client/zeth
+cargo-zisk build --release
+```
+
+The compiled ELF will be generated at:
+```bash
+./target/riscv64ima-zisk-zkvm-elf/release/zec-zeth-client
 ```
 
 ### Execute Ethereum Blocks
 
-Sample input files for Ethereum blocks are provided in the `inputs` folder.
+Sample input files for Ethereum blocks are provided in the `inputs` folder of each client.
 
 To run a block in the ZisK emulator, use:
 ```bash
-cargo-zisk run --release -i ../../inputs/22767493_185_15.bin
+cargo-zisk run --release -i ./inputs/22767493_185_15.bin
 ```
 
 Or, directly via the `ziskemu` tool:
 ```bash
-ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-eth-client -i ../../inputs/22767493_185_15.bin
+ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-rsp-client -i ./inputs/22767493_185_15.bin
 ```
 
 ## Generate Input Block Files
 
 To generate your own input files, you can use the `input-gen` tool.
 
-Example: generate input for block `22767493`:
+Example: generate input file for block `22767493` for `zec-rsp-client` guest program:
 ```bash
-cargo run --release -- -b 22767493 -r <RPC_URL>
+cargo run --release -- -b 22767493 -g rsp -r <RPC_URL>
 ```
 Replace `<RPC_URL>` with the URL of an Ethereum Mainnet RPC endpoint.
+To generate the input file for `zec-zeth-client` guest program use `-g zeth`.
 
-The command will create a file named `22767493_xxx_yy.bin` in the `inputs` folder (by default), where:
+The command will create a file named `22767493_xxx_yy_ggg.bin` in the `inputs` folder (by default), where:
 - `xxx` is the number of transactions in the block
 - `yy` is the gas used in megagas (MGas)
+- `ggg` is the guest program
 
 To place the file elsewhere, use the `-i` flag:
 ```bash
-cargo run --release -- -b 22767493 -r <RPC_URL> -i ./my_inputs
+cargo run --release -- -b 22767493 -g rsp -r <RPC_URL> -i ./bin/client/rsp/inputs
 ```

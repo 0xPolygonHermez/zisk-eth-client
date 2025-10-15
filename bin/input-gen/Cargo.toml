@@ -4,9 +4,17 @@ description = ""
 edition = "2021"
 
 [dependencies]
+rsp-client-executor.workspace = true
 rsp-host-executor.workspace = true
 rsp-primitives.workspace = true
 rsp-provider.workspace = true
+anyhow.workspace = true
+alloy.workspace = true
+alloy-json-rpc.workspace = true
+alloy-provider.workspace = true
+alloy-rpc-client.workspace = true
+alloy-transport.workspace = true
+async-trait.workspace = true
 bincode.workspace = true
 clap.workspace = true
 dotenv.workspace = true
@@ -14,3 +22,4 @@ eyre.workspace = true
 tokio.workspace = true
 tracing-subscriber.workspace = true
 url.workspace = true
+zeth-host.workspace = true
