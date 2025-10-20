@@ -87,14 +87,8 @@ impl InputGenerator for ZethInputGenerator {
         let input_bytes = bincode::serialize(&input)
             .expect("Failed to serialize input");
 
-        let input_path =self.save_input_to_file(
-            block_number,
-            input.block.header.gas_used,
-            input.block.body.transactions.len().try_into().unwrap(),
-            input_bytes)?;
-
         Ok(InputGeneratorResult {
-            input_file_path: input_path,
+            input: input_bytes,
             gas_used: input.block.header.gas_used,
             tx_count: input.block.body.transactions.len().try_into().unwrap(),
         })
