@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
 use async_trait::async_trait;
 use k256::ecdsa::VerifyingKey;
+use rayon::prelude::*;
 use reth_ethereum_primitives::{Block, TransactionSigned};
 
 use crate::types::{InputGenerator, InputGeneratorConfig, InputGeneratorResult};
@@ -34,19 +35,31 @@ impl ZethInputGenerator {
     }
 }
 
-/// Recovers the signing [`VerifyingKey`] from each transaction's signature.
-pub fn recover_signers<'a, I>(txs: I) -> Result<Vec<VerifyingKey>>
-where
-    I: IntoIterator<Item = &'a TransactionSigned>,
-{
-    txs.into_iter()
+// /// Recovers the signing [`VerifyingKey`] from each transaction's signature.
+// pub fn recover_signers<'a, I>(txs: I) -> Result<Vec<VerifyingKey>>
+// where
+//     I: IntoIterator<Item = &'a TransactionSigned>,
+// {
+//     txs.into_iter()
+//         .enumerate()
+//         .map(|(i, tx)| {
+//             tx.signature()
+//                 .recover_from_prehash(&tx.signature_hash())
+//                 .with_context(|| format!("failed to recover signature for tx #{i}"))
+//         })
+//         .collect::<Result<Vec<_>, _>>()
+// }
+
+// Recovers the signing [`VerifyingKey`] from each transaction's signature, in parallel.
+pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<VerifyingKey>> {
+    txs.par_iter()
         .enumerate()
         .map(|(i, tx)| {
             tx.signature()
                 .recover_from_prehash(&tx.signature_hash())
                 .with_context(|| format!("failed to recover signature for tx #{i}"))
         })
-        .collect::<Result<Vec<_>, _>>()
+        .collect()
 }
 
 #[async_trait]
@@ -71,7 +84,7 @@ impl InputGenerator for ZethInputGenerator {
         let block = reth_ethereum_primitives::Block::from(rpc_block);
 
         let start_recover_signers = std::time::Instant::now();
-        let signers = recover_signers(block.body.transactions())?;
+        let signers = recover_signers(block.body.transactions.as_slice())?;
         let time_recover_signers = start_recover_signers.elapsed();
 
         let start_serialize_input = std::time::Instant::now();

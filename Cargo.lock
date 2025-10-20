@@ -3727,6 +3727,7 @@ dependencies = [
  "dotenv",
  "eyre",
  "k256",
+ "rayon",
  "reth-ethereum-primitives 1.7.0",
  "reth-primitives-traits 1.7.0",
  "rsp-client-executor",
