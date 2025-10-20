@@ -4295,6 +4295,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "zec-rsp-client"
+version = "0.3.0"
+dependencies = [
+ "bincode",
+ "rsp-client-executor",
+ "ziskos",
+]
+
+[[package]]
 name = "zerocopy"
 version = "0.8.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4386,15 +4395,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.106",
-]
-
-[[package]]
-name = "zisk-eth-client"
-version = "0.3.0"
-dependencies = [
- "bincode",
- "rsp-client-executor",
- "ziskos",
 ]
 
 [[package]]

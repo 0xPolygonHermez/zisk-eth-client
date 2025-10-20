@@ -14,8 +14,8 @@ panic = "abort"
 
 [dependencies]
 bincode = "1.3.3"
-zeth-core = { git = "https://github.com/boundless-xyz/zeth.git" }
-zeth-chainspec = { git = "https://github.com/boundless-xyz/zeth.git" }
+zeth-core = { git = "https://github.com/boundless-xyz/zeth.git", rev = "db4c2d45233b59bdd2a85fcb7f9d36a12bebe0c1" }
+zeth-chainspec = { git = "https://github.com/boundless-xyz/zeth.git", rev = "db4c2d45233b59bdd2a85fcb7f9d36a12bebe0c1" }
 # zeth-core = { path = "../../../../rsp/crates/executor/client" }
 
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.12.0" }
@@ -25,6 +25,7 @@ ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.12.0" 
 [patch.crates-io]
 sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha2-0.10.9-zisk-0.12.0" }
 sha3 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha3-0.10.8-zisk-0.12.0" }
+tiny-keccak ={ git = "https://github.com/0xPolygonHermez/zisk-patch-tiny-keccak.git", branch = "zisk" }
 k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", tag = "patch-k256-0.13.4-zisk-0.12.0" }
 # bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", tag = "patch-0.6.0-zisk-0.12.0", package = "substrate-bn" }
 # KZG Precompile
@@ -36,7 +37,6 @@ ark-ec = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git"
 ark-ff = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
 ark-bn254 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
 ark-serialize  = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
-tiny-keccak ={ git = "https://github.com/0xPolygonHermez/zisk-patch-tiny-keccak.git", branch = "zisk" }
 # Local development
 # sha2 = { path = "../../../../zisk-patch-sha2/sha2" }
 # sha3 = { path = "../../../../zisk-patch-sha3/sha3" }
