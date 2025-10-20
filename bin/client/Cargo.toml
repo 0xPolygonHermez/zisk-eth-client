@@ -30,13 +30,15 @@ bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", tag = "patc
 # KZG Precompile
 kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg.git", tag = "patch-0.2.7-zisk-0.12.0" }
 sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", tag = "patch-0.8.0-zisk-0.12.0" }
-# # BLS12-381 Precompiles
+# BLS12-381 Precompiles
 ark-bls12-381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
 ark-ec = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
 ark-ff = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
 ark-bn254 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
 ark-serialize  = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
-# Local development
+# Modexp
+modexp = { git = "https://github.com/0xPolygonHermez/zisk-patch-modexp.git", tag = "patch-1.2.0-zisk-0.13.0", package = "aurora-engine-modexp" }
+# # Local development
 # sha2 = { path = "../../../zisk-patch-sha2/sha2" }
 # sha3 = { path = "../../../zisk-patch-sha3/sha3" }
 # k256 = { path = "../../../zisk-patch-k256/k256" }
@@ -50,3 +52,6 @@ ark-serialize  = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-alge
 # ark-ff = { path = "../../../zisk-patch-ark-algebra/ff" }
 # ark-bn254 = { path = "../../../zisk-patch-ark-algebra/curves/bn254" }
 # ark-serialize = { path = "../../../zisk-patch-ark-algebra/serialize" }
+# # Modexp
+# modexp = { path = "../../../zisk-patch-modexp/engine-modexp", package = "aurora-engine-modexp" }
+
