@@ -1,6 +1,6 @@
 use alloy_consensus::{private::serde};
 use alloy::{rpc::types::debug::ExecutionWitness};
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
 use async_trait::async_trait;
 use k256::ecdsa::VerifyingKey;
@@ -52,27 +52,29 @@ where
 #[async_trait]
 impl InputGenerator for ZethInputGenerator {
     async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
+        let start_rpc_connect = std::time::Instant::now();
         let provider = ProviderBuilder::new().connect(self.config.rpc_url.as_str()).await?;
+        let time_rpc_connect = start_rpc_connect.elapsed();
 
-        // First, get the block header to determine the canonical hash for caching.
-        let header = provider
-            .get_block(block_number.into())
-            .await?
-            .ok_or_else(|| anyhow!("block {} not found", block_number))?
-            .header;
-
-        // let (input, _) = processor.create_input(header.hash).await?;
-
-        let block_id = header.hash.into();
+        let start_block_fetch = std::time::Instant::now();
         let rpc_block = provider
-            .get_block(block_id)
+            .get_block(block_number.into())
             .full()
             .await?
-            .with_context(|| format!("block {block_id} not found"))?;
-        let witness = provider.debug_execution_witness(rpc_block.number().into()).await?;
-        let block = reth_ethereum_primitives::Block::from(rpc_block);
-        let signers = recover_signers(block.body.transactions())?;
+            .with_context(|| format!("block {block_number} not found"))?;
+        let time_block_fetch = start_block_fetch.elapsed();
 
+        let start_witness_fetch = std::time::Instant::now();
+        let witness = provider.debug_execution_witness(rpc_block.number().into()).await?;
+        let time_witness_fetch = start_witness_fetch.elapsed();
+
+        let block = reth_ethereum_primitives::Block::from(rpc_block);
+
+        let start_recover_signers = std::time::Instant::now();
+        let signers = recover_signers(block.body.transactions())?;
+        let time_recover_signers = start_recover_signers.elapsed();
+
+        let start_serialize_input = std::time::Instant::now();
         let input = Input {
             block,
             signers,
@@ -86,6 +88,15 @@ impl InputGenerator for ZethInputGenerator {
 
         let input_bytes = bincode::serialize(&input)
             .expect("Failed to serialize input");
+        let time_serialize_input = start_serialize_input.elapsed();
+
+        println!("input generation timings for block {block_number}: rpc connect: {:?}, block fetch: {:?}, witness fetch: {:?}, recover signers: {:?}, serialize input: {:?}",
+            time_rpc_connect,
+            time_block_fetch,
+            time_witness_fetch,
+            time_recover_signers,
+            time_serialize_input,
+        );
 
         Ok(InputGeneratorResult {
             input: input_bytes,
