@@ -3,16 +3,7 @@ use std::{path::PathBuf};
 use tracing_subscriber::{
     filter::EnvFilter, fmt, prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt,
 };
-use url::Url;
-
-mod types;
-mod rsp;
-mod zeth;
-use types::{GuestProgram, InputGenerator, Network};
-use rsp::RspInputGenerator;
-use zeth::ZethInputGenerator;
-
-use crate::types::InputGeneratorConfig;
+use input::{build_input_generator, GuestProgram, Network};
 
 #[derive(Debug, Clone, Parser)]
 pub struct InputGenArgs {
@@ -32,20 +23,6 @@ pub struct InputGenArgs {
     pub input_dir: Option<PathBuf>,
 }
 
-pub fn make_input_generator(args: &InputGenArgs) -> Box<dyn InputGenerator> {
-    let config = InputGeneratorConfig {
-        guest: args.guest.clone(),
-        rpc_url: Url::parse(&args.rpc_url).expect("Invalid RPC URL"),
-        network: args.network.clone(),
-        input_dir: args.input_dir.clone(),
-    };
-
-    match args.guest {
-        GuestProgram::Rsp => Box::new(RspInputGenerator::new(config)),
-        GuestProgram::Zeth => Box::new(ZethInputGenerator::new(config)),
-    }
-}
-
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // Initialize the environment variables.
@@ -63,9 +40,9 @@ async fn main() -> anyhow::Result<()> {
 
     // Parse the command line arguments.
     let args = InputGenArgs::parse();
-    let input_generator = make_input_generator( &args);
+    let input_generator = build_input_generator(args.guest.clone(), &args.rpc_url, args.network.clone(), args.input_dir.clone());
 
-    println!("Generating input file fo block {}, guest: {}", args.block_number, args.guest);
+    println!("Generating input file for block {}, guest: {}", args.block_number, args.guest);
 
     let start_time = std::time::Instant::now();
     let result = input_generator.generate(args.block_number).await?;

@@ -1,5 +1,5 @@
 [workspace]
-members = ["bin/input-gen"]
+members = ["bin/input-gen", "crates/input"]
 exclude = []
 resolver = "2"
 
@@ -35,7 +35,7 @@ tracing-subscriber = "0.3.18"
 url = "2.3"
 
 rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "be2fe1274414a33cab9adb68825dc2eb029c7a4a" }
-rsp-host-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "be2fe1274414a33cab9adb68825dc2eb029c7a4a" }
+rsp-host-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "be2fe1274414a33cab9adb68825dc2eb029c7a4a", features = ["execution-witness"] }
 rsp-primitives = { git = "https://github.com/succinctlabs/rsp.git", rev = "be2fe1274414a33cab9adb68825dc2eb029c7a4a" }
 rsp-provider = { git = "https://github.com/succinctlabs/rsp.git", rev = "be2fe1274414a33cab9adb68825dc2eb029c7a4a" }
 # zeth-host = { git = "https://github.com/boundless-xyz/zeth.git", rev = "db4c2d45233b59bdd2a85fcb7f9d36a12bebe0c1" }
