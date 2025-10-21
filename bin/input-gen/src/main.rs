@@ -1,8 +1,5 @@
 use clap::Parser;
 use std::{io::Write, path::PathBuf};
-use tracing_subscriber::{
-    filter::EnvFilter, fmt, prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt,
-};
 use input::{build_input_generator, GuestProgram, Network};
 
 #[derive(Debug, Clone, Parser)]
@@ -31,12 +28,6 @@ async fn main() -> anyhow::Result<()> {
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
     }
-
-    // Initialize the logger.
-    tracing_subscriber::registry()
-        .with(fmt::layer())
-        .with(EnvFilter::from_default_env())
-        .init();
 
     // Parse the command line arguments.
     let args = InputGenArgs::parse();

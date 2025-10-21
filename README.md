@@ -11,9 +11,11 @@ It allows you to build, run, and test Ethereum block execution inside the ZisK e
 
 ## Build the Client ELF
 
-There are tu guest client implementations: `zec-rsp-client` based on [RSP](https://github.com/succinctlabs/rsp) and `zec-zeth-client` based on [Zeth](https://github.com/boundless-xyz/zeth)
+There are two guest client implementations:
+- `zec-rsp-client`, based on [RSP](https://github.com/succinctlabs/rsp)
+- `zec-zeth-client`, based on [Zeth](https://github.com/boundless-xyz/zeth)
 
-To build `zec-rsp-client` ELF binary:
+### Build `zec-rsp-client`:
 ```bash
 cd bin/client/rsp
 cargo-zisk build --release
@@ -24,7 +26,7 @@ The compiled ELF will be generated at:
 ./target/riscv64ima-zisk-zkvm-elf/release/zec-rsp-client
 ```
 
-To build `zec-zeth-client` ELF binary:
+### Build `zec-zeth-client`:
 ```bash
 cd bin/client/zeth
 cargo-zisk build --release
@@ -53,14 +55,14 @@ ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-rsp-client -i ./inputs/2
 
 To generate your own input files, you can use the `input-gen` tool.
 
-Example: generate input file for block `22767493` for `zec-rsp-client` guest program:
+Example: generate an input file for block `22767493` for the `zec-rsp-client` guest program:
 ```bash
 cargo run --release -- -b 22767493 -g rsp -r <RPC_URL>
 ```
 Replace `<RPC_URL>` with the URL of an Ethereum Mainnet RPC endpoint.
-To generate the input file for `zec-zeth-client` guest program use `-g zeth`.
+To generate the input file for the `zec-zeth-client`, use `-g zeth`.
 
-The command will create a file named `22767493_xxx_yy_ggg.bin` in the `inputs` folder (by default), where:
+The command will create a file named `22767493_xxx_yy_ggg.bin` in the default `inputs` folder, where:
 - `xxx` is the number of transactions in the block
 - `yy` is the gas used in megagas (MGas)
 - `ggg` is the guest program

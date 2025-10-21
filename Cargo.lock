@@ -3712,7 +3712,7 @@ dependencies = [
 
 [[package]]
 name = "input"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "alloy",
  "alloy-consensus",
@@ -3738,13 +3738,12 @@ dependencies = [
  "serde_json",
  "serde_with",
  "tokio",
- "tracing-subscriber",
  "url",
 ]
 
 [[package]]
 name = "input-gen"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "alloy",
  "alloy-consensus",
@@ -3770,7 +3769,6 @@ dependencies = [
  "serde_json",
  "serde_with",
  "tokio",
- "tracing-subscriber",
  "url",
 ]
 
