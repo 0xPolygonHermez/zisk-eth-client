@@ -4119,6 +4119,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "zec-zeth-client"
+version = "0.4.0"
+dependencies = [
+ "bincode",
+ "zeth-chainspec",
+ "zeth-core",
+ "ziskos",
+]
+
+[[package]]
 name = "zerocopy"
 version = "0.8.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4215,7 +4225,7 @@ dependencies = [
 [[package]]
 name = "zeth-chainspec"
 version = "0.3.0"
-source = "git+https://github.com/boundless-xyz/zeth.git#db4c2d45233b59bdd2a85fcb7f9d36a12bebe0c1"
+source = "git+https://github.com/boundless-xyz/zeth.git?rev=db4c2d45233b59bdd2a85fcb7f9d36a12bebe0c1#db4c2d45233b59bdd2a85fcb7f9d36a12bebe0c1"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4230,7 +4240,7 @@ dependencies = [
 [[package]]
 name = "zeth-core"
 version = "0.3.0"
-source = "git+https://github.com/boundless-xyz/zeth.git#db4c2d45233b59bdd2a85fcb7f9d36a12bebe0c1"
+source = "git+https://github.com/boundless-xyz/zeth.git?rev=db4c2d45233b59bdd2a85fcb7f9d36a12bebe0c1#db4c2d45233b59bdd2a85fcb7f9d36a12bebe0c1"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
@@ -4249,16 +4259,6 @@ dependencies = [
  "risc0-ethereum-trie",
  "serde",
  "serde_with",
-]
-
-[[package]]
-name = "zisk-eth-client"
-version = "0.3.0"
-dependencies = [
- "bincode",
- "zeth-chainspec",
- "zeth-core",
- "ziskos",
 ]
 
 [[package]]
