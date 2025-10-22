@@ -19,7 +19,7 @@ rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "
 
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/ziskos-patch" }
 # Local development
-# ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
+# ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
 sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha2-0.10.9-zisk-0.12.0" }
@@ -35,7 +35,7 @@ ark-ec = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git"
 ark-ff = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
 ark-bn254 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
 ark-serialize  = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.12.0" }
-# Local development
+# # Local development
 # sha2 = { path = "../../../../zisk-patch-sha2/sha2" }
 # sha3 = { path = "../../../../zisk-patch-sha3/sha3" }
 # k256 = { path = "../../../../zisk-patch-k256/k256" }
