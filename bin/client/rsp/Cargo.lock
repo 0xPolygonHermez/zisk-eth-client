@@ -601,7 +601,7 @@ dependencies = [
  "num-bigint 0.4.6",
  "num-traits",
  "zeroize",
- "ziskos",
+ "ziskos 0.12.0 (git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.12.0)",
 ]
 
 [[package]]
@@ -1870,7 +1870,7 @@ dependencies = [
 [[package]]
 name = "k256"
 version = "0.13.4"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git?tag=patch-k256-0.13.4-zisk-0.12.0#e54470ba6e00d8ed43a9182830cb38457a7c7517"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git?tag=patch-k256-0.13.4-zisk-0.13.0#cd81b01c1a1edb7a89d2791d10e35dd1c674fb40"
 dependencies = [
  "cfg-if",
  "ecdsa",
@@ -1878,7 +1878,7 @@ dependencies = [
  "once_cell",
  "serdect",
  "sha2",
- "ziskos",
+ "ziskos 0.12.0 (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.12.0)",
 ]
 
 [[package]]
@@ -1912,7 +1912,7 @@ dependencies = [
  "sha2",
  "sp1_bls12_381",
  "spin",
- "ziskos",
+ "ziskos 0.12.0 (git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.12.0)",
 ]
 
 [[package]]
@@ -1928,6 +1928,16 @@ dependencies = [
 name = "lib-c"
 version = "0.12.0"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.12.0#5104c56c4736f99e1a3e809511e41ed6306a7db5"
+
+[[package]]
+name = "lib-c"
+version = "0.12.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.12.0#7c39d1aeda2a4650823514c2870069ef9aa972bf"
+
+[[package]]
+name = "lib-c"
+version = "0.13.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fziskos-patch#ccb7a1454c1a3762e6f15e46e170d81c4fbd03ac"
 
 [[package]]
 name = "libc"
@@ -3615,7 +3625,7 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest 0.10.7",
- "ziskos",
+ "ziskos 0.12.0 (git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.12.0)",
 ]
 
 [[package]]
@@ -3711,7 +3721,7 @@ dependencies = [
  "rand_core 0.6.4",
  "sp1-lib",
  "subtle",
- "ziskos",
+ "ziskos 0.12.0 (git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.12.0)",
 ]
 
 [[package]]
@@ -3772,14 +3782,14 @@ dependencies = [
 [[package]]
 name = "substrate-bn"
 version = "0.6.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-bn.git?tag=patch-0.6.0-zisk-0.12.0#f7f75e7cbe4fce224ee52ce61c6ed2583f193b6a"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-bn.git?tag=patch-0.6.0-zisk-0.13.0#9799577c5d5d702d143d66342218a88fd5ba4ca8"
 dependencies = [
  "byteorder",
  "crunchy",
  "lazy_static",
  "rand 0.8.5",
  "rustc-hex",
- "ziskos",
+ "ziskos 0.12.0 (git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.12.0)",
 ]
 
 [[package]]
@@ -4300,7 +4310,7 @@ version = "0.4.0"
 dependencies = [
  "bincode",
  "rsp-client-executor",
- "ziskos",
+ "ziskos 0.13.0",
 ]
 
 [[package]]
@@ -4405,7 +4415,39 @@ dependencies = [
  "cfg-if",
  "getrandom 0.2.16",
  "lazy_static",
- "lib-c",
+ "lib-c 0.12.0 (git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.12.0)",
+ "num-bigint 0.4.6",
+ "num-traits",
+ "rand 0.8.5",
+ "static_assertions",
+ "tiny-keccak",
+]
+
+[[package]]
+name = "ziskos"
+version = "0.12.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.12.0#7c39d1aeda2a4650823514c2870069ef9aa972bf"
+dependencies = [
+ "cfg-if",
+ "getrandom 0.2.16",
+ "lazy_static",
+ "lib-c 0.12.0 (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.12.0)",
+ "num-bigint 0.4.6",
+ "num-traits",
+ "rand 0.8.5",
+ "static_assertions",
+ "tiny-keccak",
+]
+
+[[package]]
+name = "ziskos"
+version = "0.13.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fziskos-patch#ccb7a1454c1a3762e6f15e46e170d81c4fbd03ac"
+dependencies = [
+ "cfg-if",
+ "getrandom 0.2.16",
+ "lazy_static",
+ "lib-c 0.13.0",
  "num-bigint 0.4.6",
  "num-traits",
  "rand 0.8.5",
