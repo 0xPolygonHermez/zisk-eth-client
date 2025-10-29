@@ -30,3 +30,7 @@ tokio.workspace = true
 url.workspace = true
 reth-ethereum-primitives.workspace = true
 reth-primitives-traits.workspace = true
+
+[features]
+default = []
+execution-witness = ["rsp-host-executor/execution-witness"]

@@ -35,7 +35,7 @@ tokio = { version = "1.21", default-features = false, features = [
 url = "2.3"
 
 rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "be2fe1274414a33cab9adb68825dc2eb029c7a4a" }
-rsp-host-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "be2fe1274414a33cab9adb68825dc2eb029c7a4a", features = ["execution-witness"] }
+rsp-host-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "be2fe1274414a33cab9adb68825dc2eb029c7a4a" }
 rsp-primitives = { git = "https://github.com/succinctlabs/rsp.git", rev = "be2fe1274414a33cab9adb68825dc2eb029c7a4a" }
 rsp-provider = { git = "https://github.com/succinctlabs/rsp.git", rev = "be2fe1274414a33cab9adb68825dc2eb029c7a4a" }
 reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth.git", tag = "v1.7.0", features = ["serde", "serde-bincode-compat"] }
