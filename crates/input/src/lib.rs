@@ -10,7 +10,7 @@ use crate::{rsp::RspInputGenerator, zeth::ZethInputGenerator};
 
 // Re-export the important types so other workspace crates can use them.
 
-pub fn build_input_generator(guest: GuestProgram, rpc_url: &str, network: Option<Network>) -> Box<dyn InputGenerator> {
+pub fn build_input_generator(guest: GuestProgram, rpc_url: &str, network: Network) -> Box<dyn InputGenerator> {
     let config = InputGeneratorConfig {
         guest: guest.clone(),
         rpc_url: Url::parse(rpc_url).expect("Invalid RPC URL"),

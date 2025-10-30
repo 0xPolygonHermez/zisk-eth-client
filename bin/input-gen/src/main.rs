@@ -7,13 +7,13 @@ pub struct InputGenArgs {
     #[clap(long, short)]
     pub block_number: u64,
 
-    #[clap(long, short, value_enum)]
-    pub network: Option<Network>,
+    #[clap(long, short, value_enum, default_value_t = Network::Mainnet)]
+    pub network: Network,
 
     #[clap(long, short)]
     pub rpc_url: String,
 
-    #[clap(long, short)]
+    #[clap(long, short, value_enum, default_value_t = GuestProgram::Rsp)]
     pub guest: GuestProgram,
 
     #[clap(long, short)]
@@ -44,11 +44,13 @@ async fn main() -> anyhow::Result<()> {
         std::fs::create_dir_all(&input_folder)?;
     }
 
+    let mgas = result.gas_used / 1_000_000;
+
     let input_path = input_folder.join(format!(
         "{}_{}_{}_{}.bin",
         args.block_number,
         result.tx_count,
-        result.gas_used,
+        mgas,
         args.guest
     ));
 
@@ -59,7 +61,7 @@ async fn main() -> anyhow::Result<()> {
         "Input file for block {} ({} txs, {} mgas) saved to {}, time: {} ms",
         args.block_number,
         result.tx_count,
-        (result.gas_used + 999_999) / 1_000_000,
+        mgas,
         input_path.to_string_lossy(),
         start_time.elapsed().as_millis()
     );
