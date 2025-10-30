@@ -28,7 +28,7 @@ k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.gi
 bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", tag = "patch-0.6.0-zisk-0.13.0", package = "substrate-bn" }
 # KZG Precompile
 kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg.git", tag = "patch-0.2.7-zisk-0.13.0" }
-sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", tag = "patch-0.8.0-zisk-0.11.0" }
+sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", tag = "patch-0.8.0-zisk-0.13.0" }
 # BLS12-381 Precompiles
 ark-bls12-381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.13.0" }
 ark-ec = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.13.0" }
