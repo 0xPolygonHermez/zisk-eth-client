@@ -1,43 +1,76 @@
 # Zisk Ethereum Client
 
-## Build the ELF File
+An experimental Ethereum execution client built for the ZisK zkVM.
+It allows you to build, run, and test Ethereum block execution inside the ZisK emulator.
 
-To build the `zisk-eth-client` ELF file, run the following commands:
+## Prerequisites
 
+- [Rust](https://www.rust-lang.org/tools/install) (latest stable recommended).
+- [cargo-zisk](https://0xpolygonhermez.github.io/zisk/getting_started/installation.html) (ZisK’s Cargo wrapper).
+- A working Ethereum RPC endpoint (e.g. Infura, Alchemy, or your own node) for input generation.
+
+## Build the Client ELF
+
+There are two guest client implementations:
+- `zec-rsp`, based on [RSP](https://github.com/succinctlabs/rsp)
+- `zec-zeth`, based on [Zeth](https://github.com/boundless-xyz/zeth)
+
+**Note:** We recommend using the `zec-rsp` guest client, as `zec-zeth`client is still a work in progress and doesn’t yet include all precompile patches.
+
+### Build `zec-rsp`:
 ```bash
-cd bin/client
+cd bin/client/rsp
 cargo-zisk build --release
 ```
 
-This will generate the ELF file at the following path:  
-`./target/riscv64ima-zisk-zkvm-elf/release/zisk-eth-client`
-
-## Execute
-
-Inside the `data` folder, you will find sample input files for Ethereum blocks. To execute a specific block in the Zisk emulator, run one of the following commands:
-
+The compiled ELF will be generated at:
 ```bash
-cargo-zisk run --release -i ./inputs/22767493_185_14.bin
+./target/riscv64ima-zisk-zkvm-elf/release/zec-rsp
 ```
 
-or
-
+### Build `zec-zeth`:
 ```bash
-ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-eth-client -i ./inputs/22767493_185_14.bin
+cd bin/client/zeth
+cargo-zisk build --release
+```
+
+The compiled ELF will be generated at:
+```bash
+./target/riscv64ima-zisk-zkvm-elf/release/zec-zeth
+```
+
+### Execute Ethereum Blocks
+
+Sample input files for Ethereum blocks are provided in the `inputs` folder of each client.
+
+To run a block in the ZisK emulator, use:
+```bash
+cargo-zisk run --release -i ./inputs/23583300_208_18_rsp.bin
+```
+
+Or, directly via the `ziskemu` tool:
+```bash
+ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-rsp -i ./inputs/23583300_208_18_rsp.bin
 ```
 
 ## Generate Input Block Files
 
-To generate input files for additional Ethereum blocks, you can use the `input-gen` tool. For example, to generate an input file for block `22075730`, run:
+To generate your own input files, you can use the `input-gen` tool.
 
+Example: generate an input file for block `23583300` for the `zec-rsp` guest program:
 ```bash
-cargo run --release --bin=input-gen -- -b 22075730 -r <RPC_URL>
+cargo build --release
+target/release/input-gen -b 22767493 -g rsp -r <RPC_URL>
 ```
+Replace `<RPC_URL>` with the URL of an Ethereum Mainnet RPC endpoint.
+To generate the input file for the `zec-zeth`, use `-g zeth`.
 
-Replace `<RPC_URL>` with the URL of an Ethereum Mainnet RPC node.
-
-The command will create a file named `22075730_xxx_yy.bin` in the `input` folder (by default), where:
-- `xxx` is the number of transactions in the block  
+The command will create a file named `23583300_xxx_yy_ggg.bin` in the default `inputs` folder, where:
+- `xxx` is the number of transactions in the block
 - `yy` is the gas used in megagas (MGas)
+- `ggg` is the guest program
 
-To specify a different output folder, use the `-i` flag.
+To place the file elsewhere, use the `-i` flag:
+```bash
+target/release/input-gen -b 22767493 -g rsp -r <RPC_URL> -i ./bin/client/rsp/inputs
+```

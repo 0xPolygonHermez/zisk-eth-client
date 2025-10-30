@@ -1,36 +1,27 @@
-use clap::{Parser, ValueEnum};
-use rsp_host_executor::EthHostExecutor;
-use rsp_primitives::genesis::Genesis;
-use rsp_provider::create_provider;
-use rsp_rpc_db::RpcDb;
-use std::{path::PathBuf, sync::Arc};
-use tracing_subscriber::{
-    filter::EnvFilter, fmt, prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt,
-};
-use url::Url;
+use clap::Parser;
+use std::{io::Write, path::PathBuf};
+use input::{build_input_generator, GuestProgram, Network};
 
-#[derive(Debug, Clone, ValueEnum)]
-pub enum Network {
-    Mainnet,
-    Sepolia,
-}
 #[derive(Debug, Clone, Parser)]
 pub struct InputGenArgs {
     #[clap(long, short)]
     pub block_number: u64,
 
-    #[clap(long, short, value_enum)]
-    pub network: Option<Network>,
+    #[clap(long, short, value_enum, default_value_t = Network::Mainnet)]
+    pub network: Network,
 
     #[clap(long, short)]
     pub rpc_url: String,
+
+    #[clap(long, short, value_enum, default_value_t = GuestProgram::Rsp)]
+    pub guest: GuestProgram,
 
     #[clap(long, short)]
     pub input_dir: Option<PathBuf>,
 }
 
 #[tokio::main]
-async fn main() -> eyre::Result<()> {
+async fn main() -> anyhow::Result<()> {
     // Initialize the environment variables.
     dotenv::dotenv().ok();
 
@@ -38,71 +29,38 @@ async fn main() -> eyre::Result<()> {
         std::env::set_var("RUST_LOG", "info");
     }
 
-    // Initialize the logger.
-    tracing_subscriber::registry()
-        .with(fmt::layer())
-        .with(EnvFilter::from_default_env())
-        .init();
-
-    // Parse the command line arguments.    
+    // Parse the command line arguments.
     let args = InputGenArgs::parse();
+    let input_generator = build_input_generator(args.guest.clone(), &args.rpc_url, args.network.clone());
 
-    println!("Generating input file fo block {}", args.block_number);
+    println!("Generating input file for block {}, guest: {}", args.block_number, args.guest);
 
-    // Create the RPC provider and database.
-    let provider = create_provider(
-        Url::parse(args.rpc_url.as_str())
-            .expect("Invalid RPC URL"),
-    );
-    let rpc_db = RpcDb::new(provider.clone(), args.block_number - 1);
-    let genesis = match args.network {
-        Some(Network::Mainnet) => {
-            Genesis::Mainnet
-        }
-        Some(Network::Sepolia) => {
-            Genesis::Sepolia
-        }
-        None => {
-            Genesis::Mainnet
-        }
-    };
-
-    let executor = EthHostExecutor::eth(
-        Arc::new(
-            (&genesis).try_into().expect("Failed to convert genesis block into the required type"),
-        ),
-        None,
-    );
-    
     let start_time = std::time::Instant::now();
-
-    let input = executor
-        .execute(args.block_number, &rpc_db, &provider, genesis.clone(), None, false)
-        .await
-        .expect("Failed to execute client");
+    let result = input_generator.generate(args.block_number).await?;
 
     // Create the input directory if it does not exist.
-    let input_folder = args.input_dir.unwrap_or("inputs".into());
+    let input_folder = args.input_dir.clone().unwrap_or("inputs".into());
     if !input_folder.exists() {
         std::fs::create_dir_all(&input_folder)?;
     }
 
-    // Save the input to a file
-    let mgas = (input.current_block.header.gas_used + 999_999) / 1_000_000;
-    let input_path = input_folder.join(format!(
-        "{}_{}_{}.bin",
-        args.block_number,
-        input.current_block.body.transactions.len(),
-        mgas
-    ));
-    let mut cache_file = std::fs::File::create(&input_path)?;
+    let mgas = result.gas_used / 1_000_000;
 
-    bincode::serialize_into(&mut cache_file, &input)?;
+    let input_path = input_folder.join(format!(
+        "{}_{}_{}_{}.bin",
+        args.block_number,
+        result.tx_count,
+        mgas,
+        args.guest
+    ));
+
+    let mut input_file = std::fs::File::create(&input_path)?;
+    input_file.write_all(&result.input)?;
 
     println!(
         "Input file for block {} ({} txs, {} mgas) saved to {}, time: {} ms",
         args.block_number,
-        input.current_block.body.transactions.len(),
+        result.tx_count,
         mgas,
         input_path.to_string_lossy(),
         start_time.elapsed().as_millis()
