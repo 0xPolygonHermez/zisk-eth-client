@@ -19,7 +19,7 @@ pub enum GuestProgram {
 pub struct InputGeneratorConfig {
     pub guest: GuestProgram,
     pub rpc_url: Url,
-    pub network: Option<Network>,
+    pub network: Network,
 }
 
 pub struct InputGeneratorResult {

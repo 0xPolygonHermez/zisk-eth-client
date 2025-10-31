@@ -24,14 +24,11 @@ impl InputGenerator for RspInputGenerator {
         let provider = create_provider(self.config.rpc_url.clone());
 
         let genesis = match self.config.network {
-            Some(Network::Mainnet) => {
+            Network::Mainnet => {
                 Genesis::Mainnet
             }
-            Some(Network::Sepolia) => {
+            Network::Sepolia => {
                 Genesis::Sepolia
-            }
-            None => {
-                Genesis::Mainnet
             }
         };
 
