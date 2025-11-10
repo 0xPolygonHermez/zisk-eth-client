@@ -3,10 +3,10 @@ ziskos::entrypoint!(main);
 
 use zeth_core::{Input, EthEvmConfig, validate_block};
 use zeth_chainspec::MAINNET;
-use ziskos::{read_input, set_output};
+use ziskos::{read_input_slice, set_output};
 
 fn main() {
-    let input = read_input();
+    let input = read_input_slice();
 
     let input = bincode::deserialize::<Input>(&input).unwrap();
     let block_number = input.block.header.number;
