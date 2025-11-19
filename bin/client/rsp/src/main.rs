@@ -3,10 +3,10 @@ ziskos::entrypoint!(main);
 
 use rsp_client_executor::{executor::EthClientExecutor, io::EthClientExecutorInput};
 use std::sync::Arc;
-use ziskos::{read_input, set_output};
+use ziskos::{read_input_slice, set_output};
 
 fn main() {
-    let input = read_input();
+    let input = read_input_slice();
 
     let input = bincode::deserialize::<EthClientExecutorInput>(&input).unwrap();
     let block_number = input.current_block.number;
