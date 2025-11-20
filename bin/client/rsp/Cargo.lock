@@ -57,7 +57,6 @@ dependencies = [
  "alloy-trie",
  "alloy-tx-macros",
  "auto_impl",
- "borsh",
  "c-kzg",
  "derive_more",
  "either",
@@ -138,7 +137,6 @@ dependencies = [
  "alloy-rlp",
  "alloy-serde",
  "auto_impl",
- "borsh",
  "c-kzg",
  "derive_more",
  "either",
@@ -175,7 +173,6 @@ dependencies = [
  "alloy-primitives",
  "alloy-serde",
  "alloy-trie",
- "borsh",
  "serde",
  "serde_with",
 ]
@@ -1931,14 +1928,16 @@ dependencies = [
 [[package]]
 name = "kzg-rs"
 version = "0.2.7"
-source = "git+https://github.com/succinctlabs/kzg-rs#15bdc9bfdb31859acd4e7a6558f84fae5eab71c8"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-kzg.git?tag=patch-0.2.7-zisk-0.13.0#38b45ee086c73b71be9856ab15d0d5da3f9f95bd"
 dependencies = [
+ "cfg-if",
  "ff",
  "hex",
  "serde_arrays",
  "sha2",
  "sp1_bls12_381",
  "spin",
+ "ziskos",
 ]
 
 [[package]]
@@ -4449,8 +4448,3 @@ dependencies = [
  "cc",
  "pkg-config",
 ]
-
-[[patch.unused]]
-name = "kzg-rs"
-version = "0.2.7"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-kzg.git?tag=patch-0.2.7-zisk-0.13.0#38b45ee086c73b71be9856ab15d0d5da3f9f95bd"
