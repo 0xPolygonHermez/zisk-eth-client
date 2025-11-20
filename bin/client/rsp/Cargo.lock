@@ -3667,7 +3667,7 @@ dependencies = [
 [[package]]
 name = "sha3"
 version = "0.10.8"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-hashes.git?branch=fix%2Fbls#b43f91c7836de6879af5c310260d6dddcb0ce48e"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-hashes.git?tag=patch-sha3-0.10.8-zisk-0.14.0#c404b04f733ab18bf0d0f5540249e6120519cc3e"
 dependencies = [
  "digest 0.10.7",
  "keccak",
