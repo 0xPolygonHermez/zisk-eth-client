@@ -30,10 +30,7 @@ sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", branc
 sha3 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha3-0.10.8-zisk-0.14.0" }
 k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", branch = "fix/bls" }
 bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", branch = "fix/bls", package = "substrate-bn" }
-# # KZG Precompile
-# # kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg.git", tag = "patch-0.2.7-zisk-0.14.0" }
 sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", branch = "fix/bls" }
-# # BLS12-381 Precompiles
 ark-bls12-381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", branch = "fix/bls" }
 ark-ec = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", branch = "fix/bls" }
 ark-ff = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", branch = "fix/bls" }
