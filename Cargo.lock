@@ -6257,7 +6257,7 @@ dependencies = [
 [[package]]
 name = "rsp-client-executor"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/rsp.git?rev=545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a#545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a"
+source = "git+https://github.com/succinctlabs/rsp.git?rev=12ad0292c702f22c8e3f99980e25ecac4a882854#12ad0292c702f22c8e3f99980e25ecac4a882854"
 dependencies = [
  "alloy-consensus",
  "alloy-evm",
@@ -6296,7 +6296,7 @@ dependencies = [
 [[package]]
 name = "rsp-host-executor"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/rsp.git?rev=545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a#545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a"
+source = "git+https://github.com/succinctlabs/rsp.git?rev=12ad0292c702f22c8e3f99980e25ecac4a882854#12ad0292c702f22c8e3f99980e25ecac4a882854"
 dependencies = [
  "alloy-chains",
  "alloy-consensus",
@@ -6337,7 +6337,7 @@ dependencies = [
 [[package]]
 name = "rsp-mpt"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/rsp.git?rev=545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a#545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a"
+source = "git+https://github.com/succinctlabs/rsp.git?rev=12ad0292c702f22c8e3f99980e25ecac4a882854#12ad0292c702f22c8e3f99980e25ecac4a882854"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -6352,7 +6352,7 @@ dependencies = [
 [[package]]
 name = "rsp-primitives"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/rsp.git?rev=545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a#545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a"
+source = "git+https://github.com/succinctlabs/rsp.git?rev=12ad0292c702f22c8e3f99980e25ecac4a882854#12ad0292c702f22c8e3f99980e25ecac4a882854"
 dependencies = [
  "alloy-eips",
  "alloy-genesis",
@@ -6371,7 +6371,7 @@ dependencies = [
 [[package]]
 name = "rsp-provider"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/rsp.git?rev=545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a#545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a"
+source = "git+https://github.com/succinctlabs/rsp.git?rev=12ad0292c702f22c8e3f99980e25ecac4a882854#12ad0292c702f22c8e3f99980e25ecac4a882854"
 dependencies = [
  "alloy-json-rpc",
  "alloy-provider",
@@ -6383,7 +6383,7 @@ dependencies = [
 [[package]]
 name = "rsp-rpc-db"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/rsp.git?rev=545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a#545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a"
+source = "git+https://github.com/succinctlabs/rsp.git?rev=12ad0292c702f22c8e3f99980e25ecac4a882854#12ad0292c702f22c8e3f99980e25ecac4a882854"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
