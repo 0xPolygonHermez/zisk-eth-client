@@ -23,15 +23,15 @@ ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/bl
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
-sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", branch = "fix/bls" }
-sha3 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", branch = "fix/bls" }
+# sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", branch = "fix/bls" }
+# sha3 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", branch = "fix/bls" }
 tiny-keccak ={ git = "https://github.com/0xPolygonHermez/zisk-patch-tiny-keccak.git", branch = "zisk" }
 k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", branch = "fix/bls" }
-# bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", tag = "patch-0.6.0-zisk-0.14.0", package = "substrate-bn" }
-# KZG Precompile
-# kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg.git", tag = "patch-0.2.7-zisk-0.14.0" }
-# sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", tag = "patch-0.8.0-zisk-0.14.0" }
-# # BLS12-381 Precompiles
+# # bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", tag = "patch-0.6.0-zisk-0.14.0", package = "substrate-bn" }
+# # KZG Precompile
+# # kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg.git", tag = "patch-0.2.7-zisk-0.14.0" }
+# # sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", tag = "patch-0.8.0-zisk-0.14.0" }
+# # # BLS12-381 Precompiles
 ark-bls12-381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", branch = "fix/bls" }
 ark-ec = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", branch = "fix/bls" }
 ark-ff = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", branch = "fix/bls" }
