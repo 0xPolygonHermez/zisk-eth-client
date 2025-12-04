@@ -38,5 +38,6 @@ rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "
 rsp-host-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "12ad0292c702f22c8e3f99980e25ecac4a882854" }
 rsp-primitives = { git = "https://github.com/succinctlabs/rsp.git", rev = "12ad0292c702f22c8e3f99980e25ecac4a882854" }
 rsp-provider = { git = "https://github.com/succinctlabs/rsp.git", rev = "12ad0292c702f22c8e3f99980e25ecac4a882854" }
-reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth.git", tag = "v1.9.1", features = ["serde", "serde-bincode-compat"] }
-reth-primitives-traits = { git = "https://github.com/paradigmxyz/reth.git", tag = "v1.9.1", features = ["serde", "serde-bincode-compat"] }
+reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth.git", tag = "v1.9.3", features = ["serde", "serde-bincode-compat"] }
+reth-primitives-traits = { git = "https://github.com/paradigmxyz/reth.git", tag = "v1.9.3", features = ["serde", "serde-bincode-compat"] }
+reth-stateless = { git = "https://github.com/paradigmxyz/reth.git", tag = "v1.9.3" }

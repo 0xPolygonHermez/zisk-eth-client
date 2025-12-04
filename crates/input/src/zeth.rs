@@ -3,9 +3,9 @@ use alloy::{rpc::types::debug::ExecutionWitness};
 use anyhow::{Context, Result};
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
 use async_trait::async_trait;
-use k256::ecdsa::VerifyingKey;
 use rayon::prelude::*;
 use reth_ethereum_primitives::{Block, TransactionSigned};
+use reth_stateless::UncompressedPublicKey;
 
 use crate::types::{InputGenerator, InputGeneratorConfig, InputGeneratorResult};
 
@@ -20,7 +20,7 @@ pub struct Input {
     )]
     pub block: Block,
     /// List of signing public keys for each transaction in the block.
-    pub signers: Vec<VerifyingKey>,
+    pub signers: Vec<UncompressedPublicKey>,
     /// `ExecutionWitness` for the stateless validation function
     pub witness: ExecutionWitness,
 }
@@ -35,8 +35,9 @@ impl ZethInputGenerator {
     }
 }
 
+
 // /// Recovers the signing [`VerifyingKey`] from each transaction's signature.
-// pub fn recover_signers<'a, I>(txs: I) -> Result<Vec<VerifyingKey>>
+// pub fn recover_signers<'a, I>(txs: I) -> Result<Vec<UncompressedPublicKey>>
 // where
 //     I: IntoIterator<Item = &'a TransactionSigned>,
 // {
@@ -45,18 +46,28 @@ impl ZethInputGenerator {
 //         .map(|(i, tx)| {
 //             tx.signature()
 //                 .recover_from_prehash(&tx.signature_hash())
+//                 .map(|keys| {
+//                     UncompressedPublicKey(
+//                         keys.to_encoded_point(false).as_bytes().try_into().unwrap(),
+//                     )
+//                 })
 //                 .with_context(|| format!("failed to recover signature for tx #{i}"))
 //         })
 //         .collect::<Result<Vec<_>, _>>()
 // }
 
 // Recovers the signing [`VerifyingKey`] from each transaction's signature, in parallel.
-pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<VerifyingKey>> {
+pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<UncompressedPublicKey>> {
     txs.par_iter()
         .enumerate()
         .map(|(i, tx)| {
             tx.signature()
                 .recover_from_prehash(&tx.signature_hash())
+                .map(|keys| {
+                    UncompressedPublicKey(
+                        keys.to_encoded_point(false).as_bytes().try_into().unwrap(),
+                    )
+                })
                 .with_context(|| format!("failed to recover signature for tx #{i}"))
         })
         .collect()

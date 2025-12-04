@@ -30,6 +30,7 @@ tokio.workspace = true
 url.workspace = true
 reth-ethereum-primitives.workspace = true
 reth-primitives-traits.workspace = true
+reth-stateless.workspace = true
 
 [features]
 default = []

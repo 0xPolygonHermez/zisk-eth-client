@@ -60,7 +60,7 @@ To generate your own input files, you can use the `input-gen` tool.
 Example: generate an input file for block `23583300` for the `zec-rsp` guest program:
 ```bash
 cargo build --release
-target/release/input-gen -b 22767493 -g rsp -r <RPC_URL>
+target/release/input-gen -b 23583300 -g rsp -r <RPC_URL>
 ```
 Replace `<RPC_URL>` with the URL of an Ethereum Mainnet RPC endpoint.
 To generate the input file for the `zec-zeth`, use `-g zeth`.
