@@ -514,7 +514,6 @@ dependencies = [
 [[package]]
 name = "ark-bls12-381"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?branch=fix%2Fbls#19611466de35e2ffe16940445e94b84f9d372a91"
 dependencies = [
  "ark-ec",
  "ark-ff 0.5.0",
@@ -525,7 +524,6 @@ dependencies = [
 [[package]]
 name = "ark-bn254"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?branch=fix%2Fbls#19611466de35e2ffe16940445e94b84f9d372a91"
 dependencies = [
  "ark-ec",
  "ark-ff 0.5.0",
@@ -535,7 +533,6 @@ dependencies = [
 [[package]]
 name = "ark-ec"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?branch=fix%2Fbls#19611466de35e2ffe16940445e94b84f9d372a91"
 dependencies = [
  "ahash",
  "ark-ff 0.5.0",
@@ -593,7 +590,6 @@ dependencies = [
 [[package]]
 name = "ark-ff"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?branch=fix%2Fbls#19611466de35e2ffe16940445e94b84f9d372a91"
 dependencies = [
  "ark-ff-asm 0.5.0",
  "ark-ff-macros 0.5.0",
@@ -605,7 +601,7 @@ dependencies = [
  "num-bigint 0.4.6",
  "num-traits",
  "zeroize",
- "ziskos 0.14.0",
+ "ziskos",
 ]
 
 [[package]]
@@ -631,7 +627,6 @@ dependencies = [
 [[package]]
 name = "ark-ff-asm"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?branch=fix%2Fbls#19611466de35e2ffe16940445e94b84f9d372a91"
 dependencies = [
  "quote",
  "syn 2.0.111",
@@ -665,7 +660,6 @@ dependencies = [
 [[package]]
 name = "ark-ff-macros"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?branch=fix%2Fbls#19611466de35e2ffe16940445e94b84f9d372a91"
 dependencies = [
  "num-bigint 0.4.6",
  "num-traits",
@@ -677,7 +671,6 @@ dependencies = [
 [[package]]
 name = "ark-poly"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?branch=fix%2Fbls#19611466de35e2ffe16940445e94b84f9d372a91"
 dependencies = [
  "ahash",
  "ark-ff 0.5.0",
@@ -712,7 +705,6 @@ dependencies = [
 [[package]]
 name = "ark-serialize"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?branch=fix%2Fbls#19611466de35e2ffe16940445e94b84f9d372a91"
 dependencies = [
  "ark-serialize-derive",
  "ark-std 0.5.0",
@@ -724,7 +716,6 @@ dependencies = [
 [[package]]
 name = "ark-serialize-derive"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?branch=fix%2Fbls#19611466de35e2ffe16940445e94b84f9d372a91"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -790,12 +781,11 @@ dependencies = [
 [[package]]
 name = "aurora-engine-modexp"
 version = "1.2.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-modexp.git?branch=zisk-patch%2Fv1.2.0#ceb748aa3f78dcb68b73e55dc6a41ed95af1af5f"
 dependencies = [
  "cfg-if",
  "hex",
  "num",
- "ziskos 0.15.0",
+ "ziskos",
 ]
 
 [[package]]
@@ -1920,7 +1910,6 @@ dependencies = [
 [[package]]
 name = "k256"
 version = "0.13.4"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git?branch=fix%2Fbls#231626cf4cb98186958eb998dfa4b3e8c1d48801"
 dependencies = [
  "cfg-if",
  "ecdsa",
@@ -1928,7 +1917,7 @@ dependencies = [
  "once_cell",
  "serdect",
  "sha2",
- "ziskos 0.14.0",
+ "ziskos",
 ]
 
 [[package]]
@@ -1953,7 +1942,6 @@ dependencies = [
 [[package]]
 name = "kzg-rs"
 version = "0.2.7"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-kzg.git?branch=fix%2Fbls#7f5365bec9018216b12582b664ff192a48a7f8c1"
 dependencies = [
  "cfg-if",
  "ff",
@@ -1962,7 +1950,7 @@ dependencies = [
  "sha2",
  "sp1_bls12_381",
  "spin",
- "ziskos 0.14.0",
+ "ziskos",
 ]
 
 [[package]]
@@ -1976,13 +1964,7 @@ dependencies = [
 
 [[package]]
 name = "lib-c"
-version = "0.14.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fbls#2187fa73ba2240f38f13f2aa9644fdbf16e4a2f2"
-
-[[package]]
-name = "lib-c"
 version = "0.15.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fmodexp#db0b49f088c84aa4760bf2d287f05a75ad839fff"
 
 [[package]]
 name = "libc"
@@ -3385,8 +3367,6 @@ dependencies = [
 [[package]]
 name = "ruint"
 version = "1.17.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a68df0380e5c9d20ce49534f292a36a7514ae21350726efe1865bdb1fa91d278"
 dependencies = [
  "alloy-rlp",
  "ark-ff 0.3.0",
@@ -3408,13 +3388,12 @@ dependencies = [
  "serde_core",
  "valuable",
  "zeroize",
+ "ziskos",
 ]
 
 [[package]]
 name = "ruint-macro"
 version = "1.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48fd7bd8a6377e15ad9d42a8ec25371b94ddc67abe7c8b9127bec79bebaaae18"
 
 [[package]]
 name = "rustc-hash"
@@ -3663,18 +3642,16 @@ dependencies = [
 [[package]]
 name = "sha2"
 version = "0.10.9"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-hashes.git?branch=fix%2Fbls#b43f91c7836de6879af5c310260d6dddcb0ce48e"
 dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest 0.10.7",
- "ziskos 0.14.0",
+ "ziskos",
 ]
 
 [[package]]
 name = "sha3"
 version = "0.10.8"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-hashes.git?tag=patch-sha3-0.10.8-zisk-0.14.0#c404b04f733ab18bf0d0f5540249e6120519cc3e"
 dependencies = [
  "digest 0.10.7",
  "keccak",
@@ -3755,7 +3732,6 @@ dependencies = [
 [[package]]
 name = "sp1_bls12_381"
 version = "0.8.0-sp1-5.0.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git?branch=fix%2Fbls#e60f16c062825a8e980572d87b86796fcd75db13"
 dependencies = [
  "cfg-if",
  "ff",
@@ -3764,7 +3740,7 @@ dependencies = [
  "rand_core 0.6.4",
  "sp1-lib",
  "subtle",
- "ziskos 0.14.0",
+ "ziskos",
 ]
 
 [[package]]
@@ -3825,14 +3801,13 @@ dependencies = [
 [[package]]
 name = "substrate-bn"
 version = "0.6.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-bn.git?branch=fix%2Fbls#e4989ad9e82ad6658085997971915a5467860ac6"
 dependencies = [
  "byteorder",
  "crunchy",
  "lazy_static",
  "rand 0.8.5",
  "rustc-hex",
- "ziskos 0.14.0",
+ "ziskos",
 ]
 
 [[package]]
@@ -4350,7 +4325,7 @@ version = "0.4.0"
 dependencies = [
  "bincode 1.3.3",
  "rsp-client-executor",
- "ziskos 0.15.0",
+ "ziskos",
 ]
 
 [[package]]
@@ -4449,33 +4424,13 @@ dependencies = [
 
 [[package]]
 name = "ziskos"
-version = "0.14.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fbls#2187fa73ba2240f38f13f2aa9644fdbf16e4a2f2"
-dependencies = [
- "bincode 2.0.1",
- "cfg-if",
- "getrandom 0.2.16",
- "lazy_static",
- "lib-c 0.14.0",
- "num-bigint 0.4.6",
- "num-integer",
- "num-traits",
- "rand 0.8.5",
- "serde",
- "static_assertions",
- "tiny-keccak",
-]
-
-[[package]]
-name = "ziskos"
 version = "0.15.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fmodexp#db0b49f088c84aa4760bf2d287f05a75ad839fff"
 dependencies = [
  "bincode 2.0.1",
  "cfg-if",
  "getrandom 0.2.16",
  "lazy_static",
- "lib-c 0.15.0",
+ "lib-c",
  "num-bigint 0.4.6",
  "num-integer",
  "num-traits",

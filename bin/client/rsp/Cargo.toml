@@ -26,6 +26,7 @@ kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg.git", branch
 # kzg-rs = { path = "../../../../zisk-patch-kzg" }
 
 [patch.crates-io]
+ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", tag = "patch-1.17.0-zisk-0.13.1" }
 sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", branch = "fix/bls" }
 sha3 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha3-0.10.8-zisk-0.14.0" }
 k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", branch = "fix/bls" }
@@ -38,6 +39,7 @@ ark-bn254 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.g
 ark-serialize  = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", branch = "fix/bls" }
 modexp = { git = "https://github.com/0xPolygonHermez/zisk-patch-modexp.git", branch = "zisk-patch/v1.2.0", package = "aurora-engine-modexp" }
 # # Local development
+# ruint = { path = "../../../../zisk-patch-ruint" }
 # sha2 = { path = "../../../../zisk-patch-sha2/sha2" }
 # sha3 = { path = "../../../../zisk-patch-sha3/sha3" }
 # k256 = { path = "../../../../zisk-patch-k256/k256" }
