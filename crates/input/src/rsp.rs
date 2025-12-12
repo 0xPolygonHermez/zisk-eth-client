@@ -24,17 +24,15 @@ impl InputGenerator for RspInputGenerator {
         let provider = create_provider(self.config.rpc_url.clone());
 
         let genesis = match self.config.network {
-            Network::Mainnet => {
-                Genesis::Mainnet
-            }
-            Network::Sepolia => {
-                Genesis::Sepolia
-            }
+            Network::Mainnet => Genesis::Mainnet,
+            Network::Sepolia => Genesis::Sepolia,
         };
 
         let executor = EthHostExecutor::eth(
             Arc::new(
-                (&genesis).try_into().expect("Failed to convert genesis block into the required type"),
+                (&genesis)
+                    .try_into()
+                    .expect("Failed to convert genesis block into the required type"),
             ),
             None,
         );
@@ -44,13 +42,18 @@ impl InputGenerator for RspInputGenerator {
             .await
             .expect("Failed to execute client");
 
-        let input_bytes = bincode::serialize(&input)
-            .expect("Failed to serialize input");
+        let input_bytes = bincode::serialize(&input).expect("Failed to serialize input");
 
         Ok(InputGeneratorResult {
             input: input_bytes,
             gas_used: input.current_block.gas_used,
-            tx_count: input.current_block.body.transactions.len().try_into().unwrap(),
+            tx_count: input
+                .current_block
+                .body
+                .transactions
+                .len()
+                .try_into()
+                .unwrap(),
         })
     }
 
