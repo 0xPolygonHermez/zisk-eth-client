@@ -1,7 +1,7 @@
-use alloy_consensus::{private::serde};
-use alloy::{rpc::types::debug::ExecutionWitness};
-use anyhow::{Context, Result};
+use alloy::rpc::types::debug::ExecutionWitness;
+use alloy_consensus::private::serde;
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use k256::ecdsa::VerifyingKey;
 use rayon::prelude::*;
@@ -66,7 +66,9 @@ pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<VerifyingKey>> {
 impl InputGenerator for ZethInputGenerator {
     async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
         let start_rpc_connect = std::time::Instant::now();
-        let provider = ProviderBuilder::new().connect(self.config.rpc_url.as_str()).await?;
+        let provider = ProviderBuilder::new()
+            .connect(self.config.rpc_url.as_str())
+            .await?;
         let time_rpc_connect = start_rpc_connect.elapsed();
 
         let start_block_fetch = std::time::Instant::now();
@@ -78,7 +80,9 @@ impl InputGenerator for ZethInputGenerator {
         let time_block_fetch = start_block_fetch.elapsed();
 
         let start_witness_fetch = std::time::Instant::now();
-        let witness = provider.debug_execution_witness(rpc_block.number().into()).await?;
+        let witness = provider
+            .debug_execution_witness(rpc_block.number().into())
+            .await?;
         let time_witness_fetch = start_witness_fetch.elapsed();
 
         let block = reth_ethereum_primitives::Block::from(rpc_block);
@@ -99,8 +103,7 @@ impl InputGenerator for ZethInputGenerator {
             },
         };
 
-        let input_bytes = bincode::serialize(&input)
-            .expect("Failed to serialize input");
+        let input_bytes = bincode::serialize(&input).expect("Failed to serialize input");
         let time_serialize_input = start_serialize_input.elapsed();
 
         println!("input generation timings for block {block_number}: rpc connect: {:?}, block fetch: {:?}, witness fetch: {:?}, recover signers: {:?}, serialize input: {:?}",
