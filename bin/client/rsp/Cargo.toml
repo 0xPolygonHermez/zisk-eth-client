@@ -14,7 +14,7 @@ panic = "abort"
 
 [dependencies]
 bincode = "1.3.3"
-rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "12ad0292c702f22c8e3f99980e25ecac4a882854" }
+rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "dff5c97aecab8dd33b70cf5b575904858a78efc3" }
 # rsp-client-executor = { path = "../../../../rsp/crates/executor/client" }
 
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/bls" }
