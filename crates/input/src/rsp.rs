@@ -5,21 +5,12 @@ use rsp_host_executor::EthHostExecutor;
 use rsp_primitives::genesis::Genesis;
 use rsp_provider::create_provider;
 
-use crate::types::{InputGenerator, InputGeneratorConfig, InputGeneratorResult, Network};
+use crate::types::{InputGenerator, InputGeneratorConfig, InputGeneratorResult};
 
-pub struct RspInputGenerator {
-    pub config: InputGeneratorConfig,
-}
+impl InputGenerator {
+    pub async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
+        println!("Generating input file for block {}, guest: zec-rsp", args.block_number);
 
-impl RspInputGenerator {
-    pub fn new(config: InputGeneratorConfig) -> Self {
-        Self { config }
-    }
-}
-
-#[async_trait]
-impl InputGenerator for RspInputGenerator {
-    async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
         // Create the RPC provider
         let provider = create_provider(self.config.rpc_url.clone());
 
@@ -48,13 +39,10 @@ impl InputGenerator for RspInputGenerator {
             .expect("Failed to serialize input");
 
         Ok(InputGeneratorResult {
+            guest: GuestProgram::Rsp,
             input: input_bytes,
             gas_used: input.current_block.gas_used,
             tx_count: input.current_block.body.transactions.len().try_into().unwrap(),
         })
-    }
-
-    fn get_config(&self) -> &InputGeneratorConfig {
-        &self.config
     }
 }

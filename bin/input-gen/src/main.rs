@@ -1,6 +1,8 @@
+use anyhow::{anyhow};
 use clap::Parser;
-use std::{io::Write, path::PathBuf};
-use input::{build_input_generator, GuestProgram, Network};
+use url::Url;
+use std::{io::Write, path::PathBuf, str::FromStr};
+use input::{InputGenerator, Network};
 
 #[derive(Debug, Clone, Parser)]
 pub struct InputGenArgs {
@@ -13,9 +15,6 @@ pub struct InputGenArgs {
     #[clap(long, short)]
     pub rpc_url: String,
 
-    #[clap(long, short, value_enum, default_value_t = GuestProgram::Rsp)]
-    pub guest: GuestProgram,
-
     #[clap(long, short)]
     pub input_dir: Option<PathBuf>,
 }
@@ -26,14 +25,18 @@ async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
 
     if std::env::var("RUST_LOG").is_err() {
-        std::env::set_var("RUST_LOG", "info");
+        unsafe {
+            std::env::set_var("RUST_LOG", "info");
+        }
     }
 
     // Parse the command line arguments.
     let args = InputGenArgs::parse();
-    let input_generator = build_input_generator(args.guest.clone(), &args.rpc_url, args.network.clone());
-
-    println!("Generating input file for block {}, guest: {}", args.block_number, args.guest);
+    let rpc_url = match Url::from_str(&args.rpc_url) {
+        Ok(url) => url,
+        Err(e) => return Err(anyhow!("Invalid RPC URL, error: {}", e)),
+    };
+    let input_generator = InputGenerator::new(rpc_url, args.network.clone());
 
     let start_time = std::time::Instant::now();
     let result = input_generator.generate(args.block_number).await?;
@@ -51,7 +54,7 @@ async fn main() -> anyhow::Result<()> {
         args.block_number,
         result.tx_count,
         mgas,
-        args.guest
+        result.guest
     ));
 
     let mut input_file = std::fs::File::create(&input_path)?;
