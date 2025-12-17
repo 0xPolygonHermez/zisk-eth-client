@@ -1,7 +1,7 @@
-use alloy_consensus::{private::serde};
-use alloy::{rpc::types::debug::ExecutionWitness};
-use anyhow::{Context, Result};
+use alloy::rpc::types::debug::ExecutionWitness;
+use alloy_consensus::private::serde;
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
+use anyhow::{Context, Result};
 use rayon::prelude::*;
 use reth_ethereum_primitives::{Block, TransactionSigned};
 use reth_stateless::UncompressedPublicKey;
@@ -63,10 +63,15 @@ pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<UncompressedPubl
 
 impl InputGenerator {
     pub async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
-        println!("Generating input file for block {}, guest: zec-zeth", block_number);
+        println!(
+            "Generating input file for block {}, guest: zec-zeth",
+            block_number
+        );
 
         let start_rpc_connect = std::time::Instant::now();
-        let provider = ProviderBuilder::new().connect(self.rpc_url.as_str()).await?;
+        let provider = ProviderBuilder::new()
+            .connect(self.rpc_url.as_str())
+            .await?;
         let time_rpc_connect = start_rpc_connect.elapsed();
 
         let start_block_fetch = std::time::Instant::now();
@@ -78,7 +83,9 @@ impl InputGenerator {
         let time_block_fetch = start_block_fetch.elapsed();
 
         let start_witness_fetch = std::time::Instant::now();
-        let witness = provider.debug_execution_witness(rpc_block.number().into()).await?;
+        let witness = provider
+            .debug_execution_witness(rpc_block.number().into())
+            .await?;
         let time_witness_fetch = start_witness_fetch.elapsed();
 
         let block = reth_ethereum_primitives::Block::from(rpc_block);
@@ -99,8 +106,7 @@ impl InputGenerator {
             },
         };
 
-        let input_bytes = bincode::serialize(&input)
-            .expect("Failed to serialize input");
+        let input_bytes = bincode::serialize(&input).expect("Failed to serialize input");
         let time_serialize_input = start_serialize_input.elapsed();
 
         println!("input generation timings for block {block_number}: rpc connect: {:?}, block fetch: {:?}, witness fetch: {:?}, recover signers: {:?}, serialize input: {:?}",

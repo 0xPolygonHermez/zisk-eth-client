@@ -1,6 +1,6 @@
-mod types;
 #[cfg(feature = "zec-rsp")]
 mod rsp;
+mod types;
 #[cfg(not(feature = "zec-rsp"))]
 mod zeth;
 

@@ -9,23 +9,24 @@ use crate::types::{InputGenerator, InputGeneratorConfig, InputGeneratorResult};
 
 impl InputGenerator {
     pub async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
-        println!("Generating input file for block {}, guest: zec-rsp", args.block_number);
+        println!(
+            "Generating input file for block {}, guest: zec-rsp",
+            args.block_number
+        );
 
         // Create the RPC provider
         let provider = create_provider(self.config.rpc_url.clone());
 
         let genesis = match self.config.network {
-            Network::Mainnet => {
-                Genesis::Mainnet
-            }
-            Network::Sepolia => {
-                Genesis::Sepolia
-            }
+            Network::Mainnet => Genesis::Mainnet,
+            Network::Sepolia => Genesis::Sepolia,
         };
 
         let executor = EthHostExecutor::eth(
             Arc::new(
-                (&genesis).try_into().expect("Failed to convert genesis block into the required type"),
+                (&genesis)
+                    .try_into()
+                    .expect("Failed to convert genesis block into the required type"),
             ),
             None,
         );
@@ -35,14 +36,19 @@ impl InputGenerator {
             .await
             .expect("Failed to execute client");
 
-        let input_bytes = bincode::serialize(&input)
-            .expect("Failed to serialize input");
+        let input_bytes = bincode::serialize(&input).expect("Failed to serialize input");
 
         Ok(InputGeneratorResult {
             guest: GuestProgram::Rsp,
             input: input_bytes,
             gas_used: input.current_block.gas_used,
-            tx_count: input.current_block.body.transactions.len().try_into().unwrap(),
+            tx_count: input
+                .current_block
+                .body
+                .transactions
+                .len()
+                .try_into()
+                .unwrap(),
         })
     }
 }

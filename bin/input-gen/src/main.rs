@@ -1,8 +1,8 @@
-use anyhow::{anyhow};
+use anyhow::anyhow;
 use clap::Parser;
-use url::Url;
-use std::{io::Write, path::PathBuf, str::FromStr};
 use input::{InputGenerator, Network};
+use std::{io::Write, path::PathBuf, str::FromStr};
+use url::Url;
 
 #[derive(Debug, Clone, Parser)]
 pub struct InputGenArgs {
@@ -51,10 +51,7 @@ async fn main() -> anyhow::Result<()> {
 
     let input_path = input_folder.join(format!(
         "{}_{}_{}_{}.bin",
-        args.block_number,
-        result.tx_count,
-        mgas,
-        result.guest
+        args.block_number, result.tx_count, mgas, result.guest
     ));
 
     let mut input_file = std::fs::File::create(&input_path)?;
