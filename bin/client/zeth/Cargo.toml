@@ -22,16 +22,18 @@ revm = { version = "31.0.2", default-features = false, features = [
     "bn",
 ] }
 
-# zeth-core = { git = "https://github.com/boundless-xyz/zeth.git", rev = "e8460d3e516fa01e45f00366b233d7d8e5cb8e67" }
-# zeth-chainspec = { git = "https://github.com/boundless-xyz/zeth.git", rev = "e8460d3e516fa01e45f00366b233d7d8e5cb8e67" }
-zeth-core = { path = "../../../../zeth/crates/core" }
-zeth-chainspec = { path = "../../../../zeth/crates/chainspec" }
+# Force map-fxhash for deterministic Hashmap
 alloy-primitives = { version = "1.4.1", default-features = false, features = ["std", "map", "map-fxhash"] }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.14.0" }
+# zeth-core = { git = "https://github.com/boundless-xyz/zeth.git", rev = "e8460d3e516fa01e45f00366b233d7d8e5cb8e67" }
+# zeth-chainspec = { git = "https://github.com/boundless-xyz/zeth.git", rev = "e8460d3e516fa01e45f00366b233d7d8e5cb8e67" }
 # Local development
-# ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
+zeth-core = { path = "../../../../zeth/crates/core" }
+zeth-chainspec = { path = "../../../../zeth/crates/chainspec" }
 
+# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.14.0" }
+# Local development
+ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
 # Enable this for deterministic Hashmap sort
