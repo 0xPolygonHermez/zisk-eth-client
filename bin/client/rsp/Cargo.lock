@@ -514,7 +514,8 @@ dependencies = [
 [[package]]
 name = "ark-bls12-381"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?tag=patch-0.5.0-zisk-0.15.0#c0e68a2c0f72b638b8f64485e785a15924e5d778"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3df4dcc01ff89867cd86b0da835f23c3f02738353aaee7dde7495af71363b8d5"
 dependencies = [
  "ark-ec",
  "ark-ff 0.5.0",
@@ -525,7 +526,8 @@ dependencies = [
 [[package]]
 name = "ark-bn254"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?tag=patch-0.5.0-zisk-0.15.0#c0e68a2c0f72b638b8f64485e785a15924e5d778"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d69eab57e8d2663efa5c63135b2af4f396d66424f88954c21104125ab6b3e6bc"
 dependencies = [
  "ark-ec",
  "ark-ff 0.5.0",
@@ -535,7 +537,8 @@ dependencies = [
 [[package]]
 name = "ark-ec"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?tag=patch-0.5.0-zisk-0.15.0#c0e68a2c0f72b638b8f64485e785a15924e5d778"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43d68f2d516162846c1238e755a7c4d131b892b70cc70c471a8e3ca3ed818fce"
 dependencies = [
  "ahash",
  "ark-ff 0.5.0",
@@ -544,8 +547,8 @@ dependencies = [
  "ark-std 0.5.0",
  "educe",
  "fnv",
- "hashbrown 0.16.1",
- "itertools 0.14.0",
+ "hashbrown 0.15.5",
+ "itertools 0.13.0",
  "num-bigint 0.4.6",
  "num-integer",
  "num-traits",
@@ -593,16 +596,20 @@ dependencies = [
 [[package]]
 name = "ark-ff"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?tag=patch-0.5.0-zisk-0.15.0#c0e68a2c0f72b638b8f64485e785a15924e5d778"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a177aba0ed1e0fbb62aa9f6d0502e9b46dad8c2eab04c14258a1212d2557ea70"
 dependencies = [
  "ark-ff-asm 0.5.0",
  "ark-ff-macros 0.5.0",
  "ark-serialize 0.5.0",
  "ark-std 0.5.0",
+ "arrayvec",
  "digest 0.10.7",
  "educe",
+ "itertools 0.13.0",
  "num-bigint 0.4.6",
  "num-traits",
+ "paste",
  "zeroize",
 ]
 
@@ -629,7 +636,8 @@ dependencies = [
 [[package]]
 name = "ark-ff-asm"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?tag=patch-0.5.0-zisk-0.15.0#c0e68a2c0f72b638b8f64485e785a15924e5d778"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62945a2f7e6de02a31fe400aa489f0e0f5b2502e69f95f853adb82a96c7a6b60"
 dependencies = [
  "quote",
  "syn 2.0.111",
@@ -663,7 +671,8 @@ dependencies = [
 [[package]]
 name = "ark-ff-macros"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?tag=patch-0.5.0-zisk-0.15.0#c0e68a2c0f72b638b8f64485e785a15924e5d778"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09be120733ee33f7693ceaa202ca41accd5653b779563608f1234f78ae07c4b3"
 dependencies = [
  "num-bigint 0.4.6",
  "num-traits",
@@ -675,7 +684,8 @@ dependencies = [
 [[package]]
 name = "ark-poly"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?tag=patch-0.5.0-zisk-0.15.0#c0e68a2c0f72b638b8f64485e785a15924e5d778"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "579305839da207f02b89cd1679e50e67b4331e2f9294a57693e5051b7703fe27"
 dependencies = [
  "ahash",
  "ark-ff 0.5.0",
@@ -683,7 +693,7 @@ dependencies = [
  "ark-std 0.5.0",
  "educe",
  "fnv",
- "hashbrown 0.16.1",
+ "hashbrown 0.15.5",
 ]
 
 [[package]]
@@ -710,19 +720,21 @@ dependencies = [
 [[package]]
 name = "ark-serialize"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?tag=patch-0.5.0-zisk-0.15.0#c0e68a2c0f72b638b8f64485e785a15924e5d778"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f4d068aaf107ebcd7dfb52bc748f8030e0fc930ac8e360146ca54c1203088f7"
 dependencies = [
  "ark-serialize-derive",
  "ark-std 0.5.0",
+ "arrayvec",
  "digest 0.10.7",
  "num-bigint 0.4.6",
- "serde_with",
 ]
 
 [[package]]
 name = "ark-serialize-derive"
 version = "0.5.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git?tag=patch-0.5.0-zisk-0.15.0#c0e68a2c0f72b638b8f64485e785a15924e5d778"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "213888f660fddcca0d257e88e54ac05bca01885f258ccdf695bafd77031bb69d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -788,9 +800,9 @@ dependencies = [
 [[package]]
 name = "aurora-engine-modexp"
 version = "1.2.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-modexp.git?tag=patch-1.2.0-zisk-0.15.0#f78ffea724a61964c357ab53b876af68b19f38ef"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "518bc5745a6264b5fd7b09dffb9667e400ee9e2bbe18555fac75e1fe9afa0df9"
 dependencies = [
- "cfg-if",
  "hex",
  "num",
 ]
@@ -1620,11 +1632,19 @@ checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
 
 [[package]]
 name = "hashbrown"
+version = "0.15.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
+dependencies = [
+ "allocator-api2",
+]
+
+[[package]]
+name = "hashbrown"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
 dependencies = [
- "allocator-api2",
  "foldhash",
  "serde",
  "serde_core",
@@ -1916,7 +1936,8 @@ dependencies = [
 [[package]]
 name = "k256"
 version = "0.13.4"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git?tag=patch-k256-0.13.4-zisk-0.15.0#5b84980888f6c840c7d38d575d79ae32df17085d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6e3919bbaa2945715f0bb6d3934a173d1e9a59ac23767fbaaef277265a7411b"
 dependencies = [
  "cfg-if",
  "ecdsa",
@@ -1948,9 +1969,8 @@ dependencies = [
 [[package]]
 name = "kzg-rs"
 version = "0.2.7"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-kzg.git?tag=patch-0.2.7-zisk-0.15.0#7b29934400c0af21a63635544e72a4621f88e603"
+source = "git+https://github.com/succinctlabs/kzg-rs#15bdc9bfdb31859acd4e7a6558f84fae5eab71c8"
 dependencies = [
- "cfg-if",
  "ff",
  "hex",
  "serde_arrays",
@@ -1971,6 +1991,7 @@ dependencies = [
 [[package]]
 name = "lib-c"
 version = "0.15.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.15.0#b3ca745b80423c8123dc24f19039865a5bc8b074"
 
 [[package]]
 name = "libc"
@@ -3373,7 +3394,8 @@ dependencies = [
 [[package]]
 name = "ruint"
 version = "1.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ruint.git?tag=patch-1.17.0-zisk-0.15.0#8df6ff4ea97c12df27cda57f564521eb11d9afb0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a68df0380e5c9d20ce49534f292a36a7514ae21350726efe1865bdb1fa91d278"
 dependencies = [
  "alloy-rlp",
  "ark-ff 0.3.0",
@@ -3400,7 +3422,8 @@ dependencies = [
 [[package]]
 name = "ruint-macro"
 version = "1.2.1"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ruint.git?tag=patch-1.17.0-zisk-0.15.0#8df6ff4ea97c12df27cda57f564521eb11d9afb0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "48fd7bd8a6377e15ad9d42a8ec25371b94ddc67abe7c8b9127bec79bebaaae18"
 
 [[package]]
 name = "rustc-hash"
@@ -3649,7 +3672,8 @@ dependencies = [
 [[package]]
 name = "sha2"
 version = "0.10.9"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-hashes.git?tag=patch-sha2-0.10.9-zisk-0.15.0#ee286eaa676b783823d8a07d01b43787fe12bf4a"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
 dependencies = [
  "cfg-if",
  "cpufeatures",
@@ -3659,7 +3683,8 @@ dependencies = [
 [[package]]
 name = "sha3"
 version = "0.10.8"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-hashes.git?tag=patch-sha3-0.10.8-zisk-0.15.0#08098df5827b672d604e2dc440446b86064b99f2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75872d278a8f37ef87fa0ddbda7802605cb18344497949862c0d4dcb291eba60"
 dependencies = [
  "digest 0.10.7",
  "keccak",
@@ -3740,7 +3765,7 @@ dependencies = [
 [[package]]
 name = "sp1_bls12_381"
 version = "0.8.0-sp1-5.0.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git?tag=patch-0.8.0-zisk-0.15.0#83ad5c65caf7af3f8da3ea8cd3754ef2847290ad"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git?tag=patch-0.8.0-zisk-0.11.0#128623e834587ac932b71ff4b663197174d35a48"
 dependencies = [
  "cfg-if",
  "ff",
@@ -3809,7 +3834,8 @@ dependencies = [
 [[package]]
 name = "substrate-bn"
 version = "0.6.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-bn.git?tag=patch-0.6.0-zisk-0.15.0#7d408643bf033c427826124436fc1b3141ef7425"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72b5bbfa79abbae15dd642ea8176a21a635ff3c00059961d1ea27ad04e5b441c"
 dependencies = [
  "byteorder",
  "crunchy",
@@ -4433,6 +4459,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "0.15.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.15.0#b3ca745b80423c8123dc24f19039865a5bc8b074"
 dependencies = [
  "bincode 2.0.1",
  "cfg-if",

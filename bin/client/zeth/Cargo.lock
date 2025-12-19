@@ -757,9 +757,9 @@ dependencies = [
 [[package]]
 name = "aurora-engine-modexp"
 version = "1.2.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-modexp.git?tag=patch-1.2.0-zisk-0.15.0#f78ffea724a61964c357ab53b876af68b19f38ef"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "518bc5745a6264b5fd7b09dffb9667e400ee9e2bbe18555fac75e1fe9afa0df9"
 dependencies = [
- "cfg-if",
  "hex",
  "num",
 ]
@@ -899,7 +899,8 @@ dependencies = [
 [[package]]
 name = "blst"
 version = "0.3.15"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-blst.git?tag=patch-0.3.15-zisk-0.15.0#c2cb471fa14b97afcce38395c9b989e30d3c194b"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4fd49896f12ac9b6dcd7a5998466b9b58263a695a3dd1ecc1aaca2e12a90b080"
 dependencies = [
  "cc",
  "glob",
@@ -1893,7 +1894,8 @@ dependencies = [
 [[package]]
 name = "k256"
 version = "0.13.4"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git?tag=patch-k256-0.13.4-zisk-0.15.0#5b84980888f6c840c7d38d575d79ae32df17085d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6e3919bbaa2945715f0bb6d3934a173d1e9a59ac23767fbaaef277265a7411b"
 dependencies = [
  "cfg-if",
  "ecdsa",
@@ -1934,6 +1936,7 @@ dependencies = [
 [[package]]
 name = "lib-c"
 version = "0.15.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.15.0#b3ca745b80423c8123dc24f19039865a5bc8b074"
 
 [[package]]
 name = "libc"
@@ -3235,7 +3238,8 @@ dependencies = [
 [[package]]
 name = "ruint"
 version = "1.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ruint.git?tag=patch-1.17.0-zisk-0.15.0#8df6ff4ea97c12df27cda57f564521eb11d9afb0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a68df0380e5c9d20ce49534f292a36a7514ae21350726efe1865bdb1fa91d278"
 dependencies = [
  "alloy-rlp",
  "ark-ff 0.3.0",
@@ -3262,7 +3266,8 @@ dependencies = [
 [[package]]
 name = "ruint-macro"
 version = "1.2.1"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-ruint.git?tag=patch-1.17.0-zisk-0.15.0#8df6ff4ea97c12df27cda57f564521eb11d9afb0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "48fd7bd8a6377e15ad9d42a8ec25371b94ddc67abe7c8b9127bec79bebaaae18"
 
 [[package]]
 name = "rustc-hash"
@@ -3523,7 +3528,8 @@ dependencies = [
 [[package]]
 name = "sha2"
 version = "0.10.9"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-hashes.git?tag=patch-sha2-0.10.9-zisk-0.15.0#ee286eaa676b783823d8a07d01b43787fe12bf4a"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
 dependencies = [
  "cfg-if",
  "cpufeatures",
@@ -3651,7 +3657,8 @@ dependencies = [
 [[package]]
 name = "substrate-bn"
 version = "0.6.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-bn.git?tag=patch-0.6.0-zisk-0.15.0#7d408643bf033c427826124436fc1b3141ef7425"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72b5bbfa79abbae15dd642ea8176a21a635ff3c00059961d1ea27ad04e5b441c"
 dependencies = [
  "byteorder",
  "crunchy",
@@ -3793,9 +3800,9 @@ dependencies = [
 [[package]]
 name = "tiny-keccak"
 version = "2.0.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-tiny-keccak.git?tag=patch-2.0.2-zisk-0.15.0#a5cb98ca4d9d390b39b10c9e81a061fd830aea35"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2c9d3793400a45f954c52e73d068316d76b6f4e36977e3fcebb13a2721e80237"
 dependencies = [
- "cfg-if",
  "crunchy",
 ]
 
@@ -4380,6 +4387,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "0.15.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.15.0#b3ca745b80423c8123dc24f19039865a5bc8b074"
 dependencies = [
  "bincode 2.0.1",
  "cfg-if",
