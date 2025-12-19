@@ -1,23 +1,22 @@
 use std::sync::Arc;
 
-use async_trait::async_trait;
 use rsp_host_executor::EthHostExecutor;
 use rsp_primitives::genesis::Genesis;
 use rsp_provider::create_provider;
 
-use crate::types::{InputGenerator, InputGeneratorConfig, InputGeneratorResult};
+use crate::types::{GuestProgram, InputGenerator, InputGeneratorResult, Network};
 
 impl InputGenerator {
     pub async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
         println!(
             "Generating input file for block {}, guest: zec-rsp",
-            args.block_number
+            block_number
         );
 
         // Create the RPC provider
-        let provider = create_provider(self.config.rpc_url.clone());
+        let provider = create_provider(self.rpc_url.clone());
 
-        let genesis = match self.config.network {
+        let genesis = match self.network {
             Network::Mainnet => Genesis::Mainnet,
             Network::Sepolia => Genesis::Sepolia,
         };
