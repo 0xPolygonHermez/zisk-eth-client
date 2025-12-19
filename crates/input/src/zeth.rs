@@ -1,13 +1,12 @@
-use alloy_consensus::{private::serde};
-use alloy::{rpc::types::debug::ExecutionWitness};
-use anyhow::{Context, Result};
+use alloy::rpc::types::debug::ExecutionWitness;
+use alloy_consensus::private::serde;
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
-use async_trait::async_trait;
-use k256::ecdsa::VerifyingKey;
+use anyhow::{Context, Result};
 use rayon::prelude::*;
 use reth_ethereum_primitives::{Block, TransactionSigned};
+use reth_stateless::UncompressedPublicKey;
 
-use crate::types::{InputGenerator, InputGeneratorConfig, InputGeneratorResult};
+use crate::types::{GuestProgram, InputGenerator, InputGeneratorResult};
 
 /// `StatelessInput` is a convenience structure for serializing the input needed
 /// for the stateless validation function.
@@ -20,23 +19,13 @@ pub struct Input {
     )]
     pub block: Block,
     /// List of signing public keys for each transaction in the block.
-    pub signers: Vec<VerifyingKey>,
+    pub signers: Vec<UncompressedPublicKey>,
     /// `ExecutionWitness` for the stateless validation function
     pub witness: ExecutionWitness,
 }
 
-pub struct ZethInputGenerator {
-    pub config: InputGeneratorConfig,
-}
-
-impl ZethInputGenerator {
-    pub fn new(config: InputGeneratorConfig) -> Self {
-        Self { config }
-    }
-}
-
-// /// Recovers the signing [`VerifyingKey`] from each transaction's signature.
-// pub fn recover_signers<'a, I>(txs: I) -> Result<Vec<VerifyingKey>>
+// /// Recovers the signing [`UncompressedPublicKey`] from each transaction's signature.
+// pub fn recover_signers<'a, I>(txs: I) -> Result<Vec<UncompressedPublicKey>>
 // where
 //     I: IntoIterator<Item = &'a TransactionSigned>,
 // {
@@ -45,28 +34,44 @@ impl ZethInputGenerator {
 //         .map(|(i, tx)| {
 //             tx.signature()
 //                 .recover_from_prehash(&tx.signature_hash())
+//                 .map(|keys| {
+//                     UncompressedPublicKey(
+//                         keys.to_encoded_point(false).as_bytes().try_into().unwrap(),
+//                     )
+//                 })
 //                 .with_context(|| format!("failed to recover signature for tx #{i}"))
 //         })
 //         .collect::<Result<Vec<_>, _>>()
 // }
 
-// Recovers the signing [`VerifyingKey`] from each transaction's signature, in parallel.
-pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<VerifyingKey>> {
+// Recovers the signing [`UncompressedPublicKey`] from each transaction's signature, in parallel.
+pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<UncompressedPublicKey>> {
     txs.par_iter()
         .enumerate()
         .map(|(i, tx)| {
             tx.signature()
                 .recover_from_prehash(&tx.signature_hash())
+                .map(|keys| {
+                    UncompressedPublicKey(
+                        keys.to_encoded_point(false).as_bytes().try_into().unwrap(),
+                    )
+                })
                 .with_context(|| format!("failed to recover signature for tx #{i}"))
         })
         .collect()
 }
 
-#[async_trait]
-impl InputGenerator for ZethInputGenerator {
-    async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
+impl InputGenerator {
+    pub async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
+        println!(
+            "Generating input file for block {}, guest: zec-zeth",
+            block_number
+        );
+
         let start_rpc_connect = std::time::Instant::now();
-        let provider = ProviderBuilder::new().connect(self.config.rpc_url.as_str()).await?;
+        let provider = ProviderBuilder::new()
+            .connect(self.rpc_url.as_str())
+            .await?;
         let time_rpc_connect = start_rpc_connect.elapsed();
 
         let start_block_fetch = std::time::Instant::now();
@@ -78,7 +83,9 @@ impl InputGenerator for ZethInputGenerator {
         let time_block_fetch = start_block_fetch.elapsed();
 
         let start_witness_fetch = std::time::Instant::now();
-        let witness = provider.debug_execution_witness(rpc_block.number().into()).await?;
+        let witness = provider
+            .debug_execution_witness(rpc_block.number().into())
+            .await?;
         let time_witness_fetch = start_witness_fetch.elapsed();
 
         let block = reth_ethereum_primitives::Block::from(rpc_block);
@@ -99,8 +106,7 @@ impl InputGenerator for ZethInputGenerator {
             },
         };
 
-        let input_bytes = bincode::serialize(&input)
-            .expect("Failed to serialize input");
+        let input_bytes = bincode::serialize(&input).expect("Failed to serialize input");
         let time_serialize_input = start_serialize_input.elapsed();
 
         println!("input generation timings for block {block_number}: rpc connect: {:?}, block fetch: {:?}, witness fetch: {:?}, recover signers: {:?}, serialize input: {:?}",
@@ -112,13 +118,10 @@ impl InputGenerator for ZethInputGenerator {
         );
 
         Ok(InputGeneratorResult {
+            guest: GuestProgram::Zeth,
             input: input_bytes,
             gas_used: input.block.header.gas_used,
             tx_count: input.block.body.transactions.len().try_into().unwrap(),
         })
-    }
-
-    fn get_config(&self) -> &InputGeneratorConfig {
-        &self.config
     }
 }

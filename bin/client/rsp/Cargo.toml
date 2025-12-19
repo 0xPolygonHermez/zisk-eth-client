@@ -14,41 +14,43 @@ panic = "abort"
 
 [dependencies]
 bincode = "1.3.3"
-rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "545ae85f21ba274b97ee8cb68b86acc5c3dd6b4a" }
+rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "dff5c97aecab8dd33b70cf5b575904858a78efc3" }
 # rsp-client-executor = { path = "../../../../rsp/crates/executor/client" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.14.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.15.0" }
 # Local development
 # ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
 
 [patch."https://github.com/succinctlabs/kzg-rs"]
-kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg.git", tag = "patch-0.2.7-zisk-0.14.0" }
+kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg.git", tag = "patch-0.2.7-zisk-0.15.0" }
+# Local development
+# kzg-rs = { path = "../../../../zisk-patch-kzg" }
 
 [patch.crates-io]
-sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha2-0.10.9-zisk-0.14.0" }
-sha3 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha3-0.10.8-zisk-0.14.0" }
-k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", tag = "patch-k256-0.13.4-zisk-0.14.0" }
-bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", tag = "patch-0.6.0-zisk-0.14.0", package = "substrate-bn" }
-# KZG Precompile
-# kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg.git", tag = "patch-0.2.7-zisk-0.14.0" }
-sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", tag = "patch-0.8.0-zisk-0.14.0" }
-# BLS12-381 Precompiles
-ark-bls12-381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.14.0" }
-ark-ec = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.14.0" }
-ark-ff = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.14.0" }
-ark-bn254 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.14.0" }
-ark-serialize  = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.14.0" }
-# # Local development
+ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", tag = "patch-1.17.0-zisk-0.15.0" }
+sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha2-0.10.9-zisk-0.15.0" }
+sha3 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha3-0.10.8-zisk-0.15.0" }
+k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", tag = "patch-k256-0.13.4-zisk-0.15.0" }
+# ecdsa = { git = "https://github.com/0xPolygonHermez/zisk-patch-signatures.git", tag = "patch-ecdsa-0.16.9-zisk-0.15.0" }
+substrate-bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", tag = "patch-0.6.0-zisk-0.15.0" }
+sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", tag = "patch-0.8.0-zisk-0.15.0" }
+ark-bls12-381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.15.0" }
+ark-ec = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.15.0" }
+ark-ff = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.15.0" }
+ark-bn254 = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.15.0" }
+ark-serialize  = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algebra.git", tag = "patch-0.5.0-zisk-0.15.0" }
+aurora-engine-modexp = { git = "https://github.com/0xPolygonHermez/zisk-patch-modexp.git", tag = "patch-1.2.0-zisk-0.15.0" }
+# Local development
+# ruint = { path = "../../../../zisk-patch-ruint" }
 # sha2 = { path = "../../../../zisk-patch-sha2/sha2" }
 # sha3 = { path = "../../../../zisk-patch-sha3/sha3" }
 # k256 = { path = "../../../../zisk-patch-k256/k256" }
-# bn = { path = "../../../../zisk-patch-bn", package = "substrate-bn" }
-# # KZG Precompile
-# kzg-rs = { path = "../../../../zisk-patch-kzg" }
+# # ecdsa = { path = "../../../../zisk-patch-ecdsa/ecdsa" }
+# substrate-bn = { path = "../../../../zisk-patch-bn" }
 # sp1_bls12_381 = { path = "../../../../zisk-patch-bls12-381" }
-# # BLS12-381 Precompiles
 # ark-bls12-381 = { path = "../../../../zisk-patch-ark-algebra/curves/bls12_381" }
 # ark-ec = { path = "../../../../zisk-patch-ark-algebra/ec" }
 # ark-ff = { path = "../../../../zisk-patch-ark-algebra/ff" }
 # ark-bn254 = { path = "../../../../zisk-patch-ark-algebra/curves/bn254" }
 # ark-serialize = { path = "../../../../zisk-patch-ark-algebra/serialize" }
+# aurora-engine-modexp = { path = "../../../../zisk-patch-modexp/engine-modexp" }

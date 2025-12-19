@@ -1,7 +1,5 @@
-use std::fmt::Display;
-
-use async_trait::async_trait;
 use clap::ValueEnum;
+use std::fmt::Display;
 use url::Url;
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -16,13 +14,19 @@ pub enum GuestProgram {
     Zeth,
 }
 
-pub struct InputGeneratorConfig {
-    pub guest: GuestProgram,
+pub struct InputGenerator {
     pub rpc_url: Url,
     pub network: Network,
 }
 
+impl InputGenerator {
+    pub fn new(rpc_url: Url, network: Network) -> Self {
+        Self { rpc_url, network }
+    }
+}
+
 pub struct InputGeneratorResult {
+    pub guest: GuestProgram,
     pub input: Vec<u8>,
     pub gas_used: u64,
     pub tx_count: u64,
@@ -35,11 +39,4 @@ impl Display for GuestProgram {
             GuestProgram::Zeth => write!(f, "zeth"),
         }
     }
-}
-
-#[async_trait]
-pub trait InputGenerator {
-    async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult>;
-
-    fn get_config(&self) -> &InputGeneratorConfig;
 }
