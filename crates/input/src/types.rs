@@ -1,5 +1,5 @@
-use std::fmt::Display;
 use clap::ValueEnum;
+use std::fmt::Display;
 use url::Url;
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -21,10 +21,7 @@ pub struct InputGenerator {
 
 impl InputGenerator {
     pub fn new(rpc_url: Url, network: Network) -> Self {
-        Self {
-            rpc_url,
-            network,
-        }
+        Self { rpc_url, network }
     }
 }
 

@@ -1,8 +1,8 @@
 #![no_main]
 ziskos::entrypoint!(main);
 
-use zeth_core::{Input, EthEvmConfig, validate_block};
 use zeth_chainspec::MAINNET;
+use zeth_core::{validate_block, EthEvmConfig, Input};
 use ziskos::{read_input_slice, set_output};
 
 fn main() {
