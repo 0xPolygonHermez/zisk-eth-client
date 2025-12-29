@@ -40,8 +40,8 @@ ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
 # # Enable this for deterministic Hashmap sort
-alloy-evm ={ path = "../../../../alloy-evm/crates/evm" }
-alloy-primitives = { path = "../../../../core/crates/primitives" }
+alloy-evm ={ path = "../../../../alloy-rs-evm/crates/evm" }
+alloy-primitives = { path = "../../../../alloy-rs-core/crates/primitives" }
 
 # ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", tag = "patch-1.17.0-zisk-0.15.0" }
 # sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha2-0.10.9-zisk-0.15.0" }
