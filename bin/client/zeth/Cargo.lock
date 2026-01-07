@@ -142,8 +142,6 @@ dependencies = [
 [[package]]
 name = "alloy-evm"
 version = "0.23.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "527b47dc39850c6168002ddc1f7a2063e15d26137c1bb5330f6065a7524c1aa9"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -217,8 +215,6 @@ dependencies = [
 [[package]]
 name = "alloy-primitives"
 version = "1.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c850e6ccbd34b8a463a1e934ffc8fc00e1efc5e5489f2ad82d7797949f3bd4e"
 dependencies = [
  "alloy-rlp",
  "bytes",
@@ -1935,8 +1931,7 @@ dependencies = [
 
 [[package]]
 name = "lib-c"
-version = "0.15.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.15.0#b3ca745b80423c8123dc24f19039865a5bc8b074"
+version = "0.16.0"
 
 [[package]]
 name = "libc"
@@ -2004,6 +1999,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "nix"
+version = "0.29.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71e2746dc3a24dd78b3cfcb7be93368c6de9963d30f43a6a73998a9cf4b17b46"
+dependencies = [
+ "bitflags",
+ "cfg-if",
+ "cfg_aliases",
+ "libc",
 ]
 
 [[package]]
@@ -2593,7 +2600,7 @@ dependencies = [
  "derive_more",
  "reth-ethereum-forks",
  "reth-network-peers",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "serde_json",
 ]
 
@@ -2634,7 +2641,7 @@ dependencies = [
  "alloy-primitives",
  "auto_impl",
  "reth-execution-types",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "thiserror",
 ]
 
@@ -2647,7 +2654,7 @@ dependencies = [
  "alloy-eips",
  "reth-chainspec",
  "reth-consensus",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
 ]
 
 [[package]]
@@ -2658,7 +2665,7 @@ dependencies = [
  "alloy-eips",
  "alloy-primitives",
  "bytes",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "serde",
 ]
 
@@ -2685,7 +2692,7 @@ dependencies = [
  "reth-consensus",
  "reth-consensus-common",
  "reth-execution-types",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "tracing",
 ]
 
@@ -2714,7 +2721,7 @@ dependencies = [
  "alloy-rpc-types-eth",
  "alloy-serde",
  "reth-codecs",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "reth-zstd-compressors",
  "serde",
  "serde_with",
@@ -2734,7 +2741,7 @@ dependencies = [
  "futures-util",
  "reth-execution-errors",
  "reth-execution-types",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "reth-storage-api",
  "reth-storage-errors",
  "reth-trie-common",
@@ -2757,7 +2764,7 @@ dependencies = [
  "reth-ethereum-primitives",
  "reth-evm",
  "reth-execution-types",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "reth-storage-errors",
  "revm",
 ]
@@ -2786,7 +2793,7 @@ dependencies = [
  "alloy-primitives",
  "derive_more",
  "reth-ethereum-primitives",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "reth-trie-common",
  "revm",
  "serde",
@@ -2804,6 +2811,31 @@ dependencies = [
  "serde_with",
  "thiserror",
  "url",
+]
+
+[[package]]
+name = "reth-primitives-traits"
+version = "1.9.3"
+dependencies = [
+ "alloy-consensus",
+ "alloy-eips",
+ "alloy-genesis",
+ "alloy-primitives",
+ "alloy-rlp",
+ "alloy-rpc-types-eth",
+ "alloy-trie 0.9.1",
+ "auto_impl",
+ "bytes",
+ "derive_more",
+ "once_cell",
+ "op-alloy-consensus",
+ "revm-bytecode",
+ "revm-primitives",
+ "revm-state",
+ "secp256k1 0.30.0",
+ "serde",
+ "serde_with",
+ "thiserror",
 ]
 
 [[package]]
@@ -2851,7 +2883,7 @@ version = "1.9.3"
 source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
 dependencies = [
  "alloy-primitives",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "reth-storage-api",
  "reth-storage-errors",
  "revm",
@@ -2886,7 +2918,7 @@ dependencies = [
  "reth-ethereum-consensus",
  "reth-ethereum-primitives",
  "reth-evm",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "reth-revm",
  "reth-trie-common",
  "reth-trie-sparse",
@@ -2920,7 +2952,7 @@ dependencies = [
  "reth-db-models",
  "reth-ethereum-primitives",
  "reth-execution-types",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "reth-prune-types",
  "reth-stages-types",
  "reth-storage-errors",
@@ -2937,7 +2969,7 @@ dependencies = [
  "alloy-primitives",
  "alloy-rlp",
  "derive_more",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "reth-prune-types",
  "reth-static-file-types",
  "revm-database-interface",
@@ -2947,7 +2979,6 @@ dependencies = [
 [[package]]
 name = "reth-trie-common"
 version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
@@ -2960,7 +2991,7 @@ dependencies = [
  "derive_more",
  "itertools 0.14.0",
  "nybbles 0.4.6",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3",
  "revm-database",
  "serde",
  "serde_with",
@@ -2976,7 +3007,7 @@ dependencies = [
  "alloy-trie 0.9.1",
  "auto_impl",
  "reth-execution-errors",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "reth-trie-common",
  "smallvec",
  "tracing",
@@ -3528,22 +3559,20 @@ dependencies = [
 [[package]]
 name = "sha2"
 version = "0.10.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
 dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest 0.10.7",
+ "ziskos",
 ]
 
 [[package]]
 name = "sha3"
 version = "0.10.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75872d278a8f37ef87fa0ddbda7802605cb18344497949862c0d4dcb291eba60"
 dependencies = [
  "digest 0.10.7",
  "keccak",
+ "ziskos",
 ]
 
 [[package]]
@@ -3800,10 +3829,10 @@ dependencies = [
 [[package]]
 name = "tiny-keccak"
 version = "2.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c9d3793400a45f954c52e73d068316d76b6f4e36977e3fcebb13a2721e80237"
 dependencies = [
+ "cfg-if",
  "crunchy",
+ "ziskos",
 ]
 
 [[package]]
@@ -4245,6 +4274,7 @@ dependencies = [
 name = "zec-zeth"
 version = "0.4.0"
 dependencies = [
+ "alloy-primitives",
  "bincode 1.3.3",
  "blst",
  "revm",
@@ -4350,7 +4380,6 @@ dependencies = [
 [[package]]
 name = "zeth-chainspec"
 version = "0.3.0"
-source = "git+https://github.com/boundless-xyz/zeth.git?rev=e8460d3e516fa01e45f00366b233d7d8e5cb8e67#e8460d3e516fa01e45f00366b233d7d8e5cb8e67"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4365,7 +4394,6 @@ dependencies = [
 [[package]]
 name = "zeth-core"
 version = "0.3.0"
-source = "git+https://github.com/boundless-xyz/zeth.git?rev=e8460d3e516fa01e45f00366b233d7d8e5cb8e67#e8460d3e516fa01e45f00366b233d7d8e5cb8e67"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
@@ -4376,7 +4404,7 @@ dependencies = [
  "reth-ethereum-primitives",
  "reth-evm",
  "reth-evm-ethereum",
- "reth-primitives-traits",
+ "reth-primitives-traits 1.9.3 (git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3)",
  "reth-stateless",
  "reth-trie-common",
  "risc0-ethereum-trie",
@@ -4386,21 +4414,23 @@ dependencies = [
 
 [[package]]
 name = "ziskos"
-version = "0.15.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.15.0#b3ca745b80423c8123dc24f19039865a5bc8b074"
+version = "0.16.0"
 dependencies = [
  "bincode 2.0.1",
  "cfg-if",
  "getrandom 0.2.16",
  "lazy_static",
  "lib-c",
+ "libc",
+ "log",
+ "nix",
  "num-bigint",
  "num-integer",
  "num-traits",
+ "once_cell",
  "rand 0.8.5",
  "serde",
  "static_assertions",
- "tiny-keccak",
 ]
 
 [[package]]
