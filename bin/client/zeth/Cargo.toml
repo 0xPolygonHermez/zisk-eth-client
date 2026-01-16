@@ -33,9 +33,9 @@ zeth-chainspec = { git = "https://github.com/boundless-xyz/zeth.git", rev = "e84
 # zeth-core = { path = "../../../../zeth/crates/core" }
 # zeth-chainspec = { path = "../../../../zeth/crates/chainspec" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.15.0" }
+# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.15.0" }
 # Local development
-# ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
+ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
 
 
 [patch.crates-io]
@@ -43,7 +43,7 @@ ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.15.0" 
 # alloy-evm ={ path = "../../../../alloy-evm/crates/evm" }
 # alloy-primitives = { path = "../../../../core/crates/primitives" }
 
-ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", tag = "patch-1.17.0-zisk-0.15.0" }
+ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branch = "zisk-patch/v1.17.2" } # TODO: Point to new tag when available
 sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha2-0.10.9-zisk-0.15.0" }
 tiny-keccak ={ git = "https://github.com/0xPolygonHermez/zisk-patch-tiny-keccak.git", tag = "patch-2.0.2-zisk-0.15.0" }
 k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", tag = "patch-k256-0.13.4-zisk-0.15.0" }
