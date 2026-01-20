@@ -757,9 +757,8 @@ dependencies = [
 [[package]]
 name = "aurora-engine-modexp"
 version = "1.2.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-modexp.git?tag=patch-1.2.0-zisk-0.15.0#f78ffea724a61964c357ab53b876af68b19f38ef"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-modexp.git?branch=zisk-patch%2Fv1.2.0#1529a2857fa08e79adadc29559807d0bdfd94aff"
 dependencies = [
- "cfg-if",
  "hex",
  "num",
 ]
@@ -3651,7 +3650,7 @@ dependencies = [
 [[package]]
 name = "substrate-bn"
 version = "0.6.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-bn.git?tag=patch-0.6.0-zisk-0.15.0#7d408643bf033c427826124436fc1b3141ef7425"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-bn.git?branch=zisk-patch-bn%2Fv0.6.0#d637a1e00b668d85dd9da090a5c72c7baac34e37"
 dependencies = [
  "byteorder",
  "crunchy",

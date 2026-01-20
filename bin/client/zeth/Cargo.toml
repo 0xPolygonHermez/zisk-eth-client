@@ -47,10 +47,10 @@ ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branc
 sha2 = { git = "https://github.com/0xPolygonHermez/zisk-patch-hashes.git", tag = "patch-sha2-0.10.9-zisk-0.15.0" }
 tiny-keccak ={ git = "https://github.com/0xPolygonHermez/zisk-patch-tiny-keccak.git", tag = "patch-2.0.2-zisk-0.15.0" }
 k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", tag = "patch-k256-0.13.4-zisk-0.15.0" }
-substrate-bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", tag = "patch-0.6.0-zisk-0.15.0" }
+substrate-bn = { git = "https://github.com/0xPolygonHermez/zisk-patch-bn.git", branch = "zisk-patch-bn/v0.6.0" } # TODO: Point to new tag when available
 # c-kzg = { git = "https://github.com/0xPolygonHermez/zisk-patch-c-kzg.git", tag = "TODO" }
 blst = { git = "https://github.com/0xPolygonHermez/zisk-patch-blst.git", tag = "patch-0.3.15-zisk-0.15.0" }
-aurora-engine-modexp = { git = "https://github.com/0xPolygonHermez/zisk-patch-modexp.git", tag = "patch-1.2.0-zisk-0.15.0" }
+aurora-engine-modexp = { git = "https://github.com/0xPolygonHermez/zisk-patch-modexp.git", branch = "zisk-patch/v1.2.0" } # TODO: Point to new tag when available
 # Local development
 # ruint = { path = "../../../../zisk-patch-ruint" }
 # sha2 = { path = "../../../../zisk-patch-sha2/sha2" }
