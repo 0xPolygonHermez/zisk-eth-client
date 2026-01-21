@@ -5,5 +5,4 @@ mod zeth;
 
 mod types;
 
-
 pub use types::{InputGenerator, InputGeneratorResult, Network};

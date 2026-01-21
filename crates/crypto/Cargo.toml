@@ -1,0 +1,13 @@
+[package]
+name = "crypto"
+description = "Custom cryptographic implementations for Zisk zkVM"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+revm = { version = "31.0.2", default-features = false }
+alloy-consensus = { version = "1.0.37", default-features = false, features = ["crypto-backend"] }
+alloy-primitives = { version = "1.4.1" }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_vendor, values("zisk"))'] }

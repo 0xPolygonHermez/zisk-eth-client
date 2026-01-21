@@ -1,11 +1,22 @@
 #![no_main]
 ziskos::entrypoint!(main);
 
+use std::sync::Arc;
+
+use alloy_consensus::crypto::install_default_provider;
+use crypto::CustomEvmCrypto;
+use revm::install_crypto;
 use zeth_chainspec::MAINNET;
 use zeth_core::{validate_block, EthEvmConfig, Input};
 use ziskos::{read_input_slice, set_output};
 
+//TODO: Check why ecrecover not being patched correctly for tx recovery (alloy)
+
 fn main() {
+    // Install custom EVM crypto
+    install_crypto(CustomEvmCrypto::default());
+    install_default_provider(Arc::new(CustomEvmCrypto::default())).unwrap();
+
     let input = read_input_slice();
 
     let input = bincode::deserialize::<Input>(&input).unwrap();

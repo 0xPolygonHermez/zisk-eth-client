@@ -1,11 +1,18 @@
 #![no_main]
 ziskos::entrypoint!(main);
 
+use alloy_consensus::crypto::install_default_provider;
+use crypto::CustomEvmCrypto;
+use revm::install_crypto;
 use rsp_client_executor::{executor::EthClientExecutor, io::EthClientExecutorInput};
 use std::sync::Arc;
 use ziskos::{read_input_slice, set_output};
 
 fn main() {
+    // Install custom EVM crypto
+    install_crypto(CustomEvmCrypto::default());
+    install_default_provider(Arc::new(CustomEvmCrypto::default())).unwrap();
+
     let input = read_input_slice();
 
     let input = bincode::deserialize::<EthClientExecutorInput>(&input).unwrap();
