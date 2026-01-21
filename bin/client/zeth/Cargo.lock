@@ -895,13 +895,12 @@ dependencies = [
 [[package]]
 name = "blst"
 version = "0.3.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fd49896f12ac9b6dcd7a5998466b9b58263a695a3dd1ecc1aaca2e12a90b080"
 dependencies = [
  "cc",
  "glob",
  "threadpool",
  "zeroize",
+ "ziskos",
 ]
 
 [[package]]
@@ -1890,8 +1889,6 @@ dependencies = [
 [[package]]
 name = "k256"
 version = "0.13.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6e3919bbaa2945715f0bb6d3934a173d1e9a59ac23767fbaaef277265a7411b"
 dependencies = [
  "cfg-if",
  "ecdsa",
@@ -1899,6 +1896,7 @@ dependencies = [
  "once_cell",
  "serdect",
  "sha2",
+ "ziskos",
 ]
 
 [[package]]
@@ -3269,8 +3267,6 @@ dependencies = [
 [[package]]
 name = "ruint"
 version = "1.17.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a68df0380e5c9d20ce49534f292a36a7514ae21350726efe1865bdb1fa91d278"
 dependencies = [
  "alloy-rlp",
  "ark-ff 0.3.0",
@@ -3292,13 +3288,12 @@ dependencies = [
  "serde_core",
  "valuable",
  "zeroize",
+ "ziskos",
 ]
 
 [[package]]
 name = "ruint-macro"
 version = "1.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48fd7bd8a6377e15ad9d42a8ec25371b94ddc67abe7c8b9127bec79bebaaae18"
 
 [[package]]
 name = "rustc-hash"
@@ -3559,11 +3554,12 @@ dependencies = [
 [[package]]
 name = "sha2"
 version = "0.10.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
 dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest 0.10.7",
- "ziskos",
 ]
 
 [[package]]
@@ -3686,14 +3682,13 @@ dependencies = [
 [[package]]
 name = "substrate-bn"
 version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72b5bbfa79abbae15dd642ea8176a21a635ff3c00059961d1ea27ad04e5b441c"
 dependencies = [
  "byteorder",
  "crunchy",
  "lazy_static",
  "rand 0.8.5",
  "rustc-hex",
+ "ziskos",
 ]
 
 [[package]]
@@ -4428,6 +4423,7 @@ dependencies = [
  "num-integer",
  "num-traits",
  "once_cell",
+ "paste",
  "rand 0.8.5",
  "serde",
  "static_assertions",
