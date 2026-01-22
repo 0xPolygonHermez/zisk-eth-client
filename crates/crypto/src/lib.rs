@@ -52,7 +52,7 @@ extern "C" {
 
 #[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints))]
 extern "C" {
-    fn hint_sha256(output: *const u8);
+    fn hint_sha256(f: *const u8, len: usize);
     fn hint_bn254_g1_add(p1: *const u8, p2: *const u8);
     fn hint_bn254_g1_mul(point: *const u8, scalar: *const u8);
     fn hint_bls12_381_g1_add(a: *const u8, b: *const u8);
@@ -75,30 +75,27 @@ impl Crypto for CustomEvmCrypto {
     /// Compute SHA-256 hash
     #[inline]
     fn sha256(&self, input: &[u8]) -> [u8; 32] {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            let mut output = [0u8; 32];
-            unsafe {
-                sha256_c(input.as_ptr(), input.len(), output.as_mut_ptr());
-            }
+            #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+            unsafe { hint_sha256(input.as_ptr(), input.len()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_sha256 (output: {:x?})", &output);
+            println!("hint_sha2 (input: {:x?})", &input);
 
-            output
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut output = [0u8; 32];
+                unsafe {
+                    sha256_c(input.as_ptr(), input.len(), output.as_mut_ptr());
+                }
+                output
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
         {
-            let output = self.default_crypto.sha256(input);
-
-            #[cfg(zisk_hints)]
-            unsafe { hint_sha256(output.as_ptr()); }
-
-            #[cfg(zisk_hints_debug)]
-            println!("hint_sha256 (output: {:x?})", &output);
-
-            output
+            self.default_crypto.sha256(input)
         }
     }
 
