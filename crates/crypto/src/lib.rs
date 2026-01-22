@@ -6,6 +6,9 @@ use revm::precompile::{
 use alloy_consensus::crypto::{CryptoProvider, RecoveryError};
 use alloy_primitives::Address;
 
+#[cfg(zisk_hints_debug)]
+use std::os::raw::c_char;
+
 #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
 extern "C" {
     fn sha256_c(input: *const u8, input_len: usize, output: *mut u8);
@@ -64,6 +67,23 @@ extern "C" {
     fn hint_bls12_381_g1_msm(pairs: *const u8, num_pairs: usize);
     fn hint_bls12_381_g2_msm(pairs: *const u8, num_pairs: usize);
     fn hint_bls12_381_pairing_check(pairs: *const u8, num_pairs: usize);
+
+    fn pause_hints() -> bool;
+    fn resume_hints();
+}
+
+#[cfg(zisk_hints_debug)]
+extern "C" {
+    fn hint_log_c(msg: *const c_char);
+}
+
+#[cfg(zisk_hints_debug)]
+pub fn hint_log<S: AsRef<str>>(msg: S) {
+    use std::ffi::CString;
+
+    if let Ok(c) = CString::new(msg.as_ref()) {
+        unsafe { hint_log_c(c.as_ptr()) };
+    }
 }
 
 #[derive(Debug)]
@@ -87,7 +107,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_sha256(input.as_ptr(), input.len()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_sha2 (input: {:x?})", &input);
+            hint_log(format!("hint_sha2 (input: {:x?})", &input));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -154,7 +174,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_bn254_g1_mul(point.as_ptr(), scalar.as_ptr()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_bn254_g1_mul (point: {:x?}, scalar: {:x?})", &point, &scalar);
+            hint_log(format!("hint_bn254_g1_mul (point: {:x?}, scalar: {:x?})", &point, &scalar));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -187,11 +207,11 @@ impl Crypto for CustomEvmCrypto {
 
             #[cfg(zisk_hints_debug)]
             {
-                println!("hint_bn254_pairing_check (");
+                hint_log("hint_bn254_pairing_check (");
                 for (i, (g1, g2)) in pairs.iter().enumerate() {
-                    println!("  Pair {}: g1: {:x?}, g2: {:x?}", i, g1, g2);
+                    hint_log(format!("  Pair {}: g1: {:x?}, g2: {:x?}", i, g1, g2));
                 }
-                println!(")");
+                hint_log(")");
             }
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
@@ -222,7 +242,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_secp256k1_ecrecover(sig.as_ptr(), recid, msg.as_ptr()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?})", &sig, recid, &msg);
+            hint_log(format!("hint_secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?})", &sig, recid, &msg));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -239,7 +259,20 @@ impl Crypto for CustomEvmCrypto {
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
         {
-            self.default_crypto.secp256k1_ecrecover(sig, recid, msg)
+            // Pause hint emission here so default_crypto.secp256k1_ecrecover cannot produce extra hints (e.g. keccak256)
+            #[cfg(zisk_hints)]
+            let already_paused = unsafe { pause_hints() };
+
+            let result = self.default_crypto.secp256k1_ecrecover(sig, recid, msg);
+
+            #[cfg(zisk_hints)]
+            {
+                if !already_paused {
+                    unsafe { resume_hints() };
+                }
+            }
+
+            result
         }
     }
 
@@ -252,7 +285,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_modexp_bytes_c(base.as_ptr(), base.len(), exp.as_ptr(), exp.len(), modulus.as_ptr(), modulus.len()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_modexp_bytes_c (base: {:x?}, exp: {:x?}, modulus: {:x?})", &base, &exp, &modulus);
+            hint_log(format!("hint_modexp_bytes_c (base: {:x?}, exp: {:x?}, modulus: {:x?})", &base, &exp, &modulus));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -305,7 +338,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_verify_kzg_proof(z.as_ptr(), y.as_ptr(), commitment.as_ptr(), proof.as_ptr()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_verify_kzg_proof (z: {:x?}, y: {:x?}, commitment: {:x?}, proof: {:x?})", &z, &y, &commitment, &proof);
+            hint_log(format!("hint_verify_kzg_proof (z: {:x?}, y: {:x?}, commitment: {:x?}, proof: {:x?})", &z, &y, &commitment, &proof));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -342,7 +375,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_bls12_381_g1_add(a_bytes.as_ptr(), b_bytes.as_ptr()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_bls12_381_g1_add (a: {:x?}, b: {:x?})", &a_bytes, &b_bytes);
+            hint_log(format!("hint_bls12_381_g1_add (a: {:x?}, b: {:x?})", &a_bytes, &b_bytes));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -394,7 +427,13 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_bls12_381_g1_msm(pairs_bytes.as_ptr(), num_pairs); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_bls12_381_g1_msm (num_pairs: {}, pairs: {:x?})", num_pairs, &pairs_bytes);
+            {
+                hint_log("hint_bls12_381_g1_msm (");
+                for (i, (point, scalar)) in collected.iter().enumerate() {
+                    hint_log(format!("  Pair {}: point: ({:x?}, {:x?}), scalar: {:x?}", i, &point.0, &point.1, &scalar));
+                }
+                hint_log(")");
+            }
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -436,7 +475,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_bls12_381_g2_add(a_bytes.as_ptr(), b_bytes.as_ptr()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_bls12_381_g2_add (a: {:x?}, b: {:x?})", &a_bytes, &b_bytes);
+            hint_log(format!("hint_bls12_381_g2_add (a: {:x?}, b: {:x?})", &a_bytes, &b_bytes));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -489,7 +528,14 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_bls12_381_g2_msm(pairs_bytes.as_ptr(), num_pairs); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_bls12_381_g2_msm (num_pairs: {}, pairs: {:x?})", num_pairs, &pairs_bytes);
+            #[cfg(zisk_hints_debug)]
+            {
+                hint_log("hint_bls12_381_g2_msm (");
+                for (i, (point, scalar)) in collected.iter().enumerate() {
+                    hint_log(format!("  Pair {}: point: ({:x?}, {:x?}, {:x?}, {:x?}), scalar: {:x?}", i, &point.0, &point.1, &point.2, &point.3, &scalar));
+                }
+                hint_log(")");
+            }
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -536,11 +582,11 @@ impl Crypto for CustomEvmCrypto {
 
             #[cfg(zisk_hints_debug)]
             {
-                println!("hint_bls12_381_pairing_check (");
+                hint_log(format!("hint_bls12_381_pairing_check ("));
                 for (i, (g1, g2)) in pairs.iter().enumerate() {
-                    println!("  Pair {}: g1: {:x?}, g2: {:x?}", i, g1, g2);
+                    hint_log(format!("  Pair {}: g1: {:x?}, g2: {:x?}", i, g1, g2));
                 }
-                println!(")");
+                hint_log(format!(")"));
             }
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
@@ -586,7 +632,7 @@ impl CryptoProvider for CustomEvmCrypto {
             unsafe { hint_secp256k1_ecrecover(sig_bytes.as_ptr(), recid, msg.as_ptr()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?})", &sig_bytes, recid, &msg);
+            hint_log(format!("hint_secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?})", &sig_bytes, recid, &msg));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
