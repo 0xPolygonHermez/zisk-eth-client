@@ -52,7 +52,7 @@ extern "C" {
 
 #[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints))]
 extern "C" {
-    fn hint_sha2(f: *const u8);
+    fn hint_sha2(f: *const u8, len: usize);
     fn hint_bn254_g1_add(p1: *const u8, p2: *const u8);
     fn hint_bn254_g1_mul(point: *const u8, scalar: *const u8);
     fn hint_bls12_381_g1_add(a: *const u8, b: *const u8);
@@ -78,7 +78,7 @@ impl Crypto for CustomEvmCrypto {
         #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
-            unsafe { hint_sha2(input.as_ptr()); }
+            unsafe { hint_sha2(input.as_ptr(), input.len()); }
 
             #[cfg(zisk_hints_debug)]
             println!("hint_sha2 (input: {:x?})", &input);
@@ -90,6 +90,7 @@ impl Crypto for CustomEvmCrypto {
                     sha256_c(input.as_ptr(), input.len(), output.as_mut_ptr());
                 }
                 output
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -119,7 +120,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_bn254_g1_add(p1.as_ptr(), p2.as_ptr()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("bn254_g1_add (p1: {:x?}, p2: {:x?})", &p1, &p2);
+            println!("hint_bn254_g1_add (p1: {:x?}, p2: {:x?})", &p1, &p2);
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -147,7 +148,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_bn254_g1_mul(point.as_ptr(), scalar.as_ptr()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("bn254_g1_mul (point: {:x?}, scalar: {:x?})", &point, &scalar);
+            println!("hint_bn254_g1_mul (point: {:x?}, scalar: {:x?})", &point, &scalar);
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -200,7 +201,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_secp256k1_ecrecover(sig.as_ptr(), recid, msg.as_ptr()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?})", &sig, recid, &msg);
+            println!("hint_secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?})", &sig, recid, &msg);
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
