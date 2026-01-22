@@ -16,6 +16,7 @@ panic = "abort"
 bincode = "1.3.3"
 revm = { version = "31.0.2", default-features = false }
 alloy-consensus = { version = "1.0.37", default-features = false, features = ["crypto-backend"] }
+alloy-primitives = { version = "1.5.0", default-features = false, features = ["native-keccak"] }
 
 zeth-core = { git = "https://github.com/boundless-xyz/zeth.git", rev = "e8460d3e516fa01e45f00366b233d7d8e5cb8e67" }
 zeth-chainspec = { git = "https://github.com/boundless-xyz/zeth.git", rev = "e8460d3e516fa01e45f00366b233d7d8e5cb8e67" }
@@ -30,7 +31,5 @@ ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
 ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branch = "zisk-patch/v1.17.2" } # TODO: Point to new tag when available
-tiny-keccak ={ git = "https://github.com/0xPolygonHermez/zisk-patch-tiny-keccak.git", tag = "patch-2.0.2-zisk-0.15.0" }
 # Local development
 # ruint = { path = "../../../../zisk-patch-ruint" }
-# tiny-keccak = { path = "../../../../zisk-patch-tiny-keccak" }
