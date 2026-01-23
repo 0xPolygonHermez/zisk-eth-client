@@ -8,6 +8,7 @@ edition.workspace = true
 revm = { version = "31.0.2", default-features = false }
 alloy-consensus = { version = "1.0.37", default-features = false, features = ["crypto-backend"] }
 alloy-primitives = { version = "1.4.1" }
+k256 = { version = "0.13.4" }
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_vendor, values("zisk"))'] }
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_vendor, values("zisk"))', 'cfg(zisk_hints)', 'cfg(zisk_hints_debug)'] }

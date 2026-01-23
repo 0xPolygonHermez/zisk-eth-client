@@ -2389,6 +2389,7 @@ version = "0.4.0"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
+ "k256",
  "revm",
 ]
 
