@@ -177,7 +177,7 @@ impl Crypto for CustomEvmCrypto {
             unsafe { hint_bn254_g1_add(p1.as_ptr(), p2.as_ptr()); }
 
             #[cfg(zisk_hints_debug)]
-            println!("hint_bn254_g1_add (p1: {:x?}, p2: {:x?})", &p1, &p2);
+            hint_log(format!("hint_bn254_g1_add (p1: {:x?}, p2: {:x?})", &p1, &p2));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -718,7 +718,11 @@ impl CryptoProvider for CustomEvmCrypto {
                 signature = sig_normalized;
                 recid ^= 1;
             }
-            let recid = RecoveryId::from_byte(recid).expect("recovery ID is valid");
+            
+            let recid = match RecoveryId::from_byte(recid) {
+                Some(id) => id,
+                None => return Err(RecoveryError::new()),
+            };
 
             // recover key
             let recovered_key = match VerifyingKey::recover_from_prehash(&msg[..], &signature, recid) {
