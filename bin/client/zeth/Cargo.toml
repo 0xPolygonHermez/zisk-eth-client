@@ -31,10 +31,8 @@ ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
 # ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branch = "zisk-patch/v1.17.2" } # TODO: Point to new tag when available
-# tiny-keccak ={ git = "https://github.com/0xPolygonHermez/zisk-patch-tiny-keccak.git", tag = "patch-2.0.2-zisk-0.15.0" }
 # Local development
 # ruint = { path = "../../../../zisk-patch-ruint" }
-tiny-keccak = { path = "../../../../zisk-patch-tiny-keccak" }
 
 # Enable this for deterministic Hashmap sort
 alloy-evm ={ path = "../../../../alloy-rs-evm/crates/evm" }
