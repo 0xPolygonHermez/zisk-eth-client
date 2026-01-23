@@ -10,6 +10,20 @@ use alloy_primitives::Address;
 extern "C" {
     fn sha256_c(input: *const u8, input_len: usize, output: *mut u8);
 
+    fn bn254_g1_add_c(p1: *const u8, p2: *const u8, ret: *mut u8) -> u8;
+
+    fn bn254_g1_mul_c(point: *const u8, scalar: *const u8, ret: *mut u8) -> u8;
+
+    fn bn254_pairing_check_c(pairs: *const u8, num_pairs: usize) -> u8;
+
+    fn secp256k1_ecrecover_c(
+        sig: *const u8,
+        recid: u8,
+        msg: *const u8,
+        output: *mut u8,
+        require_low_s: bool,
+    ) -> u8;
+
     fn modexp_bytes_c(
         base_ptr: *const u8,
         base_len: usize,
@@ -17,8 +31,15 @@ extern "C" {
         exp_len: usize,
         modulus_ptr: *const u8,
         modulus_len: usize,
-        result_ptr: *mut u8,
+        ret_ptr: *mut u8,
     ) -> usize;
+
+    fn verify_kzg_proof_c(
+        z: *const u8,
+        y: *const u8,
+        commitment: *const u8,
+        proof: *const u8,
+    ) -> bool;
 
     fn bls12_381_g1_add_c(ret: *mut u8, a: *const u8, b: *const u8) -> u8;
 
@@ -28,26 +49,7 @@ extern "C" {
 
     fn bls12_381_g2_msm_c(ret: *mut u8, pairs: *const u8, num_pairs: usize) -> u8;
 
-    fn bls12_381_pairing_check_c(pairs: *const u8, num_pairs: usize) -> bool;
-
-    fn verify_kzg_proof_c(
-        z: *const u8,
-        y: *const u8,
-        commitment: *const u8,
-        proof: *const u8,
-    ) -> bool;
-
-    fn bn254_g1_add_c(p1: *const u8, p2: *const u8, result: *mut u8) -> u8;
-
-    fn bn254_g1_mul_c(point: *const u8, scalar: *const u8, result: *mut u8) -> u8;
-
-    fn bn254_pairing_check_c(
-        g1_ptrs: *const *const u8,
-        g2_ptrs: *const *const u8,
-        num_pairs: usize,
-    ) -> bool;
-
-    fn secp256k1_ecrecover_c(sig: *const u8, recid: u8, msg: *const u8, output: *mut u8) -> u8;
+    fn bls12_381_pairing_check_c(pairs: *const u8, num_pairs: usize) -> u8;
 }
 
 #[derive(Debug, Default)]
@@ -92,10 +94,12 @@ impl Crypto for CustomEvmCrypto {
         {
             let mut result = [0u8; 64];
             let ret = unsafe { bn254_g1_add_c(p1.as_ptr(), p2.as_ptr(), result.as_mut_ptr()) };
-            if ret != 0 {
-                return Err(PrecompileError::other("bn254_g1_add failed"));
+            match ret {
+                0 | 1 => Ok(result),
+                2 => Err(PrecompileError::other("bn254_g1_add inputs not in field")),
+                3 => Err(PrecompileError::Bn254FieldPointNotAMember),
+                _ => Err(PrecompileError::other("bn254_g1_add failed")),
             }
-            Ok(result)
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -113,10 +117,12 @@ impl Crypto for CustomEvmCrypto {
             let mut result = [0u8; 64];
             let ret =
                 unsafe { bn254_g1_mul_c(point.as_ptr(), scalar.as_ptr(), result.as_mut_ptr()) };
-            if ret != 0 {
-                return Err(PrecompileError::other("bn254_g1_mul failed"));
+            match ret {
+                0 | 1 => Ok(result), // 0=success, 1=success_infinity
+                2 => Err(PrecompileError::other("bn254_g1_mul inputs not in field")),
+                3 => Err(PrecompileError::Bn254FieldPointNotAMember),
+                _ => Err(PrecompileError::other("bn254_g1_mul failed")),
             }
-            Ok(result)
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -131,12 +137,27 @@ impl Crypto for CustomEvmCrypto {
     fn bn254_pairing_check(&self, pairs: &[(&[u8], &[u8])]) -> Result<bool, PrecompileError> {
         #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
         {
-            let g1_ptrs: Vec<*const u8> = pairs.iter().map(|(g1, _)| g1.as_ptr()).collect();
-            let g2_ptrs: Vec<*const u8> = pairs.iter().map(|(_, g2)| g2.as_ptr()).collect();
+            // Each pair is G1 (64 bytes) + G2 (128 bytes) = 192 bytes
+            let mut pairs_bytes = Vec::new();
 
-            let ret =
-                unsafe { bn254_pairing_check_c(g1_ptrs.as_ptr(), g2_ptrs.as_ptr(), pairs.len()) };
-            Ok(ret)
+            for (g1, g2) in pairs {
+                pairs_bytes.extend_from_slice(g1);
+                pairs_bytes.extend_from_slice(g2);
+            }
+
+            let ret = unsafe { bn254_pairing_check_c(pairs_bytes.as_ptr(), pairs.len()) };
+            match ret {
+                0 => Ok(true),
+                1 => Ok(false),
+                2 => Err(PrecompileError::other("bn254 G1 inputs not in field")),
+                3 => Err(PrecompileError::Bn254FieldPointNotAMember),
+                4 => Err(PrecompileError::other("bn254 G2 inputs not in field")),
+                5 => Err(PrecompileError::other("bn254 G2 point not on curve")),
+                6 => Err(PrecompileError::other(
+                    "bn254 pairing check subgroup check failed",
+                )),
+                _ => Err(PrecompileError::other("bn254_pairing_check failed")),
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -158,12 +179,18 @@ impl Crypto for CustomEvmCrypto {
         {
             let mut output = [0u8; 32];
             let ret = unsafe {
-                secp256k1_ecrecover_c(sig.as_ptr(), recid, msg.as_ptr(), output.as_mut_ptr())
+                secp256k1_ecrecover_c(
+                    sig.as_ptr(),
+                    recid,
+                    msg.as_ptr(),
+                    output.as_mut_ptr(),
+                    false,
+                )
             };
-            if ret != 0 {
-                return Err(PrecompileError::Secp256k1RecoverFailed);
+            match ret {
+                0 => Ok(output),
+                _ => Err(PrecompileError::Secp256k1RecoverFailed),
             }
-            Ok(output)
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -253,13 +280,14 @@ impl Crypto for CustomEvmCrypto {
             b_bytes[48..].copy_from_slice(&b.1);
 
             let mut result = [0u8; 96];
-            let ret = unsafe {
+            let ret_code = unsafe {
                 bls12_381_g1_add_c(result.as_mut_ptr(), a_bytes.as_ptr(), b_bytes.as_ptr())
             };
-            if ret != 0 {
-                return Err(PrecompileError::other("bls12_381_g1_add failed"));
+
+            match ret_code {
+                0 | 1 => Ok(result),
+                _ => Err(PrecompileError::Bls12381G1NotOnCurve),
             }
-            Ok(result)
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -280,7 +308,6 @@ impl Crypto for CustomEvmCrypto {
             // Each pair is 96 + 32 = 128 bytes
             let mut pairs_bytes = Vec::new();
             let mut num_pairs = 0usize;
-
             for pair in pairs {
                 let (point, scalar) = pair?;
                 pairs_bytes.extend_from_slice(&point.0);
@@ -290,12 +317,15 @@ impl Crypto for CustomEvmCrypto {
             }
 
             let mut result = [0u8; 96];
-            let ret =
+            let ret_code =
                 unsafe { bls12_381_g1_msm_c(result.as_mut_ptr(), pairs_bytes.as_ptr(), num_pairs) };
-            if ret != 0 {
-                return Err(PrecompileError::other("bls12_381_g1_msm failed"));
+
+            match ret_code {
+                0 | 1 => Ok(result),
+                2 => Err(PrecompileError::Bls12381G1NotOnCurve),
+                3 => Err(PrecompileError::Bls12381G1NotInSubgroup),
+                _ => Err(PrecompileError::other("bls12_381_g1_msm failed")),
             }
-            Ok(result)
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -323,13 +353,13 @@ impl Crypto for CustomEvmCrypto {
             b_bytes[144..].copy_from_slice(&b.3);
 
             let mut result = [0u8; 192];
-            let ret = unsafe {
+            let ret_code = unsafe {
                 bls12_381_g2_add_c(result.as_mut_ptr(), a_bytes.as_ptr(), b_bytes.as_ptr())
             };
-            if ret != 0 {
-                return Err(PrecompileError::other("bls12_381_g2_add failed"));
+            match ret_code {
+                0 | 1 => Ok(result),
+                _ => Err(PrecompileError::Bls12381G2NotOnCurve),
             }
-            Ok(result)
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -362,12 +392,14 @@ impl Crypto for CustomEvmCrypto {
             }
 
             let mut result = [0u8; 192];
-            let ret =
+            let ret_code =
                 unsafe { bls12_381_g2_msm_c(result.as_mut_ptr(), pairs_bytes.as_ptr(), num_pairs) };
-            if ret != 0 {
-                return Err(PrecompileError::other("bls12_381_g2_msm failed"));
+            match ret_code {
+                0 | 1 => Ok(result),
+                2 => Err(PrecompileError::Bls12381G2NotOnCurve),
+                3 => Err(PrecompileError::Bls12381G2NotInSubgroup),
+                _ => Err(PrecompileError::other("bls12_381_g2_msm failed")),
             }
-            Ok(result)
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -386,7 +418,6 @@ impl Crypto for CustomEvmCrypto {
         {
             // Each pair is G1Point (96 bytes) + G2Point (192 bytes) = 288 bytes
             let mut pairs_bytes = Vec::new();
-
             for (g1, g2) in pairs {
                 // G1Point: ([u8; 48], [u8; 48])
                 pairs_bytes.extend_from_slice(&g1.0);
@@ -398,8 +429,16 @@ impl Crypto for CustomEvmCrypto {
                 pairs_bytes.extend_from_slice(&g2.3);
             }
 
-            let ret = unsafe { bls12_381_pairing_check_c(pairs_bytes.as_ptr(), pairs.len()) };
-            Ok(ret)
+            let ret_code = unsafe { bls12_381_pairing_check_c(pairs_bytes.as_ptr(), pairs.len()) };
+            match ret_code {
+                0 => Ok(true),
+                1 => Ok(false),
+                2 => Err(PrecompileError::Bls12381G1NotOnCurve),
+                3 => Err(PrecompileError::Bls12381G1NotInSubgroup),
+                4 => Err(PrecompileError::Bls12381G2NotOnCurve),
+                5 => Err(PrecompileError::Bls12381G2NotInSubgroup),
+                _ => Err(PrecompileError::other("bls12_381_pairing_check failed")),
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -427,7 +466,6 @@ impl CryptoProvider for CustomEvmCrypto {
         sig: &[u8; 65],
         msg: &[u8; 32],
     ) -> Result<Address, RecoveryError> {
-        // TODO: I can use RecoveryError to manage the errors
         #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
         {
             // Extract signature (first 64 bytes) and recovery id (last byte)
@@ -437,7 +475,13 @@ impl CryptoProvider for CustomEvmCrypto {
 
             let mut output = [0u8; 32];
             let ret = unsafe {
-                secp256k1_ecrecover_c(sig_bytes.as_ptr(), recid, msg.as_ptr(), output.as_mut_ptr())
+                secp256k1_ecrecover_c(
+                    sig_bytes.as_ptr(),
+                    recid,
+                    msg.as_ptr(),
+                    output.as_mut_ptr(),
+                    true,
+                )
             };
             if ret != 0 {
                 return Err(RecoveryError::new());
