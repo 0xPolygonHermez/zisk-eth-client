@@ -653,6 +653,10 @@ impl CryptoProvider for CustomEvmCrypto {
             use alloy_consensus::crypto::secp256k1::public_key_to_address;
             use k256::ecdsa::{RecoveryId, VerifyingKey};
 
+            // Pause hint emission here so non-Zisk target execution cannot produce extra hints (e.g. keccak256)
+            #[cfg(zisk_hints)]
+            let already_paused = unsafe { pause_hints() };
+
             let mut signature = match k256::ecdsa::Signature::from_slice(&sig[0..64]){
                 Ok(sig) => sig,
                 Err(_) => return Err(RecoveryError::new()),
@@ -672,7 +676,16 @@ impl CryptoProvider for CustomEvmCrypto {
                 Err(_) => return Err(RecoveryError::new()),
             };
 
-            Ok(public_key_to_address(recovered_key))
+            let result = public_key_to_address(recovered_key);
+
+            #[cfg(zisk_hints)]
+            {
+                if !already_paused {
+                    unsafe { resume_hints() };
+                }
+            }
+
+            Ok(result)
         }
     }
 }
