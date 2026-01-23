@@ -6,7 +6,7 @@ edition.workspace = true
 
 [dependencies]
 revm = { version = "31.0.2", default-features = false }
-alloy-consensus = { version = "1.0.37", default-features = false, features = ["k256", "crypto-backend"] }
+alloy-consensus = { version = "1.0.37", default-features = false, features = ["crypto-backend"] }
 alloy-primitives = { version = "1.4.1" }
 k256 = { version = "0.13.4" }
 
