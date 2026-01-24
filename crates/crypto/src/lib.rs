@@ -6,6 +6,11 @@ use revm::precompile::{
 use alloy_consensus::crypto::{CryptoProvider, RecoveryError};
 use alloy_primitives::Address;
 
+#[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+use k256::ecdsa::VerifyingKey;
+#[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+use tiny_keccak::{Hasher, Keccak};
+
 #[cfg(zisk_hints_debug)]
 use std::os::raw::c_char;
 
@@ -657,6 +662,17 @@ impl Crypto for CustomEvmCrypto {
     // }
 }
 
+#[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+fn public_key_to_address(key: &VerifyingKey) -> Address {
+    let mut hasher = Keccak::v256();
+    hasher.update(&key.to_encoded_point(/* compress = */ false).as_bytes()[1..]);
+
+    let mut hash = [0u8; 32];
+    hasher.finalize(&mut hash);
+
+    Address::from_slice(&hash[12..])
+}
+
 impl CryptoProvider for CustomEvmCrypto {
     /// Recover signer from signature and message hash, without ensuring low S values.
     fn recover_signer_unchecked(
@@ -700,7 +716,6 @@ impl CryptoProvider for CustomEvmCrypto {
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
         {
-            use alloy_consensus::crypto::secp256k1::public_key_to_address;
             use k256::ecdsa::{RecoveryId, VerifyingKey};
 
             // Pause hint emission here so non-Zisk target execution cannot produce extra hints (e.g. keccak256)
@@ -718,7 +733,7 @@ impl CryptoProvider for CustomEvmCrypto {
                 signature = sig_normalized;
                 recid ^= 1;
             }
-            
+
             let recid = match RecoveryId::from_byte(recid) {
                 Some(id) => id,
                 None => return Err(RecoveryError::new()),
@@ -730,7 +745,7 @@ impl CryptoProvider for CustomEvmCrypto {
                 Err(_) => return Err(RecoveryError::new()),
             };
 
-            let result = public_key_to_address(recovered_key);
+            let result = public_key_to_address(&recovered_key);
 
             #[cfg(zisk_hints)]
             {
