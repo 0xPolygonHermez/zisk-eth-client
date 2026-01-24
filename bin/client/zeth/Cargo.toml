@@ -20,24 +20,23 @@ alloy-primitives = { version = "1.5.0", default-features = false, features = ["n
 
 zeth-core = { git = "https://github.com/boundless-xyz/zeth.git", rev = "e8460d3e516fa01e45f00366b233d7d8e5cb8e67" }
 zeth-chainspec = { git = "https://github.com/boundless-xyz/zeth.git", rev = "e8460d3e516fa01e45f00366b233d7d8e5cb8e67" }
-# zeth-core = { path = "../../../../zeth/crates/core" }
-# zeth-chainspec = { path = "../../../../zeth/crates/chainspec" }
 
 crypto = { path = "../../../crates/crypto" }
 
-# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.15.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/fix-new-patch" }
 # Local development
-ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
+# ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
-# ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branch = "zisk-patch/v1.17.2" } # TODO: Point to new tag when available
+ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branch = "zisk-patch/v1.17.2" } # TODO: Point to new tag when available
 # Local development
 # ruint = { path = "../../../../zisk-patch-ruint" }
 
-# Enable this for deterministic Hashmap sort
-alloy-evm ={ path = "../../../../alloy-rs-evm/crates/evm" }
-alloy-primitives = { path = "../../../../alloy-rs-core/crates/primitives" }
+# TODO: Add URLs when available
+# # Enable this for deterministic Hashmap sort
+# alloy-evm ={ path = "../../../../alloy-rs-evm/crates/evm" }
+# alloy-primitives = { path = "../../../../alloy-rs-core/crates/primitives" }
 
-[patch."https://github.com/paradigmxyz/reth.git"]
-# Enable this for deterministic Hashmap sort
-reth-trie-common = { path = "../../../../reth/crates/trie/common" }
+# # Enable this for deterministic Hashmap sort
+# [patch."https://github.com/paradigmxyz/reth.git"]
+# reth-trie-common = { path = "../../../../reth/crates/trie/common" }

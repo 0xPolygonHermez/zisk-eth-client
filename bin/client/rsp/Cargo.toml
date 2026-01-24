@@ -18,15 +18,13 @@ revm = { version = "31.0.2", default-features = false }
 alloy-consensus = { version = "1.4.3", default-features = false, features = ["crypto-backend"] }
 alloy-primitives = { version = "1.5.2", default-features = false, features = ["native-keccak"] }
 
-# rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "31e077b1039c32a8c028570bb9b82645dda155cc" }
-# Remove the following if PR https://github.com/succinctlabs/rsp/pull/169 is merged
-rsp-client-executor = { git = "https://github.com/hecmas/rsp.git", branch = "feat/dynamic-keccak", default-features = false, features = ["native-keccak"] }
+rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "af7c7e76b4853dc8bdfcd0af9f0ab527f7430608", default-features = false, features = ["native-keccak"] }
 
 crypto = { path = "../../../crates/crypto" }
 
-# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.15.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/fix-new-patch" }
 # Local development
-ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
+# ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
 
 [patch.crates-io]
 sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", tag = "patch-0.8.0-zisk-0.11.0" } # Needed for rsp symbol linking

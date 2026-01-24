@@ -665,6 +665,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ark-secp256k1"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8bd211c48debd3037b48873a7aa22c3aba034e83388aa4124795c9f220b88c7"
+dependencies = [
+ "ark-ec",
+ "ark-ff 0.5.0",
+ "ark-std 0.5.0",
+]
+
+[[package]]
 name = "ark-serialize"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1010,6 +1021,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "circuit"
+version = "0.16.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Ffix-new-patch#f136b80be6d90d6971b09993e1f918265352b091"
+
+[[package]]
 name = "const-hex"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1104,7 +1120,9 @@ version = "0.4.0"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
+ "k256",
  "revm",
+ "tiny-keccak",
 ]
 
 [[package]]
@@ -1477,6 +1495,17 @@ checksum = "c0b50bfb653653f9ca9095b427bed08ab8d75a137839d9ad64eb11810d5b6393"
 dependencies = [
  "rand_core 0.6.4",
  "subtle",
+]
+
+[[package]]
+name = "fields"
+version = "0.16.0"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0#74b7c04f96386fc312d09f43530084bd04fd3d5d"
+dependencies = [
+ "cfg-if",
+ "num-bigint",
+ "paste",
+ "serde",
 ]
 
 [[package]]
@@ -1912,6 +1941,7 @@ dependencies = [
  "once_cell",
  "serdect",
  "sha2",
+ "signature",
 ]
 
 [[package]]
@@ -1942,6 +1972,7 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 [[package]]
 name = "lib-c"
 version = "0.16.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Ffix-new-patch#f136b80be6d90d6971b09993e1f918265352b091"
 
 [[package]]
 name = "libc"
@@ -2368,6 +2399,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85eae3c4ed2f50dcfe72643da4befc30deadb458a9b590d720cde2f2b1e97da9"
 dependencies = [
  "zerocopy",
+]
+
+[[package]]
+name = "precompiles-helpers"
+version = "0.16.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Ffix-new-patch#f136b80be6d90d6971b09993e1f918265352b091"
+dependencies = [
+ "ark-bls12-381",
+ "ark-bn254",
+ "ark-ff 0.5.0",
+ "ark-secp256k1",
+ "ark-std 0.5.0",
+ "cfg-if",
+ "circuit",
+ "lib-c",
+ "num-bigint",
+ "num-traits",
 ]
 
 [[package]]
@@ -4371,17 +4419,21 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "0.16.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Ffix-new-patch#f136b80be6d90d6971b09993e1f918265352b091"
 dependencies = [
  "bincode 2.0.1",
  "cfg-if",
+ "fields",
  "getrandom 0.2.16",
  "lazy_static",
  "lib-c",
  "num-bigint",
  "num-integer",
  "num-traits",
+ "precompiles-helpers",
  "rand 0.8.5",
  "serde",
+ "sha2",
  "static_assertions",
  "tiny-keccak",
 ]

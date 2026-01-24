@@ -1,6 +1,6 @@
 use revm::precompile::{
     bls12_381::{G1Point, G1PointScalar, G2Point, G2PointScalar},
-    Crypto, PrecompileError, DefaultCrypto,
+    Crypto, DefaultCrypto, PrecompileError,
 };
 
 use alloy_consensus::crypto::{CryptoProvider, RecoveryError};
@@ -72,12 +72,7 @@ extern "C" {
 
     fn hint_bls12_381_g2_add(a: *const u8, b: *const u8);
 
-    fn hint_secp256k1_ecrecover(
-        sig: *const u8,
-        recid: u8,
-        msg: *const u8,
-        require_low_s: bool
-    );
+    fn hint_secp256k1_ecrecover(sig: *const u8, recid: u8, msg: *const u8, require_low_s: bool);
 
     fn hint_modexp_bytes_c(
         base_ptr: *const u8,
@@ -85,15 +80,10 @@ extern "C" {
         exp_ptr: *const u8,
         exp_len: usize,
         modulus_ptr: *const u8,
-        modulus_len: usize
+        modulus_len: usize,
     );
 
-    fn hint_verify_kzg_proof(
-        z: *const u8,
-        y: *const u8,
-        commitment: *const u8,
-        proof: *const u8
-    );
+    fn hint_verify_kzg_proof(z: *const u8, y: *const u8, commitment: *const u8, proof: *const u8);
 
     fn hint_bn254_pairing_check(pairs: *const u8, num_pairs: usize);
 
@@ -129,7 +119,9 @@ pub struct CustomEvmCrypto {
 
 impl Default for CustomEvmCrypto {
     fn default() -> Self {
-        Self { default_crypto: DefaultCrypto }
+        Self {
+            default_crypto: DefaultCrypto,
+        }
     }
 }
 
@@ -140,7 +132,9 @@ impl Crypto for CustomEvmCrypto {
         #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             #[cfg(zisk_hints)]
-            unsafe { hint_sha256(input.as_ptr(), input.len()); }
+            unsafe {
+                hint_sha256(input.as_ptr(), input.len());
+            }
 
             #[cfg(zisk_hints_debug)]
             hint_log(format!("hint_sha2 (input: {:x?})", &input));
@@ -179,10 +173,15 @@ impl Crypto for CustomEvmCrypto {
         #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             #[cfg(zisk_hints)]
-            unsafe { hint_bn254_g1_add(p1.as_ptr(), p2.as_ptr()); }
+            unsafe {
+                hint_bn254_g1_add(p1.as_ptr(), p2.as_ptr());
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_bn254_g1_add (p1: {:x?}, p2: {:x?})", &p1, &p2));
+            hint_log(format!(
+                "hint_bn254_g1_add (p1: {:x?}, p2: {:x?})",
+                &p1, &p2
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -209,10 +208,15 @@ impl Crypto for CustomEvmCrypto {
         #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             #[cfg(zisk_hints)]
-            unsafe { hint_bn254_g1_mul(point.as_ptr(), scalar.as_ptr()); }
+            unsafe {
+                hint_bn254_g1_mul(point.as_ptr(), scalar.as_ptr());
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_bn254_g1_mul (point: {:x?}, scalar: {:x?})", &point, &scalar));
+            hint_log(format!(
+                "hint_bn254_g1_mul (point: {:x?}, scalar: {:x?})",
+                &point, &scalar
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -248,10 +252,15 @@ impl Crypto for CustomEvmCrypto {
             }
 
             #[cfg(zisk_hints)]
-            unsafe { hint_bn254_pairing_check(pairs_bytes.as_ptr(), pairs.len()); }
+            unsafe {
+                hint_bn254_pairing_check(pairs_bytes.as_ptr(), pairs.len());
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_bn254_pairing_check (pairs_bytes: {:x?})", &pairs_bytes[..]));
+            hint_log(format!(
+                "hint_bn254_pairing_check (pairs_bytes: {:x?})",
+                &pairs_bytes[..]
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -288,7 +297,9 @@ impl Crypto for CustomEvmCrypto {
         #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             #[cfg(zisk_hints)]
-            unsafe { hint_secp256k1_ecrecover(sig.as_ptr(), recid, msg.as_ptr(), false); }
+            unsafe {
+                hint_secp256k1_ecrecover(sig.as_ptr(), recid, msg.as_ptr(), false);
+            }
 
             #[cfg(zisk_hints_debug)]
             hint_log(format!("hint_secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?}, require_low_s: false)", &sig, recid, &msg));
@@ -298,12 +309,12 @@ impl Crypto for CustomEvmCrypto {
                 let mut output = [0u8; 32];
                 let ret = unsafe {
                     secp256k1_ecrecover_c(
-                    sig.as_ptr(),
-                    recid,
-                    msg.as_ptr(),
-                    output.as_mut_ptr(),
-                    false,
-                )
+                        sig.as_ptr(),
+                        recid,
+                        msg.as_ptr(),
+                        output.as_mut_ptr(),
+                        false,
+                    )
                 };
                 match ret {
                     0 => Ok(output),
@@ -337,10 +348,22 @@ impl Crypto for CustomEvmCrypto {
         #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             #[cfg(zisk_hints)]
-            unsafe { hint_modexp_bytes_c(base.as_ptr(), base.len(), exp.as_ptr(), exp.len(), modulus.as_ptr(), modulus.len()); }
+            unsafe {
+                hint_modexp_bytes_c(
+                    base.as_ptr(),
+                    base.len(),
+                    exp.as_ptr(),
+                    exp.len(),
+                    modulus.as_ptr(),
+                    modulus.len(),
+                );
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_modexp_bytes_c (base: {:x?}, exp: {:x?}, modulus: {:x?})", &base, &exp, &modulus));
+            hint_log(format!(
+                "hint_modexp_bytes_c (base: {:x?}, exp: {:x?}, modulus: {:x?})",
+                &base, &exp, &modulus
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -390,10 +413,15 @@ impl Crypto for CustomEvmCrypto {
         #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             #[cfg(zisk_hints)]
-            unsafe { hint_verify_kzg_proof(z.as_ptr(), y.as_ptr(), commitment.as_ptr(), proof.as_ptr()); }
+            unsafe {
+                hint_verify_kzg_proof(z.as_ptr(), y.as_ptr(), commitment.as_ptr(), proof.as_ptr());
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_verify_kzg_proof (z: {:x?}, y: {:x?}, commitment: {:x?}, proof: {:x?})", &z, &y, &commitment, &proof));
+            hint_log(format!(
+                "hint_verify_kzg_proof (z: {:x?}, y: {:x?}, commitment: {:x?}, proof: {:x?})",
+                &z, &y, &commitment, &proof
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -409,7 +437,8 @@ impl Crypto for CustomEvmCrypto {
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
         {
-            self.default_crypto.verify_kzg_proof(z, y, commitment, proof)
+            self.default_crypto
+                .verify_kzg_proof(z, y, commitment, proof)
         }
     }
 
@@ -427,10 +456,15 @@ impl Crypto for CustomEvmCrypto {
             b_bytes[48..].copy_from_slice(&b.1);
 
             #[cfg(zisk_hints)]
-            unsafe { hint_bls12_381_g1_add(a_bytes.as_ptr(), b_bytes.as_ptr()); }
+            unsafe {
+                hint_bls12_381_g1_add(a_bytes.as_ptr(), b_bytes.as_ptr());
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_bls12_381_g1_add (a: {:x?}, b: {:x?})", &a_bytes, &b_bytes));
+            hint_log(format!(
+                "hint_bls12_381_g1_add (a: {:x?}, b: {:x?})",
+                &a_bytes, &b_bytes
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -439,7 +473,7 @@ impl Crypto for CustomEvmCrypto {
                     bls12_381_g1_add_c(result.as_mut_ptr(), a_bytes.as_ptr(), b_bytes.as_ptr())
                 };
 
-            match ret_code {
+                match ret_code {
                     0 | 1 => Ok(result),
                     _ => Err(PrecompileError::Bls12381G1NotOnCurve),
                 }
@@ -459,8 +493,7 @@ impl Crypto for CustomEvmCrypto {
     ) -> Result<[u8; 96], PrecompileError> {
         // TODO: Review if it's a better way to do this to avoid borrowing issues with pairs
         let mut collected: Vec<G1PointScalar> = Vec::new();
-
-        while let Some(pair) = pairs.next() {
+        for pair in pairs {
             collected.push(pair?);
         }
 
@@ -480,18 +513,25 @@ impl Crypto for CustomEvmCrypto {
             }
 
             #[cfg(zisk_hints)]
-            unsafe { hint_bls12_381_g1_msm(pairs_bytes.as_ptr(), num_pairs); }
+            unsafe {
+                hint_bls12_381_g1_msm(pairs_bytes.as_ptr(), num_pairs);
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_bls12_381_g1_msm (pairs_bytes: {:x?}, num_pairs: {})", &pairs_bytes[..], num_pairs));
+            hint_log(format!(
+                "hint_bls12_381_g1_msm (pairs_bytes: {:x?}, num_pairs: {})",
+                &pairs_bytes[..],
+                num_pairs
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
                 let mut result = [0u8; 96];
-                let ret_code =
-                    unsafe { bls12_381_g1_msm_c(result.as_mut_ptr(), pairs_bytes.as_ptr(), num_pairs) };
+                let ret_code = unsafe {
+                    bls12_381_g1_msm_c(result.as_mut_ptr(), pairs_bytes.as_ptr(), num_pairs)
+                };
 
-            match ret_code {
+                match ret_code {
                     0 | 1 => Ok(result),
                     2 => Err(PrecompileError::Bls12381G1NotOnCurve),
                     3 => Err(PrecompileError::Bls12381G1NotInSubgroup),
@@ -525,10 +565,15 @@ impl Crypto for CustomEvmCrypto {
             b_bytes[144..].copy_from_slice(&b.3);
 
             #[cfg(zisk_hints)]
-            unsafe { hint_bls12_381_g2_add(a_bytes.as_ptr(), b_bytes.as_ptr()); }
+            unsafe {
+                hint_bls12_381_g2_add(a_bytes.as_ptr(), b_bytes.as_ptr());
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_bls12_381_g2_add (a: {:x?}, b: {:x?})", &a_bytes, &b_bytes));
+            hint_log(format!(
+                "hint_bls12_381_g2_add (a: {:x?}, b: {:x?})",
+                &a_bytes, &b_bytes
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -556,8 +601,7 @@ impl Crypto for CustomEvmCrypto {
     ) -> Result<[u8; 192], PrecompileError> {
         // TODO: Review if it's a better way to do this to avoid borrowing issues with pairs
         let mut collected: Vec<G2PointScalar> = Vec::new();
-
-        while let Some(pair) = pairs.next() {
+        for pair in pairs {
             collected.push(pair?);
         }
 
@@ -578,16 +622,23 @@ impl Crypto for CustomEvmCrypto {
             }
 
             #[cfg(zisk_hints)]
-            unsafe { hint_bls12_381_g2_msm(pairs_bytes.as_ptr(), num_pairs); }
+            unsafe {
+                hint_bls12_381_g2_msm(pairs_bytes.as_ptr(), num_pairs);
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_bls12_381_g2_msm (pairs_bytes: {:x?}, num_pairs: {})", &pairs_bytes[..], num_pairs));
+            hint_log(format!(
+                "hint_bls12_381_g2_msm (pairs_bytes: {:x?}, num_pairs: {})",
+                &pairs_bytes[..],
+                num_pairs
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
                 let mut result = [0u8; 192];
-                let ret_code =
-                    unsafe { bls12_381_g2_msm_c(result.as_mut_ptr(), pairs_bytes.as_ptr(), num_pairs) };
+                let ret_code = unsafe {
+                    bls12_381_g2_msm_c(result.as_mut_ptr(), pairs_bytes.as_ptr(), num_pairs)
+                };
                 match ret_code {
                     0 | 1 => Ok(result),
                     2 => Err(PrecompileError::Bls12381G2NotOnCurve),
@@ -625,14 +676,21 @@ impl Crypto for CustomEvmCrypto {
             }
 
             #[cfg(zisk_hints)]
-            unsafe { hint_bls12_381_pairing_check(pairs_bytes.as_ptr(), pairs.len()); }
+            unsafe {
+                hint_bls12_381_pairing_check(pairs_bytes.as_ptr(), pairs.len());
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_bls12_381_pairing_check (pairs_bytes: {:x?}, pairs_len: {})", &pairs_bytes, pairs.len()));
+            hint_log(format!(
+                "hint_bls12_381_pairing_check (pairs_bytes: {:x?}, pairs_len: {})",
+                &pairs_bytes,
+                pairs.len()
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
-                let ret_code = unsafe { bls12_381_pairing_check_c(pairs_bytes.as_ptr(), pairs.len()) };
+                let ret_code =
+                    unsafe { bls12_381_pairing_check_c(pairs_bytes.as_ptr(), pairs.len()) };
                 match ret_code {
                     0 => Ok(true),
                     1 => Ok(false),
@@ -689,22 +747,27 @@ impl CryptoProvider for CustomEvmCrypto {
             let recid = sig[64];
 
             #[cfg(zisk_hints)]
-            unsafe { hint_secp256k1_ecrecover(sig_bytes.as_ptr(), recid, msg.as_ptr(), true); }
+            unsafe {
+                hint_secp256k1_ecrecover(sig_bytes.as_ptr(), recid, msg.as_ptr(), true);
+            }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?}, require_low_s: true)", &sig_bytes, recid, &msg));
+            hint_log(format!(
+                "hint_secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?}, require_low_s: true)",
+                &sig_bytes, recid, &msg
+            ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
                 let mut output = [0u8; 32];
                 let ret = unsafe {
                     secp256k1_ecrecover_c(
-                    sig_bytes.as_ptr(),
-                    recid,
-                    msg.as_ptr(),
-                    output.as_mut_ptr(),
-                    true,
-                )
+                        sig_bytes.as_ptr(),
+                        recid,
+                        msg.as_ptr(),
+                        output.as_mut_ptr(),
+                        true,
+                    )
                 };
                 if ret != 0 {
                     return Err(RecoveryError::new());
@@ -722,7 +785,7 @@ impl CryptoProvider for CustomEvmCrypto {
             #[cfg(zisk_hints)]
             let already_paused = unsafe { pause_hints() };
 
-            let mut signature = match k256::ecdsa::Signature::from_slice(&sig[0..64]){
+            let mut signature = match k256::ecdsa::Signature::from_slice(&sig[0..64]) {
                 Ok(sig) => sig,
                 Err(_) => return Err(RecoveryError::new()),
             };
@@ -740,10 +803,11 @@ impl CryptoProvider for CustomEvmCrypto {
             };
 
             // recover key
-            let recovered_key = match VerifyingKey::recover_from_prehash(&msg[..], &signature, recid) {
-                Ok(key) => key,
-                Err(_) => return Err(RecoveryError::new()),
-            };
+            let recovered_key =
+                match VerifyingKey::recover_from_prehash(&msg[..], &signature, recid) {
+                    Ok(key) => key,
+                    Err(_) => return Err(RecoveryError::new()),
+                };
 
             let result = public_key_to_address(&recovered_key);
 
