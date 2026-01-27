@@ -76,9 +76,14 @@ extern "C" {
 
     fn hint_bls12_381_g2_add(a: *const u8, b: *const u8);
 
-    fn hint_secp256k1_ecrecover(sig: *const u8, recid: u8, msg: *const u8, require_low_s: bool);
+    fn hint_secp256k1_ecrecover(
+        sig: *const u8,
+        recid: *const u8,
+        msg: *const u8,
+        require_low_s: *const u8,
+    );
 
-    fn hint_modexp_bytes_c(
+    fn hint_modexp_bytes(
         base_ptr: *const u8,
         base_len: usize,
         exp_ptr: *const u8,
@@ -266,8 +271,9 @@ impl Crypto for CustomEvmCrypto {
 
             #[cfg(zisk_hints_debug)]
             hint_log(format!(
-                "hint_bn254_pairing_check (pairs_bytes: {:x?})",
-                &pairs_bytes[..]
+                "hint_bn254_pairing_check (pairs_bytes: {:x?}), num_pairs: {}",
+                &pairs_bytes[..],
+                pairs.len()
             ));
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
@@ -306,11 +312,18 @@ impl Crypto for CustomEvmCrypto {
         {
             #[cfg(zisk_hints)]
             unsafe {
-                hint_secp256k1_ecrecover(sig.as_ptr(), recid, msg.as_ptr(), false);
+                let recid_bytes = (recid as u64).to_le_bytes();
+                let require_low_s_bytes = [0u8; 8];
+                hint_secp256k1_ecrecover(sig.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr(), require_low_s_bytes.as_ptr());
             }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!("hint_secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?}, require_low_s: false)", &sig, recid, &msg));
+            {
+                let recid_bytes = (recid as u64).to_le_bytes();
+                let require_low_s_bytes = [0u8; 8];
+                hint_log(format!("hint_secp256k1_ecrecover (sig: {:x?}, recid: {:x?}, msg: {:x?}, require_low_s: {:x?})",
+                    &sig, &recid_bytes, &msg, &require_low_s_bytes));
+            }
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
@@ -357,7 +370,7 @@ impl Crypto for CustomEvmCrypto {
         {
             #[cfg(zisk_hints)]
             unsafe {
-                hint_modexp_bytes_c(
+                hint_modexp_bytes(
                     base.as_ptr(),
                     base.len(),
                     exp.as_ptr(),
@@ -369,7 +382,7 @@ impl Crypto for CustomEvmCrypto {
 
             #[cfg(zisk_hints_debug)]
             hint_log(format!(
-                "hint_modexp_bytes_c (base: {:x?}, exp: {:x?}, modulus: {:x?})",
+                "hint_modexp_bytes (base: {:x?}, exp: {:x?}, modulus: {:x?})",
                 &base, &exp, &modulus
             ));
 
@@ -690,7 +703,7 @@ impl Crypto for CustomEvmCrypto {
 
             #[cfg(zisk_hints_debug)]
             hint_log(format!(
-                "hint_bls12_381_pairing_check (pairs_bytes: {:x?}, pairs_len: {})",
+                "hint_bls12_381_pairing_check (pairs_bytes: {:x?}, num_pairs: {})",
                 &pairs_bytes,
                 pairs.len()
             ));
@@ -809,14 +822,20 @@ impl CryptoProvider for CustomEvmCrypto {
 
             #[cfg(zisk_hints)]
             unsafe {
-                hint_secp256k1_ecrecover(sig_bytes.as_ptr(), recid, msg.as_ptr(), true);
+                let recid_bytes = (recid as u64).to_le_bytes();
+                let require_low_s_bytes = [1u8; 8];
+                hint_secp256k1_ecrecover(sig_bytes.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr(), require_low_s_bytes.as_ptr());
             }
 
             #[cfg(zisk_hints_debug)]
-            hint_log(format!(
-                "hint_secp256k1_ecrecover (sig: {:x?}, recid: {}, msg: {:x?}, require_low_s: true)",
-                &sig_bytes, recid, &msg
-            ));
+            {
+                let recid_bytes = (recid as u64).to_le_bytes();
+                let require_low_s_bytes = [1u8; 8];
+                hint_log(format!(
+                    "hint_secp256k1_ecrecover (sig: {:x?}, recid: {:x?}, msg: {:x?}, require_low_s: {:x?})",
+                    &sig_bytes, &recid_bytes, &msg, &require_low_s_bytes
+                ));
+            }
 
             #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             {
