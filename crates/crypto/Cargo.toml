@@ -5,11 +5,12 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-revm = { version = "31.0.2", default-features = false }
-alloy-consensus = { version = "1.0.37", default-features = false, features = ["crypto-backend"] }
-alloy-primitives = { version = "1.4.1" }
-k256 = { version = "0.13.4" }
-tiny-keccak = { version = "2.0.0", features = ["keccak"] }
+revm.workspace = true
+alloy-consensus = { workspace = true, features = ["crypto-backend"] }
+alloy-primitives.workspace = true
+
+k256.workspace = true
+tiny-keccak.workspace = true
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_vendor, values("zisk"))', 'cfg(zisk_hints)', 'cfg(zisk_hints_debug)'] }

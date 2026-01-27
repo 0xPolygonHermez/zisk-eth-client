@@ -58,6 +58,10 @@ extern "C" {
     fn bls12_381_g2_msm_c(ret: *mut u8, pairs: *const u8, num_pairs: usize) -> u8;
 
     fn bls12_381_pairing_check_c(pairs: *const u8, num_pairs: usize) -> u8;
+
+    fn bls12_381_fp_to_g1_c(ret: *mut u8, fp: *const u8) -> u8;
+
+    fn bls12_381_fp2_to_g2_c(ret: *mut u8, fp2: *const u8) -> u8;
 }
 
 #[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints))]
@@ -92,6 +96,10 @@ extern "C" {
     fn hint_bls12_381_g2_msm(pairs: *const u8, num_pairs: usize);
 
     fn hint_bls12_381_pairing_check(pairs: *const u8, num_pairs: usize);
+
+    fn hint_bls12_381_fp_to_g1(fp: *const u8);
+
+    fn hint_bls12_381_fp2_to_g2(fp2: *const u8);
 
     fn pause_hints() -> bool;
 
@@ -709,15 +717,68 @@ impl Crypto for CustomEvmCrypto {
         }
     }
 
-    // /// BLS12-381 map field element to G1.
-    // fn bls12_381_fp_to_g1(&self, fp: &[u8; 48]) -> Result<[u8; 96], PrecompileError> {
-    //     crate::bls12_381::crypto_backend::map_fp_to_g1_bytes(fp)
-    // }
+    /// BLS12-381 map field element to G1.
+    fn bls12_381_fp_to_g1(&self, fp: &[u8; 48]) -> Result<[u8; 96], PrecompileError> {
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
+        {
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bls12_381_fp_to_g1(fp.as_ptr());
+            }
 
-    // /// BLS12-381 map field element to G2.
-    // fn bls12_381_fp2_to_g2(&self, fp2: ([u8; 48], [u8; 48])) -> Result<[u8; 192], PrecompileError> {
-    //     crate::bls12_381::crypto_backend::map_fp2_to_g2_bytes(&fp2.0, &fp2.1)
-    // }
+            #[cfg(zisk_hints_debug)]
+            hint_log(format!("hint_bls12_381_fp_to_g1 (fp: {:x?})", &fp));
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut result = [0u8; 96];
+                let ret_code = unsafe { bls12_381_fp_to_g1_c(result.as_mut_ptr(), fp.as_ptr()) };
+                match ret_code {
+                    0 => Ok(result),
+                    _ => Err(PrecompileError::other("bls12_381_fp_to_g1 failed")),
+                }
+            }
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.default_crypto.bls12_381_fp_to_g1(fp)
+        }
+    }
+
+    /// BLS12-381 map field element to G2.
+    fn bls12_381_fp2_to_g2(&self, fp2: ([u8; 48], [u8; 48])) -> Result<[u8; 192], PrecompileError> {
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
+        {
+            let mut fp2_bytes = [0u8; 96];
+            fp2_bytes[..48].copy_from_slice(&fp2.0);
+            fp2_bytes[48..].copy_from_slice(&fp2.1);
+
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bls12_381_fp2_to_g2(fp2_bytes.as_ptr());
+            }
+
+            #[cfg(zisk_hints_debug)]
+            hint_log(format!("hint_bls12_381_fp2_to_g2 (fp2: {:x?})", &fp2_bytes));
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut result = [0u8; 192];
+                let ret_code =
+                    unsafe { bls12_381_fp2_to_g2_c(result.as_mut_ptr(), fp2_bytes.as_ptr()) };
+                match ret_code {
+                    0 => Ok(result),
+                    _ => Err(PrecompileError::other("bls12_381_fp2_to_g2 failed")),
+                }
+            }
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.default_crypto.bls12_381_fp2_to_g2(fp2)
+        }
+    }
 }
 
 #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -821,4 +882,17 @@ impl CryptoProvider for CustomEvmCrypto {
             Ok(result)
         }
     }
+
+    // /// Verify a signature against a public key and message hash, without ensuring low S values.
+    // fn verify_and_compute_signer_unchecked(
+    //     &self,
+    //     pubkey: &[u8; 65],
+    //     sig: &[u8; 64],
+    //     msg: &[u8; 32],
+    // ) -> Result<Address, RecoveryError> {
+    //     let _ = pubkey;
+    //     let _ = sig;
+    //     let _ = msg;
+    //     unimplemented!("verify_and_compute_signer_unchecked is not implemented yet");
+    // }
 }
