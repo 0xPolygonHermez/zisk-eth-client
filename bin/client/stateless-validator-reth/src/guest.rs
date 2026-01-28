@@ -19,6 +19,7 @@ use stateless_validator_common::{guest::StatelessValidatorOutput, new_payload_re
 use stateless_validator_reth::new_payload_request::new_payload_request_to_block;
 
 /// Input for the stateless validator guest program.
+/// Copied from https://github.com/eth-act/ere-guests/blob/main/crates/stateless-validator-reth/src/guest.rs
 #[serde_as]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct StatelessValidatorRethInput {
