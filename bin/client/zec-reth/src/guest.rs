@@ -1,21 +1,23 @@
-use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
+use std::sync::Arc;
 
 use crypto::CustomEvmCrypto;
 
-use alloy_genesis::{Genesis, ChainConfig};
 use alloy_consensus::crypto::install_default_provider;
+use alloy_genesis::{ChainConfig, Genesis};
 
 use sparsestate::SparseState;
 
-use reth_stateless::{ExecutionWitness, UncompressedPublicKey, stateless_validation_with_trie};
 use reth_chainspec::ChainSpec;
 use reth_evm_ethereum::EthEvmConfig;
+use reth_stateless::{ExecutionWitness, UncompressedPublicKey, stateless_validation_with_trie};
 
 use revm::install_crypto;
 
-use stateless_validator_common::{guest::StatelessValidatorOutput, new_payload_request::NewPayloadRequest};
+use stateless_validator_common::{
+    guest::StatelessValidatorOutput, new_payload_request::NewPayloadRequest,
+};
 use stateless_validator_reth::new_payload_request::new_payload_request_to_block;
 
 /// Input for the stateless validator guest program.

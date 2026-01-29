@@ -4163,7 +4163,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zec"
+name = "zec-reth"
 version = "0.1.0"
 dependencies = [
  "alloy-consensus",

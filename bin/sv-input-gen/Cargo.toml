@@ -9,6 +9,7 @@ alloy-consensus = "1.5.2"
 alloy-eips = "1.5.2"
 alloy-genesis = "1.5.2"
 alloy-rpc-types-eth = "1.5.2"
+alloy-primitives = "1.4.1"
 
 # reth-stateless = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 reth-stateless = { git = "https://github.com/paradigmxyz/reth", rev = "cfde951976bfa9100a6d9f806e06fb539ae25241" }

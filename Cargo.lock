@@ -12118,6 +12118,7 @@ dependencies = [
  "alloy-consensus",
  "alloy-eips",
  "alloy-genesis",
+ "alloy-primitives",
  "alloy-rpc-types-eth",
  "anyhow",
  "bincode 1.3.3",
