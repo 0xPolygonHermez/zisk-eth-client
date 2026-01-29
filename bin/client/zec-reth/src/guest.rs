@@ -6,20 +6,20 @@ use crypto::CustomEvmCrypto;
 
 use alloy_consensus::crypto::install_default_provider;
 use alloy_genesis::{ChainConfig, Genesis};
+use alloy_primitives::B256;
 
 use sparsestate::SparseState;
 
 use reth_chainspec::ChainSpec;
 use reth_evm_ethereum::EthEvmConfig;
-use reth_stateless::{ExecutionWitness, UncompressedPublicKey, stateless_validation_with_trie};
+use reth_stateless::{validation::StatelessValidationError, ExecutionWitness, UncompressedPublicKey, stateless_validation_with_trie};
 
 use revm::install_crypto;
 
-use stateless_validator_common::{
-    guest::StatelessValidatorOutput, new_payload_request::NewPayloadRequest,
-};
+use stateless_validator_common::new_payload_request::NewPayloadRequest;
 use stateless_validator_reth::new_payload_request::new_payload_request_to_block;
 
+// TODO: Import it from witness_generator when erorrs are resolved
 /// Input for the stateless validator guest program.
 /// Copied from https://github.com/eth-act/ere-guests/blob/main/crates/stateless-validator-reth/src/guest.rs
 #[serde_as]
@@ -37,30 +37,11 @@ pub struct StatelessValidatorRethInput {
 }
 
 /// Performs stateless validation of a block using the provided witness data.
-pub fn validate_block(input: StatelessValidatorRethInput) -> StatelessValidatorOutput {
+pub fn validate_block(input: StatelessValidatorRethInput) -> Result<B256, StatelessValidationError> {
     // Install custom EVM crypto
     install_crypto(CustomEvmCrypto::default());
     install_default_provider(Arc::new(CustomEvmCrypto::default())).unwrap();
 
-    let new_payload_request_root = input.new_payload_request.tree_hash_root();
-
-    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        validate_block_inner(input, new_payload_request_root)
-    }));
-
-    match result {
-        Ok(output) => output,
-        Err(_) => {
-            println!("Panic occurred during validation\n");
-            StatelessValidatorOutput::new(new_payload_request_root, false)
-        }
-    }
-}
-
-fn validate_block_inner(
-    input: StatelessValidatorRethInput,
-    new_payload_request_root: [u8; 32],
-) -> StatelessValidatorOutput {
     // Build chain spec from input's chain config
     let genesis = Genesis {
         config: input.chain_config.clone(),
@@ -70,28 +51,21 @@ fn validate_block_inner(
     let evm_config = EthEvmConfig::new(chain_spec.clone());
 
     // Convert new payload request to block
-    let block = match new_payload_request_to_block(input.new_payload_request, chain_spec.clone()) {
-        Ok(sealed_block) => sealed_block.into_block(),
-        Err(err) => {
+    let block = new_payload_request_to_block(input.new_payload_request, chain_spec.clone())
+        .map_err(|err| {
             println!("Failed to convert to reth block: {err}");
-            return StatelessValidatorOutput::new(new_payload_request_root, false);
-        }
-    };
+            StatelessValidationError::Custom("Block conversion failed")
+        })?
+        .into_block();
 
     // Perform stateless validation
-    let result = stateless_validation_with_trie::<SparseState, _, _>(
+    let (hash, _) = stateless_validation_with_trie::<SparseState, _, _>(
         block,
         input.public_keys,
         input.witness,
         chain_spec,
         evm_config,
-    );
+    )?;
 
-    match result {
-        Ok(_) => StatelessValidatorOutput::new(new_payload_request_root, true),
-        Err(err) => {
-            println!("Block validation failed: {err}");
-            StatelessValidatorOutput::new(new_payload_request_root, false)
-        }
-    }
+    Ok(hash)
 }
