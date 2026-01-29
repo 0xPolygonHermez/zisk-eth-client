@@ -314,7 +314,12 @@ impl Crypto for CustomEvmCrypto {
             unsafe {
                 let recid_bytes = (recid as u64).to_le_bytes();
                 let require_low_s_bytes = [0u8; 8];
-                hint_secp256k1_ecrecover(sig.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr(), require_low_s_bytes.as_ptr());
+                hint_secp256k1_ecrecover(
+                    sig.as_ptr(),
+                    recid_bytes.as_ptr(),
+                    msg.as_ptr(),
+                    require_low_s_bytes.as_ptr(),
+                );
             }
 
             #[cfg(zisk_hints_debug)]
@@ -824,7 +829,12 @@ impl CryptoProvider for CustomEvmCrypto {
             unsafe {
                 let recid_bytes = (recid as u64).to_le_bytes();
                 let require_low_s_bytes = [1u8; 8];
-                hint_secp256k1_ecrecover(sig_bytes.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr(), require_low_s_bytes.as_ptr());
+                hint_secp256k1_ecrecover(
+                    sig_bytes.as_ptr(),
+                    recid_bytes.as_ptr(),
+                    msg.as_ptr(),
+                    require_low_s_bytes.as_ptr(),
+                );
             }
 
             #[cfg(zisk_hints_debug)]

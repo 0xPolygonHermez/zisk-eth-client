@@ -1,7 +1,8 @@
 [workspace.package]
 
 [package]
-name = "stateless-validator-reth"
+name = "zec"
+description = "ZisK Ethereum Client"
 version = "0.1.0"
 edition = "2024"
 
@@ -44,5 +45,14 @@ serde = { version = "1.0", default-features = false }
 serde_with = { version = "3", default-features = false }
 
 [patch.crates-io]
+# TODO: Decide what to do with the ruint patch
+#       If included, it must be patched independently
+# ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branch = "zisk-patch/v1.17.2" } # TODO: Point to new tag when available
+# Local development
+# ruint = { path = "../../../../zisk-patch-ruint" }
+
 # This patch removes "ring" as a dependency, that is not compatible with the ZisK toolchain
 ethereum_hashing = { git = "https://github.com/jsign/ethereum_hashing", rev = "08c88633b700d7447ef840d19ce7b369c44311de" }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }
