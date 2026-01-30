@@ -6,3 +6,4 @@ tmp
 zkevm-benchmark-*
 zkevm-fixtures-*
 reth-inputs
+metrics

@@ -13894,6 +13894,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "zec-host"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber 0.3.22",
+]
+
+[[package]]
 name = "zerocopy"
 version = "0.8.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
