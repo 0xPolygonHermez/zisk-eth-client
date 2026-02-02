@@ -42,6 +42,8 @@ extern "C" {
         ret_ptr: *mut u8,
     ) -> usize;
 
+    fn secp256r1_ecdsa_verify_c(msg: *const u8, sig: *const u8, pk: *const u8) -> bool;
+
     fn verify_kzg_proof_c(
         z: *const u8,
         y: *const u8,
@@ -314,7 +316,12 @@ impl Crypto for CustomEvmCrypto {
             unsafe {
                 let recid_bytes = (recid as u64).to_le_bytes();
                 let require_low_s_bytes = [0u8; 8];
-                hint_secp256k1_ecrecover(sig.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr(), require_low_s_bytes.as_ptr());
+                hint_secp256k1_ecrecover(
+                    sig.as_ptr(),
+                    recid_bytes.as_ptr(),
+                    msg.as_ptr(),
+                    require_low_s_bytes.as_ptr(),
+                );
             }
 
             #[cfg(zisk_hints_debug)]
@@ -416,11 +423,19 @@ impl Crypto for CustomEvmCrypto {
     //     crate::blake2::algo::compress(rounds as usize, h, m, t, f);
     // }
 
-    // /// secp256r1 (P-256) signature verification.
-    // #[inline]
-    // fn secp256r1_verify_signature(&self, msg: &[u8; 32], sig: &[u8; 64], pk: &[u8; 64]) -> bool {
-    //     crate::secp256r1::verify_signature(*msg, *sig, *pk).is_some()
-    // }
+    /// secp256r1 (P-256) signature verification.
+    #[inline]
+    fn secp256r1_verify_signature(&self, msg: &[u8; 32], sig: &[u8; 64], pk: &[u8; 64]) -> bool {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            unsafe { secp256r1_ecdsa_verify_c(msg.as_ptr(), sig.as_ptr(), pk.as_ptr()) }
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.default_crypto.secp256r1_verify_signature(msg, sig, pk)
+        }
+    }
 
     /// KZG point evaluation.
     #[inline]
@@ -824,7 +839,12 @@ impl CryptoProvider for CustomEvmCrypto {
             unsafe {
                 let recid_bytes = (recid as u64).to_le_bytes();
                 let require_low_s_bytes = [1u8; 8];
-                hint_secp256k1_ecrecover(sig_bytes.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr(), require_low_s_bytes.as_ptr());
+                hint_secp256k1_ecrecover(
+                    sig_bytes.as_ptr(),
+                    recid_bytes.as_ptr(),
+                    msg.as_ptr(),
+                    require_low_s_bytes.as_ptr(),
+                );
             }
 
             #[cfg(zisk_hints_debug)]
