@@ -1,4 +1,3 @@
-// TODO: Integrate the fixtures-witness relationship via the witness or witness-cli crate
 // TODO: Add old blocks via local reth node
 
 use anyhow::{Context, Result};

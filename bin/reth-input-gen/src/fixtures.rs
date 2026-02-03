@@ -1,27 +1,13 @@
 use anyhow::{Context, Result};
 use rayon::iter::{ParallelBridge, ParallelIterator};
-use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tracing::{info, warn};
 use walkdir::WalkDir;
 
-use reth_stateless::StatelessInput;
-
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
+use witness_generator::StatelessValidationFixture;
 
 use crate::OutputFormat;
-
-// TODO: Import from witness-generator when fixed
-/// A stateless validation fixture containing block data and witness information.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StatelessValidationFixture {
-    /// Name of the blockchain test case (e.g., "`ModExpAttackContract`").
-    pub name: String,
-    /// The stateless input for the block validation.
-    pub stateless_input: StatelessInput,
-    /// Whether the stateless block validation is successful.
-    pub success: bool,
-}
 
 pub fn process_fixtures(input: &Path, output: &Path, format: OutputFormat) -> Result<()> {
     info!("Reading fixtures from: {}", input.display());

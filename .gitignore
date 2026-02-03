@@ -3,7 +3,8 @@ target
 tmp
 /inputs
 *.log
-zkevm-benchmark-*
-zkevm-fixtures-*
-reth-inputs
+*zkevm-benchmark*
+zkevm-fixtures*
+fixtures
+reth-inputs*
 metrics

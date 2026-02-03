@@ -1,5 +1,5 @@
 [workspace]
-members = ["bin/host", "bin/input-gen", "bin/sv-input-gen", "crates/input", "crates/crypto"]
+members = ["bin/host", "bin/input-gen", "bin/reth-input-gen", "crates/input", "crates/crypto"]
 exclude = []
 resolver = "2"
 
@@ -8,19 +8,25 @@ version = "0.4.0"
 edition = "2021"
 
 [workspace.dependencies]
-revm = { version = "33.1.0", default-features = false }
+revm = "33.1.0"
 
-alloy-primitives = { version = "1.5.4" }
+# alloy
+alloy-primitives = "1.5.4" 
+alloy = "1.6.0"
+alloy-consensus = "1.6.0"
+alloy-json-rpc = "1.6.0"
+alloy-provider = "1.6.0"
+alloy-rpc-client = "1.6.0"
+alloy-transport = "1.6.0"
+alloy-genesis = "1.6.0"
+alloy-eips = "1.6.0"
+alloy-rpc-types-eth = "1.6.0"
 
-alloy = { version = "1.6.0", features = ["full"] }
-alloy-consensus = { version = "1.6.0", default-features = false }
-alloy-json-rpc = { version = "1.6.0", default-features = false }
-alloy-provider = { version = "1.6.0", default-features = false, features = [
-    "reqwest",
-    "reqwest-rustls-tls",
-] }
-alloy-rpc-client = { version = "1.6.0", default-features = false }
-alloy-transport = { version = "1.6.0", default-features = false }
+# reth
+reth-stateless = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
+reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
+reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
+reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2", features = ["client"]}
 
 # common dependencies
 anyhow = "1.0"
@@ -43,4 +49,6 @@ url = "2.3"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 walkdir = "2"
+jsonrpsee = { version = "0.26", features = ["http-client"] }
+http = "1.4.0"
 

@@ -11,7 +11,9 @@ use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_api::{DebugApiClient, EthApiClient};
 use reth_stateless::StatelessInput;
 
-use crate::fixtures::{generate_reth_inputs_from_fixtures, StatelessValidationFixture};
+use witness_generator::StatelessValidationFixture;
+
+use crate::fixtures::generate_reth_inputs_from_fixtures;
 use crate::OutputFormat;
 
 pub async fn process_rpc(
