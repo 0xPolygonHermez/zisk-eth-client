@@ -3,10 +3,12 @@ ziskos::entrypoint!(main);
 
 use ziskos::{read_input_slice, set_output};
 
+use stateless_validator_reth::guest::StatelessValidatorRethInput;
+use stateless_validator_common::new_payload_request::NewPayloadRequest;
+
 mod guest;
 
-use guest::{StatelessValidatorRethInput, validate_block};
-use stateless_validator_common::new_payload_request::NewPayloadRequest;
+use guest::validate_block;
 
 fn main() {
     // Read and deserialize input

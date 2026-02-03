@@ -912,16 +912,16 @@ impl CryptoProvider for CustomEvmCrypto {
         }
     }
 
-    // /// Verify a signature against a public key and message hash, without ensuring low S values.
-    // fn verify_and_compute_signer_unchecked(
-    //     &self,
-    //     pubkey: &[u8; 65],
-    //     sig: &[u8; 64],
-    //     msg: &[u8; 32],
-    // ) -> Result<Address, RecoveryError> {
-    //     let _ = pubkey;
-    //     let _ = sig;
-    //     let _ = msg;
-    //     unimplemented!("verify_and_compute_signer_unchecked is not implemented yet");
-    // }
+    /// Verify a signature against a public key and message hash, without ensuring low S values.
+    fn verify_and_compute_signer_unchecked(
+        &self,
+        pubkey: &[u8; 65],
+        sig: &[u8; 64],
+        msg: &[u8; 32],
+    ) -> Result<Address, RecoveryError> {
+        let _ = pubkey;
+        let _ = sig;
+        let _ = msg;
+        unimplemented!("verify_and_compute_signer_unchecked is not implemented yet");
+    }
 }
