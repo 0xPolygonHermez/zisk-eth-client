@@ -10,17 +10,17 @@ edition = "2021"
 [workspace.dependencies]
 revm = { version = "33.1.0", default-features = false }
 
-alloy-primitives = { version = "1.4.1" }
+alloy-primitives = { version = "1.5.4" }
 
-alloy = { version = "1.1.2", features = ["full"] }
-alloy-consensus = { version = "1.1.2", default-features = false }
-alloy-json-rpc = { version = "1.1.2", default-features = false }
-alloy-provider = { version = "1.1.2", default-features = false, features = [
+alloy = { version = "1.6.0", features = ["full"] }
+alloy-consensus = { version = "1.6.0", default-features = false }
+alloy-json-rpc = { version = "1.6.0", default-features = false }
+alloy-provider = { version = "1.6.0", default-features = false, features = [
     "reqwest",
     "reqwest-rustls-tls",
 ] }
-alloy-rpc-client = { version = "1.1.2", default-features = false }
-alloy-transport = { version = "1.1.2", default-features = false }
+alloy-rpc-client = { version = "1.6.0", default-features = false }
+alloy-transport = { version = "1.6.0", default-features = false }
 
 # common dependencies
 anyhow = "1.0"
