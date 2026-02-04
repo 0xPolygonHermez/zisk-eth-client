@@ -32,6 +32,13 @@ extern "C" {
         require_low_s: bool,
     ) -> u8;
 
+    fn secp256k1_ecdsa_verify_and_recover_c(
+        sig: *const u8,
+        msg: *const u8,
+        pk: *const u8,
+        output: *mut u8,
+    ) -> u8;
+
     fn modexp_bytes_c(
         base_ptr: *const u8,
         base_len: usize,
@@ -955,9 +962,26 @@ impl CryptoProvider for CustomEvmCrypto {
         sig: &[u8; 64],
         msg: &[u8; 32],
     ) -> Result<Address, RecoveryError> {
-        let _ = pubkey;
-        let _ = sig;
-        let _ = msg;
-        unimplemented!("verify_and_compute_signer_unchecked is not implemented yet");
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            // pubkey is 65 bytes: 0x04 prefix + 64 bytes (x || y)
+            // We need just the 64-byte uncompressed point (without 0x04 prefix)
+            let pk_bytes: &[u8; 64] = pubkey[1..].try_into().unwrap();
+
+            let mut output = [0u8; 32];
+            let ret = unsafe {
+                secp256k1_ecdsa_verify_and_recover_c(
+                    sig.as_ptr(),
+                    msg.as_ptr(),
+                    pk_bytes.as_ptr(),
+                    output.as_mut_ptr(),
+                )
+            };
+            if ret != 0 {
+                return Err(RecoveryError::new());
+            }
+            // The output is the keccak256 hash of the public key (last 20 bytes = address)
+            Ok(Address::from_slice(&output[12..]))
+        }
     }
 }
