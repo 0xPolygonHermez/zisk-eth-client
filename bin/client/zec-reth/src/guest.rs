@@ -10,14 +10,19 @@ use sparsestate::SparseState;
 
 use reth_chainspec::ChainSpec;
 use reth_evm_ethereum::EthEvmConfig;
-use reth_stateless::{validation::StatelessValidationError, stateless_validation_with_trie};
+use reth_stateless::{stateless_validation_with_trie, validation::StatelessValidationError};
 
 use revm::install_crypto;
 
-use stateless_validator_reth::{guest::StatelessValidatorRethInput, new_payload_request::new_payload_request_to_block};
+use stateless_validator_common::new_payload_request::NewPayloadRequest;
+use stateless_validator_reth::{
+    guest::StatelessValidatorRethInput, new_payload_request::new_payload_request_to_block,
+};
 
 /// Performs stateless validation of a block using the provided witness data.
-pub fn validate_block(input: StatelessValidatorRethInput) -> Result<B256, StatelessValidationError> {
+pub fn validate_block(
+    input: StatelessValidatorRethInput,
+) -> Result<B256, StatelessValidationError> {
     // Install custom EVM crypto
     install_crypto(CustomEvmCrypto::default());
     install_default_provider(Arc::new(CustomEvmCrypto::default())).unwrap();
@@ -48,4 +53,42 @@ pub fn validate_block(input: StatelessValidatorRethInput) -> Result<B256, Statel
     )?;
 
     Ok(hash)
+}
+
+/// Get chain name from chain ID
+pub fn chain_name(chain_id: u64) -> &'static str {
+    match chain_id {
+        0x1 => "Mainnet",
+        0xaa36a7 => "Sepolia",
+        0x4268 => "Holesky",
+        0x5 => "Goerli",
+        _ => "Unknown",
+        // Add more chain IDs as needed
+    }
+}
+
+/// Extract common execution payload information across forks.
+pub fn extract_block_info(req: &NewPayloadRequest) -> (u64, u64, usize) {
+    match req {
+        NewPayloadRequest::Bellatrix(r) => (
+            r.execution_payload.block_number,
+            r.execution_payload.gas_used,
+            r.execution_payload.transactions.len(),
+        ),
+        NewPayloadRequest::Capella(r) => (
+            r.execution_payload.block_number,
+            r.execution_payload.gas_used,
+            r.execution_payload.transactions.len(),
+        ),
+        NewPayloadRequest::Deneb(r) => (
+            r.execution_payload.block_number,
+            r.execution_payload.gas_used,
+            r.execution_payload.transactions.len(),
+        ),
+        NewPayloadRequest::ElectraFulu(r) => (
+            r.execution_payload.block_number,
+            r.execution_payload.gas_used,
+            r.execution_payload.transactions.len(),
+        ),
+    }
 }

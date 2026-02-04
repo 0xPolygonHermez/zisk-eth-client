@@ -11,7 +11,7 @@ use k256::ecdsa::VerifyingKey;
 #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
 use tiny_keccak::{Hasher, Keccak};
 
-#[cfg(zisk_hints_debug)]
+#[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints_debug))]
 use std::os::raw::c_char;
 
 #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
@@ -41,6 +41,8 @@ extern "C" {
         modulus_len: usize,
         ret_ptr: *mut u8,
     ) -> usize;
+
+    // fn secp256r1_ecdsa_verify_c(msg: *const u8, sig: *const u8, pk: *const u8) -> bool;
 
     fn verify_kzg_proof_c(
         z: *const u8,
@@ -92,6 +94,8 @@ extern "C" {
         modulus_len: usize,
     );
 
+    // fn hint_secp256r1_ecdsa_verify(msg: *const u8, sig: *const u8, pk: *const u8);
+
     fn hint_verify_kzg_proof(z: *const u8, y: *const u8, commitment: *const u8, proof: *const u8);
 
     fn hint_bn254_pairing_check(pairs: *const u8, num_pairs: usize);
@@ -111,17 +115,26 @@ extern "C" {
     fn resume_hints();
 }
 
-#[cfg(zisk_hints_debug)]
+#[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints_debug))]
 extern "C" {
     fn hint_log_c(msg: *const c_char);
 }
 
 #[cfg(zisk_hints_debug)]
 pub fn hint_log<S: AsRef<str>>(msg: S) {
-    use std::ffi::CString;
+    // On native we call external C function to log hints, since it controls if hints are paused or not
+    #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    {
+        use std::ffi::CString;
 
-    if let Ok(c) = CString::new(msg.as_ref()) {
-        unsafe { hint_log_c(c.as_ptr()) };
+        if let Ok(c) = CString::new(msg.as_ref()) {
+            unsafe { hint_log_c(c.as_ptr()) };
+        }
+    }
+    // On zkvm/zisk, we can just print directly
+    #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    {
+        println!("{}", msg.as_ref());
     }
 }
 
@@ -421,10 +434,33 @@ impl Crypto for CustomEvmCrypto {
     //     crate::blake2::algo::compress(rounds as usize, h, m, t, f);
     // }
 
+    // TODO: Restore when working
     // /// secp256r1 (P-256) signature verification.
     // #[inline]
     // fn secp256r1_verify_signature(&self, msg: &[u8; 32], sig: &[u8; 64], pk: &[u8; 64]) -> bool {
-    //     crate::secp256r1::verify_signature(*msg, *sig, *pk).is_some()
+    //     #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
+    //     {
+    //         #[cfg(zisk_hints)]
+    //         unsafe {
+    //             hint_secp256r1_ecdsa_verify(msg.as_ptr(), sig.as_ptr(), pk.as_ptr());
+    //         }
+
+    //         #[cfg(zisk_hints_debug)]
+    //         hint_log(format!(
+    //             "hint_secp256r1_ecdsa_verify (msg: {:x?}, sig: {:x?}, pk: {:x?})",
+    //                 &msg, &sig, &pk
+    //         ));
+
+    //         #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    //         {
+    //             unsafe { secp256r1_ecdsa_verify_c(msg.as_ptr(), sig.as_ptr(), pk.as_ptr()) }
+    //         }
+    //     }
+
+    //     #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    //     {
+    //         self.default_crypto.secp256r1_verify_signature(msg, sig, pk)
+    //     }
     // }
 
     /// KZG point evaluation.

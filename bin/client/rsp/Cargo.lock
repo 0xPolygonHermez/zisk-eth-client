@@ -489,9 +489,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-trie"
-version = "0.9.3"
+version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "428aa0f0e0658ff091f8f667c406e034b431cb10abd39de4f507520968acc499"
+checksum = "4d7fd448ab0a017de542de1dcca7a58e7019fe0e7a34ed3f9543ebddf6aceffa"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -500,6 +500,7 @@ dependencies = [
  "nybbles",
  "serde",
  "smallvec",
+ "thiserror 2.0.18",
  "tracing",
 ]
 
@@ -714,6 +715,17 @@ name = "ark-secp256k1"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8bd211c48debd3037b48873a7aa22c3aba034e83388aa4124795c9f220b88c7"
+dependencies = [
+ "ark-ec",
+ "ark-ff 0.5.0",
+ "ark-std 0.5.0",
+]
+
+[[package]]
+name = "ark-secp256r1"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5cf8be5820de567729bfa73a410ddd07cec8ad102d9a4bf61fd6b2e60db264e8"
 dependencies = [
  "ark-ec",
  "ark-ff 0.5.0",
@@ -1067,6 +1079,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "0.16.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#ce8f7762c76acdc6383753afe009e0b1c34a1982"
 
 [[package]]
 name = "const-hex"
@@ -1526,7 +1539,7 @@ dependencies = [
 [[package]]
 name = "fields"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0#4836fde21c866747b2575aab03e7a07b80fb4064"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0#472ad48fa6cc7e68d4d711f7cb9bc37fc1ce2630"
 dependencies = [
  "cfg-if",
  "num-bigint 0.4.6",
@@ -2033,6 +2046,7 @@ dependencies = [
 [[package]]
 name = "lib-c"
 version = "0.16.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#ce8f7762c76acdc6383753afe009e0b1c34a1982"
 
 [[package]]
 name = "libc"
@@ -2552,11 +2566,13 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "0.16.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#ce8f7762c76acdc6383753afe009e0b1c34a1982"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
  "ark-ff 0.5.0",
  "ark-secp256k1",
+ "ark-secp256r1",
  "ark-std 0.5.0",
  "cfg-if",
  "circuit",
@@ -4533,18 +4549,18 @@ dependencies = [
 
 [[package]]
 name = "zerocopy"
-version = "0.8.37"
+version = "0.8.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7456cf00f0685ad319c5b1693f291a650eaf345e941d082fc4e03df8a03996ac"
+checksum = "57cf3aa6855b23711ee9852dfc97dfaa51c45feaba5b645d0c777414d494a961"
 dependencies = [
  "zerocopy-derive",
 ]
 
 [[package]]
 name = "zerocopy-derive"
-version = "0.8.37"
+version = "0.8.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1328722bbf2115db7e19d69ebcc15e795719e2d66b60827c6a69a117365e37a0"
+checksum = "8a616990af1a287837c4fe6596ad77ef57948f787e46ce28e166facc0cc1cb75"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4628,6 +4644,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "0.16.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#ce8f7762c76acdc6383753afe009e0b1c34a1982"
 dependencies = [
  "bincode",
  "cfg-if",

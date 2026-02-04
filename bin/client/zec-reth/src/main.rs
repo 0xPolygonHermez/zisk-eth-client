@@ -4,11 +4,10 @@ ziskos::entrypoint!(main);
 use ziskos::{read_input_slice, set_output};
 
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
-use stateless_validator_common::new_payload_request::NewPayloadRequest;
 
 mod guest;
 
-use guest::validate_block;
+use guest::{chain_name, extract_block_info, validate_block};
 
 fn main() {
     // Read and deserialize input
@@ -16,25 +15,30 @@ fn main() {
     let input: StatelessValidatorRethInput =
         bincode::deserialize(&input).expect("Failed to deserialize input");
 
-    // Extract block number from the payload request
-    let block_number = match &input.new_payload_request {
-        NewPayloadRequest::Bellatrix(req) => req.execution_payload.block_number,
-        NewPayloadRequest::Capella(req) => req.execution_payload.block_number,
-        NewPayloadRequest::Deneb(req) => req.execution_payload.block_number,
-        NewPayloadRequest::ElectraFulu(req) => req.execution_payload.block_number,
-    };
+    // Get chain info
+    let chain_id = input.chain_config.chain_id;
+    let chain = chain_name(chain_id);
 
-    println!("Executing block validation for block: {}", block_number);
+    // Extract useful information for logging
+    let (block_number, gas_used, tx_count) = extract_block_info(&input.new_payload_request);
 
     // Validate the block
+    println!(
+        "Executing block validation for {} Block #{} ({} txs)",
+        chain, block_number, tx_count
+    );
     let block_hash = validate_block(input).expect("Block validation failed");
 
     // Write block_hash value to the public output
-    for (index, chunk) in block_hash.to_vec().chunks(4).enumerate() {
-        let value = u32::from_le_bytes(chunk.try_into().unwrap());
-        set_output(index, value);
+    for (i, chunk) in block_hash.to_vec().chunks_exact(4).enumerate() {
+        let limb = u32::from_le_bytes(chunk.try_into().unwrap());
+        set_output(i, limb);
     }
 
     // Print block number and calculated hash
-    println!("Block validation succeeded! Block: {}. Data hash: {}", block_number, block_hash);
+    println!("Block validation succeeded!");
+    println!(
+        "Execution summary:\n  -Chain: {} (ID: {})\n  -Block Number: {}\n  -Data Hash: {}\n  -Transaction Count: {}\n  -Gas Consumed: {}",
+        chain, chain_id, block_number, block_hash, tx_count, gas_used
+    );
 }

@@ -15,9 +15,9 @@ panic = "abort"
 [dependencies]
 crypto = { path = "../../../crates/crypto" }
 
-# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/fix-new-patch" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
 # Local development
-ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
+# ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
 
 # alloy
 alloy-primitives = { version = "1.5.4", default-features = false, features = ["native-keccak"] }
@@ -49,12 +49,6 @@ ethereum_hashing = { git = "https://github.com/jsign/ethereum_hashing", rev = "0
 # TODO: Remove the k256 patch when the new injected reth features are released
 k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", tag = "patch-k256-0.13.4-zisk-0.15.0" }
 # k256 = { path = "../../../../zisk-patch-k256/k256" }
-
-# TODO: Decide what to do with the ruint patch
-#       If included, it must be patched independently
-# ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branch = "zisk-patch/v1.17.2" } # TODO: Point to new tag when available
-# Local development
-# ruint = { path = "../../../../zisk-patch-ruint" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }
