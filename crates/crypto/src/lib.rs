@@ -945,8 +945,7 @@ impl CryptoProvider for CustomEvmCrypto {
     ) -> Result<Address, RecoveryError> {
         #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
         {
-            // pubkey is 65 bytes: 0x04 prefix + 64 bytes (x || y)
-            // We need just the 64-byte uncompressed point (without 0x04 prefix)
+            // pubkey is 65 bytes: prefix + 64 bytes (x || y)
             let pk_bytes: &[u8; 64] = pubkey[1..].try_into().unwrap();
 
             let mut output = [0u8; 32];
@@ -969,8 +968,24 @@ impl CryptoProvider for CustomEvmCrypto {
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
         {
-            let _ = (pubkey, sig, msg);
-            unimplemented!()
+            use k256::ecdsa::{signature::hazmat::PrehashVerifier, Signature, VerifyingKey};
+
+            let vk = VerifyingKey::from_sec1_bytes(pubkey)
+                .map_err(|_| RecoveryError::new())?;
+
+            let mut signature = Signature::from_slice(sig)
+                .map_err(|_| RecoveryError::new())?;
+
+            // normalize signature if needed
+            if let Some(sig_normalized) = signature.normalize_s() {
+                signature = sig_normalized;
+            }
+
+            vk
+                .verify_prehash(msg, &signature)
+                .map_err(|_| RecoveryError::new())?;
+
+            Ok(public_key_to_address(&vk))
         }
     }
 }
