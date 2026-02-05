@@ -966,5 +966,11 @@ impl CryptoProvider for CustomEvmCrypto {
                 _ => Err(RecoveryError::new()),
             }
         }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            let _ = (pubkey, sig, msg);
+            unimplemented!()
+        }
     }
 }
