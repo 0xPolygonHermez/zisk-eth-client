@@ -1,8 +1,6 @@
 #![no_main]
 ziskos::entrypoint!(main);
 
-use ziskos::{read_input_slice, set_output};
-
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
 
 mod guest;
@@ -11,9 +9,7 @@ use guest::{chain_name, extract_block_info, validate_block};
 
 fn main() {
     // Read and deserialize input
-    let input = read_input_slice();
-    let input: StatelessValidatorRethInput =
-        bincode::deserialize(&input).expect("Failed to deserialize input");
+    let input: StatelessValidatorRethInput = ziskos::io::read();
 
     // Get chain info
     let chain_id = input.chain_config.chain_id;
@@ -29,11 +25,8 @@ fn main() {
     );
     let block_hash = validate_block(input).expect("Block validation failed");
 
-    // Write block_hash value to the public output
-    for (i, chunk) in block_hash.to_vec().chunks_exact(4).enumerate() {
-        let limb = u32::from_le_bytes(chunk.try_into().unwrap());
-        set_output(i, limb);
-    }
+    // Commit to block hash as the output
+    ziskos::io::commit(&block_hash);
 
     // Print block number and calculated hash
     println!("Block validation succeeded!");

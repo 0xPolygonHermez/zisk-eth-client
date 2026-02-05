@@ -18,7 +18,7 @@ crypto = { path = "../../../crates/crypto" }
 # rsp
 rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "af7c7e76b4853dc8bdfcd0af9f0ab527f7430608", default-features = false, features = ["native-keccak"] }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/k256-ecdsa-ver" }
 # Local development
 # ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
 
@@ -27,17 +27,13 @@ alloy-primitives = { version = "1.5.4", default-features = false, features = ["n
 alloy-consensus = { version = "1.6.0", default-features = false, features = ["crypto-backend"] }
 
 # revm
-revm = { version = "33.1.0", default-features = false }
+revm = { version = "34.0.0", default-features = false }
 
 # misc
 bincode = "1.3.3"
 
 [patch.crates-io]
 sp1_bls12_381 = { git = "https://github.com/0xPolygonHermez/zisk-patch-bls12-381.git", tag = "patch-0.8.0-zisk-0.11.0" } # Needed for rsp symbol linking
-
-# TODO: Remove the k256 patch when the new injected reth features are released
-k256 = { git = "https://github.com/0xPolygonHermez/zisk-patch-elliptic-curves.git", tag = "patch-k256-0.13.4-zisk-0.15.0" }
-# k256 = { path = "../../../../zisk-patch-k256/k256" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

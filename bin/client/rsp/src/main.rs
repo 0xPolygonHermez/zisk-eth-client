@@ -1,21 +1,22 @@
 #![no_main]
 ziskos::entrypoint!(main);
 
-use alloy_consensus::crypto::install_default_provider;
-use crypto::CustomEvmCrypto;
-use revm::install_crypto;
-use rsp_client_executor::{executor::EthClientExecutor, io::EthClientExecutorInput};
 use std::sync::Arc;
-use ziskos::{read_input_slice, set_output};
+
+use alloy_consensus::crypto::install_default_provider;
+use revm::install_crypto;
+
+use rsp_client_executor::{executor::EthClientExecutor, io::EthClientExecutorInput};
+
+use crypto::CustomEvmCrypto;
 
 fn main() {
     // Install custom EVM crypto
     install_crypto(CustomEvmCrypto::default());
     install_default_provider(Arc::new(CustomEvmCrypto::default())).unwrap();
 
-    let input = read_input_slice();
+    let input: EthClientExecutorInput = ziskos::io::read();
 
-    let input = bincode::deserialize::<EthClientExecutorInput>(&input).unwrap();
     let block_number = input.current_block.number;
 
     println!("Executing {} block", block_number);
@@ -34,11 +35,8 @@ fn main() {
     // Calculate block hash
     let block_hash = header.hash_slow();
 
-    // Write block_hash value to the public output
-    for (index, chunk) in block_hash.to_vec().chunks(4).enumerate() {
-        let value = u32::from_le_bytes(chunk.try_into().unwrap());
-        set_output(index, value);
-    }
+    // Commit to block hash as the output
+    ziskos::io::commit(&block_hash);
 
     // Print block number and calculated hash
     println!("Block number: {}, hash: {}", block_number, block_hash);
