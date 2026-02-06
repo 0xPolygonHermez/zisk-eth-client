@@ -12,6 +12,7 @@ pub enum Network {
 pub enum GuestProgram {
     Rsp,
     Zeth,
+    Reth,
 }
 
 pub struct InputGenerator {
@@ -37,6 +38,7 @@ impl Display for GuestProgram {
         match self {
             GuestProgram::Rsp => write!(f, "rsp"),
             GuestProgram::Zeth => write!(f, "zeth"),
+            GuestProgram::Reth => write!(f, "reth"),
         }
     }
 }

@@ -1,7 +1,9 @@
 #[cfg(feature = "zec-rsp")]
 mod rsp;
-#[cfg(not(feature = "zec-rsp"))]
+#[cfg(feature = "zec-zeth")]
 mod zeth;
+#[cfg(not(any(feature = "zec-rsp", feature = "zec-zeth")))]
+mod reth;
 
 mod types;
 

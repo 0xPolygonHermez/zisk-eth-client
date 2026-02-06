@@ -64,7 +64,7 @@ pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<UncompressedPubl
 impl InputGenerator {
     pub async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
         println!(
-            "Generating input file for block {}, guest: zec-zeth",
+            "Generating input for block {}, guest: zec-zeth",
             block_number
         );
 

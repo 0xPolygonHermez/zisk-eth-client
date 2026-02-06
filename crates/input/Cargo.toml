@@ -19,10 +19,17 @@ url.workspace = true
 
 alloy = { workspace = true, features = ["full"] }
 alloy-consensus.workspace = true
+alloy-eips.workspace = true
 alloy-json-rpc.workspace = true
 alloy-provider.workspace = true
 alloy-rpc-client.workspace = true
+alloy-rpc-types-eth.workspace = true
 alloy-transport.workspace = true
+
+reth-chainspec.workspace = true
+reth-rpc-api = { workspace = true, features = ["client"]}
+reth-stateless.workspace = true
+jsonrpsee.workspace = true
 
 rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "dff5c97aecab8dd33b70cf5b575904858a78efc3", optional = true }
 rsp-host-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "dff5c97aecab8dd33b70cf5b575904858a78efc3", features = ["execution-witness"], optional = true }
@@ -30,8 +37,10 @@ rsp-primitives = { git = "https://github.com/succinctlabs/rsp.git", rev = "dff5c
 rsp-provider = { git = "https://github.com/succinctlabs/rsp.git", rev = "dff5c97aecab8dd33b70cf5b575904858a78efc3", optional = true }
 reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth.git", tag = "v1.9.3", features = ["serde", "serde-bincode-compat"] }
 reth-primitives-traits = { git = "https://github.com/paradigmxyz/reth.git", tag = "v1.9.3", features = ["serde", "serde-bincode-compat"] }
-reth-stateless = { git = "https://github.com/paradigmxyz/reth.git", tag = "v1.9.3" }
+stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "c696d4bb8073190208a481174b48781544052c4d", features = ["host"]}
+witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "9dd0da971b81b0176c820cda7ea75f258daed8bd" }
 
 [features]
 default = []
 zec-rsp = ["rsp-client-executor", "rsp-host-executor", "rsp-primitives", "rsp-provider"]
+zec-zeth = []

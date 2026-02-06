@@ -9,7 +9,7 @@ use crate::types::{GuestProgram, InputGenerator, InputGeneratorResult, Network};
 impl InputGenerator {
     pub async fn generate(&self, block_number: u64) -> anyhow::Result<InputGeneratorResult> {
         println!(
-            "Generating input file for block {}, guest: zec-rsp",
+            "Generating input for block {}, guest: zec-rsp",
             block_number
         );
 

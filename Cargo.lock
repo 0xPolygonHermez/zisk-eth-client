@@ -3444,8 +3444,8 @@ dependencies = [
  "reth-evm-ethereum 1.10.2",
  "reth-primitives-traits 1.10.2",
  "reth-provider",
- "reth-revm 1.10.2",
- "reth-stateless 1.10.2",
+ "reth-revm",
+ "reth-stateless",
  "reth-tracing",
  "reth-trie 1.10.2",
  "reth-trie-db",
@@ -4855,19 +4855,24 @@ version = "0.4.0"
 dependencies = [
  "alloy",
  "alloy-consensus",
+ "alloy-eips",
  "alloy-json-rpc",
  "alloy-provider",
  "alloy-rpc-client",
+ "alloy-rpc-types-eth",
  "alloy-transport",
  "anyhow",
  "async-trait",
  "bincode 1.3.3",
  "clap",
+ "jsonrpsee",
  "k256",
  "rayon",
+ "reth-chainspec 1.10.2",
  "reth-ethereum-primitives 1.9.3",
  "reth-primitives-traits 1.9.3",
- "reth-stateless 1.9.3",
+ "reth-rpc-api",
+ "reth-stateless",
  "rsp-client-executor",
  "rsp-host-executor",
  "rsp-primitives",
@@ -4875,8 +4880,10 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
+ "stateless-validator-reth",
  "tokio",
  "url",
+ "witness-generator",
 ]
 
 [[package]]
@@ -7497,7 +7504,7 @@ dependencies = [
  "reth-payload-builder-primitives",
  "reth-payload-primitives",
  "reth-primitives-traits 1.10.2",
- "reth-revm 1.10.2",
+ "reth-revm",
  "reth-storage-api 1.10.2",
  "reth-tasks",
  "tokio",
@@ -7552,26 +7559,6 @@ dependencies = [
  "reth-ethereum-forks 1.9.1",
  "reth-network-peers 1.9.1",
  "reth-primitives-traits 1.9.1",
- "serde_json",
-]
-
-[[package]]
-name = "reth-chainspec"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-chains",
- "alloy-consensus",
- "alloy-eips",
- "alloy-evm 0.23.3",
- "alloy-genesis",
- "alloy-primitives",
- "alloy-trie 0.9.3",
- "auto_impl",
- "derive_more 2.1.1",
- "reth-ethereum-forks 1.9.3",
- "reth-network-peers 1.9.3",
- "reth-primitives-traits 1.9.3",
  "serde_json",
 ]
 
@@ -7729,19 +7716,6 @@ dependencies = [
 
 [[package]]
 name = "reth-consensus"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-consensus",
- "alloy-primitives",
- "auto_impl",
- "reth-execution-types 1.9.3",
- "reth-primitives-traits 1.9.3",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "reth-consensus"
 version = "1.10.2"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
 dependencies = [
@@ -7763,18 +7737,6 @@ dependencies = [
  "reth-chainspec 1.9.1",
  "reth-consensus 1.9.1",
  "reth-primitives-traits 1.9.1",
-]
-
-[[package]]
-name = "reth-consensus-common"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "reth-chainspec 1.9.3",
- "reth-consensus 1.9.3",
- "reth-primitives-traits 1.9.3",
 ]
 
 [[package]]
@@ -7881,16 +7843,6 @@ dependencies = [
  "alloy-eips",
  "alloy-primitives",
  "reth-primitives-traits 1.9.1",
-]
-
-[[package]]
-name = "reth-db-models"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-eips",
- "alloy-primitives",
- "reth-primitives-traits 1.9.3",
 ]
 
 [[package]]
@@ -8070,17 +8022,6 @@ dependencies = [
 
 [[package]]
 name = "reth-errors"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "reth-consensus 1.9.3",
- "reth-execution-errors 1.9.3",
- "reth-storage-errors 1.9.3",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "reth-errors"
 version = "1.10.2"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
 dependencies = [
@@ -8157,22 +8098,6 @@ dependencies = [
 
 [[package]]
 name = "reth-ethereum-consensus"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-primitives",
- "reth-chainspec 1.9.3",
- "reth-consensus 1.9.3",
- "reth-consensus-common 1.9.3",
- "reth-execution-types 1.9.3",
- "reth-primitives-traits 1.9.3",
- "tracing",
-]
-
-[[package]]
-name = "reth-ethereum-consensus"
 version = "1.10.2"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
 dependencies = [
@@ -8209,18 +8134,6 @@ dependencies = [
 name = "reth-ethereum-forks"
 version = "1.9.1"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.9.1#3afe69a5738459a7cb5f46c598c7f541a1510f32"
-dependencies = [
- "alloy-eip2124",
- "alloy-hardforks",
- "alloy-primitives",
- "auto_impl",
- "once_cell",
-]
-
-[[package]]
-name = "reth-ethereum-forks"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
 dependencies = [
  "alloy-eip2124",
  "alloy-hardforks",
@@ -8330,27 +8243,6 @@ dependencies = [
 
 [[package]]
 name = "reth-evm"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-evm 0.23.3",
- "alloy-primitives",
- "auto_impl",
- "derive_more 2.1.1",
- "futures-util",
- "reth-execution-errors 1.9.3",
- "reth-execution-types 1.9.3",
- "reth-primitives-traits 1.9.3",
- "reth-storage-api 1.9.3",
- "reth-storage-errors 1.9.3",
- "reth-trie-common 1.9.3",
- "revm 31.0.2",
-]
-
-[[package]]
-name = "reth-evm"
 version = "1.10.2"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
 dependencies = [
@@ -8426,19 +8318,6 @@ dependencies = [
 
 [[package]]
 name = "reth-execution-errors"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-evm 0.23.3",
- "alloy-primitives",
- "alloy-rlp",
- "nybbles 0.4.8",
- "reth-storage-errors 1.9.3",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "reth-execution-errors"
 version = "1.10.2"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
 dependencies = [
@@ -8463,22 +8342,6 @@ dependencies = [
  "reth-ethereum-primitives 1.9.1",
  "reth-primitives-traits 1.9.1",
  "reth-trie-common 1.9.1",
- "revm 31.0.2",
-]
-
-[[package]]
-name = "reth-execution-types"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-evm 0.23.3",
- "alloy-primitives",
- "derive_more 2.1.1",
- "reth-ethereum-primitives 1.9.3",
- "reth-primitives-traits 1.9.3",
- "reth-trie-common 1.9.3",
  "revm 31.0.2",
 ]
 
@@ -8526,7 +8389,7 @@ dependencies = [
  "reth-chainspec 1.10.2",
  "reth-ethereum-primitives 1.10.2",
  "reth-rpc-api",
- "reth-stateless 1.10.2",
+ "reth-stateless",
  "serde",
  "serde_json",
  "serde_with",
@@ -8705,18 +8568,6 @@ dependencies = [
 name = "reth-network-peers"
 version = "1.9.1"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.9.1#3afe69a5738459a7cb5f46c598c7f541a1510f32"
-dependencies = [
- "alloy-primitives",
- "alloy-rlp",
- "serde_with",
- "thiserror 2.0.18",
- "url",
-]
-
-[[package]]
-name = "reth-network-peers"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -9190,17 +9041,6 @@ dependencies = [
 
 [[package]]
 name = "reth-prune-types"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-primitives",
- "derive_more 2.1.1",
- "strum 0.27.2",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "reth-prune-types"
 version = "1.10.2"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
 dependencies = [
@@ -9212,18 +9052,6 @@ dependencies = [
  "serde",
  "strum 0.27.2",
  "thiserror 2.0.18",
-]
-
-[[package]]
-name = "reth-revm"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-primitives",
- "reth-primitives-traits 1.9.3",
- "reth-storage-api 1.9.3",
- "reth-storage-errors 1.9.3",
- "revm 31.0.2",
 ]
 
 [[package]]
@@ -9320,7 +9148,7 @@ dependencies = [
  "reth-network-api",
  "reth-node-api",
  "reth-primitives-traits 1.10.2",
- "reth-revm 1.10.2",
+ "reth-revm",
  "reth-rpc-convert",
  "reth-rpc-eth-types",
  "reth-rpc-server-types",
@@ -9364,7 +9192,7 @@ dependencies = [
  "reth-execution-types 1.10.2",
  "reth-metrics",
  "reth-primitives-traits 1.10.2",
- "reth-revm 1.10.2",
+ "reth-revm",
  "reth-rpc-convert",
  "reth-rpc-server-types",
  "reth-storage-api 1.10.2",
@@ -9409,15 +9237,6 @@ dependencies = [
 
 [[package]]
 name = "reth-stages-types"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-primitives",
- "reth-trie-common 1.9.3",
-]
-
-[[package]]
-name = "reth-stages-types"
 version = "1.10.2"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
 dependencies = [
@@ -9428,33 +9247,6 @@ dependencies = [
  "reth-codecs 1.10.2",
  "reth-trie-common 1.10.2",
  "serde",
-]
-
-[[package]]
-name = "reth-stateless"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-consensus",
- "alloy-primitives",
- "alloy-rlp",
- "alloy-rpc-types-debug",
- "alloy-trie 0.9.3",
- "itertools 0.14.0",
- "k256",
- "reth-chainspec 1.9.3",
- "reth-consensus 1.9.3",
- "reth-errors 1.9.3",
- "reth-ethereum-consensus 1.9.3",
- "reth-ethereum-primitives 1.9.3",
- "reth-evm 1.9.3",
- "reth-primitives-traits 1.9.3",
- "reth-revm 1.9.3",
- "reth-trie-common 1.9.3",
- "reth-trie-sparse 1.9.3",
- "serde",
- "serde_with",
- "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -9477,7 +9269,7 @@ dependencies = [
  "reth-ethereum-primitives 1.10.2",
  "reth-evm 1.10.2",
  "reth-primitives-traits 1.10.2",
- "reth-revm 1.10.2",
+ "reth-revm",
  "reth-trie-common 1.10.2",
  "reth-trie-sparse 1.10.2",
  "secp256k1 0.30.0",
@@ -9490,17 +9282,6 @@ dependencies = [
 name = "reth-static-file-types"
 version = "1.9.1"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.9.1#3afe69a5738459a7cb5f46c598c7f541a1510f32"
-dependencies = [
- "alloy-primitives",
- "derive_more 2.1.1",
- "serde",
- "strum 0.27.2",
-]
-
-[[package]]
-name = "reth-static-file-types"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
 dependencies = [
  "alloy-primitives",
  "derive_more 2.1.1",
@@ -9544,28 +9325,6 @@ dependencies = [
 
 [[package]]
 name = "reth-storage-api"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-primitives",
- "alloy-rpc-types-engine",
- "auto_impl",
- "reth-chainspec 1.9.3",
- "reth-db-models 1.9.3",
- "reth-ethereum-primitives 1.9.3",
- "reth-execution-types 1.9.3",
- "reth-primitives-traits 1.9.3",
- "reth-prune-types 1.9.3",
- "reth-stages-types 1.9.3",
- "reth-storage-errors 1.9.3",
- "reth-trie-common 1.9.3",
- "revm-database 9.0.6",
-]
-
-[[package]]
-name = "reth-storage-api"
 version = "1.10.2"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
 dependencies = [
@@ -9600,22 +9359,6 @@ dependencies = [
  "reth-primitives-traits 1.9.1",
  "reth-prune-types 1.9.1",
  "reth-static-file-types 1.9.1",
- "revm-database-interface 8.0.5",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "reth-storage-errors"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-eips",
- "alloy-primitives",
- "alloy-rlp",
- "derive_more 2.1.1",
- "reth-primitives-traits 1.9.3",
- "reth-prune-types 1.9.3",
- "reth-static-file-types 1.9.3",
  "revm-database-interface 8.0.5",
  "thiserror 2.0.18",
 ]
@@ -9805,22 +9548,6 @@ dependencies = [
 
 [[package]]
 name = "reth-trie-common"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-consensus",
- "alloy-primitives",
- "alloy-rlp",
- "alloy-trie 0.9.3",
- "derive_more 2.1.1",
- "itertools 0.14.0",
- "nybbles 0.4.8",
- "reth-primitives-traits 1.9.3",
- "revm-database 9.0.6",
-]
-
-[[package]]
-name = "reth-trie-common"
 version = "1.10.2"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
 dependencies = [
@@ -9878,22 +9605,6 @@ dependencies = [
  "reth-execution-errors 1.9.1",
  "reth-primitives-traits 1.9.1",
  "reth-trie-common 1.9.1",
- "smallvec",
- "tracing",
-]
-
-[[package]]
-name = "reth-trie-sparse"
-version = "1.9.3"
-source = "git+https://github.com/paradigmxyz/reth.git?tag=v1.9.3#27a8c0f5a6dfb27dea84c5751776ecabdd069646"
-dependencies = [
- "alloy-primitives",
- "alloy-rlp",
- "alloy-trie 0.9.3",
- "auto_impl",
- "reth-execution-errors 1.9.3",
- "reth-primitives-traits 1.9.3",
- "reth-trie-common 1.9.3",
  "smallvec",
  "tracing",
 ]
@@ -11869,8 +11580,8 @@ dependencies = [
  "alloy-trie 0.9.3",
  "mpt",
  "reth-errors 1.10.2",
- "reth-revm 1.10.2",
- "reth-stateless 1.10.2",
+ "reth-revm",
+ "reth-stateless",
  "reth-trie-common 1.10.2",
 ]
 
@@ -11953,7 +11664,7 @@ dependencies = [
  "reth-evm-ethereum 1.10.2",
  "reth-payload-validator",
  "reth-primitives-traits 1.10.2",
- "reth-stateless 1.10.2",
+ "reth-stateless",
  "serde",
  "serde_with",
  "sha2",
@@ -13811,7 +13522,7 @@ dependencies = [
  "reth-chainspec 1.10.2",
  "reth-ethereum-primitives 1.10.2",
  "reth-rpc-api",
- "reth-stateless 1.10.2",
+ "reth-stateless",
  "serde",
  "serde_json",
  "thiserror 2.0.18",

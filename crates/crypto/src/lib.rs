@@ -84,7 +84,9 @@ extern "C" {
 
     fn hint_bls12_381_g2_add(a: *const u8, b: *const u8);
 
-    fn hint_secp256k1_ecrecover(sig: *const u8, recid: *const u8, msg: *const u8);
+    fn hint_secp256k1_ecdsa_verify_and_address_recover(sig: *const u8, msg: *const u8, pk: *const u8);
+
+    fn hint_secp256k1_ecdsa_address_recover(sig: *const u8, recid: *const u8, msg: *const u8);
 
     fn hint_modexp_bytes(
         base_ptr: *const u8,
@@ -95,7 +97,7 @@ extern "C" {
         modulus_len: usize,
     );
 
-    // fn hint_secp256r1_ecdsa_verify(msg: *const u8, sig: *const u8, pk: *const u8);
+    fn hint_secp256r1_ecdsa_verify(msg: *const u8, sig: *const u8, pk: *const u8);
 
     fn hint_verify_kzg_proof(z: *const u8, y: *const u8, commitment: *const u8, proof: *const u8);
 
@@ -327,14 +329,14 @@ impl Crypto for CustomEvmCrypto {
             #[cfg(zisk_hints)]
             unsafe {
                 let recid_bytes = (recid as u64).to_le_bytes();
-                hint_secp256k1_ecrecover(sig.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr());
+                hint_secp256k1_ecdsa_address_recover(sig.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr());
             }
 
             #[cfg(zisk_hints_debug)]
             {
                 let recid_bytes = (recid as u64).to_le_bytes();
                 hint_log(format!(
-                    "hint_secp256k1_ecrecover (sig: {:x?}, recid: {:x?}, msg: {:x?})",
+                    "hint_secp256k1_ecdsa_address_recover (sig: {:x?}, recid: {:x?}, msg: {:x?})",
                     &sig, &recid_bytes, &msg
                 ));
             }
@@ -857,15 +859,14 @@ impl CryptoProvider for CustomEvmCrypto {
             #[cfg(zisk_hints)]
             unsafe {
                 let recid_bytes = (recid as u64).to_le_bytes();
-                hint_secp256k1_ecrecover(sig_bytes.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr());
+                hint_secp256k1_ecdsa_address_recover(sig_bytes.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr());
             }
 
             #[cfg(zisk_hints_debug)]
             {
                 let recid_bytes = (recid as u64).to_le_bytes();
-                let require_low_s_bytes = [1u8; 8];
                 hint_log(format!(
-                    "hint_secp256k1_ecrecover (sig: {:x?}, recid: {:x?}, msg: {:x?})",
+                    "hint_secp256k1_ecdsa_address_recover (sig: {:x?}, recid: {:x?}, msg: {:x?})",
                     &sig_bytes, &recid_bytes, &msg
                 ));
             }
@@ -943,26 +944,42 @@ impl CryptoProvider for CustomEvmCrypto {
         sig: &[u8; 64],
         msg: &[u8; 32],
     ) -> Result<Address, RecoveryError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             // pubkey is 65 bytes: prefix + 64 bytes (x || y)
             let pk_bytes: &[u8; 64] = pubkey[1..].try_into().unwrap();
 
-            let mut output = [0u8; 32];
-            let ret = unsafe {
-                secp256k1_ecdsa_verify_and_address_recover_c(
-                    sig.as_ptr(),
-                    msg.as_ptr(),
-                    pk_bytes.as_ptr(),
-                    output.as_mut_ptr(),
-                )
-            };
-            match ret {
-                0 => {
-                    // The output is already the keccak256 hash of the public key (last 20 bytes = address)
-                    Ok(Address::from_slice(&output[12..]))
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_secp256k1_ecdsa_verify_and_address_recover(sig.as_ptr(), msg.as_ptr(), pk_bytes.as_ptr());
+            }
+
+            #[cfg(zisk_hints_debug)]
+            {
+                hint_log(format!(
+                    "hint_secp256k1_ecdsa_verify_and_address_recover (sig: {:x?}, msg: {:x?}, pk: {:x?})",
+                    &sig, &msg, &pk_bytes
+                ));
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut output = [0u8; 32];
+                let ret = unsafe {
+                    secp256k1_ecdsa_verify_and_address_recover_c(
+                        sig.as_ptr(),
+                        msg.as_ptr(),
+                        pk_bytes.as_ptr(),
+                        output.as_mut_ptr(),
+                    )
+                };
+                match ret {
+                    0 => {
+                        // The output is already the keccak256 hash of the public key (last 20 bytes = address)
+                        Ok(Address::from_slice(&output[12..]))
+                    }
+                    _ => Err(RecoveryError::new()),
                 }
-                _ => Err(RecoveryError::new()),
             }
         }
 
