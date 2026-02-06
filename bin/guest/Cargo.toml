@@ -41,7 +41,6 @@ sparsestate = { path = "../../../zisk-patch-zkvm-ethereum-mpt/crates/sparsestate
 # Local development
 alloy-evm = { path = "../../../zisk-patch-alloy-evm/crates/evm" }
 
-
 # TODO: This can be removed when a new version of reth is released
 [patch."https://github.com/paradigmxyz/reth.git"]
 # reth-stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "chore/clean-brec-up" }
