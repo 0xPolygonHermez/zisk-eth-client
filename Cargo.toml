@@ -1,5 +1,5 @@
 [workspace]
-members = ["bin/host", "bin/input-gen", "bin/reth-input-gen", "crates/input", "crates/crypto"]
+members = ["bin/host", "bin/input-gen", "crates/input", "crates/crypto", "crates/guest"]
 exclude = []
 resolver = "2"
 
@@ -11,7 +11,7 @@ edition = "2021"
 revm = { version = "34.0.0", default-features = false }
 
 # alloy
-alloy-primitives = "1.5.4" 
+alloy-primitives = "1.5.4"
 alloy = "1.6.0"
 alloy-consensus = "1.6.0"
 alloy-json-rpc = "1.6.0"
@@ -26,6 +26,7 @@ alloy-rpc-types-eth = "1.6.0"
 reth-stateless = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
+reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2", features = ["client"]}
 
 # common dependencies

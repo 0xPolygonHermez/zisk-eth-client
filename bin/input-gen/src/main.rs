@@ -1,70 +1,90 @@
-use anyhow::anyhow;
-use clap::Parser;
-use input::{InputGenerator, Network};
-use std::{io::Write, path::PathBuf, str::FromStr};
-use url::Url;
+// TODO: Add old blocks via local reth node
 
-#[derive(Debug, Clone, Parser)]
-pub struct InputGenArgs {
-    #[clap(long, short)]
-    pub block_number: u64,
+use anyhow::{Context, Result};
+use clap::{Parser, Subcommand};
+use input::{OutputFormat, reth_input_files_from_fixtures, reth_input_files_from_rpc};
+use std::path::PathBuf;
+use tracing_subscriber::EnvFilter;
 
-    #[clap(long, short, value_enum, default_value_t = Network::Mainnet)]
-    pub network: Network,
+#[derive(Parser)]
+#[command(name = "reth-input-generator")]
+#[command(about = "Generate Reth zkVM inputs from StatelessValidationFixture files")]
+#[command(version)]
+struct Cli {
+    /// Source of inputs
+    #[command(subcommand)]
+    source: SourceCommand,
 
-    #[clap(long, short)]
-    pub rpc_url: String,
+    /// Output folder for generated Reth input files
+    #[arg(short, long, default_value = "reth-inputs")]
+    output: PathBuf,
 
-    #[clap(long, short)]
-    pub input_dir: Option<PathBuf>,
+    /// Output format
+    #[arg(short, long, default_value = "binary")]
+    format: OutputFormat,
+}
+
+#[derive(Subcommand, Clone, Debug)]
+enum SourceCommand {
+    /// Generate inputs from StatelessValidationFixture JSON files
+    Fixtures {
+        /// Input folder containing StatelessValidationFixture JSON files
+        #[arg(short, long)]
+        input: PathBuf,
+    },
+    /// Generate inputs from an RPC endpoint
+    Rpc {
+        /// RPC URL to use (mandatory)
+        #[arg(long)]
+        rpc_url: String,
+
+        /// Specific block number to fetch
+        #[arg(long, conflicts_with = "last_n_blocks")]
+        block: Option<u64>,
+
+        /// Number of last blocks to fetch
+        #[arg(long, conflicts_with = "block")]
+        last_n_blocks: Option<usize>,
+
+        /// Optional RPC headers (format: "Key:Value")
+        #[arg(long)]
+        rpc_header: Option<Vec<String>>,
+    },
 }
 
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    // Initialize the environment variables.
-    dotenv::dotenv().ok();
+async fn main() -> Result<()> {
+    tracing_subscriber::fmt()
+        .with_env_filter(EnvFilter::from_default_env())
+        .init();
 
-    if std::env::var("RUST_LOG").is_err() {
-        unsafe {
-            std::env::set_var("RUST_LOG", "info");
+    let cli = Cli::parse();
+
+    // Create output directory if it doesn't exist
+    std::fs::create_dir_all(&cli.output)
+        .with_context(|| format!("Failed to create output folder: {}", cli.output.display()))?;
+
+    match cli.source {
+        SourceCommand::Fixtures { input } => {
+            reth_input_files_from_fixtures(&input, &cli.output, cli.format)?;
+        }
+        SourceCommand::Rpc {
+            rpc_url,
+            block,
+            last_n_blocks,
+            rpc_header,
+        } => {
+            reth_input_files_from_rpc(
+                &rpc_url,
+                block,
+                last_n_blocks,
+                rpc_header,
+                &cli.output,
+                cli.format,
+            )
+            .await?;
         }
     }
-
-    // Parse the command line arguments.
-    let args = InputGenArgs::parse();
-    let rpc_url = match Url::from_str(&args.rpc_url) {
-        Ok(url) => url,
-        Err(e) => return Err(anyhow!("Invalid RPC URL, error: {}", e)),
-    };
-    let input_generator = InputGenerator::new(rpc_url, args.network.clone());
-
-    let start_time = std::time::Instant::now();
-    let result = input_generator.generate(args.block_number).await?;
-
-    // Create the input directory if it does not exist.
-    let input_folder = args.input_dir.clone().unwrap_or("inputs".into());
-    if !input_folder.exists() {
-        std::fs::create_dir_all(&input_folder)?;
-    }
-
-    let mgas = result.gas_used / 1_000_000;
-
-    let input_path = input_folder.join(format!(
-        "{}_{}_{}_{}.bin",
-        args.block_number, result.tx_count, mgas, result.guest
-    ));
-
-    let mut input_file = std::fs::File::create(&input_path)?;
-    input_file.write_all(&result.input)?;
-
-    println!(
-        "Input file for block {} ({} txs, {} mgas) saved to {}, time: {} ms",
-        args.block_number,
-        result.tx_count,
-        mgas,
-        input_path.to_string_lossy(),
-        start_time.elapsed().as_millis()
-    );
 
     Ok(())
 }

@@ -1,32 +1,20 @@
 use std::sync::Arc;
 
-use crypto::CustomEvmCrypto;
-
-use alloy_consensus::crypto::install_default_provider;
 use alloy_genesis::Genesis;
 use alloy_primitives::B256;
-
 use sparsestate::SparseState;
-
-use reth_chainspec::ChainSpec;
-use reth_evm_ethereum::EthEvmConfig;
-use reth_stateless::{stateless_validation_with_trie, validation::StatelessValidationError};
-
-use revm::install_crypto;
-
 use stateless_validator_common::new_payload_request::NewPayloadRequest;
 use stateless_validator_reth::{
     guest::StatelessValidatorRethInput, new_payload_request::new_payload_request_to_block,
 };
+use reth_chainspec::ChainSpec;
+use reth_evm_ethereum::EthEvmConfig;
+use reth_stateless::{stateless_validation_with_trie, validation::StatelessValidationError};
 
 /// Performs stateless validation of a block using the provided witness data.
 pub fn validate_block(
     input: StatelessValidatorRethInput,
 ) -> Result<B256, StatelessValidationError> {
-    // Install custom EVM crypto
-    install_crypto(CustomEvmCrypto::default());
-    install_default_provider(Arc::new(CustomEvmCrypto::default())).unwrap();
-
     // Build chain spec from input's chain config
     let genesis = Genesis {
         config: input.chain_config.clone(),

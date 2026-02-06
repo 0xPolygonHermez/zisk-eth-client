@@ -5,21 +5,9 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-anyhow = { workspace = true }
-alloy = { workspace = true }
-alloy-consensus = { workspace = true }
-alloy-json-rpc = { workspace = true }
-alloy-provider = { workspace = true }
-alloy-rpc-client = { workspace = true }
-alloy-transport = { workspace = true }
-async-trait = { workspace = true }
-bincode = { workspace = true }
-clap = { workspace = true }
-dotenv = { workspace = true }
-k256 = { workspace = true }
-serde = { workspace = true }
-serde_with = { workspace = true }
-serde_json = { workspace = true }
-tokio = { workspace = true }
-url = { workspace = true }
+clap.workspace = true
+anyhow.workspace = true
+tracing-subscriber.workspace = true
+tokio.workspace = true
+
 input = { path = "../../crates/input" }

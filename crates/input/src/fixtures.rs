@@ -7,9 +7,9 @@ use walkdir::WalkDir;
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use witness_generator::StatelessValidationFixture;
 
-use crate::OutputFormat;
+use crate::types::OutputFormat;
 
-pub fn process_fixtures(input: &Path, output: &Path, format: OutputFormat) -> Result<()> {
+pub fn reth_input_files_from_fixtures(input: &Path, output: &Path, format: OutputFormat) -> Result<()> {
     info!("Reading fixtures from: {}", input.display());
 
     let fixtures = read_benchmark_fixtures(input)?;
@@ -18,8 +18,10 @@ pub fn process_fixtures(input: &Path, output: &Path, format: OutputFormat) -> Re
     let mut success_count = 0;
     let mut error_count = 0;
     for fixture in &fixtures {
-        match generate_reth_inputs_from_fixtures(fixture, output, format) {
-            Ok(_) => {
+        match generate_reth_input_from_fixture(fixture) {
+            Ok(reth_input) => {
+                save_reth_input_to_file(reth_input, &fixture.name, output, format)?;
+
                 info!("Generated input for: {}", fixture.name);
                 success_count += 1;
             }
@@ -57,11 +59,7 @@ pub fn read_benchmark_fixtures(path: &Path) -> Result<Vec<StatelessValidationFix
         .collect()
 }
 
-pub fn generate_reth_inputs_from_fixtures(
-    fixture: &StatelessValidationFixture,
-    output_dir: &Path,
-    format: OutputFormat,
-) -> Result<()> {
+pub fn generate_reth_input_from_fixture(fixture: &StatelessValidationFixture) -> Result<StatelessValidatorRethInput> {
     let reth_input = StatelessValidatorRethInput::new(&fixture.stateless_input, fixture.success)
         .with_context(|| {
             format!(
@@ -69,8 +67,11 @@ pub fn generate_reth_inputs_from_fixtures(
                 fixture.name
             )
         })?;
+    Ok(reth_input)
+}
 
-    let filename = sanitize_filename(&fixture.name);
+pub fn save_reth_input_to_file(reth_input: StatelessValidatorRethInput, file_name: &str, output_dir: &Path, format: OutputFormat) -> Result<()> {
+    let filename = sanitize_filename(file_name);
 
     match format {
         OutputFormat::Binary => {

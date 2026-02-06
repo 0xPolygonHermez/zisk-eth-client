@@ -47,15 +47,11 @@ fn parse_metrics(output: &str) -> Result<ExecutionMetrics> {
         {
             cost = val.replace(",", "").parse().unwrap_or(0);
         }
-        if line.contains("-Transaction Count:") {
-            if let Some(val) = line.split(':').last() {
-                tx_count = val.trim().replace(",", "").parse().ok();
-            }
+        if line.contains("-Transaction Count:") && let Some(val) = line.split(':').next_back() {
+            tx_count = val.trim().replace(",", "").parse().ok();
         }
-        if line.contains("-Gas Consumed:") {
-            if let Some(val) = line.split(':').last() {
-                gas_used = val.trim().replace(",", "").parse().ok();
-            }
+        if line.contains("-Gas Consumed:") && let Some(val) = line.split(':').next_back() {
+            gas_used = val.trim().replace(",", "").parse().ok();
         }
     }
 

@@ -8,3 +8,6 @@ zkevm-fixtures*
 fixtures
 reth-inputs*
 metrics
+hint_log
+hints
+tmp_scripts

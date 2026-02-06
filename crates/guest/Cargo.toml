@@ -1,0 +1,17 @@
+[package]
+name = "guest"
+description = ""
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+alloy-primitives.workspace = true
+alloy-genesis.workspace = true
+
+reth-stateless.workspace = true
+reth-chainspec.workspace = true
+reth-evm-ethereum.workspace = true
+
+sparsestate = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", rev = "a1e44638c49c4e16751a0b915593fce98ab6bdef" }
+stateless-validator-common = { git = "https://github.com/eth-act/ere-guests.git", rev = "c696d4bb8073190208a481174b48781544052c4d" }
+stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "c696d4bb8073190208a481174b48781544052c4d" }
