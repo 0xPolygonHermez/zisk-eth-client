@@ -24,13 +24,13 @@ if [[ "$OUTPUT_DIR" != "$INPUT_DIR" ]]; then
     mkdir -p "$OUTPUT_DIR"
 fi
 
-# Prague EVM opcodes https://www.evm.codes/?fork=prague
+# Prague EVM opcodes https://www.evm.codes/?fork=osaka
 OPCODES=(
     # Stop and Arithmetic
     "stop" "add" "mul" "sub" "div" "sdiv" "mod" "smod" "addmod" "mulmod" "exp" "signextend"
     # Comparison & Bitwise
-    "lt" "gt" "slt" "sgt" "eq" "iszero" "and" "or" "xor" "not" "byte" "shl" "shr" "sar"
-    # KECCAK
+    "lt" "gt" "slt" "sgt" "eq" "iszero" "and" "or" "xor" "not" "byte" "shl" "shr" "sar" "clz"
+    # Keccak
     "keccak256" "sha3" "keccak"
     # Environmental
     "address" "balance" "origin" "caller" "callvalue" "calldataload" "calldatasize" "calldatacopy"
@@ -38,10 +38,12 @@ OPCODES=(
     # Block
     "blockhash" "coinbase" "timestamp" "number" "prevrandao" "gaslimit" "chainid" "selfbalance" "basefee" "blobhash" "blobbasefee"
     # Stack, Memory, Storage, Flow
-    "pop" "mload" "mstore" "mstore8" "sload" "ssload" "sstore" "jump" "jumpi" "pc" "msize" "gas" "jumpdest"
+    "pop" "mload" "mstore" "mstore8" "sload" "ssload" "sstore"
+    "jump" "jumps"
+    "jumpi" "jumpis"
+    "pc" "msize" "gas" 
+    "jumpdest" "jumpdests"
     "tload" "tstore" "mcopy"
-    # Plural variants used in test names
-    "jumpdests" "jumpis" "jumps"
     # Push
     "push0" "push1" "push2" "push3" "push4" "push5" "push6" "push7" "push8" "push9" "push10"
     "push11" "push12" "push13" "push14" "push15" "push16" "push17" "push18" "push19" "push20"
@@ -52,15 +54,11 @@ OPCODES=(
     "swap1" "swap2" "swap3" "swap4" "swap5" "swap6" "swap7" "swap8" "swap9" "swap10" "swap11" "swap12" "swap13" "swap14" "swap15" "swap16"
     # Log
     "log0" "log1" "log2" "log3" "log4"
-    "dataload" "dataloadn" "datasize" "datacopy" 
-    "rjump" "rjumpi" "rjumpv"
-    "callf" "retf" "jumpf" 
-    "dupn" "swapn" "exchange" "eofcreate" "returncontract"
     # System
-    "create" "call" "callcode" "return" "delegatecall" "create2" "returndataload" "extcall" "extdelegatecall" "staticcall" "extstaticcall" "revert" "invalid" "selfdestruct"
+    "create" "call" "callcode" "return" "delegatecall" "create2" "staticcall" "revert" "invalid" "selfdestruct"
 )
 
-# Prague EVM precompiles https://www.evm.codes/precompiled?fork=prague
+# Prague EVM precompiles https://www.evm.codes/precompiled?fork=osaka
 PRECOMPILES=(
     "ecrecover" "ec_recover"
     "sha256" "sha2" "sha2_256"
@@ -81,6 +79,7 @@ PRECOMPILES=(
     "bls12_pairing" "bls_pairing"
     "bls12_map_fp_to_g1" "bls_map_fp_to_g1" "map_fp_to_g1" "bls12_fp_to_g1"
     "bls12_map_fp2_to_g2" "bls_map_fp2_to_g2" "map_fp2_to_g2" "bls12_fp2_to_g2" "bls12_fp_to_g2"
+    "p256verify"
 )
 
 # Canonical names for normalization
@@ -274,14 +273,9 @@ cd "${OUTPUT_DIR}"
 # Clean up empty directories
 find . -type d -empty -delete 2>/dev/null || true
 
-echo ""
-echo "Fixtures organized by opcode/precompile:"
-echo ""
-
 opcode_count=0
 precompile_count=0
 other_count=0
-
 for dir in $(ls -d */ 2>/dev/null | sed 's/\///' | sort); do
     [ -d "$dir" ] || continue
     count=$(find "$dir" -maxdepth 1 \( -name "*.json" -o -name "*.bin" \) | wc -l)
@@ -297,19 +291,16 @@ for dir in $(ls -d */ 2>/dev/null | sed 's/\///' | sort); do
     done
     
     if [[ "$is_precompile" == true ]]; then
-        echo "  [precompile] ${dir}: ${count} files"
         ((precompile_count += count))
     elif [[ "$dir" == "uncategorized" ]]; then
-        echo "  [other] ${dir}: ${count} files"
         ((other_count += count))
     else
-        echo "  [opcode] ${dir}: ${count} files"
         ((opcode_count += count))
     fi
 done
 
 echo ""
-echo "Summary:"
+echo "Organization summary:"
 echo "  Opcodes:     ${opcode_count} tests"
 echo "  Precompiles: ${precompile_count} tests"
 echo "  Other:       ${other_count} tests"

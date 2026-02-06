@@ -19,7 +19,6 @@ pub fn execute(ziskemu: &Path, elf: &Path, input_file: &Path) -> Result<Executio
         .arg("--stats")
         .output()
         .context("Failed to run ziskemu")?;
-    println!("ziskemu output:\n{}", String::from_utf8_lossy(&output.stdout));
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
