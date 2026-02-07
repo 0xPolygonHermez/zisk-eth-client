@@ -51,7 +51,7 @@ fn main() {
     // Print block number and calculated hash
     println!("Block validation succeeded!");
     println!(
-        "Execution summary:\n  -Chain: {} (ID: {})\n  -Block Number: {}\n  -Data Hash: {}\n  -Transaction Count: {}\n  -Gas Consumed: {}",
+        "Execution summary:\n  - Chain: {} (ID: {})\n  - Block Number: {}\n  - Block Hash: {}\n  - Transaction Count: {}\n  - Gas Consumed: {}",
         chain, chain_id, block_number, block_hash, tx_count, gas_used
     );
 
