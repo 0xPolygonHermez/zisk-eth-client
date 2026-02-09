@@ -2956,24 +2956,14 @@ dependencies = [
  "reth-evm-ethereum",
  "reth-stateless",
  "sparsestate",
- "stateless-validator-common 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=c696d4bb8073190208a481174b48781544052c4d)",
- "stateless-validator-reth 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=c696d4bb8073190208a481174b48781544052c4d)",
+ "stateless-validator-common",
+ "stateless-validator-reth",
 ]
 
 [[package]]
 name = "guest"
 version = "0.5.0"
 source = "git+https://github.com/eth-act/ere-guests.git?rev=885398bc1478e777096a8456bc925b2ab28a8d0f#885398bc1478e777096a8456bc925b2ab28a8d0f"
-dependencies = [
- "ere-io",
- "ere-platform-trait",
- "sha2",
-]
-
-[[package]]
-name = "guest"
-version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=c696d4bb8073190208a481174b48781544052c4d#c696d4bb8073190208a481174b48781544052c4d"
 dependencies = [
  "ere-io",
  "ere-platform-trait",
@@ -3562,7 +3552,7 @@ dependencies = [
  "reth-stateless",
  "serde",
  "serde_json",
- "stateless-validator-reth 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=885398bc1478e777096a8456bc925b2ab28a8d0f)",
+ "stateless-validator-reth",
  "tempfile",
  "tokio",
  "tokio-util",
@@ -7984,23 +7974,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "stateless-validator-common"
-version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=c696d4bb8073190208a481174b48781544052c4d#c696d4bb8073190208a481174b48781544052c4d"
-dependencies = [
- "anyhow",
- "ethereum_ssz",
- "ethereum_ssz_derive",
- "serde",
- "serde_with",
- "sha2",
- "ssz_types",
- "tree_hash",
- "tree_hash_derive",
- "typenum",
-]
-
-[[package]]
 name = "stateless-validator-reth"
 version = "0.5.0"
 source = "git+https://github.com/eth-act/ere-guests.git?rev=885398bc1478e777096a8456bc925b2ab28a8d0f#885398bc1478e777096a8456bc925b2ab28a8d0f"
@@ -8015,7 +7988,7 @@ dependencies = [
  "ere-io",
  "ere-zkvm-interface",
  "ethereum_ssz",
- "guest 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=885398bc1478e777096a8456bc925b2ab28a8d0f)",
+ "guest 0.5.0",
  "once_cell",
  "reth-chainspec",
  "reth-ethereum-primitives",
@@ -8028,39 +8001,7 @@ dependencies = [
  "sha2",
  "sparsestate",
  "ssz_types",
- "stateless-validator-common 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=885398bc1478e777096a8456bc925b2ab28a8d0f)",
- "tree_hash",
- "tree_hash_derive",
-]
-
-[[package]]
-name = "stateless-validator-reth"
-version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=c696d4bb8073190208a481174b48781544052c4d#c696d4bb8073190208a481174b48781544052c4d"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-genesis",
- "alloy-primitives",
- "alloy-rlp",
- "alloy-rpc-types-engine",
- "anyhow",
- "ere-io",
- "ethereum_ssz",
- "guest 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=c696d4bb8073190208a481174b48781544052c4d)",
- "once_cell",
- "reth-chainspec",
- "reth-ethereum-primitives",
- "reth-evm-ethereum",
- "reth-payload-validator",
- "reth-primitives-traits",
- "reth-stateless",
- "serde",
- "serde_with",
- "sha2",
- "sparsestate",
- "ssz_types",
- "stateless-validator-common 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=c696d4bb8073190208a481174b48781544052c4d)",
+ "stateless-validator-common",
  "tree_hash",
  "tree_hash_derive",
 ]
