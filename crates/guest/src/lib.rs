@@ -2,14 +2,14 @@ use std::sync::Arc;
 
 use alloy_genesis::Genesis;
 use alloy_primitives::B256;
+use reth_chainspec::ChainSpec;
+use reth_evm_ethereum::EthEvmConfig;
+use reth_stateless::{stateless_validation_with_trie, validation::StatelessValidationError};
 use sparsestate::SparseState;
 use stateless_validator_common::new_payload_request::NewPayloadRequest;
 use stateless_validator_reth::{
     guest::StatelessValidatorRethInput, new_payload_request::new_payload_request_to_block,
 };
-use reth_chainspec::ChainSpec;
-use reth_evm_ethereum::EthEvmConfig;
-use reth_stateless::{stateless_validation_with_trie, validation::StatelessValidationError};
 
 /// Performs stateless validation of a block using the provided witness data.
 pub fn validate_block(

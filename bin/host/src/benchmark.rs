@@ -1,16 +1,17 @@
 use anyhow::Result;
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::time::Instant;
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    time::Instant,
+};
 use tracing::{error, info};
 
-use crate::cli::{Action, Cli, Client};
+use crate::cli::Cli;
 use crate::zisk::{self, ExecutionMetrics};
 
 #[derive(Debug, serde::Serialize)]
 pub struct BenchmarkResult {
     pub test_name: String,
-    pub action: Action,
     pub time: f64,
     pub metrics: ExecutionMetrics,
 }
@@ -21,11 +22,11 @@ pub struct BenchmarkRunner<'a> {
 }
 
 impl<'a> BenchmarkRunner<'a> {
-    pub fn new(cli: &'a Cli, client: Client) -> Self {
-        let output_folder = cli
-            .output_folder
-            .join(format!("stateless-validator-{:?}", client).to_lowercase());
-        Self { cli, output_folder }
+    pub fn new(cli: &'a Cli) -> Self {
+        Self {
+            cli,
+            output_folder: cli.output_folder.clone(),
+        }
     }
 
     pub fn run(&self, input_folder: &Path) -> Result<()> {
@@ -75,7 +76,6 @@ impl<'a> BenchmarkRunner<'a> {
 
         let result = BenchmarkResult {
             test_name: test_name.to_string(),
-            action: self.cli.action.clone(),
             time: elapsed.as_secs_f64(),
             metrics,
         };

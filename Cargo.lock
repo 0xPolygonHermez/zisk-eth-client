@@ -3153,6 +3153,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "host"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber 0.3.22",
+]
+
+[[package]]
 name = "http"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9646,18 +9658,6 @@ dependencies = [
  "quote",
  "syn 2.0.114",
  "synstructure",
-]
-
-[[package]]
-name = "zec-host"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "serde",
- "serde_json",
- "tracing",
- "tracing-subscriber 0.3.22",
 ]
 
 [[package]]
