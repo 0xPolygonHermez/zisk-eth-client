@@ -29,7 +29,7 @@ alloy-consensus = { version = "1.6.0", default-features = false, features = ["cr
 revm = { version = "34.0.0", default-features = false }
 
 #ere
-stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "c696d4bb8073190208a481174b48781544052c4d" }
+stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "885398bc1478e777096a8456bc925b2ab28a8d0f" }
 
 [patch.crates-io]
 # This patch removes "ring" as a dependency, that is not compatible with the ZisK toolchain
