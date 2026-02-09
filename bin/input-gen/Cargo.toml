@@ -5,9 +5,9 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+input = { path = "../../crates/input" }
+
 clap.workspace = true
 anyhow.workspace = true
 tracing-subscriber.workspace = true
 tokio.workspace = true
-
-input = { path = "../../crates/input" }

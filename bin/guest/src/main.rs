@@ -17,6 +17,7 @@ fn main() {
         if !hints_dir.exists() {
             std::fs::create_dir_all(&hints_dir).expect("Failed to create hints directory");
         }
+
         // Initialize hints file
         let hints_file = std::path::PathBuf::from("./hints/block_hints.bin");
         if let Err(e) = ziskos::hints::init_hints_file(hints_file) {

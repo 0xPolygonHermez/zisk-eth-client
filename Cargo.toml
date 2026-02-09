@@ -27,7 +27,13 @@ reth-stateless = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" 
 reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
-reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2", features = ["client"]}
+reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
+
+# eth-act
+stateless-validator-common = { git = "https://github.com/eth-act/ere-guests.git", rev = "885398bc1478e777096a8456bc925b2ab28a8d0f" } 
+stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "885398bc1478e777096a8456bc925b2ab28a8d0f" }
+witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "8907be92536696319f04e6fdf40a07ebc93e891a" }
+sparsestate = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", rev = "a1e44638c49c4e16751a0b915593fce98ab6bdef" }
 
 # common dependencies
 anyhow = "1.0"
@@ -46,10 +52,12 @@ tokio = { version = "1.21", default-features = false, features = [
     "rt",
     "rt-multi-thread",
 ] }
+tokio-util = { version = "0.7", features = ["rt"] }
 url = "2.3"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 walkdir = "2"
 jsonrpsee = { version = "0.26", features = ["http-client"] }
 http = "1.4.0"
+tempfile = "3"
 

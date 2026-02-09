@@ -1,5 +1,5 @@
 [package]
-name = "zec-host"
+name = "host"
 description = "ZisK Ethereum Client Host"
 version = "0.1.0"
 edition = "2024"
@@ -11,7 +11,3 @@ serde_json.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
-
-# # ZisK
-# zisk_core = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/fix-new-patch" }
-# proofman-cli = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/fix-new-patch" }

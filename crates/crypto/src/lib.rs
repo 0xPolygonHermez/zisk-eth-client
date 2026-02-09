@@ -84,7 +84,11 @@ extern "C" {
 
     fn hint_bls12_381_g2_add(a: *const u8, b: *const u8);
 
-    fn hint_secp256k1_ecdsa_verify_and_address_recover(sig: *const u8, msg: *const u8, pk: *const u8);
+    fn hint_secp256k1_ecdsa_verify_and_address_recover(
+        sig: *const u8,
+        msg: *const u8,
+        pk: *const u8,
+    );
 
     fn hint_secp256k1_ecdsa_address_recover(sig: *const u8, recid: *const u8, msg: *const u8);
 
@@ -329,7 +333,11 @@ impl Crypto for CustomEvmCrypto {
             #[cfg(zisk_hints)]
             unsafe {
                 let recid_bytes = (recid as u64).to_le_bytes();
-                hint_secp256k1_ecdsa_address_recover(sig.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr());
+                hint_secp256k1_ecdsa_address_recover(
+                    sig.as_ptr(),
+                    recid_bytes.as_ptr(),
+                    msg.as_ptr(),
+                );
             }
 
             #[cfg(zisk_hints_debug)]
@@ -859,7 +867,11 @@ impl CryptoProvider for CustomEvmCrypto {
             #[cfg(zisk_hints)]
             unsafe {
                 let recid_bytes = (recid as u64).to_le_bytes();
-                hint_secp256k1_ecdsa_address_recover(sig_bytes.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr());
+                hint_secp256k1_ecdsa_address_recover(
+                    sig_bytes.as_ptr(),
+                    recid_bytes.as_ptr(),
+                    msg.as_ptr(),
+                );
             }
 
             #[cfg(zisk_hints_debug)]
@@ -951,7 +963,11 @@ impl CryptoProvider for CustomEvmCrypto {
 
             #[cfg(zisk_hints)]
             unsafe {
-                hint_secp256k1_ecdsa_verify_and_address_recover(sig.as_ptr(), msg.as_ptr(), pk_bytes.as_ptr());
+                hint_secp256k1_ecdsa_verify_and_address_recover(
+                    sig.as_ptr(),
+                    msg.as_ptr(),
+                    pk_bytes.as_ptr(),
+                );
             }
 
             #[cfg(zisk_hints_debug)]
@@ -987,19 +1003,16 @@ impl CryptoProvider for CustomEvmCrypto {
         {
             use k256::ecdsa::{signature::hazmat::PrehashVerifier, Signature, VerifyingKey};
 
-            let vk = VerifyingKey::from_sec1_bytes(pubkey)
-                .map_err(|_| RecoveryError::new())?;
+            let vk = VerifyingKey::from_sec1_bytes(pubkey).map_err(|_| RecoveryError::new())?;
 
-            let mut signature = Signature::from_slice(sig)
-                .map_err(|_| RecoveryError::new())?;
+            let mut signature = Signature::from_slice(sig).map_err(|_| RecoveryError::new())?;
 
             // normalize signature if needed
             if let Some(sig_normalized) = signature.normalize_s() {
                 signature = sig_normalized;
             }
 
-            vk
-                .verify_prehash(msg, &signature)
+            vk.verify_prehash(msg, &signature)
                 .map_err(|_| RecoveryError::new())?;
 
             Ok(public_key_to_address(&vk))
