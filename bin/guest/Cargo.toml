@@ -35,29 +35,32 @@ guest = { path = "../../crates/guest" }
 ethereum_hashing = { git = "https://github.com/jsign/ethereum_hashing", rev = "08c88633b700d7447ef840d19ce7b369c44311de" }
 
 # Enable this for deterministic Hashmap sort
-# alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.27.2" }
+alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.27.2" }
 # Local development
-alloy-evm = { path = "../../../zisk-patch-alloy-evm/crates/evm" }
+# alloy-evm = { path = "../../../zisk-patch-alloy-evm/crates/evm" }
 
 # TODO: This can be removed when a new version of reth is released
 [patch."https://github.com/paradigmxyz/reth.git"]
-# reth-stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "chore/clean-brec-up" }
-# reth-chainspec = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "chore/clean-brec-up" }
-# reth-evm-ethereum = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "chore/clean-brec-up" }
-# # The following are needed for compilation
-# reth-errors = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "chore/clean-brec-up" }
-# reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "chore/clean-brec-up" }
-# Local development
-reth-stateless = { path = "../../../zisk-patch-reth/crates/stateless" }
-reth-chainspec = { path = "../../../zisk-patch-reth/crates/chainspec" }
-reth-evm-ethereum = { path = "../../../zisk-patch-reth/crates/ethereum/evm" }
+reth-stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.10.2" }
+reth-chainspec = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.10.2" }
+reth-evm-ethereum = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.10.2" }
 # Needed for compilation
-reth-errors = { path = "../../../zisk-patch-reth/crates/errors" }
+reth-errors = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.10.2" }
 # Needed for compilation and deterministic Hashmap sort
-reth-trie-common = { path = "../../../zisk-patch-reth/crates/trie/common" }
+reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.10.2" }
+# Local development
+# reth-stateless = { path = "../../../zisk-patch-reth/crates/stateless" }
+# reth-chainspec = { path = "../../../zisk-patch-reth/crates/chainspec" }
+# reth-evm-ethereum = { path = "../../../zisk-patch-reth/crates/ethereum/evm" }
+# # Needed for compilation
+# reth-errors = { path = "../../../zisk-patch-reth/crates/errors" }
+# # Needed for compilation and deterministic Hashmap sort
+# reth-trie-common = { path = "../../../zisk-patch-reth/crates/trie/common" }
 
 [patch."https://github.com/eth-act/zkvm-ethereum-mpt.git"]
-sparsestate = { path = "../../../zisk-patch-zkvm-ethereum-mpt/crates/sparsestate" }
+sparsestate = { git = "https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git", branch = "zisk-hints/v0.4.0" }
+# Local development
+# sparsestate = { path = "../../../zisk-patch-zkvm-ethereum-mpt/crates/sparsestate" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }
