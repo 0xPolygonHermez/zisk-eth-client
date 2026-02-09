@@ -8529,6 +8529,8 @@ dependencies = [
  "anyhow",
  "bincode 1.3.3",
  "clap",
+ "http 1.4.0",
+ "jsonrpsee",
  "rayon",
  "reth-chainspec 1.10.2",
  "reth-ethereum-primitives 1.10.2",

@@ -1,5 +1,3 @@
-// TODO: Add old blocks via local reth node
-
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
@@ -67,12 +65,12 @@ enum SourceCommand {
     /// Generate inputs from an RPC endpoint
     Rpc {
         /// RPC URL to use (mandatory)
-        #[arg(long)]
+        #[arg(short = 'u', long)]
         rpc_url: String,
 
         /// Optional RPC headers (format: "Key:Value")
-        #[arg(long)]
-        rpc_header: Option<Vec<String>>,
+        #[arg(short = 'h', long)]
+        rpc_headers: Option<Vec<String>>,
 
         /// Specific block number to fetch
         #[arg(long, conflicts_with_all = ["last_n_blocks", "follow"])]
@@ -122,14 +120,14 @@ async fn main() -> Result<()> {
 
         SourceCommand::Rpc {
             rpc_url,
-            rpc_header,
+            rpc_headers,
             block,
             last_n_blocks,
             follow,
         } => {
             process_rpc(
-                rpc_url,
-                rpc_header,
+                &rpc_url,
+                rpc_headers,
                 block,
                 last_n_blocks,
                 follow,

@@ -6,13 +6,12 @@ use std::{
 };
 use tracing::{error, info};
 
-use crate::cli::{Action, Cli};
+use crate::cli::Cli;
 use crate::zisk::{self, ExecutionMetrics};
 
 #[derive(Debug, serde::Serialize)]
 pub struct BenchmarkResult {
     pub test_name: String,
-    pub action: Action,
     pub time: f64,
     pub metrics: ExecutionMetrics,
 }
@@ -77,7 +76,6 @@ impl<'a> BenchmarkRunner<'a> {
 
         let result = BenchmarkResult {
             test_name: test_name.to_string(),
-            action: self.cli.action.clone(),
             time: elapsed.as_secs_f64(),
             metrics,
         };
