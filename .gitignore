@@ -8,3 +8,4 @@ zkevm-fixtures*
 fixtures
 reth-inputs*
 metrics
+.venv
