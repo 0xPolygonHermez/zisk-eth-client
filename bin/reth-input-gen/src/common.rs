@@ -9,16 +9,36 @@ use witness_generator::StatelessValidationFixture;
 
 use crate::OutputFormat;
 
-pub fn process_fixtures(input: &Path, output: &Path, format: OutputFormat) -> Result<()> {
-    info!("Reading fixtures from: {}", input.display());
+/// Reads fixture JSON files from a directory.
+pub fn read_fixtures_from_path(path: &Path) -> Result<Vec<StatelessValidationFixture>> {
+    WalkDir::new(path)
+        .min_depth(1)
+        .into_iter()
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| {
+            entry.file_type().is_file() && entry.path().extension().is_some_and(|ext| ext == "json")
+        })
+        .par_bridge()
+        .map(|entry| {
+            let content = std::fs::read(entry.path())?;
+            let fixture: StatelessValidationFixture = serde_json::from_slice(&content)
+                .with_context(|| format!("Failed to parse {}", entry.path().display()))?;
+            Ok(fixture)
+        })
+        .collect()
+}
 
-    let fixtures = read_benchmark_fixtures(input)?;
-    info!("Found {} fixtures", fixtures.len());
-
+/// Generate reth inputs from a list of fixtures.
+pub fn generate_reth_inputs(
+    fixtures: &[StatelessValidationFixture],
+    output: &Path,
+    format: OutputFormat,
+) -> Result<()> {
     let mut success_count = 0;
     let mut error_count = 0;
-    for fixture in &fixtures {
-        match generate_reth_inputs_from_fixtures(fixture, output, format) {
+
+    for fixture in fixtures {
+        match generate_single_reth_input(fixture, output, format) {
             Ok(_) => {
                 info!("Generated input for: {}", fixture.name);
                 success_count += 1;
@@ -38,26 +58,8 @@ pub fn process_fixtures(input: &Path, output: &Path, format: OutputFormat) -> Re
     Ok(())
 }
 
-/// Reads the benchmark fixtures folder and returns a list of block and witness pairs.
-pub fn read_benchmark_fixtures(path: &Path) -> Result<Vec<StatelessValidationFixture>> {
-    WalkDir::new(path)
-        .min_depth(1)
-        .into_iter()
-        .filter_map(|entry| entry.ok())
-        .filter(|entry| {
-            entry.file_type().is_file() && entry.path().extension().is_some_and(|ext| ext == "json")
-        })
-        .par_bridge()
-        .map(|entry| {
-            let content = std::fs::read(entry.path())?;
-            let fixture: StatelessValidationFixture = serde_json::from_slice(&content)
-                .with_context(|| format!("Failed to parse {}", entry.path().display()))?;
-            Ok(fixture)
-        })
-        .collect()
-}
-
-pub fn generate_reth_inputs_from_fixtures(
+/// Generate a single reth input from a fixture.
+pub fn generate_single_reth_input(
     fixture: &StatelessValidationFixture,
     output_dir: &Path,
     format: OutputFormat,
@@ -74,16 +76,14 @@ pub fn generate_reth_inputs_from_fixtures(
 
     match format {
         OutputFormat::Binary => {
-            let bin_dir = output_dir.join("bin");
-            std::fs::create_dir_all(&bin_dir)?;
-            let output_path = bin_dir.join(format!("{}.bin", filename));
+            std::fs::create_dir_all(output_dir)?;
+            let output_path = output_dir.join(format!("{}.bin", filename));
             let bytes = bincode::serialize(&reth_input)?;
             std::fs::write(&output_path, bytes)?;
         }
         OutputFormat::Json => {
-            let json_dir = output_dir.join("json");
-            std::fs::create_dir_all(&json_dir)?;
-            let output_path = json_dir.join(format!("{}.json", filename));
+            std::fs::create_dir_all(output_dir)?;
+            let output_path = output_dir.join(format!("{}.json", filename));
             let json = serde_json::to_string_pretty(&reth_input)?;
             std::fs::write(&output_path, json)?;
         }
