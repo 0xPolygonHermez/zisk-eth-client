@@ -1,15 +1,15 @@
 use anyhow::{Context, Result};
 use std::path::{Path, PathBuf};
-use tracing::info;
+use tracing::{info, warn};
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
 
 use crate::{
-    common::{generate_reth_inputs, read_fixtures_from_path},
+    common::{generate_reth_input_from_fixture, read_fixtures_from_path, save_reth_input_to_file},
     types::OutputFormat,
 };
 
 /// Process EEST (Ethereum Execution Specification Tests) to generate reth inputs.
-pub async fn process_tests(
+pub async fn reth_input_files_from_tests(
     tag: Option<String>,
     include: Option<Vec<String>>,
     exclude: Option<Vec<String>>,
@@ -18,7 +18,6 @@ pub async fn process_tests(
     format: OutputFormat,
     num_threads: Option<usize>,
 ) -> Result<()> {
-    // Set RAYON_NUM_THREADS if specified (must be set before rayon initializes)
     if let Some(threads) = num_threads {
         std::env::set_var("RAYON_NUM_THREADS", threads.to_string());
     }
@@ -63,5 +62,27 @@ pub async fn process_tests(
     );
 
     let fixtures = read_fixtures_from_path(temp_dir.path())?;
-    generate_reth_inputs(&fixtures, output, format)
+
+    let mut success_count = 0;
+    let mut error_count = 0;
+    for fixture in &fixtures {
+        match generate_reth_input_from_fixture(fixture) {
+            Ok(reth_input) => {
+                save_reth_input_to_file(reth_input, &fixture.name, output, format)?;
+                info!("Generated input for: {}", fixture.name);
+                success_count += 1;
+            }
+            Err(e) => {
+                warn!("Failed to generate input for {}: {}", fixture.name, e);
+                error_count += 1;
+            }
+        }
+    }
+
+    info!(
+        "Completed: {} succeeded, {} failed",
+        success_count, error_count
+    );
+
+    Ok(())
 }

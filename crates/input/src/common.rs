@@ -1,7 +1,6 @@
 use anyhow::{Context, Result};
 use rayon::iter::{ParallelBridge, ParallelIterator};
 use std::path::Path;
-use tracing::{info, warn};
 use walkdir::WalkDir;
 
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
@@ -28,42 +27,10 @@ pub fn read_fixtures_from_path(path: &Path) -> Result<Vec<StatelessValidationFix
         .collect()
 }
 
-/// Generate reth inputs from a list of fixtures.
-pub fn generate_reth_inputs(
-    fixtures: &[StatelessValidationFixture],
-    output: &Path,
-    format: OutputFormat,
-) -> Result<()> {
-    let mut success_count = 0;
-    let mut error_count = 0;
-
-    for fixture in fixtures {
-        match generate_reth_input(fixture, output, format) {
-            Ok(_) => {
-                info!("Generated input for: {}", fixture.name);
-                success_count += 1;
-            }
-            Err(e) => {
-                warn!("Failed to generate input for {}: {}", fixture.name, e);
-                error_count += 1;
-            }
-        }
-    }
-
-    info!(
-        "Completed: {} succeeded, {} failed",
-        success_count, error_count
-    );
-
-    Ok(())
-}
-
 /// Generate a reth input from a fixture.
-pub fn generate_reth_input(
+pub fn generate_reth_input_from_fixture(
     fixture: &StatelessValidationFixture,
-    output_dir: &Path,
-    format: OutputFormat,
-) -> Result<()> {
+) -> Result<StatelessValidatorRethInput> {
     let reth_input = StatelessValidatorRethInput::new(&fixture.stateless_input, fixture.success)
         .with_context(|| {
             format!(
@@ -71,8 +38,16 @@ pub fn generate_reth_input(
                 fixture.name
             )
         })?;
+    Ok(reth_input)
+}
 
-    let filename = sanitize_filename(&fixture.name);
+pub fn save_reth_input_to_file(
+    reth_input: StatelessValidatorRethInput,
+    file_name: &str,
+    output_dir: &Path,
+    format: OutputFormat,
+) -> Result<()> {
+    let filename = sanitize_filename(file_name);
 
     match format {
         OutputFormat::Binary => {
