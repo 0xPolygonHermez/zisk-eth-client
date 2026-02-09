@@ -970,19 +970,16 @@ impl CryptoProvider for CustomEvmCrypto {
         {
             use k256::ecdsa::{signature::hazmat::PrehashVerifier, Signature, VerifyingKey};
 
-            let vk = VerifyingKey::from_sec1_bytes(pubkey)
-                .map_err(|_| RecoveryError::new())?;
+            let vk = VerifyingKey::from_sec1_bytes(pubkey).map_err(|_| RecoveryError::new())?;
 
-            let mut signature = Signature::from_slice(sig)
-                .map_err(|_| RecoveryError::new())?;
+            let mut signature = Signature::from_slice(sig).map_err(|_| RecoveryError::new())?;
 
             // normalize signature if needed
             if let Some(sig_normalized) = signature.normalize_s() {
                 signature = sig_normalized;
             }
 
-            vk
-                .verify_prehash(msg, &signature)
+            vk.verify_prehash(msg, &signature)
                 .map_err(|_| RecoveryError::new())?;
 
             Ok(public_key_to_address(&vk))

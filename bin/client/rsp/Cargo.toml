@@ -18,7 +18,7 @@ crypto = { path = "../../../crates/crypto" }
 # rsp
 rsp-client-executor = { git = "https://github.com/succinctlabs/rsp.git", rev = "af7c7e76b4853dc8bdfcd0af9f0ab527f7430608", default-features = false, features = ["native-keccak"] }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/k256-ecdsa-ver" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
 # Local development
 # ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
 
