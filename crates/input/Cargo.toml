@@ -5,16 +5,6 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-clap.workspace = true
-anyhow.workspace = true
-bincode.workspace = true
-rayon.workspace = true
-serde_json.workspace = true
-tracing.workspace = true
-walkdir.workspace = true
-jsonrpsee.workspace = true
-http.workspace = true
-
 alloy-eips.workspace = true
 alloy-genesis.workspace = true
 alloy-rpc-types-eth.workspace = true
@@ -24,5 +14,21 @@ reth-chainspec.workspace = true
 reth-ethereum-primitives.workspace = true
 reth-rpc-api = { workspace = true, features = ["client"]}
 
-stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "c696d4bb8073190208a481174b48781544052c4d", features = ["host"]}
-witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "9dd0da971b81b0176c820cda7ea75f258daed8bd" }
+stateless-validator-reth = { workspace = true, features = ["host"] }
+witness-generator.workspace = true
+
+# Common dependencies
+anyhow.workspace = true
+bincode.workspace = true
+clap.workspace = true
+rayon.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tempfile.workspace = true
+tokio.workspace = true
+tokio-util = { workspace = true, features = ["rt"] }
+tracing.workspace = true
+tracing-subscriber.workspace = true
+walkdir.workspace = true
+jsonrpsee.workspace = true
+http.workspace = true

@@ -165,19 +165,6 @@ get_canonical_name() {
     fi
 }
 
-# Tokens to ignore when extracting op names
-IGNORED_PATTERNS=(
-    "gas-value"
-)
-
-remove_ignored_patterns() {
-    local str="$1"
-    for pattern in "${IGNORED_PATTERNS[@]}"; do
-        str="${str//$pattern/}"
-    done
-    echo "$str"
-}
-
 extract_op_name() {
     local filename="$1"
     
@@ -186,18 +173,13 @@ extract_op_name() {
     basename="${basename%.bin}"
     basename="${basename##*/}"
     
-    # Convert to lowercase for matching
-    local lower_basename="${basename,,}"
-    
-    # Remove ignored patterns before matching
-    lower_basename=$(remove_ignored_patterns "$lower_basename")
-    
-    # First, try to match multi-word ops/precompiles directly in the string (longest match wins)
     local best_match=""
     local best_len=0
     
-    for op in "${OPCODES[@]}" "${PRECOMPILES[@]}"; do
-        if [[ "$lower_basename" == *"$op"* ]]; then
+    # FIRST PASS: Match UPPERCASE opcodes (e.g., "opcode_CALL", "opcode_BALANCE")
+    for op in "${OPCODES[@]}"; do
+        local upper_op="${op^^}"  # Convert to uppercase
+        if [[ "$basename" == *"$upper_op"* ]]; then
             if [[ ${#op} -gt $best_len ]]; then
                 best_match="$op"
                 best_len=${#op}
@@ -210,29 +192,35 @@ extract_op_name() {
         return 0
     fi
     
-    # Fallback: split by delimiters and check individual tokens
-    local tokens="${lower_basename//[\[\]_-]/ }"
+    # SECOND PASS: Match precompiles (case-insensitive)
+    local lower_basename="${basename,,}"
     
-    for token in $tokens; do
-        for op in "${OPCODES[@]}"; do
-            if [[ "$token" == "$op" && ${#op} -gt $best_len ]]; then
-                best_match="$op"
-                best_len=${#op}
-            fi
-        done
-        
-        for precompile in "${PRECOMPILES[@]}"; do
-            if [[ "$token" == "$precompile" && ${#precompile} -gt $best_len ]]; then
+    for precompile in "${PRECOMPILES[@]}"; do
+        if [[ "$lower_basename" == *"$precompile"* ]]; then
+            if [[ ${#precompile} -gt $best_len ]]; then
                 best_match="$precompile"
                 best_len=${#precompile}
             fi
-        done
+        fi
     done
     
     if [[ -n "$best_match" ]]; then
         get_canonical_name "$best_match"
         return 0
     fi
+    
+    # THIRD PASS: Match lowercase opcodes in test function names (e.g., "test_codecopy_benchmark")
+    # Pattern: test_<opcode>[ or test_<opcode>_
+    # Sort opcodes by length descending to match longer ones first
+    local sorted_ops=($(printf '%s\n' "${OPCODES[@]}" | awk '{ print length, $0 }' | sort -rn | cut -d' ' -f2-))
+    
+    for op in "${sorted_ops[@]}"; do
+        # Match patterns like: test_<opcode>[ or test_<opcode>_ or __test_<opcode>[
+        if [[ "$lower_basename" =~ (^|_)test_${op}(\[|_|$) ]]; then
+            get_canonical_name "$op"
+            return 0
+        fi
+    done
     
     # Fallback: return "uncategorized"
     echo "uncategorized"

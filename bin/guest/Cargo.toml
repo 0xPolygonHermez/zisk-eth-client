@@ -13,22 +13,23 @@ codegen-units = 1
 panic = "abort"
 
 [dependencies]
+# local
+crypto = { path = "../../crates/crypto" }
+guest = { path = "../../crates/guest" }
+
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
+# Local development
+# ziskos = { path = "../../../zisk/ziskos/entrypoint" }
+
+# alloy
+alloy-primitives = { version = "1.5.4", default-features = false, features = ["native-keccak"] }
+alloy-consensus = { version = "1.6.0", default-features = false, features = ["crypto-backend"] }
+
 # revm
 revm = { version = "34.0.0", default-features = false }
 
-# alloy
-alloy-consensus = { version = "1.6.0", default-features = false, features = ["crypto-backend"] }
-alloy-primitives = { version = "1.5.4", default-features = false, features = ["native-keccak"] }
-
 #ere
 stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "c696d4bb8073190208a481174b48781544052c4d" }
-
-# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/k256-ecdsa-ver" }
-# Local development
-ziskos = { path = "../../../zisk/ziskos/entrypoint" }
-
-crypto = { path = "../../crates/crypto" }
-guest = { path = "../../crates/guest" }
 
 [patch.crates-io]
 # This patch removes "ring" as a dependency, that is not compatible with the ZisK toolchain

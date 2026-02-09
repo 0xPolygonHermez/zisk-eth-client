@@ -1,54 +1,74 @@
-// TODO: Add old blocks via local reth node
-
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
-use input::{OutputFormat, reth_input_files_from_fixtures, reth_input_files_from_rpc};
 use std::path::PathBuf;
 use tracing_subscriber::EnvFilter;
+
+use input::{rpc::process_rpc, tests::process_tests, types::OutputFormat};
 
 #[derive(Parser)]
 #[command(name = "reth-input-generator")]
 #[command(about = "Generate Reth zkVM inputs from StatelessValidationFixture files")]
 #[command(version)]
 struct Cli {
-    /// Source of inputs
-    #[command(subcommand)]
-    source: SourceCommand,
+    /// Output format
+    #[arg(short, long, default_value = "binary")]
+    format: OutputFormat,
 
     /// Output folder for generated Reth input files
     #[arg(short, long, default_value = "reth-inputs")]
     output: PathBuf,
 
-    /// Output format
-    #[arg(short, long, default_value = "binary")]
-    format: OutputFormat,
+    /// Source of inputs
+    #[command(subcommand)]
+    source: SourceCommand,
 }
 
 #[derive(Subcommand, Clone, Debug)]
 enum SourceCommand {
-    /// Generate inputs from StatelessValidationFixture JSON files
-    Fixtures {
-        /// Input folder containing StatelessValidationFixture JSON files
+    /// Generate inputs from execution specification tests (EEST)
+    Tests {
+        /// EEST release tag to use (e.g., "v0.1.0"). If empty, the latest release will be used.
+        #[arg(short, long, conflicts_with = "eest_fixtures_path")]
+        tag: Option<String>,
+
+        /// Input folder for EEST files. If not provided, --tag is required.
+        #[arg(long, conflicts_with = "tag")]
+        eest_fixtures_path: Option<PathBuf>,
+
+        /// Include only test names containing the provided strings.
         #[arg(short, long)]
-        input: PathBuf,
+        include: Option<Vec<String>>,
+
+        /// Exclude all test names containing the provided strings.
+        #[arg(short, long)]
+        exclude: Option<Vec<String>>,
+
+        /// Number of threads for parallel processing (default: all available)
+        #[arg(long, default_value = "10")]
+        threads: Option<usize>,
     },
+
     /// Generate inputs from an RPC endpoint
     Rpc {
         /// RPC URL to use (mandatory)
-        #[arg(long)]
+        #[arg(short = 'u', long)]
         rpc_url: String,
 
+        /// Optional RPC headers (format: "Key:Value")
+        #[arg(short = 'h', long)]
+        rpc_headers: Option<Vec<String>>,
+
         /// Specific block number to fetch
-        #[arg(long, conflicts_with = "last_n_blocks")]
+        #[arg(long, conflicts_with_all = ["last_n_blocks", "follow"])]
         block: Option<u64>,
 
         /// Number of last blocks to fetch
-        #[arg(long, conflicts_with = "block")]
+        #[arg(long, conflicts_with_all = ["block", "follow"])]
         last_n_blocks: Option<usize>,
 
-        /// Optional RPC headers (format: "Key:Value")
-        #[arg(long)]
-        rpc_header: Option<Vec<String>>,
+        /// Listen for new blocks
+        #[arg(long, default_value_t = false, conflicts_with_all = ["last_n_blocks", "block"])]
+        follow: bool,
     },
 }
 
@@ -65,20 +85,38 @@ async fn main() -> Result<()> {
         .with_context(|| format!("Failed to create output folder: {}", cli.output.display()))?;
 
     match cli.source {
-        SourceCommand::Fixtures { input } => {
-            reth_input_files_from_fixtures(&input, &cli.output, cli.format)?;
+        SourceCommand::Tests {
+            tag,
+            include,
+            exclude,
+            eest_fixtures_path,
+            threads,
+        } => {
+            process_tests(
+                tag,
+                include,
+                exclude,
+                eest_fixtures_path,
+                &cli.output,
+                cli.format,
+                threads,
+            )
+            .await?;
         }
+
         SourceCommand::Rpc {
             rpc_url,
+            rpc_headers,
             block,
             last_n_blocks,
-            rpc_header,
+            follow,
         } => {
-            reth_input_files_from_rpc(
+            process_rpc(
                 &rpc_url,
+                rpc_headers,
                 block,
                 last_n_blocks,
-                rpc_header,
+                follow,
                 &cli.output,
                 cli.format,
             )

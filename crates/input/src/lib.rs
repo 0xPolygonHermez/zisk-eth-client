@@ -1,7 +1,4 @@
-mod fixtures;
-mod rpc;
-mod types;
-
-pub use fixtures::*;
-pub use rpc::*;
-pub use types::*;
+mod common;
+pub mod tests;
+pub mod rpc;
+pub mod types;
