@@ -18,11 +18,15 @@ use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_api::{DebugApiClient, EthApiClient};
 use reth_stateless::StatelessInput;
 
+use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use witness_generator::StatelessValidationFixture;
 
-use crate::{common::generate_reth_input, types::OutputFormat};
+use crate::{
+    common::{generate_reth_input_from_fixture, save_reth_input_to_file},
+    types::OutputFormat,
+};
 
-pub async fn process_rpc(
+pub async fn reth_input_files_from_rpc(
     rpc_url: &str,
     rpc_headers: Option<Vec<String>>,
     block: Option<u64>,
@@ -33,6 +37,70 @@ pub async fn process_rpc(
 ) -> Result<()> {
     info!("Connecting to RPC: {}", rpc_url);
 
+    // Initialize RPC client
+    let (client, chain_config, chain_name) = init_rpc_client(rpc_url, rpc_headers).await?;
+
+    info!(
+        "Connected to chain: {} (ID: {})",
+        chain_name, chain_config.chain_id
+    );
+
+    if follow {
+        return follow_new_blocks(&client, &chain_config, chain_name, output, format).await;
+    }
+
+    // Determine which blocks to fetch
+    let block_numbers: Vec<u64> = if let Some(block_num) = block {
+        vec![block_num]
+    } else {
+        let n = last_n_blocks.unwrap_or(1);
+        if n == 0 {
+            info!("No blocks to process (last_n_blocks = 0)");
+            return Ok(());
+        }
+        let latest = fetch_latest_block_number(&client).await?;
+        let start = latest.saturating_sub(n as u64 - 1);
+        (start..=latest).collect()
+    };
+
+    info!(
+        "Processing {} block(s): {:?}",
+        block_numbers.len(),
+        block_numbers
+    );
+
+    let mut success_count = 0;
+    let mut error_count = 0;
+    for block_num in block_numbers {
+        match fetch_and_generate_input(&client, block_num, &chain_config, chain_name).await {
+            Ok((reth_input, fixture_name)) => {
+                save_reth_input_to_file(reth_input, &fixture_name, output, format)?;
+                info!("Generated input for block: {}", block_num);
+                success_count += 1;
+            }
+            Err(e) => {
+                warn!("Failed to generate input for block {}: {:?}", block_num, e);
+                error_count += 1;
+            }
+        }
+    }
+
+    info!(
+        "Completed: {} succeeded, {} failed",
+        success_count, error_count
+    );
+
+    Ok(())
+}
+
+async fn init_rpc_client(
+    rpc_url: &str,
+    rpc_headers: Option<Vec<String>>,
+) -> Result<(
+    jsonrpsee::http_client::HttpClient,
+    ChainConfig,
+    &'static str,
+)> {
     // Build headers if provided
     let mut header_map = HeaderMap::new();
     if let Some(headers) = rpc_headers {
@@ -69,62 +137,22 @@ pub async fn process_rpc(
         _ => anyhow::bail!("Unsupported chain ID: {}", chain_id),
     };
 
-    info!("Connected to chain: {} (ID: {})", chain_name, chain_id);
+    Ok((client, chain_config, chain_name))
+}
 
-    if follow {
-        return follow_new_blocks(&client, &chain_config, chain_name, output, format).await;
-    }
+pub async fn reth_input_from_rpc(rpc_url: &str, block_num: u64) -> Result<Vec<u8>> {
+    let (client, chain_config, chain_name) = init_rpc_client(rpc_url, None).await?;
 
-    // Determine which blocks to fetch
-    let block_numbers: Vec<u64> = if let Some(block_num) = block {
-        vec![block_num]
-    } else {
-        let n = last_n_blocks.unwrap_or(1);
-        if n == 0 {
-            info!("No blocks to process (last_n_blocks = 0)");
-            return Ok(());
-        }
-        let latest = fetch_latest_block_number(&client).await?;
-        let start = latest.saturating_sub(n as u64 - 1);
-        (start..=latest).collect()
-    };
-
-    info!(
-        "Processing {} block(s): {:?}",
-        block_numbers.len(),
-        block_numbers
-    );
-
-    let mut success_count = 0;
-    let mut error_count = 0;
-    for block_num in block_numbers {
-        match fetch_and_generate_input(
-            &client,
-            block_num,
-            &chain_config,
-            chain_name,
-            output,
-            format,
-        )
-        .await
-        {
-            Ok(_) => {
-                info!("Generated input for block: {}", block_num);
-                success_count += 1;
-            }
-            Err(e) => {
-                warn!("Failed to generate input for block {}: {:?}", block_num, e);
-                error_count += 1;
-            }
+    match fetch_and_generate_input(&client, block_num, &chain_config, chain_name).await {
+        Ok((reth_input, _)) => Ok(bincode::serialize(&reth_input)?),
+        Err(e) => {
+            anyhow::bail!(
+                "Failed to generate input for block {}, error: {:?}",
+                block_num,
+                e
+            );
         }
     }
-
-    info!(
-        "Completed: {} succeeded, {} failed",
-        success_count, error_count
-    );
-
-    Ok(())
 }
 
 /// Continuously follow and process new blocks
@@ -207,12 +235,10 @@ async fn process_new_blocks(
 
     let mut success_count = 0;
     let mut error_count = 0;
-
     for block_num in *next_block_num..=latest {
-        match fetch_and_generate_input(client, block_num, chain_config, chain_name, output, format)
-            .await
-        {
-            Ok(_) => {
+        match fetch_and_generate_input(client, block_num, chain_config, chain_name).await {
+            Ok((reth_input, fixture_name)) => {
+                save_reth_input_to_file(reth_input, &fixture_name, output, format)?;
                 info!("Generated input for block: {}", block_num);
                 success_count += 1;
             }
@@ -249,9 +275,7 @@ async fn fetch_and_generate_input(
     block_num: u64,
     chain_config: &ChainConfig,
     chain_name: &str,
-    output: &Path,
-    format: OutputFormat,
-) -> Result<()> {
+) -> Result<(StatelessValidatorRethInput, String)> {
     // Fetch the execution witness using debug_execution_witness
     let witness =
         DebugApiClient::<()>::debug_execution_witness(client, BlockNumberOrTag::Number(block_num))
@@ -279,11 +303,12 @@ async fn fetch_and_generate_input(
     let mgas = gas_used / 1_000_000;
 
     // Create the fixture
+    let fixture_name = format!(
+        "{}_{}_{}_{}_zec_reth",
+        chain_name, block_num, tx_count, mgas
+    );
     let fixture = StatelessValidationFixture {
-        name: format!(
-            "{}_{}_{}_{}_zec_reth",
-            chain_name, block_num, tx_count, mgas
-        ),
+        name: fixture_name.clone(),
         stateless_input: StatelessInput {
             block: block.into_consensus(),
             witness,
@@ -293,7 +318,7 @@ async fn fetch_and_generate_input(
     };
 
     // Generate reth input
-    generate_reth_input(&fixture, output, format)
+    Ok((generate_reth_input_from_fixture(&fixture)?, fixture_name))
 }
 
 // TODO: The following simplified version should work when the method `debug_execution_witness_by_block_hash`

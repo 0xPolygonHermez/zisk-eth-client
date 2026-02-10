@@ -3,7 +3,9 @@ use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 use tracing_subscriber::EnvFilter;
 
-use input::{rpc::process_rpc, tests::process_tests, types::OutputFormat};
+use input::{
+    rpc::reth_input_files_from_rpc, tests::reth_input_files_from_tests, types::OutputFormat,
+};
 
 #[derive(Parser)]
 #[command(name = "reth-input-generator")]
@@ -92,7 +94,7 @@ async fn main() -> Result<()> {
             eest_fixtures_path,
             threads,
         } => {
-            process_tests(
+            reth_input_files_from_tests(
                 tag,
                 include,
                 exclude,
@@ -111,7 +113,7 @@ async fn main() -> Result<()> {
             last_n_blocks,
             follow,
         } => {
-            process_rpc(
+            reth_input_files_from_rpc(
                 &rpc_url,
                 rpc_headers,
                 block,
