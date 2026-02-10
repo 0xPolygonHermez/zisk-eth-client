@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
+use tracing::{error, warn};
 
 /// ZisK Ethereum Client Host - Benchmark runner
 #[derive(Parser, Debug)]
@@ -27,9 +28,35 @@ pub struct Cli {
     #[arg(long)]
     pub elf: PathBuf,
 
+    /// Path to the proving key file
+    #[arg(short, long)]
+    pub proving_key: Option<PathBuf>,
+
     /// Path to ziskemu binary
-    #[arg(long, default_value = "ziskemu")]
+    #[arg(long)]
     pub ziskemu: PathBuf,
+}
+
+impl Cli {
+    pub fn validate(&self) -> Result<(), String> {
+        match self.action {
+            Action::VerifyConstraints | Action::Prove => {
+                if self.proving_key.is_none() {
+                    error!("Proving key is required for action {:?}", self.action);
+                    return Err(format!(
+                        "Proving key is required for action {:?}",
+                        self.action
+                    ));
+                }
+            }
+            Action::Execute => {
+                if self.proving_key.is_some() {
+                    warn!("Proving key is ignored when action is {:?}", self.action);
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 /// Actions to perform
@@ -51,6 +78,7 @@ pub enum GuestProgramCommand {
         /// Input folder
         #[arg(short, long)]
         input_folder: PathBuf,
+
         /// Client
         #[arg(short, long, default_value = "reth")]
         client: Client,

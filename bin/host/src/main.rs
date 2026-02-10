@@ -9,7 +9,7 @@ mod cli;
 mod zisk;
 
 use benchmark::BenchmarkRunner;
-use cli::{Action, Cli, GuestProgramCommand};
+use cli::{Cli, GuestProgramCommand};
 
 fn main() -> Result<()> {
     tracing_subscriber::fmt()
@@ -17,21 +17,10 @@ fn main() -> Result<()> {
         .init();
 
     let cli = Cli::parse();
+    cli.validate().map_err(|e| anyhow::anyhow!(e))?;
 
     // Write metadata to a separate file
     write_run_metadata(&cli)?;
-
-    match &cli.action {
-        Action::Execute => { /* proceed */ }
-        Action::VerifyConstraints => {
-            info!("Verifying constraints is not yet implemented");
-            return Ok(());
-        }
-        Action::Prove => {
-            info!("Generating proofs is not yet implemented");
-            return Ok(());
-        }
-    }
 
     info!("ZisK Ethereum Client Host");
     info!(" Guest Program: {}", cli.guest_program.display_name());

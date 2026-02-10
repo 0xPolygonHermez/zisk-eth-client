@@ -6,8 +6,10 @@ use std::{
 };
 use tracing::{error, info};
 
-use crate::cli::Cli;
-use crate::zisk::{self, ExecutionMetrics};
+use crate::{
+    cli::{Action, Cli},
+    zisk::{ExecutionMetrics, Zisk},
+};
 
 #[derive(Debug, serde::Serialize)]
 pub struct BenchmarkResult {
@@ -63,9 +65,22 @@ impl<'a> BenchmarkRunner<'a> {
 
         info!("[{}/{}] Running: {}", current, total, test_name);
 
-        let start = Instant::now();
-        let metrics = zisk::execute(&self.cli.ziskemu, &self.cli.elf, input_file)?;
-        let elapsed = start.elapsed();
+        let time = Instant::now();
+
+        let mut zisk = Zisk::new(&self.cli.ziskemu, &self.cli.elf);
+        if let Some(ref pk) = self.cli.proving_key {
+            zisk = zisk.with_proving_key(pk);
+        }
+
+        let metrics = match self.cli.action {
+            Action::Execute => zisk.execute(input_file)?,
+            Action::VerifyConstraints => zisk.verify_constraints(input_file)?,
+            Action::Prove => {
+                info!("Generating proofs is not yet implemented");
+                return Ok(());
+            }
+        };
+        let elapsed = time.elapsed();
 
         info!(
             "[{}/{}] Completed in {:.2}s",

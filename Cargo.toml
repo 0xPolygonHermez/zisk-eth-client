@@ -8,6 +8,12 @@ version = "0.4.0"
 edition = "2021"
 
 [workspace.dependencies]
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/ziskemu-example" }
+zisk-common = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/ziskemu-example" }
+# local dev
+# zisk-sdk = { path = "../zisk/sdk" }
+# zisk-common = { path = "../zisk/common" }
+
 revm = { version = "34.0.0", default-features = false }
 
 # alloy
@@ -60,4 +66,3 @@ walkdir = "2"
 jsonrpsee = { version = "0.26", features = ["http-client"] }
 http = "1.4.0"
 tempfile = "3"
-
