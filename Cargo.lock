@@ -1877,7 +1877,7 @@ checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
 
 [[package]]
 name = "crypto"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
@@ -2978,7 +2978,7 @@ dependencies = [
 
 [[package]]
 name = "guest"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "alloy-genesis",
  "alloy-primitives",
@@ -3582,7 +3582,7 @@ dependencies = [
 
 [[package]]
 name = "input"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "alloy-provider",
  "anyhow",
@@ -3596,7 +3596,7 @@ dependencies = [
 
 [[package]]
 name = "input-gen"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "alloy-eips",
  "alloy-genesis",
@@ -8115,7 +8115,7 @@ dependencies = [
  "ere-io",
  "ere-zkvm-interface",
  "ethereum_ssz",
- "guest 0.5.0",
+ "guest 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=885398bc1478e777096a8456bc925b2ab28a8d0f)",
  "once_cell",
  "reth-chainspec",
  "reth-ethereum-primitives",
