@@ -5,13 +5,9 @@ use rayon::prelude::*;
 use reth_chainspec::{Chain, HOLESKY, HOODI, NamedChain, SEPOLIA, mainnet_chain_config};
 use reth_ethereum_primitives::TransactionSigned;
 use reth_stateless::{StatelessInput, UncompressedPublicKey};
+use tracing::debug;
 
 pub async fn reth_input_from_rpc(rpc_url: &str, block_number: u64) -> anyhow::Result<Vec<u8>> {
-    println!(
-        "Generating input file for block {}, guest: zec-zeth",
-        block_number
-    );
-
     let start_rpc_connect = std::time::Instant::now();
     let provider = ProviderBuilder::new()
         .connect(rpc_url)
@@ -76,7 +72,7 @@ pub async fn reth_input_from_rpc(rpc_url: &str, block_number: u64) -> anyhow::Re
 
     let time_serialize_input = start_serialize_input.elapsed();
 
-    println!("input generation timings for block {block_number}: rpc connect: {:?}, block fetch: {:?}, witness fetch: {:?}, serialize input: {:?}",
+    debug!("Input generation timings for block {block_number}: rpc connect: {:?}, block fetch: {:?}, witness fetch: {:?}, serialize input: {:?}",
         time_rpc_connect,
         time_block_fetch,
         time_witness_fetch,

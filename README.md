@@ -29,20 +29,20 @@ Sample input files for Ethereum blocks are provided in the `inputs` folder
 To run a block in the ZisK emulator, use:
 
 ```bash
-cargo-zisk run --release -i ./inputs/23583300_208_18_rsp.bin
+cargo-zisk run --release -i ./inputs/23583300_208_18_mainnet_24341035_74_5_zec_reth.bin
 ```
 
 Or, directly via the `ziskemu` tool:
 
 ```bash
-ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zisk-rsp -i ./inputs/23583300_208_18_rsp.bin
+ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zec-reth -i ./inputs/mainnet_24341035_74_5_zec_reth.bin
 ```
 
 ## Generate Input Block Files
 
 To generate your own input files, you can use the `input-gen` tool.
 
-Example: generate an input file for block `23583300` for the `zec-rsp` guest program:
+Example, generate an input file for block `22767493`:
 
 ```bash
 cargo build --release
@@ -51,8 +51,9 @@ target/release/input-gen rpc --block 22767493 -u <RPC_URL>
 
 Replace `<RPC_URL>` with the URL of an Ethereum Mainnet RPC endpoint.
 
-The command will create a file named `cccccc_22767493_xxx_yy_zec_reth.bin` in the default `inputs` folder, where:
-- `cccccc` in the chain name (i.e. mainnet)
+The command will create a file named `cccccc_22767493_xxx_yy_zec_reth.bin` in the default `reth-inputs` folder, where:
+
+- `cccccc` is the chain name (i.e. mainnet)
 - `xxx` is the number of transactions in the block
 - `yy` is the gas used in megagas (MGas)
 

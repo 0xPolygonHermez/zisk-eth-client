@@ -3592,6 +3592,7 @@ dependencies = [
  "reth-ethereum-primitives",
  "reth-stateless",
  "stateless-validator-reth",
+ "tracing",
 ]
 
 [[package]]
