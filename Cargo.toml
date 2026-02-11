@@ -27,7 +27,6 @@ reth-stateless = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" 
 reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
-reth-primitives-traits = { git = "https://github.com/paradigmxyz/reth", default-features = false, tag = "v1.10.2" }
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 
 # eth-act

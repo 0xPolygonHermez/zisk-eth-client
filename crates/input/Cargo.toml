@@ -5,26 +5,14 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-clap.workspace = true
 anyhow.workspace = true
 bincode.workspace = true
 rayon.workspace = true
-serde.workspace = true
-tracing.workspace = true
-walkdir.workspace = true
 
-alloy = { workspace = true }
-alloy-consensus.workspace = true
-alloy-eips.workspace = true
-alloy-genesis.workspace = true
-alloy-rpc-types-eth.workspace = true
 alloy-provider = { workspace = true, features = ["debug-api", "reqwest", "reqwest-rustls-tls"] }
 
 reth-stateless.workspace = true
 reth-chainspec.workspace = true
 reth-ethereum-primitives.workspace = true
-reth-primitives-traits.workspace = true
 
 stateless-validator-reth = { workspace = true, features = ["host"] }
-
-guest = { path = "../../crates/guest" }
