@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
+use tracing::{error, warn};
 
 /// ZisK Ethereum Client Host - Benchmark runner
 #[derive(Parser, Debug)]
@@ -20,16 +21,60 @@ pub struct Cli {
     pub guest_program: GuestProgramCommand,
 
     /// Output folder for benchmark results
-    #[arg(short, long, default_value = "metrics")]
-    pub output_folder: PathBuf,
+    #[arg(short, long)]
+    pub output_folder: Option<PathBuf>,
 
     /// Path to the compiled guest program ELF binary
     #[arg(long)]
     pub elf: PathBuf,
 
+    /// Path to the proving key file
+    #[arg(short, long)]
+    pub proving_key: Option<PathBuf>,
+
     /// Path to ziskemu binary
-    #[arg(long, default_value = "ziskemu")]
-    pub ziskemu: PathBuf,
+    #[arg(long)]
+    pub ziskemu: Option<PathBuf>,
+}
+
+impl Cli {
+    pub fn validate(&self) -> Result<(), String> {
+        match self.action {
+            Action::VerifyConstraints | Action::Prove => {
+                if self.proving_key.is_none() {
+                    error!("Proving key is required for action {:?}", self.action);
+                    return Err(format!(
+                        "Proving key is required for action {:?}",
+                        self.action
+                    ));
+                }
+
+                if self.ziskemu.is_some() {
+                    warn!(
+                        "ZisK Emulator path is ignored when action is {:?}",
+                        self.action
+                    );
+                }
+            }
+            Action::Execute => {
+                if self.proving_key.is_some() {
+                    warn!("Proving key is ignored when action is {:?}", self.action);
+                }
+
+                if self.ziskemu.is_none() {
+                    error!(
+                        "ZisK Emulator path is required for action {:?}",
+                        self.action
+                    );
+                    return Err(format!(
+                        "ZisK Emulator path is required for action {:?}",
+                        self.action
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 /// Actions to perform
@@ -51,6 +96,7 @@ pub enum GuestProgramCommand {
         /// Input folder
         #[arg(short, long)]
         input_folder: PathBuf,
+
         /// Client
         #[arg(short, long, default_value = "reth")]
         client: Client,

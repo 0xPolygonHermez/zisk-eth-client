@@ -9,7 +9,7 @@ mod cli;
 mod zisk;
 
 use benchmark::BenchmarkRunner;
-use cli::{Action, Cli, GuestProgramCommand};
+use cli::{Cli, GuestProgramCommand};
 
 fn main() -> Result<()> {
     tracing_subscriber::fmt()
@@ -17,20 +17,11 @@ fn main() -> Result<()> {
         .init();
 
     let cli = Cli::parse();
+    cli.validate().map_err(|e| anyhow::anyhow!(e))?;
 
     // Write metadata to a separate file
-    write_run_metadata(&cli)?;
-
-    match &cli.action {
-        Action::Execute => { /* proceed */ }
-        Action::VerifyConstraints => {
-            info!("Verifying constraints is not yet implemented");
-            return Ok(());
-        }
-        Action::Prove => {
-            info!("Generating proofs is not yet implemented");
-            return Ok(());
-        }
+    if cli.output_folder.is_some() {
+        write_metadata(&cli)?;
     }
 
     info!("ZisK Ethereum Client Host");
@@ -51,8 +42,9 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn write_run_metadata(cli: &Cli) -> Result<()> {
-    let log_path = cli.output_folder.join("run_metadata.log");
+fn write_metadata(cli: &Cli) -> Result<()> {
+    let output_folder = cli.output_folder.as_ref().unwrap();
+    let log_path = output_folder.join("metadata.log");
 
     // Create parent directory if needed
     if let Some(parent) = log_path.parent() {

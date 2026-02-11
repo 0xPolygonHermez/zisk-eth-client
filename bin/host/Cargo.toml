@@ -5,9 +5,16 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+zisk-sdk.workspace = true
+zisk-common.workspace = true
+
 clap.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+
+[features]
+default = []
+gpu = [ "zisk-sdk/gpu"]
