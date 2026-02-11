@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{Context, Ok, Result};
 use std::{
     path::{Path, PathBuf},
     process::Command,
@@ -17,18 +17,23 @@ pub struct ExecutionMetrics {
 
 #[derive(Debug, Clone)]
 pub struct Zisk {
-    pub ziskemu: PathBuf,
+    pub ziskemu: Option<PathBuf>,
     pub elf: PathBuf,
     pub proving_key: Option<PathBuf>,
 }
 
 impl Zisk {
-    pub fn new(ziskemu: impl Into<PathBuf>, elf: impl Into<PathBuf>) -> Self {
+    pub fn new(elf: impl Into<PathBuf>) -> Self {
         Self {
-            ziskemu: ziskemu.into(),
+            ziskemu: None,
             elf: elf.into(),
             proving_key: None,
         }
+    }
+
+    pub fn with_ziskemu(mut self, ziskemu: impl Into<PathBuf>) -> Self {
+        self.ziskemu = Some(ziskemu.into());
+        self
     }
 
     pub fn with_proving_key(mut self, proving_key: impl Into<PathBuf>) -> Self {
@@ -38,7 +43,11 @@ impl Zisk {
 
     /// Execute the guest program and return metrics
     pub fn execute(&self, input_file: &Path) -> Result<ExecutionMetrics> {
-        let output = Command::new(&self.ziskemu)
+        let ziskemu = self
+            .ziskemu
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("ZisK Emulator path is required for execution"))?;
+        let output = Command::new(ziskemu)
             .arg("-e")
             .arg(&self.elf)
             .arg("-i")
@@ -57,31 +66,28 @@ impl Zisk {
     }
 
     /// Execute and verify constraints
-    pub fn verify_constraints(&self, input_file: &Path) -> Result<ExecutionMetrics> {
+    pub fn verify_constraints(&self, input_file: &Path) -> Result<()> {
         let elf = ElfBinaryFromFile::new(&self.elf, false).context("Failed to load ELF binary")?;
 
         let stdin = ZiskStdin::from_file(input_file).context("Failed to load input file")?;
 
-        let mut builder = ProverClient::builder().emu().verify_constraints();
-        if let Some(ref pk) = self.proving_key {
-            builder = builder.proving_key_path(pk.clone());
-        }
+        let pk = self.proving_key.as_ref().ok_or_else(|| {
+            anyhow::anyhow!("Proving key is required for constraint verification")
+        })?;
+        let builder = ProverClient::builder()
+            .emu()
+            .verify_constraints()
+            .proving_key_path(pk.clone());
 
         let client = builder.build().context("Failed to build ProverClient")?;
 
         client.setup(&elf).context("Failed to setup program")?;
 
-        let result = client
+        client
             .verify_constraints(stdin)
             .context("Failed to verify constraints")?;
 
-        // TODO: Finish!
-        Ok(ExecutionMetrics {
-            steps: *result.get_execution_steps(),
-            cost: *result.get_execution_steps(),
-            tx_count: None,
-            gas_used: None,
-        })
+        Ok(())
     }
 }
 

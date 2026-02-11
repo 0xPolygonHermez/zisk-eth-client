@@ -20,15 +20,11 @@ pub struct BenchmarkResult {
 
 pub struct BenchmarkRunner<'a> {
     cli: &'a Cli,
-    output_folder: PathBuf,
 }
 
 impl<'a> BenchmarkRunner<'a> {
     pub fn new(cli: &'a Cli) -> Self {
-        Self {
-            cli,
-            output_folder: cli.output_folder.clone(),
-        }
+        Self { cli }
     }
 
     pub fn run(&self, input_folder: &Path) -> Result<()> {
@@ -36,69 +32,110 @@ impl<'a> BenchmarkRunner<'a> {
         let total = input_files.len();
         info!("Found {} input files to run", total);
 
+        let mut passed = 0;
+        let mut failed = 0;
+        let mut skipped = 0;
         for (index, file) in input_files.iter().enumerate() {
-            if let Err(e) = self.run_single(file, index + 1, total) {
-                error!("Failed to run benchmark for {}: {}", file.display(), e);
+            match self.run_single(file, index + 1, total) {
+                Ok(true) => passed += 1,
+                Ok(false) => skipped += 1,
+                Err(e) => {
+                    error!("Failed to run benchmark for {}: {}", file.display(), e);
+                    failed += 1;
+                }
             }
         }
+
+        // Print summary
+        info!("");
+        info!(
+            "Summary: {} passed, {} failed, {} skipped",
+            passed, failed, skipped
+        );
 
         Ok(())
     }
 
-    fn run_single(&self, input_file: &Path, current: usize, total: usize) -> Result<()> {
+    /// Returns Ok(true) if ran, Ok(false) if skipped, Err if failed
+    fn run_single(&self, input_file: &Path, current: usize, total: usize) -> Result<bool> {
         let test_name = input_file
             .file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or("unknown");
 
-        let filename = input_file.file_name().unwrap_or_default();
-        let output_file = self.output_folder.join(filename).with_extension("json");
+        if matches!(self.cli.action, Action::Execute) {
+            // If output folder exists, check if output file exists and skip if it does
+            if let Some(ref output_folder) = self.cli.output_folder {
+                let filename = input_file.file_name().unwrap_or_default();
+                let output_file = output_folder.join(filename).with_extension("json");
 
-        if output_file.exists() && !self.cli.force_rerun {
-            info!("[{}/{}] Skipping {}", current, total, test_name);
-            return Ok(());
-        }
-
-        if let Some(parent) = output_file.parent() {
-            fs::create_dir_all(parent)?;
-        }
-
-        info!("[{}/{}] Running: {}", current, total, test_name);
-
-        let time = Instant::now();
-
-        let mut zisk = Zisk::new(&self.cli.ziskemu, &self.cli.elf);
-        if let Some(ref pk) = self.cli.proving_key {
-            zisk = zisk.with_proving_key(pk);
-        }
-
-        let metrics = match self.cli.action {
-            Action::Execute => zisk.execute(input_file)?,
-            Action::VerifyConstraints => zisk.verify_constraints(input_file)?,
-            Action::Prove => {
-                info!("Generating proofs is not yet implemented");
-                return Ok(());
+                if output_file.exists() && !self.cli.force_rerun {
+                    info!("[{}/{}] Skipping {}", current, total, test_name);
+                    return Ok(false);
+                }
             }
-        };
-        let elapsed = time.elapsed();
 
-        info!(
-            "[{}/{}] Completed in {:.2}s",
-            current,
-            total,
-            elapsed.as_secs_f64(),
-        );
+            info!("[{}/{}] Running: {}", current, total, test_name);
 
-        let result = BenchmarkResult {
-            test_name: test_name.to_string(),
-            time: elapsed.as_secs_f64(),
-            metrics,
-        };
+            let time = Instant::now();
+            let zisk = Zisk::new(&self.cli.elf).with_ziskemu(self.cli.ziskemu.as_ref().unwrap());
+            let metrics = zisk.execute(input_file)?;
+            let elapsed = time.elapsed();
 
-        let output_json = serde_json::to_string_pretty(&result)?;
-        fs::write(&output_file, output_json)?;
+            info!(
+                "[{}/{}] Completed in {:.2}s",
+                current,
+                total,
+                elapsed.as_secs_f64(),
+            );
 
-        Ok(())
+            // Write metrics to output folder if specified
+            if let Some(ref output_folder) = self.cli.output_folder {
+                let filename = input_file.file_name().unwrap_or_default();
+                let output_file = output_folder.join(filename).with_extension("json");
+
+                if let Some(parent) = output_file.parent() {
+                    fs::create_dir_all(parent)?;
+                }
+
+                let result = BenchmarkResult {
+                    test_name: test_name.to_string(),
+                    time: elapsed.as_secs_f64(),
+                    metrics,
+                };
+
+                let output_json = serde_json::to_string_pretty(&result)?;
+                fs::write(&output_file, output_json)?;
+            }
+        } else {
+            info!("[{}/{}] Testing: {}", current, total, test_name);
+
+            let time = Instant::now();
+            let pk = self.cli.proving_key.as_ref().ok_or_else(|| {
+                anyhow::anyhow!("Proving key is required for action {:?}", self.cli.action)
+            })?;
+            let zisk = Zisk::new(&self.cli.elf).with_proving_key(pk);
+
+            match self.cli.action {
+                Action::VerifyConstraints => {
+                    zisk.verify_constraints(input_file)?;
+                }
+                Action::Prove => {
+                    unimplemented!("Prove action is not implemented yet");
+                }
+                Action::Execute => unreachable!(),
+            };
+
+            let elapsed = time.elapsed();
+            info!(
+                "[{}/{}] PASSED in {:.2}s",
+                current,
+                total,
+                elapsed.as_secs_f64(),
+            );
+        }
+
+        Ok(true)
     }
 }
 

@@ -8,8 +8,8 @@ version = "0.4.0"
 edition = "2021"
 
 [workspace.dependencies]
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/ziskemu-example" }
-zisk-common = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/ziskemu-example" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/features" }
+zisk-common = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/features" }
 # local dev
 # zisk-sdk = { path = "../zisk/sdk" }
 # zisk-common = { path = "../zisk/common" }
