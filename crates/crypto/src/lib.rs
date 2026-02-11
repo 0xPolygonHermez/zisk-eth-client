@@ -48,6 +48,8 @@ extern "C" {
         ret_ptr: *mut u8,
     ) -> usize;
 
+    fn blake2b_compress_c(rounds: u32, h: *mut u64, m: *const u64, t: *const u64, f: u8);
+
     fn secp256r1_ecdsa_verify_c(msg: *const u8, sig: *const u8, pk: *const u8) -> bool;
 
     fn verify_kzg_proof_c(
@@ -433,11 +435,21 @@ impl Crypto for CustomEvmCrypto {
         }
     }
 
-    // /// Blake2 compression function.
-    // #[inline]
-    // fn blake2_compress(&self, rounds: u32, h: &mut [u64; 8], m: [u64; 16], t: [u64; 2], f: bool) {
-    //     crate::blake2::algo::compress(rounds as usize, h, m, t, f);
-    // }
+    /// Blake2 compression function.
+    #[inline]
+    fn blake2_compress(&self, rounds: u32, h: &mut [u64; 8], m: [u64; 16], t: [u64; 2], f: bool) {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            unsafe {
+                blake2b_compress_c(rounds, h.as_mut_ptr(), m.as_ptr(), t.as_ptr(), f as u8);
+            }
+        }
+
+        #[cfg(not(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints)))]
+        {
+            unimplemented!();
+        }
+    }
 
     /// secp256r1 (P-256) signature verification.
     #[inline]
