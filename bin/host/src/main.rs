@@ -20,7 +20,7 @@ fn main() -> Result<()> {
     cli.validate().map_err(|e| anyhow::anyhow!(e))?;
 
     // Write metadata to a separate file
-    write_run_metadata(&cli)?;
+    write_metadata(&cli)?;
 
     info!("ZisK Ethereum Client Host");
     info!(" Guest Program: {}", cli.guest_program.display_name());
@@ -40,8 +40,8 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn write_run_metadata(cli: &Cli) -> Result<()> {
-    let log_path = cli.output_folder.join("run_metadata.log");
+fn write_metadata(cli: &Cli) -> Result<()> {
+    let log_path = cli.output_folder.join("metadata.log");
 
     // Create parent directory if needed
     if let Some(parent) = log_path.parent() {
