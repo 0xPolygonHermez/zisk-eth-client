@@ -1,5 +1,5 @@
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use rayon::prelude::*;
 use reth_chainspec::{Chain, HOLESKY, HOODI, NamedChain, SEPOLIA, mainnet_chain_config};
@@ -71,7 +71,9 @@ pub async fn reth_input_from_rpc(rpc_url: &str, block_number: u64) -> anyhow::Re
             )
         })?;
 
-    let input_bytes = bincode::serialize(&reth_input).expect("Failed to serialize input");
+    let input_bytes = bincode::serialize(&reth_input)
+        .with_context(|| format!("Failed to serialize reth input for block {}", block_number))?;
+
     let time_serialize_input = start_serialize_input.elapsed();
 
     println!("input generation timings for block {block_number}: rpc connect: {:?}, block fetch: {:?}, witness fetch: {:?}, serialize input: {:?}",
@@ -89,14 +91,18 @@ pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<UncompressedPubl
     txs.par_iter()
         .enumerate()
         .map(|(i, tx)| {
-            tx.signature()
+            let keys = tx
+                .signature()
                 .recover_from_prehash(&tx.signature_hash())
-                .map(|keys| {
-                    UncompressedPublicKey(
-                        keys.to_encoded_point(false).as_bytes().try_into().unwrap(),
-                    )
-                })
-                .with_context(|| format!("failed to recover signature for tx #{i}"))
+                .with_context(|| format!("Failed to recover signature for tx #{i}"))?;
+
+            let encoded_point: [u8; 65] = keys
+                .to_encoded_point(false)
+                .as_bytes()
+                .try_into()
+                .map_err(|e| anyhow!("Failed to encode public key for tx #{i}, error: {e}"))?;
+
+            Ok(UncompressedPublicKey(encoded_point))
         })
         .collect()
 }
