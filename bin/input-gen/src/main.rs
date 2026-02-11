@@ -1,11 +1,16 @@
+mod common;
+mod rpc;
+mod tests;
+mod types;
+
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 use tracing_subscriber::EnvFilter;
 
-use input::{
-    rpc::reth_input_files_from_rpc, tests::reth_input_files_from_tests, types::OutputFormat,
-};
+use rpc::reth_input_files_from_rpc;
+use tests::reth_input_files_from_tests;
+use types::OutputFormat;
 
 #[derive(Parser)]
 #[command(name = "reth-input-generator")]
