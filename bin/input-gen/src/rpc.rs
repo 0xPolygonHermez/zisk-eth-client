@@ -140,21 +140,6 @@ async fn init_rpc_client(
     Ok((client, chain_config, chain_name))
 }
 
-pub async fn reth_input_from_rpc(rpc_url: &str, block_num: u64) -> Result<Vec<u8>> {
-    let (client, chain_config, chain_name) = init_rpc_client(rpc_url, None).await?;
-
-    match fetch_and_generate_input(&client, block_num, &chain_config, chain_name).await {
-        Ok((reth_input, _)) => Ok(bincode::serialize(&reth_input)?),
-        Err(e) => {
-            anyhow::bail!(
-                "Failed to generate input for block {}, error: {:?}",
-                block_num,
-                e
-            );
-        }
-    }
-}
-
 /// Continuously follow and process new blocks
 async fn follow_new_blocks(
     client: &HttpClient,
