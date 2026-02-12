@@ -32,11 +32,20 @@ impl<'a> BenchmarkRunner<'a> {
         let total = input_files.len();
         info!("Found {} input files to run", total);
 
+        // Setup things
+        let zisk = if matches!(self.cli.action, Action::Execute) {
+            Zisk::new(&self.cli.elf).with_ziskemu(self.cli.ziskemu.as_ref().unwrap())
+        } else {
+            Zisk::new(&self.cli.elf)
+                .with_proving_key(self.cli.proving_key.as_ref().unwrap())
+                .setup()?
+        };
+
         let mut passed = 0;
         let mut failed = 0;
         let mut skipped = 0;
         for (index, file) in input_files.iter().enumerate() {
-            match self.run_single(file, index + 1, total) {
+            match self.run_single(&zisk, file, index + 1, total) {
                 Ok(true) => passed += 1,
                 Ok(false) => skipped += 1,
                 Err(e) => {
@@ -57,7 +66,13 @@ impl<'a> BenchmarkRunner<'a> {
     }
 
     /// Returns Ok(true) if ran, Ok(false) if skipped, Err if failed
-    fn run_single(&self, input_file: &Path, current: usize, total: usize) -> Result<bool> {
+    fn run_single(
+        &self,
+        zisk: &Zisk,
+        input_file: &Path,
+        current: usize,
+        total: usize,
+    ) -> Result<bool> {
         let test_name = input_file
             .file_stem()
             .and_then(|s| s.to_str())
@@ -78,7 +93,6 @@ impl<'a> BenchmarkRunner<'a> {
             info!("[{}/{}] Running: {}", current, total, test_name);
 
             let time = Instant::now();
-            let zisk = Zisk::new(&self.cli.elf).with_ziskemu(self.cli.ziskemu.as_ref().unwrap());
             let metrics = zisk.execute(input_file)?;
             let elapsed = time.elapsed();
 
@@ -111,11 +125,6 @@ impl<'a> BenchmarkRunner<'a> {
             info!("[{}/{}] Testing: {}", current, total, test_name);
 
             let time = Instant::now();
-            let pk = self.cli.proving_key.as_ref().ok_or_else(|| {
-                anyhow::anyhow!("Proving key is required for action {:?}", self.cli.action)
-            })?;
-            let zisk = Zisk::new(&self.cli.elf).with_proving_key(pk);
-
             match self.cli.action {
                 Action::VerifyConstraints => {
                     zisk.verify_constraints(input_file)?;
@@ -125,8 +134,8 @@ impl<'a> BenchmarkRunner<'a> {
                 }
                 Action::Execute => unreachable!(),
             };
-
             let elapsed = time.elapsed();
+
             info!(
                 "[{}/{}] PASSED in {:.2}s",
                 current,
