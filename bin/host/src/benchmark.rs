@@ -8,23 +8,33 @@ use tracing::{error, info};
 
 use crate::{
     cli::{Action, Cli},
-    zisk::{ExecutionMetrics, Zisk},
+    zisk::{ZiskExecutionMetrics, Zisk},
 };
 
 #[derive(Debug, serde::Serialize)]
-pub struct BenchmarkResult {
-    pub test_name: String,
-    pub time: f64,
-    pub metrics: ExecutionMetrics,
+struct BenchmarkResult {
+    test_name: String,
+    time: f64,
+    metrics: ZiskExecutionMetrics,
 }
 
 pub struct BenchmarkRunner<'a> {
     cli: &'a Cli,
+    zisk: Zisk,
 }
 
 impl<'a> BenchmarkRunner<'a> {
     pub fn new(cli: &'a Cli) -> Self {
-        Self { cli }
+        // Setup things
+        let zisk = if matches!(cli.action, Action::Execute) {
+            Zisk::new(&cli.elf).with_ziskemu(cli.ziskemu.as_ref().unwrap())
+        } else {
+            Zisk::new(&cli.elf)
+                .with_proving_key(cli.proving_key.as_ref().unwrap())
+                .expect("Failed to setup Zisk with proving key")
+        };
+
+        Self { cli, zisk }
     }
 
     pub fn run(&self, input_folder: &Path) -> Result<()> {
@@ -32,20 +42,11 @@ impl<'a> BenchmarkRunner<'a> {
         let total = input_files.len();
         info!("Found {} input files to run", total);
 
-        // Setup things
-        let zisk = if matches!(self.cli.action, Action::Execute) {
-            Zisk::new(&self.cli.elf).with_ziskemu(self.cli.ziskemu.as_ref().unwrap())
-        } else {
-            Zisk::new(&self.cli.elf)
-                .with_proving_key(self.cli.proving_key.as_ref().unwrap())
-                .setup()?
-        };
-
         let mut passed = 0;
         let mut failed = 0;
         let mut skipped = 0;
         for (index, file) in input_files.iter().enumerate() {
-            match self.run_single(&zisk, file, index + 1, total) {
+            match self.run_single(file, index + 1, total) {
                 Ok(true) => passed += 1,
                 Ok(false) => skipped += 1,
                 Err(e) => {
@@ -66,13 +67,7 @@ impl<'a> BenchmarkRunner<'a> {
     }
 
     /// Returns Ok(true) if ran, Ok(false) if skipped, Err if failed
-    fn run_single(
-        &self,
-        zisk: &Zisk,
-        input_file: &Path,
-        current: usize,
-        total: usize,
-    ) -> Result<bool> {
+    fn run_single(&self, input_file: &Path, current: usize, total: usize) -> Result<bool> {
         let test_name = input_file
             .file_stem()
             .and_then(|s| s.to_str())
@@ -93,7 +88,7 @@ impl<'a> BenchmarkRunner<'a> {
             info!("[{}/{}] Running: {}", current, total, test_name);
 
             let time = Instant::now();
-            let metrics = zisk.execute(input_file)?;
+            let metrics = self.zisk.execute(input_file)?;
             let elapsed = time.elapsed();
 
             info!(
@@ -127,7 +122,7 @@ impl<'a> BenchmarkRunner<'a> {
             let time = Instant::now();
             match self.cli.action {
                 Action::VerifyConstraints => {
-                    zisk.verify_constraints(input_file)?;
+                    self.zisk.verify_constraints(input_file)?;
                 }
                 Action::Prove => {
                     unimplemented!("Prove action is not implemented yet");

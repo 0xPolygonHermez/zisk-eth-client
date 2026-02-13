@@ -8,7 +8,7 @@ use zisk_common::{ElfBinaryFromFile, io::ZiskStdin};
 use zisk_sdk::{Emu, ProverClient, ZiskProver};
 
 #[derive(Debug, serde::Serialize)]
-pub struct ExecutionMetrics {
+pub struct ZiskExecutionMetrics {
     pub steps: u64,
     pub cost: u64,
     pub tx_count: Option<u64>,
@@ -17,18 +17,16 @@ pub struct ExecutionMetrics {
 
 // #[derive(Debug, Clone)]
 pub struct Zisk {
-    pub ziskemu: Option<PathBuf>,
     pub elf: PathBuf,
-    pub proving_key: Option<PathBuf>,
+    pub ziskemu: Option<PathBuf>,
     pub client: Option<ZiskProver<Emu>>,
 }
 
 impl Zisk {
     pub fn new(elf: impl Into<PathBuf>) -> Self {
         Self {
-            ziskemu: None,
             elf: elf.into(),
-            proving_key: None,
+            ziskemu: None,
             client: None,
         }
     }
@@ -38,23 +36,15 @@ impl Zisk {
         self
     }
 
-    pub fn with_proving_key(mut self, proving_key: impl Into<PathBuf>) -> Self {
-        self.proving_key = Some(proving_key.into());
-        self
-    }
-
-    pub fn setup(mut self) -> Result<Self> {
+    pub fn with_proving_key(mut self, proving_key: impl Into<PathBuf>) -> Result<Self> {
         let elf = ElfBinaryFromFile::new(&self.elf, false).context("Failed to load ELF binary")?;
 
-        let pk = self.proving_key.as_ref().ok_or_else(|| {
-            anyhow::anyhow!("Proving key is required for constraint verification")
-        })?;
-        let builder = ProverClient::builder()
+        let client = ProverClient::builder()
             .emu()
             .verify_constraints()
-            .proving_key_path(pk.clone());
-
-        let client = builder.build().context("Failed to build ProverClient")?;
+            .proving_key_path(proving_key.into())
+            .build()
+            .context("Failed to build ProverClient builder")?;
 
         client.setup(&elf).context("Failed to setup program")?;
 
@@ -64,7 +54,7 @@ impl Zisk {
     }
 
     /// Execute the guest program and return metrics
-    pub fn execute(&self, input_file: &Path) -> Result<ExecutionMetrics> {
+    pub fn execute(&self, input_file: &Path) -> Result<ZiskExecutionMetrics> {
         let ziskemu = self
             .ziskemu
             .as_ref()
@@ -101,7 +91,7 @@ impl Zisk {
     }
 }
 
-fn parse_metrics(output: &str) -> Result<ExecutionMetrics> {
+fn parse_metrics(output: &str) -> Result<ZiskExecutionMetrics> {
     let mut steps = 0u64;
     let mut cost = 0u64;
     let mut tx_count = None;
@@ -131,7 +121,7 @@ fn parse_metrics(output: &str) -> Result<ExecutionMetrics> {
         }
     }
 
-    Ok(ExecutionMetrics {
+    Ok(ZiskExecutionMetrics {
         steps,
         cost,
         tx_count,
