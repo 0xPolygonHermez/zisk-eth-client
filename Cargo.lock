@@ -3570,8 +3570,6 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
- "tracing-subscriber 0.3.22",
- "zisk-common",
  "zisk-sdk",
 ]
 

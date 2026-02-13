@@ -37,8 +37,19 @@ impl<'a> BenchmarkRunner<'a> {
         Self { cli, zisk }
     }
 
-    pub fn run(&self, input_folder: &Path) -> Result<()> {
-        let input_files = collect_input_files(input_folder)?;
+    pub fn run(&self, input_folder: &Path, gas_millions: Option<u32>) -> Result<()> {
+        let mut input_files = collect_input_files(input_folder)?;
+
+        // Filter by gas value if specified
+        if let Some(gas_mb) = gas_millions {
+            let gas_pattern = format!("gas-value_{}M", gas_mb);
+            info!(
+                "Filtering for gas value: {} (pattern: {})",
+                gas_mb, gas_pattern
+            );
+            input_files.retain(|file| file.to_string_lossy().contains(&gas_pattern));
+        }
+
         let total = input_files.len();
         info!("Found {} input files to run", total);
 

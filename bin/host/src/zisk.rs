@@ -4,8 +4,7 @@ use std::{
     process::Command,
 };
 
-use zisk_common::{ElfBinaryFromFile, io::ZiskStdin};
-use zisk_sdk::{Emu, ProverClient, ZiskProver};
+use zisk_sdk::{ElfBinaryFromFile, Emu, ProverClient, ZiskProver, ZiskStdin};
 
 #[derive(Debug, serde::Serialize)]
 pub struct ZiskExecutionMetrics {

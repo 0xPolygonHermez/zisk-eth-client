@@ -100,6 +100,11 @@ pub enum GuestProgramCommand {
         /// Client
         #[arg(short, long, default_value = "reth")]
         client: Client,
+
+        /// Filter tests by gas value in millions (e.g., 1, 5, 10, 20, 30, 60).
+        /// Only tests with "gas-value_XM" matching this value will be run.
+        #[arg(short = 'g', long)]
+        gas_millions: Option<u32>,
     },
     // Add more guest programs here as needed
 }
