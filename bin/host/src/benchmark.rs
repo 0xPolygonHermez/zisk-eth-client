@@ -8,27 +8,48 @@ use tracing::{error, info};
 
 use crate::{
     cli::{Action, Cli},
-    zisk::{ExecutionMetrics, Zisk},
+    zisk::{ZiskExecutionMetrics, Zisk},
 };
 
 #[derive(Debug, serde::Serialize)]
-pub struct BenchmarkResult {
-    pub test_name: String,
-    pub time: f64,
-    pub metrics: ExecutionMetrics,
+struct BenchmarkResult {
+    test_name: String,
+    time: f64,
+    metrics: ZiskExecutionMetrics,
 }
 
 pub struct BenchmarkRunner<'a> {
     cli: &'a Cli,
+    zisk: Zisk,
 }
 
 impl<'a> BenchmarkRunner<'a> {
     pub fn new(cli: &'a Cli) -> Self {
-        Self { cli }
+        // Setup things
+        let zisk = if matches!(cli.action, Action::Execute) {
+            Zisk::new(&cli.elf).with_ziskemu(cli.ziskemu.as_ref().unwrap())
+        } else {
+            Zisk::new(&cli.elf)
+                .with_proving_key(cli.proving_key.as_ref().unwrap())
+                .expect("Failed to setup Zisk with proving key")
+        };
+
+        Self { cli, zisk }
     }
 
-    pub fn run(&self, input_folder: &Path) -> Result<()> {
-        let input_files = collect_input_files(input_folder)?;
+    pub fn run(&self, input_folder: &Path, gas_millions: Option<u32>) -> Result<()> {
+        let mut input_files = collect_input_files(input_folder)?;
+
+        // Filter by gas value if specified
+        if let Some(gas_mb) = gas_millions {
+            let gas_pattern = format!("gas-value_{}M", gas_mb);
+            info!(
+                "Filtering for gas value: {} (pattern: {})",
+                gas_mb, gas_pattern
+            );
+            input_files.retain(|file| file.to_string_lossy().contains(&gas_pattern));
+        }
+
         let total = input_files.len();
         info!("Found {} input files to run", total);
 
@@ -78,8 +99,7 @@ impl<'a> BenchmarkRunner<'a> {
             info!("[{}/{}] Running: {}", current, total, test_name);
 
             let time = Instant::now();
-            let zisk = Zisk::new(&self.cli.elf).with_ziskemu(self.cli.ziskemu.as_ref().unwrap());
-            let metrics = zisk.execute(input_file)?;
+            let metrics = self.zisk.execute(input_file)?;
             let elapsed = time.elapsed();
 
             info!(
@@ -111,22 +131,17 @@ impl<'a> BenchmarkRunner<'a> {
             info!("[{}/{}] Testing: {}", current, total, test_name);
 
             let time = Instant::now();
-            let pk = self.cli.proving_key.as_ref().ok_or_else(|| {
-                anyhow::anyhow!("Proving key is required for action {:?}", self.cli.action)
-            })?;
-            let zisk = Zisk::new(&self.cli.elf).with_proving_key(pk);
-
             match self.cli.action {
                 Action::VerifyConstraints => {
-                    zisk.verify_constraints(input_file)?;
+                    self.zisk.verify_constraints(input_file)?;
                 }
                 Action::Prove => {
                     unimplemented!("Prove action is not implemented yet");
                 }
                 Action::Execute => unreachable!(),
             };
-
             let elapsed = time.elapsed();
+
             info!(
                 "[{}/{}] PASSED in {:.2}s",
                 current,

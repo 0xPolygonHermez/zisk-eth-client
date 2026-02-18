@@ -8,11 +8,9 @@ version = "0.5.0"
 edition = "2021"
 
 [workspace.dependencies]
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/features" }
-zisk-common = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/features" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/rom-instance" }
 # local dev
 # zisk-sdk = { path = "../zisk/sdk" }
-# zisk-common = { path = "../zisk/common" }
 
 revm = { version = "34.0.0", default-features = false }
 

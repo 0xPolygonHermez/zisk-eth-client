@@ -1,17 +1,15 @@
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
 use anyhow::{anyhow, Context, Result};
-use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use rayon::prelude::*;
-use reth_chainspec::{Chain, HOLESKY, HOODI, NamedChain, SEPOLIA, mainnet_chain_config};
+use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
 use reth_ethereum_primitives::TransactionSigned;
 use reth_stateless::{StatelessInput, UncompressedPublicKey};
+use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use tracing::debug;
 
 pub async fn reth_input_from_rpc(rpc_url: &str, block_number: u64) -> anyhow::Result<Vec<u8>> {
     let start_rpc_connect = std::time::Instant::now();
-    let provider = ProviderBuilder::new()
-        .connect(rpc_url)
-        .await?;
+    let provider = ProviderBuilder::new().connect(rpc_url).await?;
     let time_rpc_connect = start_rpc_connect.elapsed();
 
     let start_block_fetch = std::time::Instant::now();
@@ -59,8 +57,8 @@ pub async fn reth_input_from_rpc(rpc_url: &str, block_number: u64) -> anyhow::Re
     };
 
     // Generate reth input
-    let reth_input = StatelessValidatorRethInput::new(&stateless_input, true)
-        .with_context(|| {
+    let reth_input =
+        StatelessValidatorRethInput::new(&stateless_input, true).with_context(|| {
             format!(
                 "Failed to create StatelessValidatorReth input for {}",
                 fixture_name

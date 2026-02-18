@@ -2,7 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use std::{fs::File, io::Write};
 use tracing::info;
-use tracing_subscriber::EnvFilter;
+use zisk_sdk::VerboseMode;
 
 mod benchmark;
 mod cli;
@@ -12,9 +12,7 @@ use benchmark::BenchmarkRunner;
 use cli::{Cli, GuestProgramCommand};
 
 fn main() -> Result<()> {
-    tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env())
-        .init();
+    zisk_sdk::setup_logger(VerboseMode::Info);
 
     let cli = Cli::parse();
     cli.validate().map_err(|e| anyhow::anyhow!(e))?;
@@ -33,9 +31,10 @@ fn main() -> Result<()> {
         GuestProgramCommand::StatelessValidator {
             input_folder,
             client: _,
+            gas_millions,
         } => {
             let runner = BenchmarkRunner::new(&cli);
-            runner.run(input_folder)?;
+            runner.run(input_folder, *gas_millions)?;
         }
     }
 
@@ -64,9 +63,13 @@ fn write_metadata(cli: &Cli) -> Result<()> {
         GuestProgramCommand::StatelessValidator {
             input_folder,
             client,
+            gas_millions,
         } => {
             writeln!(file, "Input Folder: {}", input_folder.display())?;
             writeln!(file, "Client: {:?}", client)?;
+            if let Some(gas) = gas_millions {
+                writeln!(file, "Gas Filter: {}M", gas)?;
+            }
         }
     }
 
