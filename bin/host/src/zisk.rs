@@ -4,7 +4,7 @@ use std::{
     process::Command,
 };
 
-use zisk_sdk::{ElfBinaryFromFile, Emu, ProverClient, ZiskProver, ZiskStdin};
+use zisk_sdk::{ElfBinaryFromFile, Emu, ProverClient, ZiskProver, ZiskProgramPK, ZiskStdin};
 
 #[derive(Debug, serde::Serialize)]
 pub struct ZiskExecutionMetrics {
@@ -19,6 +19,7 @@ pub struct Zisk {
     pub elf: PathBuf,
     pub ziskemu: Option<PathBuf>,
     pub client: Option<ZiskProver<Emu>>,
+    pub pk: Option<ZiskProgramPK>,
 }
 
 impl Zisk {
@@ -27,6 +28,7 @@ impl Zisk {
             elf: elf.into(),
             ziskemu: None,
             client: None,
+            pk: None,
         }
     }
 
@@ -45,9 +47,10 @@ impl Zisk {
             .build()
             .context("Failed to build ProverClient builder")?;
 
-        client.setup(&elf).context("Failed to setup program")?;
+        let (pk, _) = client.setup(&elf).context("Failed to setup program")?;
 
         self.client = Some(client);
+        self.pk = Some(pk);
 
         Ok(self)
     }
@@ -80,10 +83,12 @@ impl Zisk {
     pub fn verify_constraints(&self, input_file: &Path) -> Result<()> {
         let stdin = ZiskStdin::from_file(input_file).context("Failed to load input file")?;
 
+        let pk = self.pk.as_ref().ok_or_else(|| anyhow::anyhow!("Proving key is not set up"))?;
+
         self.client
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("Client is not set up"))?
-            .verify_constraints(stdin)
+            .verify_constraints(&pk, stdin)
             .context("Failed to verify constraints")?;
 
         Ok(())
