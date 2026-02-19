@@ -20,7 +20,7 @@ fn main() {
 
         // Initialize hints file
         let hints_file = std::path::PathBuf::from("./hints/block_hints.bin");
-        if let Err(e) = ziskos::hints::init_hints_file(hints_file) {
+        if let Err(e) = ziskos::hints::init_hints_file(hints_file, None) {
             panic!("Failed to init hints, error: {}", e);
         }
     }
