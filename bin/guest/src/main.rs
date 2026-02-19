@@ -3,11 +3,11 @@ ziskos::entrypoint!(main);
 
 use std::sync::Arc;
 
-use guest::{chain_name, extract_block_info, validate_block};
-use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use alloy_consensus::crypto::install_default_provider;
 use crypto::CustomEvmCrypto;
+use guest::{chain_name, extract_block_info, validate_block};
 use revm::install_crypto;
+use stateless_validator_reth::guest::StatelessValidatorRethInput;
 
 fn main() {
     #[cfg(zisk_hints)]
@@ -65,9 +65,13 @@ fn main() {
 
         // Rename hint file
         let hints_file = std::path::PathBuf::from("./hints/block_hints.bin");
-        let new_hints_file = std::path::PathBuf::from(format!("./hints/{}_hints.bin", block_number));
+        let new_hints_file =
+            std::path::PathBuf::from(format!("./hints/{}_hints.bin", block_number));
         std::fs::rename(&hints_file, &new_hints_file).unwrap();
 
-        println!("Hints generated successfully in file {}", &new_hints_file.display());
+        println!(
+            "Hints generated successfully in file {}",
+            &new_hints_file.display()
+        );
     }
 }
