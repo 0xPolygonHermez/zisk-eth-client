@@ -4,30 +4,31 @@ use std::{
     process::Command,
 };
 
-use zisk_common::{ElfBinaryFromFile, io::ZiskStdin};
-use zisk_sdk::ProverClient;
+use zisk_sdk::{ElfBinaryFromFile, Emu, ProverClient, ZiskProver, ZiskProgramPK, ZiskStdin};
 
 #[derive(Debug, serde::Serialize)]
-pub struct ExecutionMetrics {
+pub struct ZiskExecutionMetrics {
     pub steps: u64,
     pub cost: u64,
     pub tx_count: Option<u64>,
     pub gas_used: Option<u64>,
 }
 
-#[derive(Debug, Clone)]
+// #[derive(Debug, Clone)]
 pub struct Zisk {
-    pub ziskemu: Option<PathBuf>,
     pub elf: PathBuf,
-    pub proving_key: Option<PathBuf>,
+    pub ziskemu: Option<PathBuf>,
+    pub client: Option<ZiskProver<Emu>>,
+    pub pk: Option<ZiskProgramPK>,
 }
 
 impl Zisk {
     pub fn new(elf: impl Into<PathBuf>) -> Self {
         Self {
-            ziskemu: None,
             elf: elf.into(),
-            proving_key: None,
+            ziskemu: None,
+            client: None,
+            pk: None,
         }
     }
 
@@ -36,13 +37,26 @@ impl Zisk {
         self
     }
 
-    pub fn with_proving_key(mut self, proving_key: impl Into<PathBuf>) -> Self {
-        self.proving_key = Some(proving_key.into());
-        self
+    pub fn with_proving_key(mut self, proving_key: impl Into<PathBuf>) -> Result<Self> {
+        let elf = ElfBinaryFromFile::new(&self.elf, false).context("Failed to load ELF binary")?;
+
+        let client = ProverClient::builder()
+            .emu()
+            .verify_constraints()
+            .proving_key_path(proving_key.into())
+            .build()
+            .context("Failed to build ProverClient builder")?;
+
+        let (pk, _) = client.setup(&elf).context("Failed to setup program")?;
+
+        self.client = Some(client);
+        self.pk = Some(pk);
+
+        Ok(self)
     }
 
     /// Execute the guest program and return metrics
-    pub fn execute(&self, input_file: &Path) -> Result<ExecutionMetrics> {
+    pub fn execute(&self, input_file: &Path) -> Result<ZiskExecutionMetrics> {
         let ziskemu = self
             .ziskemu
             .as_ref()
@@ -67,31 +81,21 @@ impl Zisk {
 
     /// Execute and verify constraints
     pub fn verify_constraints(&self, input_file: &Path) -> Result<()> {
-        let elf = ElfBinaryFromFile::new(&self.elf, false).context("Failed to load ELF binary")?;
-
         let stdin = ZiskStdin::from_file(input_file).context("Failed to load input file")?;
 
-        let pk = self.proving_key.as_ref().ok_or_else(|| {
-            anyhow::anyhow!("Proving key is required for constraint verification")
-        })?;
-        let builder = ProverClient::builder()
-            .emu()
-            .verify_constraints()
-            .proving_key_path(pk.clone());
+        let pk = self.pk.as_ref().ok_or_else(|| anyhow::anyhow!("Proving key is not set up"))?;
 
-        let client = builder.build().context("Failed to build ProverClient")?;
-
-        client.setup(&elf).context("Failed to setup program")?;
-
-        client
-            .verify_constraints(stdin)
+        self.client
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("Client is not set up"))?
+            .verify_constraints(&pk, stdin)
             .context("Failed to verify constraints")?;
 
         Ok(())
     }
 }
 
-fn parse_metrics(output: &str) -> Result<ExecutionMetrics> {
+fn parse_metrics(output: &str) -> Result<ZiskExecutionMetrics> {
     let mut steps = 0u64;
     let mut cost = 0u64;
     let mut tx_count = None;
@@ -121,7 +125,7 @@ fn parse_metrics(output: &str) -> Result<ExecutionMetrics> {
         }
     }
 
-    Ok(ExecutionMetrics {
+    Ok(ZiskExecutionMetrics {
         steps,
         cost,
         tx_count,
