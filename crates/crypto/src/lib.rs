@@ -447,7 +447,7 @@ impl Crypto for CustomEvmCrypto {
 
         #[cfg(not(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints)))]
         {
-            unimplemented!();
+            self.default_crypto.blake2_compress(rounds, h, m, t, f);
         }
     }
 
