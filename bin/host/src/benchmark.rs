@@ -8,7 +8,7 @@ use tracing::{error, info};
 
 use crate::{
     cli::{Action, Cli},
-    zisk::{ZiskExecutionMetrics, Zisk},
+    zisk::{Zisk, ZiskExecutionMetrics},
 };
 
 #[derive(Debug, serde::Serialize)]
