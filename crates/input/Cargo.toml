@@ -12,8 +12,9 @@ tracing.workspace = true
 
 alloy-provider = { workspace = true, features = ["debug-api", "reqwest", "reqwest-rustls-tls"] }
 
-reth-stateless.workspace = true
 reth-chainspec.workspace = true
 reth-ethereum-primitives.workspace = true
+
+stateless.workspace = true
 
 stateless-validator-reth = { workspace = true, features = ["host"] }

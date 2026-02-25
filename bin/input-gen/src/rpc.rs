@@ -16,7 +16,7 @@ use tracing::{info, warn};
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
 use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_api::{DebugApiClient, EthApiClient};
-use reth_stateless::StatelessInput;
+use stateless::StatelessInput;
 
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use witness_generator::StatelessValidationFixture;
