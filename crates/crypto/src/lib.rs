@@ -103,6 +103,8 @@ extern "C" {
         modulus_len: usize,
     );
 
+    fn hint_blake2b_compress(rounds: u32, h: *mut u64, m: *const u64, t: *const u64, f: u8);
+
     fn hint_secp256r1_ecdsa_verify(msg: *const u8, sig: *const u8, pk: *const u8);
 
     fn hint_verify_kzg_proof(z: *const u8, y: *const u8, commitment: *const u8, proof: *const u8);
@@ -438,8 +440,20 @@ impl Crypto for CustomEvmCrypto {
     /// Blake2 compression function.
     #[inline]
     fn blake2_compress(&self, rounds: u32, h: &mut [u64; 8], m: [u64; 16], t: [u64; 2], f: bool) {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_blake2b_compress(rounds, h.as_mut_ptr(), m.as_ptr(), t.as_ptr(), f as u8);
+            }
+
+            #[cfg(zisk_hints_debug)]
+            hint_log(format!(
+                "hint_blake2b_compress (rounds: {:x?}, h: {:x?}, m: {:x?}, t: {:x?}, f: {:x?})",
+                &rounds, &h, &m, &t, &f
+            ));
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
             unsafe {
                 blake2b_compress_c(rounds, h.as_mut_ptr(), m.as_ptr(), t.as_ptr(), f as u8);
             }
