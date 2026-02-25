@@ -934,9 +934,27 @@ impl CryptoProvider for CustomEvmCrypto {
         {
             use k256::ecdsa::{RecoveryId, VerifyingKey};
 
+            #[cfg(zisk_hints)]
+            struct ResumeHintsGuard {
+                already_paused: bool,
+            }
+
+            #[cfg(zisk_hints)]
+            impl Drop for ResumeHintsGuard {
+                fn drop(&mut self) {
+                    if !self.already_paused {
+                        unsafe { resume_hints() };
+                    }
+                }
+            }
+
             // Pause hint emission here so non-Zisk target execution cannot produce extra hints (e.g. keccak256)
             #[cfg(zisk_hints)]
             let already_paused = unsafe { pause_hints() };
+
+            // Ensure hints are always resumed on early returns.
+            #[cfg(zisk_hints)]
+            let _resume_hints_guard = ResumeHintsGuard { already_paused };
 
             let mut signature = match k256::ecdsa::Signature::from_slice(&sig[0..64]) {
                 Ok(sig) => sig,
@@ -963,13 +981,6 @@ impl CryptoProvider for CustomEvmCrypto {
                 };
 
             let result = public_key_to_address(&recovered_key);
-
-            #[cfg(zisk_hints)]
-            {
-                if !already_paused {
-                    unsafe { resume_hints() };
-                }
-            }
 
             Ok(result)
         }
