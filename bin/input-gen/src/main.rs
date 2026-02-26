@@ -8,22 +8,26 @@ use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 use tracing_subscriber::EnvFilter;
 
-use rpc::reth_input_files_from_rpc;
-use tests::reth_input_files_from_tests;
-use types::OutputFormat;
+use rpc::zisk_inputs_from_rpc;
+use tests::zisk_inputs_from_eest;
+use types::{ExecutionClient, OutputFormat};
 
 #[derive(Parser)]
-#[command(name = "reth-input-generator")]
-#[command(about = "Generate Reth zkVM inputs from StatelessValidationFixture files")]
+#[command(name = "input-generator")]
+#[command(about = "Generate ZisK inputs from a variety of sources")]
 #[command(version)]
 struct Cli {
     /// Output format
     #[arg(short, long, default_value = "binary")]
     format: OutputFormat,
 
-    /// Output folder for generated Reth input files
-    #[arg(short, long, default_value = "reth-inputs")]
-    output: PathBuf,
+    /// Output folder for the generated ZisK input files (default: <client>-inputs)
+    #[arg(short, long)]
+    output: Option<PathBuf>,
+
+    /// Execution client to generate inputs for
+    #[arg(short, long, value_enum, default_value = "reth")]
+    client: ExecutionClient,
 
     /// Source of inputs
     #[command(subcommand)]
@@ -87,9 +91,13 @@ async fn main() -> Result<()> {
 
     let cli = Cli::parse();
 
+    let output = cli
+        .output
+        .unwrap_or_else(|| PathBuf::from(format!("{}-inputs", cli.client)));
+
     // Create output directory if it doesn't exist
-    std::fs::create_dir_all(&cli.output)
-        .with_context(|| format!("Failed to create output folder: {}", cli.output.display()))?;
+    std::fs::create_dir_all(&output)
+        .with_context(|| format!("Failed to create output folder: {}", output.display()))?;
 
     match cli.source {
         SourceCommand::Tests {
@@ -99,14 +107,15 @@ async fn main() -> Result<()> {
             eest_fixtures_path,
             threads,
         } => {
-            reth_input_files_from_tests(
+            zisk_inputs_from_eest(
                 tag,
                 include,
                 exclude,
                 eest_fixtures_path,
-                &cli.output,
+                &output,
                 cli.format,
                 threads,
+                &cli.client,
             )
             .await?;
         }
@@ -118,14 +127,15 @@ async fn main() -> Result<()> {
             last_n_blocks,
             follow,
         } => {
-            reth_input_files_from_rpc(
+            zisk_inputs_from_rpc(
                 &rpc_url,
                 rpc_headers,
                 block,
                 last_n_blocks,
                 follow,
-                &cli.output,
+                &output,
                 cli.format,
+                &cli.client,
             )
             .await?;
         }

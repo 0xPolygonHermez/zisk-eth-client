@@ -1,15 +1,20 @@
 use anyhow::{Context, Result};
 use std::path::{Path, PathBuf};
 use tracing::{info, warn};
+
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
 
 use crate::{
-    common::{generate_reth_input_from_fixture, read_fixtures_from_path, save_reth_input_to_file},
-    types::OutputFormat,
+    common::{
+        generate_ethrex_input_from_fixture, generate_reth_input_from_fixture,
+        read_fixtures_from_path, save_ethrex_input_to_file, save_reth_input_to_file,
+    },
+    types::{ExecutionClient, OutputFormat},
 };
 
-/// Process EEST (Ethereum Execution Specification Tests) to generate reth inputs.
-pub async fn reth_input_files_from_tests(
+/// Process EEST (Ethereum Execution Specification Tests) to generate inputs
+#[allow(clippy::too_many_arguments)]
+pub async fn zisk_inputs_from_eest(
     tag: Option<String>,
     include: Option<Vec<String>>,
     exclude: Option<Vec<String>>,
@@ -17,6 +22,7 @@ pub async fn reth_input_files_from_tests(
     output: &Path,
     format: OutputFormat,
     num_threads: Option<usize>,
+    client: &ExecutionClient,
 ) -> Result<()> {
     if let Some(threads) = num_threads {
         std::env::set_var("RAYON_NUM_THREADS", threads.to_string());
@@ -48,7 +54,7 @@ pub async fn reth_input_files_from_tests(
         .await
         .context("Failed to build EEST generator")?;
 
-    // Generate fixtures to a temp directory, then convert to reth inputs
+    // Generate fixtures to a temp directory, then convert to ZisK inputs
     let temp_dir = tempfile::tempdir().context("Failed to create temp directory")?;
 
     let count = generator
@@ -57,7 +63,7 @@ pub async fn reth_input_files_from_tests(
         .context("Failed to generate EEST fixtures")?;
 
     info!(
-        "Generated {} EEST fixtures, converting to reth inputs...",
+        "Generated {} EEST fixtures, converting to ZisK inputs...",
         count
     );
 
@@ -66,16 +72,29 @@ pub async fn reth_input_files_from_tests(
     let mut success_count = 0;
     let mut error_count = 0;
     for fixture in &fixtures {
-        match generate_reth_input_from_fixture(fixture) {
-            Ok(reth_input) => {
-                save_reth_input_to_file(reth_input, &fixture.name, output, format)?;
-                info!("Generated input for: {}", fixture.name);
-                success_count += 1;
-            }
-            Err(e) => {
-                warn!("Failed to generate input for {}: {}", fixture.name, e);
-                error_count += 1;
-            }
+        match client {
+            ExecutionClient::Reth => match generate_reth_input_from_fixture(fixture) {
+                Ok(reth_input) => {
+                    save_reth_input_to_file(reth_input, &fixture.name, output, format)?;
+                    info!("Generated input for: {}", fixture.name);
+                    success_count += 1;
+                }
+                Err(e) => {
+                    warn!("Failed to generate input for {}: {}", fixture.name, e);
+                    error_count += 1;
+                }
+            },
+            ExecutionClient::Ethrex => match generate_ethrex_input_from_fixture(fixture) {
+                Ok(ethrex_input) => {
+                    save_ethrex_input_to_file(ethrex_input, &fixture.name, output, format)?;
+                    info!("Generated input for: {}", fixture.name);
+                    success_count += 1;
+                }
+                Err(e) => {
+                    warn!("Failed to generate input for {}: {}", fixture.name, e);
+                    error_count += 1;
+                }
+            },
         }
     }
 

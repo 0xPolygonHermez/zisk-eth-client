@@ -18,15 +18,18 @@ use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_api::{DebugApiClient, EthApiClient};
 use reth_stateless::StatelessInput;
 
-use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use witness_generator::StatelessValidationFixture;
 
 use crate::{
-    common::{generate_reth_input_from_fixture, save_reth_input_to_file},
-    types::OutputFormat,
+    common::{
+        generate_ethrex_input_from_fixture, generate_reth_input_from_fixture,
+        save_ethrex_input_to_file, save_reth_input_to_file,
+    },
+    types::{ExecutionClient, OutputFormat},
 };
 
-pub async fn reth_input_files_from_rpc(
+#[allow(clippy::too_many_arguments)]
+pub async fn zisk_inputs_from_rpc(
     rpc_url: &str,
     rpc_headers: Option<Vec<String>>,
     block: Option<u64>,
@@ -34,22 +37,32 @@ pub async fn reth_input_files_from_rpc(
     follow: bool,
     output: &Path,
     format: OutputFormat,
+    client: &ExecutionClient,
 ) -> Result<()> {
     info!("Connecting to RPC: {}", rpc_url);
 
     // Initialize RPC client
-    let (client, chain_config, chain_name) = init_rpc_client(rpc_url, rpc_headers).await?;
+    let (rpc_client, chain_config, chain_name) = init_rpc_client(rpc_url, rpc_headers).await?;
 
     info!(
         "Connected to chain: {} (ID: {})",
         chain_name, chain_config.chain_id
     );
 
+    // If follow is enabled, continuously listen for new blocks.
     if follow {
-        return follow_new_blocks(&client, &chain_config, chain_name, output, format).await;
+        return follow_new_blocks(
+            &rpc_client,
+            &chain_config,
+            chain_name,
+            output,
+            format,
+            client,
+        )
+        .await;
     }
 
-    // Determine which blocks to fetch
+    // Otherwise, process specified blocks.
     let block_numbers: Vec<u64> = if let Some(block_num) = block {
         vec![block_num]
     } else {
@@ -58,7 +71,7 @@ pub async fn reth_input_files_from_rpc(
             info!("No blocks to process (last_n_blocks = 0)");
             return Ok(());
         }
-        let latest = fetch_latest_block_number(&client).await?;
+        let latest = fetch_latest_block_number(&rpc_client).await?;
         let start = latest.saturating_sub(n as u64 - 1);
         (start..=latest).collect()
     };
@@ -72,9 +85,18 @@ pub async fn reth_input_files_from_rpc(
     let mut success_count = 0;
     let mut error_count = 0;
     for block_num in block_numbers {
-        match fetch_and_generate_input(&client, block_num, &chain_config, chain_name).await {
-            Ok((reth_input, fixture_name)) => {
-                save_reth_input_to_file(reth_input, &fixture_name, output, format)?;
+        match process_block_for_client(
+            &rpc_client,
+            block_num,
+            &chain_config,
+            chain_name,
+            output,
+            format,
+            client,
+        )
+        .await
+        {
+            Ok(_) => {
                 info!("Generated input for block: {}", block_num);
                 success_count += 1;
             }
@@ -89,6 +111,33 @@ pub async fn reth_input_files_from_rpc(
         "Completed: {} succeeded, {} failed",
         success_count, error_count
     );
+
+    Ok(())
+}
+
+/// Process a single block and generate input for the specified client
+async fn process_block_for_client(
+    rpc_client: &HttpClient,
+    block_num: u64,
+    chain_config: &ChainConfig,
+    chain_name: &str,
+    output: &Path,
+    format: OutputFormat,
+    client: &ExecutionClient,
+) -> Result<()> {
+    let (fixture, fixture_name) =
+        fetch_fixture(rpc_client, block_num, chain_config, chain_name, client).await?;
+
+    match client {
+        ExecutionClient::Reth => {
+            let reth_input = generate_reth_input_from_fixture(&fixture)?;
+            save_reth_input_to_file(reth_input, &fixture_name, output, format)?;
+        }
+        ExecutionClient::Ethrex => {
+            let ethrex_input = generate_ethrex_input_from_fixture(&fixture)?;
+            save_ethrex_input_to_file(ethrex_input, &fixture_name, output, format)?;
+        }
+    }
 
     Ok(())
 }
@@ -116,14 +165,14 @@ async fn init_rpc_client(
     }
 
     // Build HTTP client
-    let client = HttpClientBuilder::default()
+    let rpc_client = HttpClientBuilder::default()
         .set_headers(header_map)
         .max_response_size(1 << 30)
         .build(rpc_url)
         .context("Failed to build HTTP client")?;
 
     // Fetch chain ID and determine chain config
-    let chain_id = EthApiClient::<(), (), (), (), (), ()>::chain_id(&client)
+    let chain_id = EthApiClient::<(), (), (), (), (), ()>::chain_id(&rpc_client)
         .await
         .context("Failed to fetch chain ID")?
         .context("Chain ID not found")?;
@@ -137,16 +186,17 @@ async fn init_rpc_client(
         _ => anyhow::bail!("Unsupported chain ID: {}", chain_id),
     };
 
-    Ok((client, chain_config, chain_name))
+    Ok((rpc_client, chain_config, chain_name))
 }
 
 /// Continuously follow and process new blocks
 async fn follow_new_blocks(
-    client: &HttpClient,
+    rpc_client: &HttpClient,
     chain_config: &ChainConfig,
     chain_name: &str,
     output: &Path,
     format: OutputFormat,
+    client: &ExecutionClient,
 ) -> Result<()> {
     info!("Following new blocks (press Ctrl+C to stop)...");
 
@@ -162,7 +212,7 @@ async fn follow_new_blocks(
         stop_clone.cancel();
     });
 
-    let mut next_block_num = fetch_latest_block_number(client).await?;
+    let mut next_block_num = fetch_latest_block_number(rpc_client).await?;
     let mut success_count = 0;
     let mut error_count = 0;
 
@@ -172,7 +222,7 @@ async fn follow_new_blocks(
                 info!("Stopped following blocks.");
                 break;
             }
-            result = process_new_blocks(client, &mut next_block_num, chain_config, chain_name, output, format) => {
+            result = process_new_blocks(rpc_client, &mut next_block_num, chain_config, chain_name, output, format, client) => {
                 match result {
                     Ok((successes, errors)) => {
                         success_count += successes;
@@ -205,14 +255,15 @@ async fn follow_new_blocks(
 
 /// Process any new blocks from next_block_num to latest
 async fn process_new_blocks(
-    client: &HttpClient,
+    rpc_client: &HttpClient,
     next_block_num: &mut u64,
     chain_config: &ChainConfig,
     chain_name: &str,
     output: &Path,
     format: OutputFormat,
+    client: &ExecutionClient,
 ) -> Result<(usize, usize)> {
-    let latest = fetch_latest_block_number(client).await?;
+    let latest = fetch_latest_block_number(rpc_client).await?;
 
     if *next_block_num > latest {
         return Ok((0, 0));
@@ -221,9 +272,18 @@ async fn process_new_blocks(
     let mut success_count = 0;
     let mut error_count = 0;
     for block_num in *next_block_num..=latest {
-        match fetch_and_generate_input(client, block_num, chain_config, chain_name).await {
-            Ok((reth_input, fixture_name)) => {
-                save_reth_input_to_file(reth_input, &fixture_name, output, format)?;
+        match process_block_for_client(
+            rpc_client,
+            block_num,
+            chain_config,
+            chain_name,
+            output,
+            format,
+            client,
+        )
+        .await
+        {
+            Ok(_) => {
                 info!("Generated input for block: {}", block_num);
                 success_count += 1;
             }
@@ -239,7 +299,7 @@ async fn process_new_blocks(
     Ok((success_count, error_count))
 }
 
-async fn fetch_latest_block_number(client: &HttpClient) -> Result<u64> {
+async fn fetch_latest_block_number(rpc_client: &HttpClient) -> Result<u64> {
     let block = EthApiClient::<
         TransactionRequest,
         Transaction,
@@ -247,7 +307,7 @@ async fn fetch_latest_block_number(client: &HttpClient) -> Result<u64> {
         Receipt,
         Header,
         TransactionSigned,
-    >::block_by_number(client, BlockNumberOrTag::Latest, false)
+    >::block_by_number(rpc_client, BlockNumberOrTag::Latest, false)
     .await
     .context("Failed to fetch latest block")?
     .context("Latest block not found")?;
@@ -255,19 +315,21 @@ async fn fetch_latest_block_number(client: &HttpClient) -> Result<u64> {
     Ok(block.header.number)
 }
 
-async fn fetch_and_generate_input(
-    client: &HttpClient,
+/// Fetch block data and create a fixture for the specified client
+async fn fetch_fixture(
+    rpc_client: &HttpClient,
     block_num: u64,
     chain_config: &ChainConfig,
     chain_name: &str,
-) -> Result<(StatelessValidatorRethInput, String)> {
+    client: &ExecutionClient,
+) -> Result<(StatelessValidationFixture, String)> {
     // Fetch the execution witness using debug_execution_witness
-    let witness =
-        DebugApiClient::<()>::debug_execution_witness(client, BlockNumberOrTag::Number(block_num))
-            .await
-            .with_context(|| {
-                format!("Failed to fetch execution witness for block {}", block_num)
-            })?;
+    let witness = DebugApiClient::<()>::debug_execution_witness(
+        rpc_client,
+        BlockNumberOrTag::Number(block_num),
+    )
+    .await
+    .with_context(|| format!("Failed to fetch execution witness for block {}", block_num))?;
 
     // Fetch the block
     let block = EthApiClient::<
@@ -277,7 +339,7 @@ async fn fetch_and_generate_input(
         Receipt,
         Header,
         TransactionSigned,
-    >::block_by_number(client, BlockNumberOrTag::Number(block_num), true)
+    >::block_by_number(rpc_client, BlockNumberOrTag::Number(block_num), true)
     .await
     .with_context(|| format!("Failed to fetch block {}", block_num))?
     .with_context(|| format!("Block {} not found", block_num))?;
@@ -289,8 +351,12 @@ async fn fetch_and_generate_input(
 
     // Create the fixture
     let fixture_name = format!(
-        "{}_{}_{}_{}_zec_reth",
-        chain_name, block_num, tx_count, mgas
+        "{}_{}_{}_{}_zec_{}",
+        chain_name,
+        block_num,
+        tx_count,
+        mgas,
+        client.name()
     );
     let fixture = StatelessValidationFixture {
         name: fixture_name.clone(),
@@ -302,8 +368,7 @@ async fn fetch_and_generate_input(
         success: true,
     };
 
-    // Generate reth input
-    Ok((generate_reth_input_from_fixture(&fixture)?, fixture_name))
+    Ok((fixture, fixture_name))
 }
 
 // TODO: The following simplified version should work when the method `debug_execution_witness_by_block_hash`
