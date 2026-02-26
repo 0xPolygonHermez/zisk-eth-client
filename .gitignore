@@ -6,7 +6,7 @@ tmp
 *zkevm-benchmark*
 zkevm-fixtures*
 fixtures
-reth-inputs*
+*-inputs
 metrics
 hint_log
 hints

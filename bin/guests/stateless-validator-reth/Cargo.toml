@@ -14,8 +14,8 @@ panic = "abort"
 
 [dependencies]
 # local
-crypto = { path = "../../crates/crypto" }
-guest = { path = "../../crates/guest" }
+crypto = { path = "../../../crates/crypto" }
+guest = { path = "../../../crates/guest" }
 
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
 # Local development
@@ -28,7 +28,7 @@ alloy-consensus = { version = "1.6.0", default-features = false, features = ["cr
 # revm
 revm = { version = "34.0.0", default-features = false }
 
-#ere
+# ere
 stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "885398bc1478e777096a8456bc925b2ab28a8d0f" }
 
 [patch.crates-io]

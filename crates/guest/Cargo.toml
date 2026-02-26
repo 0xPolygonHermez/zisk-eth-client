@@ -12,6 +12,11 @@ reth-stateless.workspace = true
 reth-chainspec.workspace = true
 reth-evm-ethereum.workspace = true
 
+primitive-types.workspace = true
+
+ethrex-stateless.workspace = true
+
 sparsestate.workspace = true
 stateless-validator-common.workspace = true
 stateless-validator-reth.workspace = true
+stateless-validator-ethrex.workspace = true
