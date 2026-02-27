@@ -21,11 +21,11 @@ use reth_stateless::StatelessInput;
 use witness_generator::StatelessValidationFixture;
 
 use crate::{
+    client::ExecutionClient,
     common::{
         generate_ethrex_input_from_fixture, generate_reth_input_from_fixture,
         save_ethrex_input_to_file, save_reth_input_to_file,
     },
-    types::{ExecutionClient, OutputFormat},
 };
 
 #[allow(clippy::too_many_arguments)]
@@ -34,9 +34,9 @@ pub async fn zisk_inputs_from_rpc(
     rpc_headers: Option<Vec<String>>,
     block: Option<u64>,
     last_n_blocks: Option<usize>,
+    range_of_blocks: Option<Vec<u64>>,
     follow: bool,
     output: &Path,
-    format: OutputFormat,
     client: &ExecutionClient,
 ) -> Result<()> {
     info!("Connecting to RPC: {}", rpc_url);
@@ -51,21 +51,25 @@ pub async fn zisk_inputs_from_rpc(
 
     // If follow is enabled, continuously listen for new blocks.
     if follow {
-        return follow_new_blocks(
-            &rpc_client,
-            &chain_config,
-            chain_name,
-            output,
-            format,
-            client,
-        )
-        .await;
+        return follow_new_blocks(&rpc_client, &chain_config, chain_name, output, client).await;
     }
 
     // Otherwise, process specified blocks.
     let block_numbers: Vec<u64> = if let Some(block_num) = block {
+        // Single block
         vec![block_num]
+    } else if let Some(range) = range_of_blocks {
+        // Range of blocks
+        if range.len() != 2 {
+            anyhow::bail!("Range requires exactly 2 values: START and END");
+        }
+        let (start, end) = (range[0], range[1]);
+        if start > end {
+            anyhow::bail!("Range START ({}) must be <= END ({})", start, end);
+        }
+        (start..=end).collect()
     } else {
+        // Last N blocks (default: 1)
         let n = last_n_blocks.unwrap_or(1);
         if n == 0 {
             info!("No blocks to process (last_n_blocks = 0)");
@@ -91,7 +95,6 @@ pub async fn zisk_inputs_from_rpc(
             &chain_config,
             chain_name,
             output,
-            format,
             client,
         )
         .await
@@ -122,7 +125,6 @@ async fn process_block_for_client(
     chain_config: &ChainConfig,
     chain_name: &str,
     output: &Path,
-    format: OutputFormat,
     client: &ExecutionClient,
 ) -> Result<()> {
     let (fixture, fixture_name) =
@@ -131,11 +133,11 @@ async fn process_block_for_client(
     match client {
         ExecutionClient::Reth => {
             let reth_input = generate_reth_input_from_fixture(&fixture)?;
-            save_reth_input_to_file(reth_input, &fixture_name, output, format)?;
+            save_reth_input_to_file(reth_input, &fixture_name, output)?;
         }
         ExecutionClient::Ethrex => {
             let ethrex_input = generate_ethrex_input_from_fixture(&fixture)?;
-            save_ethrex_input_to_file(ethrex_input, &fixture_name, output, format)?;
+            save_ethrex_input_to_file(ethrex_input, &fixture_name, output)?;
         }
     }
 
@@ -195,7 +197,6 @@ async fn follow_new_blocks(
     chain_config: &ChainConfig,
     chain_name: &str,
     output: &Path,
-    format: OutputFormat,
     client: &ExecutionClient,
 ) -> Result<()> {
     info!("Following new blocks (press Ctrl+C to stop)...");
@@ -222,7 +223,7 @@ async fn follow_new_blocks(
                 info!("Stopped following blocks.");
                 break;
             }
-            result = process_new_blocks(rpc_client, &mut next_block_num, chain_config, chain_name, output, format, client) => {
+            result = process_new_blocks(rpc_client, &mut next_block_num, chain_config, chain_name, output, client) => {
                 match result {
                     Ok((successes, errors)) => {
                         success_count += successes;
@@ -260,7 +261,6 @@ async fn process_new_blocks(
     chain_config: &ChainConfig,
     chain_name: &str,
     output: &Path,
-    format: OutputFormat,
     client: &ExecutionClient,
 ) -> Result<(usize, usize)> {
     let latest = fetch_latest_block_number(rpc_client).await?;
@@ -278,7 +278,6 @@ async fn process_new_blocks(
             chain_config,
             chain_name,
             output,
-            format,
             client,
         )
         .await

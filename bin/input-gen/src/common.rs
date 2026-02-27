@@ -12,8 +12,6 @@ use witness_generator::StatelessValidationFixture;
 
 use ere_io::Io;
 
-use crate::types::OutputFormat;
-
 /// Reads fixture JSON files from a directory.
 pub fn read_fixtures_from_path(path: &Path) -> Result<Vec<StatelessValidationFixture>> {
     WalkDir::new(path)
@@ -51,33 +49,21 @@ pub fn save_reth_input_to_file(
     reth_input: StatelessValidatorRethInput,
     file_name: &str,
     output_dir: &Path,
-    format: OutputFormat,
 ) -> Result<()> {
     let filename = sanitize_filename(file_name);
 
     std::fs::create_dir_all(output_dir)?;
 
-    match format {
-        OutputFormat::Binary => {
-            let output_path = output_dir.join(format!("{}.bin", filename));
+    // Define output path with sanitized filename
+    let output_path = output_dir.join(format!("{}.bin", filename));
 
-            let bytes = StatelessValidatorRethIo::serialize_input(&reth_input)
-                .map_err(|e| anyhow::anyhow!("Failed to serialize reth input: {}", e))?;
+    // Serialize the reth input to binary format
+    let bytes = StatelessValidatorRethIo::serialize_input(&reth_input)
+        .map_err(|e| anyhow::anyhow!("Failed to serialize reth input: {}", e))?;
 
-            std::fs::write(&output_path, bytes).with_context(|| {
-                format!("Failed to write reth input to {}", output_path.display())
-            })?;
-        }
-        OutputFormat::Json => {
-            let output_path = output_dir.join(format!("{}.json", filename));
-
-            let json = serde_json::to_string_pretty(&reth_input)?;
-
-            std::fs::write(&output_path, json).with_context(|| {
-                format!("Failed to write reth input to {}", output_path.display())
-            })?;
-        }
-    }
+    // Write the binary data to the output file
+    std::fs::write(&output_path, bytes)
+        .with_context(|| format!("Failed to write reth input to {}", output_path.display()))?;
 
     Ok(())
 }
@@ -101,29 +87,21 @@ pub fn save_ethrex_input_to_file(
     ethrex_input: StatelessValidatorEthrexInput,
     file_name: &str,
     output_dir: &Path,
-    format: OutputFormat,
 ) -> Result<()> {
     let filename = sanitize_filename(file_name);
 
-    match format {
-        OutputFormat::Binary => {
-            std::fs::create_dir_all(output_dir)?;
-            let output_path = output_dir.join(format!("{}.bin", filename));
+    std::fs::create_dir_all(output_dir)?;
 
-            let bytes = StatelessValidatorEthrexIo::serialize_input(&ethrex_input)
-                .map_err(|e| anyhow::anyhow!("Failed to serialize Ethrex input: {}", e))?;
+    // Define output path with sanitized filename
+    let output_path = output_dir.join(format!("{}.bin", filename));
 
-            std::fs::write(&output_path, bytes).with_context(|| {
-                format!("Failed to write ethrex input to {}", output_path.display())
-            })?;
-        }
-        OutputFormat::Json => {
-            // Ethrex uses rkyv serialization, not serde - JSON not supported
-            anyhow::bail!(
-                "JSON format is not supported for ethrex inputs (uses rkyv serialization). Use binary format instead."
-            );
-        }
-    }
+    // Serialize the ethrex input to binary format
+    let bytes = StatelessValidatorEthrexIo::serialize_input(&ethrex_input)
+        .map_err(|e| anyhow::anyhow!("Failed to serialize Ethrex input: {}", e))?;
+
+    // Write the binary data to the output file
+    std::fs::write(&output_path, bytes)
+        .with_context(|| format!("Failed to write ethrex input to {}", output_path.display()))?;
 
     Ok(())
 }

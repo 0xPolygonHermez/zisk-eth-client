@@ -1,26 +1,21 @@
+pub mod client;
 mod common;
-mod rpc;
-mod tests;
-mod types;
+pub mod source;
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 use tracing_subscriber::EnvFilter;
 
-use rpc::zisk_inputs_from_rpc;
-use tests::zisk_inputs_from_eest;
-use types::{ExecutionClient, OutputFormat};
+use client::ExecutionClient;
+use source::eest::zisk_inputs_from_eest;
+use source::rpc::zisk_inputs_from_rpc;
 
 #[derive(Parser)]
 #[command(name = "input-generator")]
 #[command(about = "Generate ZisK inputs from a variety of sources")]
 #[command(version)]
 struct Cli {
-    /// Output format
-    #[arg(short, long, default_value = "binary")]
-    format: OutputFormat,
-
     /// Output folder for the generated ZisK input files (default: <client>-inputs)
     #[arg(short, long)]
     output: Option<PathBuf>,
@@ -36,8 +31,8 @@ struct Cli {
 
 #[derive(Subcommand, Clone, Debug)]
 enum SourceCommand {
-    /// Generate inputs from execution specification tests (EEST)
-    Tests {
+    /// Generate inputs from Ethereum Execution Specification Tests (EEST)
+    Eest {
         /// EEST release tag to use (e.g., "v0.1.0"). If empty, the latest release will be used.
         #[arg(short, long, conflicts_with = "eest_fixtures_path")]
         tag: Option<String>,
@@ -70,15 +65,19 @@ enum SourceCommand {
         rpc_headers: Option<Vec<String>>,
 
         /// Specific block number to fetch
-        #[arg(long, conflicts_with_all = ["last_n_blocks", "follow"])]
+        #[arg(long, group = "block_selection")]
         block: Option<u64>,
 
         /// Number of last blocks to fetch
-        #[arg(long, conflicts_with_all = ["block", "follow"])]
+        #[arg(long, group = "block_selection")]
         last_n_blocks: Option<usize>,
 
+        /// Fetch blocks in a range (inclusive)
+        #[arg(long, num_args = 2, value_names = ["START", "END"], group = "block_selection")]
+        range_of_blocks: Option<Vec<u64>>,
+
         /// Listen for new blocks
-        #[arg(long, default_value_t = false, conflicts_with_all = ["last_n_blocks", "block"])]
+        #[arg(long, default_value_t = false, group = "block_selection")]
         follow: bool,
     },
 }
@@ -93,14 +92,14 @@ async fn main() -> Result<()> {
 
     let output = cli
         .output
-        .unwrap_or_else(|| PathBuf::from(format!("{}-inputs", cli.client)));
+        .unwrap_or_else(|| PathBuf::from(format!("{}-inputs", cli.client.name())));
 
     // Create output directory if it doesn't exist
     std::fs::create_dir_all(&output)
         .with_context(|| format!("Failed to create output folder: {}", output.display()))?;
 
     match cli.source {
-        SourceCommand::Tests {
+        SourceCommand::Eest {
             tag,
             include,
             exclude,
@@ -113,7 +112,6 @@ async fn main() -> Result<()> {
                 exclude,
                 eest_fixtures_path,
                 &output,
-                cli.format,
                 threads,
                 &cli.client,
             )
@@ -125,6 +123,7 @@ async fn main() -> Result<()> {
             rpc_headers,
             block,
             last_n_blocks,
+            range_of_blocks,
             follow,
         } => {
             zisk_inputs_from_rpc(
@@ -132,9 +131,9 @@ async fn main() -> Result<()> {
                 rpc_headers,
                 block,
                 last_n_blocks,
+                range_of_blocks,
                 follow,
                 &output,
-                cli.format,
                 &cli.client,
             )
             .await?;

@@ -5,11 +5,11 @@ use tracing::{info, warn};
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
 
 use crate::{
+    client::ExecutionClient,
     common::{
         generate_ethrex_input_from_fixture, generate_reth_input_from_fixture,
         read_fixtures_from_path, save_ethrex_input_to_file, save_reth_input_to_file,
     },
-    types::{ExecutionClient, OutputFormat},
 };
 
 /// Process EEST (Ethereum Execution Specification Tests) to generate inputs
@@ -20,7 +20,6 @@ pub async fn zisk_inputs_from_eest(
     exclude: Option<Vec<String>>,
     eest_fixtures_path: Option<PathBuf>,
     output: &Path,
-    format: OutputFormat,
     num_threads: Option<usize>,
     client: &ExecutionClient,
 ) -> Result<()> {
@@ -75,7 +74,7 @@ pub async fn zisk_inputs_from_eest(
         match client {
             ExecutionClient::Reth => match generate_reth_input_from_fixture(fixture) {
                 Ok(reth_input) => {
-                    save_reth_input_to_file(reth_input, &fixture.name, output, format)?;
+                    save_reth_input_to_file(reth_input, &fixture.name, output)?;
                     info!("Generated input for: {}", fixture.name);
                     success_count += 1;
                 }
@@ -86,7 +85,7 @@ pub async fn zisk_inputs_from_eest(
             },
             ExecutionClient::Ethrex => match generate_ethrex_input_from_fixture(fixture) {
                 Ok(ethrex_input) => {
-                    save_ethrex_input_to_file(ethrex_input, &fixture.name, output, format)?;
+                    save_ethrex_input_to_file(ethrex_input, &fixture.name, output)?;
                     info!("Generated input for: {}", fixture.name);
                     success_count += 1;
                 }
