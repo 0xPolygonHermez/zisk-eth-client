@@ -33,13 +33,6 @@ reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = 
 reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
 
-
-# ethereum-types (for ethrex)
-primitive-types = "0.13.1"
-
-# ethrex
-ethrex-stateless = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v9.0.0", default-features = false, package = "guest_program" }
-
 # eth-act
 stateless-validator-common = { git = "https://github.com/eth-act/ere-guests.git", rev = "885398bc1478e777096a8456bc925b2ab28a8d0f" }
 stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "885398bc1478e777096a8456bc925b2ab28a8d0f" }

@@ -4062,14 +4062,11 @@ version = "0.5.0"
 dependencies = [
  "alloy-genesis",
  "alloy-primitives",
- "guest_program",
- "primitive-types 0.13.1",
  "reth-chainspec",
  "reth-evm-ethereum",
  "reth-stateless",
  "sparsestate",
  "stateless-validator-common",
- "stateless-validator-ethrex",
  "stateless-validator-reth",
 ]
 

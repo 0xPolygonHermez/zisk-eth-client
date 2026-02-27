@@ -13,18 +13,23 @@ codegen-units = 1
 panic = "abort"
 
 [dependencies]
-# local
 guest = { path = "../../../crates/guest" }
 
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
 # Local development
 # ziskos = { path = "../../../zisk/ziskos/entrypoint" }
 
-# ere
-ere-io = { git = "https://github.com/eth-act/ere", tag = "v0.2.0" }
+# ethereum-types (for ethrex)
+primitive-types = "0.13.1"
+
+# ethrex
+ethrex-stateless = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v9.0.0", default-features = false, package = "guest_program" }
+
+# eth-act
 stateless-validator-ethrex = { git = "https://github.com/eth-act/ere-guests.git", rev = "885398bc1478e777096a8456bc925b2ab28a8d0f", default-features =  false, features = [
     "std",
 ] }
+ere-io = { git = "https://github.com/eth-act/ere", tag = "v0.2.0" }
 
 [patch.crates-io]
 # This patch removes "ring" as a dependency, that is not compatible with the ZisK toolchain
