@@ -91,17 +91,17 @@ async fn main() -> Result<()> {
 
     let cli = Cli::parse();
 
+    // Create execution client
+    let client = create_client(&cli.client);
+
     // Define output directory
     let output = cli
         .output
-        .unwrap_or_else(|| PathBuf::from(format!("{}-inputs", cli.client.name())));
+        .unwrap_or_else(|| PathBuf::from(format!("{}-inputs", client.name())));
 
     // Create output directory if it doesn't exist
     std::fs::create_dir_all(&output)
         .with_context(|| format!("Failed to create output folder: {}", output.display()))?;
-
-    // Create execution client
-    let client = create_client(&cli.client);
 
     match cli.source {
         SourceCommand::Eest {

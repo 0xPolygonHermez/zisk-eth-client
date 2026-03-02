@@ -75,7 +75,12 @@ pub async fn zisk_inputs_from_eest(
                 success_count += 1;
             }
             Err(e) => {
-                warn!("Failed to generate input for {}: {}", fixture.name, e);
+                warn!(
+                    "Failed to generate {} input for {}: {}",
+                    client.name(),
+                    fixture.name,
+                    e
+                );
                 error_count += 1;
             }
         }

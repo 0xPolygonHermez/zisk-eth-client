@@ -16,15 +16,6 @@ pub enum ClientType {
     Ethrex,
 }
 
-impl ClientType {
-    pub fn name(&self) -> &'static str {
-        match self {
-            ClientType::Reth => "reth",
-            ClientType::Ethrex => "ethrex",
-        }
-    }
-}
-
 /// Trait for execution clients that generate zkVM inputs
 pub trait ExecutionClient: Send + Sync {
     /// Human-readable name for this client
