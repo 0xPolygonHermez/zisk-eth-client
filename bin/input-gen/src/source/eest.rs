@@ -4,27 +4,24 @@ use tracing::{info, warn};
 
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
 
-use crate::{
-    client::ExecutionClient,
-    common::{
-        generate_ethrex_input_from_fixture, generate_reth_input_from_fixture,
-        read_fixtures_from_path, save_ethrex_input_to_file, save_reth_input_to_file,
-    },
-};
+use crate::{client::ExecutionClient, common::read_fixtures_from_path};
 
 /// Process EEST (Ethereum Execution Specification Tests) to generate inputs
 #[allow(clippy::too_many_arguments)]
 pub async fn zisk_inputs_from_eest(
     tag: Option<String>,
-    include: Option<Vec<String>>,
-    exclude: Option<Vec<String>>,
+    includes: Option<Vec<String>>,
+    excludes: Option<Vec<String>>,
     eest_fixtures_path: Option<PathBuf>,
     output: &Path,
     num_threads: Option<usize>,
-    client: &ExecutionClient,
+    client: &dyn ExecutionClient,
 ) -> Result<()> {
     if let Some(threads) = num_threads {
-        std::env::set_var("RAYON_NUM_THREADS", threads.to_string());
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build_global()
+            .expect("Failed to build global Rayon thread pool");
     }
 
     let mut builder = EESTFixtureGeneratorBuilder::default();
@@ -39,13 +36,13 @@ pub async fn zisk_inputs_from_eest(
         info!("Using latest EEST release");
     }
 
-    if let Some(include) = include {
-        info!("Include patterns: {:?}", include);
-        builder = builder.with_includes(include);
+    if let Some(includes) = includes {
+        info!("Include patterns: {:?}", includes);
+        builder = builder.with_includes(includes);
     }
-    if let Some(exclude) = exclude {
-        info!("Exclude patterns: {:?}", exclude);
-        builder = builder.with_excludes(exclude);
+    if let Some(excludes) = excludes {
+        info!("Exclude patterns: {:?}", excludes);
+        builder = builder.with_excludes(excludes);
     }
 
     let generator = builder
@@ -71,29 +68,16 @@ pub async fn zisk_inputs_from_eest(
     let mut success_count = 0;
     let mut error_count = 0;
     for fixture in &fixtures {
-        match client {
-            ExecutionClient::Reth => match generate_reth_input_from_fixture(fixture) {
-                Ok(reth_input) => {
-                    save_reth_input_to_file(reth_input, &fixture.name, output)?;
-                    info!("Generated input for: {}", fixture.name);
-                    success_count += 1;
-                }
-                Err(e) => {
-                    warn!("Failed to generate input for {}: {}", fixture.name, e);
-                    error_count += 1;
-                }
-            },
-            ExecutionClient::Ethrex => match generate_ethrex_input_from_fixture(fixture) {
-                Ok(ethrex_input) => {
-                    save_ethrex_input_to_file(ethrex_input, &fixture.name, output)?;
-                    info!("Generated input for: {}", fixture.name);
-                    success_count += 1;
-                }
-                Err(e) => {
-                    warn!("Failed to generate input for {}: {}", fixture.name, e);
-                    error_count += 1;
-                }
-            },
+        match client.generate_input(fixture) {
+            Ok(result) => {
+                result.save_to_file(&fixture.name, output)?;
+                info!("Generated {} input for: {}", client.name(), fixture.name);
+                success_count += 1;
+            }
+            Err(e) => {
+                warn!("Failed to generate input for {}: {}", fixture.name, e);
+                error_count += 1;
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 pub mod client;
 mod common;
+pub mod processor;
 pub mod source;
 
 use anyhow::{Context, Result};
@@ -7,7 +8,7 @@ use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 use tracing_subscriber::EnvFilter;
 
-use client::ExecutionClient;
+use client::{create_client, ClientType};
 use source::eest::zisk_inputs_from_eest;
 use source::rpc::zisk_inputs_from_rpc;
 
@@ -22,7 +23,7 @@ struct Cli {
 
     /// Execution client to generate inputs for
     #[arg(short, long, value_enum, default_value = "reth")]
-    client: ExecutionClient,
+    client: ClientType,
 
     /// Source of inputs
     #[command(subcommand)]
@@ -43,11 +44,11 @@ enum SourceCommand {
 
         /// Include only test names containing the provided strings.
         #[arg(short, long)]
-        include: Option<Vec<String>>,
+        includes: Option<Vec<String>>,
 
         /// Exclude all test names containing the provided strings.
         #[arg(short, long)]
-        exclude: Option<Vec<String>>,
+        excludes: Option<Vec<String>>,
 
         /// Number of threads for parallel processing (default: all available)
         #[arg(long, default_value = "10")]
@@ -90,6 +91,7 @@ async fn main() -> Result<()> {
 
     let cli = Cli::parse();
 
+    // Define output directory
     let output = cli
         .output
         .unwrap_or_else(|| PathBuf::from(format!("{}-inputs", cli.client.name())));
@@ -98,22 +100,25 @@ async fn main() -> Result<()> {
     std::fs::create_dir_all(&output)
         .with_context(|| format!("Failed to create output folder: {}", output.display()))?;
 
+    // Create execution client
+    let client = create_client(&cli.client);
+
     match cli.source {
         SourceCommand::Eest {
             tag,
-            include,
-            exclude,
+            includes,
+            excludes,
             eest_fixtures_path,
             threads,
         } => {
             zisk_inputs_from_eest(
                 tag,
-                include,
-                exclude,
+                includes,
+                excludes,
                 eest_fixtures_path,
                 &output,
                 threads,
-                &cli.client,
+                client.as_ref(),
             )
             .await?;
         }
@@ -134,7 +139,7 @@ async fn main() -> Result<()> {
                 range_of_blocks,
                 follow,
                 &output,
-                &cli.client,
+                client.as_ref(),
             )
             .await?;
         }

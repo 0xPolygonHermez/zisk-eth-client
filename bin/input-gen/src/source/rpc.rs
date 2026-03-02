@@ -17,13 +17,7 @@ use reth_stateless::StatelessInput;
 
 use witness_generator::StatelessValidationFixture;
 
-use crate::{
-    client::ExecutionClient,
-    common::{
-        generate_ethrex_input_from_fixture, generate_reth_input_from_fixture,
-        save_ethrex_input_to_file, save_reth_input_to_file,
-    },
-};
+use crate::client::ExecutionClient;
 
 #[allow(clippy::too_many_arguments)]
 pub async fn zisk_inputs_from_rpc(
@@ -34,7 +28,7 @@ pub async fn zisk_inputs_from_rpc(
     range_of_blocks: Option<Vec<u64>>,
     follow: bool,
     output: &Path,
-    client: &ExecutionClient,
+    client: &dyn ExecutionClient,
 ) -> Result<()> {
     info!("Connecting to RPC: {}", rpc_url);
 
@@ -122,21 +116,19 @@ async fn process_block_for_client(
     chain_config: &ChainConfig,
     chain_name: &str,
     output: &Path,
-    client: &ExecutionClient,
+    client: &dyn ExecutionClient,
 ) -> Result<()> {
-    let (fixture, fixture_name) =
-        fetch_fixture(rpc_client, block_num, chain_config, chain_name, client).await?;
+    let (fixture, fixture_name) = fetch_fixture(
+        rpc_client,
+        block_num,
+        chain_config,
+        chain_name,
+        client.name(),
+    )
+    .await?;
 
-    match client {
-        ExecutionClient::Reth => {
-            let reth_input = generate_reth_input_from_fixture(&fixture)?;
-            save_reth_input_to_file(reth_input, &fixture_name, output)?;
-        }
-        ExecutionClient::Ethrex => {
-            let ethrex_input = generate_ethrex_input_from_fixture(&fixture)?;
-            save_ethrex_input_to_file(ethrex_input, &fixture_name, output)?;
-        }
-    }
+    let result = client.generate_input(&fixture)?;
+    result.save_to_file(&fixture_name, output)?;
 
     Ok(())
 }
@@ -194,7 +186,7 @@ async fn follow_new_blocks(
     chain_config: &ChainConfig,
     chain_name: &str,
     output: &Path,
-    client: &ExecutionClient,
+    client: &dyn ExecutionClient,
 ) -> Result<()> {
     info!("Following new blocks (press Ctrl+C to stop)...");
 
@@ -258,7 +250,7 @@ async fn process_new_blocks(
     chain_config: &ChainConfig,
     chain_name: &str,
     output: &Path,
-    client: &ExecutionClient,
+    client: &dyn ExecutionClient,
 ) -> Result<(usize, usize)> {
     let latest = fetch_latest_block_number(rpc_client).await?;
 
@@ -317,7 +309,7 @@ async fn fetch_fixture(
     block_num: u64,
     chain_config: &ChainConfig,
     chain_name: &str,
-    client: &ExecutionClient,
+    client_name: &str,
 ) -> Result<(StatelessValidationFixture, String)> {
     // Fetch the execution witness using debug_execution_witness
     let witness = DebugApiClient::<()>::debug_execution_witness(
@@ -348,11 +340,7 @@ async fn fetch_fixture(
     // Create the fixture
     let fixture_name = format!(
         "{}_{}_{}_{}_zec_{}",
-        chain_name,
-        block_num,
-        tx_count,
-        mgas,
-        client.name()
+        chain_name, block_num, tx_count, mgas, client_name
     );
     let fixture = StatelessValidationFixture {
         name: fixture_name.clone(),
