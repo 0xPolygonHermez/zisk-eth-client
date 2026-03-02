@@ -99,7 +99,7 @@ pub enum GuestProgramCommand {
 
         /// Client
         #[arg(short, long, default_value = "reth")]
-        client: Client,
+        client: ClientType,
 
         /// Filter tests by gas value in millions (e.g., 1, 5, 10, 20, 30, 60).
         /// Only tests with "gas-value_XM" matching this value will be run.
@@ -122,7 +122,7 @@ impl GuestProgramCommand {
 
 /// Execution clients for the stateless validator
 #[derive(Debug, Copy, Clone, ValueEnum, serde::Serialize)]
-pub enum Client {
+pub enum ClientType {
     Reth,
-    //Add more execution clients here as needed
+    Ethrex,
 }

@@ -50,6 +50,8 @@ pub async fn zisk_inputs_from_eest(
         .await
         .context("Failed to build EEST generator")?;
 
+    info!("Generating EEST fixtures...");
+
     // Generate fixtures to a temp directory, then convert to ZisK inputs
     let temp_dir = tempfile::tempdir().context("Failed to create temp directory")?;
 
