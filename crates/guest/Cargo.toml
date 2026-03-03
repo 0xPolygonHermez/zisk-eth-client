@@ -8,10 +8,12 @@ edition.workspace = true
 alloy-primitives.workspace = true
 alloy-genesis.workspace = true
 
-reth-stateless.workspace = true
 reth-chainspec.workspace = true
 reth-evm-ethereum.workspace = true
 
-sparsestate.workspace = true
+zeth-mpt-state.workspace = true
+
+stateless.workspace = true
+
 stateless-validator-common.workspace = true
 stateless-validator-reth.workspace = true

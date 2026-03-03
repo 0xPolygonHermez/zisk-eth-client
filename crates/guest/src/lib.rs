@@ -2,10 +2,15 @@ use std::sync::Arc;
 
 use alloy_genesis::Genesis;
 use alloy_primitives::B256;
+
 use reth_chainspec::ChainSpec;
 use reth_evm_ethereum::EthEvmConfig;
-use reth_stateless::{stateless_validation_with_trie, validation::StatelessValidationError};
-use sparsestate::SparseState;
+use stateless::{
+    recover_block_with_public_keys, stateless_validation_recovered_with_trie,
+    validation::StatelessValidationError,
+};
+use zeth_mpt_state::SparseState;
+
 use stateless_validator_common::new_payload_request::NewPayloadRequest;
 use stateless_validator_reth::{
     guest::StatelessValidatorRethInput, new_payload_request::new_payload_request_to_block,
@@ -31,10 +36,12 @@ pub fn validate_block(
         })?
         .into_block();
 
+    // Recover block with public keys while validating signatures
+    let recovered_block = recover_block_with_public_keys(block, input.public_keys, &*chain_spec)?;
+
     // Perform stateless validation
-    let (hash, _) = stateless_validation_with_trie::<SparseState, _, _>(
-        block,
-        input.public_keys,
+    let (hash, _) = stateless_validation_recovered_with_trie::<SparseState, _, _>(
+        recovered_block,
         input.witness,
         chain_spec,
         evm_config,

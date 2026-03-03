@@ -1,7 +1,5 @@
-// TODO: Add old blocks via local reth node
-
+// TODO: Add old blocks via archive reth node
 // TODO: Substitute with commented code when `debug_execution_witness_by_block_hash` gets available for free-tiers RPC.
-
 // TODO: The previous two could get solved by using a premium RPC provider
 
 use alloy_eips::BlockNumberOrTag;
@@ -16,7 +14,7 @@ use tracing::{info, warn};
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
 use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_api::{DebugApiClient, EthApiClient};
-use reth_stateless::StatelessInput;
+use stateless::StatelessInput;
 
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use witness_generator::StatelessValidationFixture;
@@ -306,24 +304,24 @@ async fn fetch_and_generate_input(
     Ok((generate_reth_input_from_fixture(&fixture)?, fixture_name))
 }
 
-// TODO: The following simplified version should work when the method `debug_execution_witness_by_block_hash`
-//       gets available for free-tiers RPC. Otherwise, one should always fall back to `debug_execution_witness`
+// // TODO: The following simplified version should work when the method `debug_execution_witness_by_block_hash`
+// //       gets available for free-tiers RPC. Otherwise, one should use `debug_execution_witness`
 // use anyhow::{anyhow, Context, Result};
 // use std::path::Path;
 // use tokio_util::sync::CancellationToken;
-// use tracing::info;
+// use tracing::{info, warn};
 // use witness_generator::{
 //     rpc_generator::{RpcBlocksAndWitnessesBuilder, RpcFlatHeaderKeyValues},
 //     FixtureGenerator,
 // };
 
-// use crate::common::{generate_reth_inputs, read_fixtures_from_path};
+// use crate::common::{generate_reth_input_from_fixture, read_fixtures_from_path, save_reth_input_to_file};
 // use crate::OutputFormat;
 
 // /// Process blocks from an RPC endpoint to generate reth inputs.
-// pub async fn process_rpc(
-//     rpc_url: String,
-//     rpc_header: Option<Vec<String>>,
+// pub async fn reth_input_files_from_rpc(
+//     rpc_url: &str,
+//     rpc_headers: Option<Vec<String>>,
 //     block: Option<u64>,
 //     last_n_blocks: Option<usize>,
 //     follow: bool,
@@ -332,15 +330,16 @@ async fn fetch_and_generate_input(
 // ) -> Result<()> {
 //     info!("Connecting to RPC: {}", rpc_url);
 
-//     let mut builder = RpcBlocksAndWitnessesBuilder::new(rpc_url);
+//     let mut builder = RpcBlocksAndWitnessesBuilder::new(rpc_url.to_string());
 
-//     if let Some(rpc_header) = rpc_header {
-//         let headers = RpcFlatHeaderKeyValues::new(rpc_header)
+//     if let Some(rpc_headers) = rpc_headers {
+//         let headers = RpcFlatHeaderKeyValues::new(rpc_headers)
 //             .try_into()
 //             .context("Failed to parse RPC headers")?;
 //         builder = builder.with_headers(headers);
 //     }
 
+//     // Determine which blocks to fetch
 //     if follow {
 //         let stop = CancellationToken::new();
 //         builder = builder.listen(stop.clone());
@@ -363,6 +362,12 @@ async fn fetch_and_generate_input(
 //         builder = builder.last_n_blocks(n_blocks);
 //     }
 
+//     // info!(
+//     //     "Processing {} block(s): {:?}",
+//     //     block_numbers.len(),
+//     //     block_numbers
+//     // );
+
 //     let generator = builder
 //         .build()
 //         .await
@@ -382,5 +387,27 @@ async fn fetch_and_generate_input(
 //     );
 
 //     let fixtures = read_fixtures_from_path(temp_dir.path())?;
-//     generate_reth_inputs(&fixtures, output, format)
+
+//     let mut success_count = 0;
+//     let mut error_count = 0;
+//     for fixture in &fixtures {
+//         match generate_reth_input_from_fixture(fixture) {
+//             Ok(reth_input) => {
+//                 save_reth_input_to_file(reth_input, &fixture.name, output, format)?;
+//                 info!("Generated input for: {}", fixture.name);
+//                 success_count += 1;
+//             }
+//             Err(e) => {
+//                 warn!("Failed to generate input for {}: {}", fixture.name, e);
+//                 error_count += 1;
+//             }
+//         }
+//     }
+
+//     info!(
+//         "Completed: {} succeeded, {} failed",
+//         success_count, error_count
+//     );
+
+//     Ok(())
 // }

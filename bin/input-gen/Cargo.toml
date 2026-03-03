@@ -9,10 +9,11 @@ alloy-eips.workspace = true
 alloy-genesis.workspace = true
 alloy-rpc-types-eth.workspace = true
 
-reth-stateless.workspace = true
 reth-chainspec.workspace = true
 reth-ethereum-primitives.workspace = true
 reth-rpc-api = { workspace = true, features = ["client"]}
+
+stateless.workspace = true
 
 stateless-validator-reth = { workspace = true, features = ["host"] }
 witness-generator.workspace = true
