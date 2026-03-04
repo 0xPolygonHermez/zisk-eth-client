@@ -2628,7 +2628,7 @@ dependencies = [
 [[package]]
 name = "ef-tests"
 version = "0.1.0"
-source = "git+https://github.com/paradigmxyz/stateless.git?rev=68cd8e73682d21fed69670fc7eabe25e55c5cdbe#68cd8e73682d21fed69670fc7eabe25e55c5cdbe"
+source = "git+https://github.com/paradigmxyz/stateless?rev=68cd8e73682d21fed69670fc7eabe25e55c5cdbe#68cd8e73682d21fed69670fc7eabe25e55c5cdbe"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
