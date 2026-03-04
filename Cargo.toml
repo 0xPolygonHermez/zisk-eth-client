@@ -36,7 +36,7 @@ reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 
 # stateless
-stateless = { git = "https://github.com/paradigmxyz/stateless.git", rev = "68cd8e73682d21fed69670fc7eabe25e55c5cdbe" }
+stateless = { git = "https://github.com/paradigmxyz/stateless", rev = "68cd8e73682d21fed69670fc7eabe25e55c5cdbe" }
 
 zeth-mpt-state = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", tag = "v0.5.0" }
 

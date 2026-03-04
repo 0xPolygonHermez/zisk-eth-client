@@ -15,6 +15,7 @@ use stateless_validator_common::new_payload_request::NewPayloadRequest;
 use stateless_validator_reth::{
     guest::StatelessValidatorRethInput, new_payload_request::new_payload_request_to_block,
 };
+use zeth_mpt_state::SparseState;
 
 /// Performs stateless validation of a block using the provided witness data.
 pub fn validate_block(
