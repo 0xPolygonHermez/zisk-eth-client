@@ -3359,7 +3359,7 @@ dependencies = [
  "stateless",
  "stateless-validator-common",
  "stateless-validator-reth",
- "zeth-mpt-state",
+ "zeth-mpt-state 0.1.0 (git+https://github.com/eth-act/zkvm-ethereum-mpt.git?tag=v0.5.0)",
 ]
 
 [[package]]
@@ -9265,7 +9265,7 @@ dependencies = [
  "stateless-validator-common",
  "tree_hash",
  "tree_hash_derive",
- "zeth-mpt-state",
+ "zeth-mpt-state 0.1.0 (git+https://github.com/eth-act/zkvm-ethereum-mpt.git?rev=0e7ec8ecccf0d00ed1b7981155433e34b8746cc5)",
 ]
 
 [[package]]
@@ -11358,12 +11358,37 @@ dependencies = [
 [[package]]
 name = "zeth-mpt"
 version = "0.1.0"
+source = "git+https://github.com/eth-act/zkvm-ethereum-mpt.git?tag=v0.5.0#0e7ec8ecccf0d00ed1b7981155433e34b8746cc5"
+dependencies = [
+ "alloy-primitives",
+ "alloy-rlp",
+ "alloy-trie 0.8.1",
+ "arrayvec",
+]
+
+[[package]]
+name = "zeth-mpt"
+version = "0.1.0"
 source = "git+https://github.com/eth-act/zkvm-ethereum-mpt.git?rev=0e7ec8ecccf0d00ed1b7981155433e34b8746cc5#0e7ec8ecccf0d00ed1b7981155433e34b8746cc5"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
  "alloy-trie 0.8.1",
  "arrayvec",
+]
+
+[[package]]
+name = "zeth-mpt-state"
+version = "0.1.0"
+source = "git+https://github.com/eth-act/zkvm-ethereum-mpt.git?tag=v0.5.0#0e7ec8ecccf0d00ed1b7981155433e34b8746cc5"
+dependencies = [
+ "alloy-primitives",
+ "alloy-rlp",
+ "alloy-trie 0.9.4",
+ "reth-trie-common",
+ "revm-bytecode",
+ "stateless",
+ "zeth-mpt 0.1.0 (git+https://github.com/eth-act/zkvm-ethereum-mpt.git?tag=v0.5.0)",
 ]
 
 [[package]]
@@ -11377,7 +11402,7 @@ dependencies = [
  "reth-trie-common",
  "revm-bytecode",
  "stateless",
- "zeth-mpt",
+ "zeth-mpt 0.1.0 (git+https://github.com/eth-act/zkvm-ethereum-mpt.git?rev=0e7ec8ecccf0d00ed1b7981155433e34b8746cc5)",
 ]
 
 [[package]]

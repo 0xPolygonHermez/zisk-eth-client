@@ -17,9 +17,9 @@ panic = "abort"
 crypto = { path = "../../crates/crypto" }
 guest = { path = "../../crates/guest" }
 
-# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
 # Local development
-ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
+# ziskos = { path = "../../../zisk/ziskos/entrypoint" }
 
 # alloy
 alloy-primitives = { version = "1.5.6", default-features = false, features = ["native-keccak"] }
@@ -36,21 +36,23 @@ stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", 
 ethereum_hashing = { git = "https://github.com/jsign/ethereum_hashing", rev = "08c88633b700d7447ef840d19ce7b369c44311de" }
 
 # Needed for deterministic Hashmap sort
-alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.27.2" }
-# Local development
+alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.27.3" }
 # alloy-evm = { path = "../../../zisk-patch-alloy-evm/crates/evm" }
 
 [patch."https://github.com/paradigmxyz/reth.git"]
 # Needed for deterministic Hashmap sort
 reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.11.0" }
-# Local development
 # reth-trie-common = { path = "../../../zisk-patch-reth/crates/trie/common" }
 
 [patch."https://github.com/eth-act/zkvm-ethereum-mpt.git"]
 # Needed for deterministic Hashmap sort
 zeth-mpt-state = { git = "https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git", branch = "zisk-hints/v0.5.0" }
-# Local development
 # zeth-mpt-state = { path = "../../../zisk-patch-zkvm-ethereum-mpt/crates/zeth-mpt-state" }
+
+[patch."https://github.com/paradigmxyz/stateless.git"]
+# Needed for function visibility
+stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/68cd8e73" }
+# stateless = { path = "../zisk-patch-stateless/crates/stateless" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }
