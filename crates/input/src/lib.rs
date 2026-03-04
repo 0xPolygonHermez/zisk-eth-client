@@ -1,85 +1,114 @@
 use anyhow::{anyhow, Context, Result};
 use rayon::prelude::*;
+use serde::{Deserialize, Serialize};
+use serde_with::serde_as;
 use tracing::debug;
 
+use alloy_genesis::ChainConfig;
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
+use alloy_rpc_types_debug::ExecutionWitness;
 
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
 use reth_ethereum_primitives::TransactionSigned;
+
 use stateless::{StatelessInput, UncompressedPublicKey};
+
+use stateless_validator_common::new_payload_request::NewPayloadRequest;
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
 
-pub async fn reth_input_from_rpc(rpc_url: &str, block_number: u64) -> anyhow::Result<Vec<u8>> {
+/// StatelessValidatorRethInput with public keys split out
+#[serde_as]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StatelessValidatorRethInputNoPk {
+    /// New payload request data.
+    pub new_payload_request: NewPayloadRequest,
+    /// Execution witness for the EL block.
+    pub witness: ExecutionWitness,
+    /// Chain configuration for the stateless validation function
+    #[serde_as(as = "alloy_genesis::serde_bincode_compat::ChainConfig<'_>")]
+    pub chain_config: ChainConfig,
+}
+
+pub async fn reth_input_from_rpc(
+    rpc_url: &str,
+    block_number: u64,
+) -> Result<StatelessValidatorRethInput> {
+    let stateless_input = fetch_stateless_input(rpc_url, block_number).await?;
+    reth_input_from_stateless(&stateless_input, true)
+}
+
+/// Serialize only the public keys from a reth input
+pub fn serialize_public_keys(reth_input: &StatelessValidatorRethInput) -> Result<Vec<u8>> {
+    bincode::serialize(&reth_input.public_keys).context("Failed to serialize public keys")
+}
+
+/// Serialize reth input without public keys
+pub fn serialize_reth_input_no_pk(reth_input: StatelessValidatorRethInput) -> Result<Vec<u8>> {
+    let input_no_pk = StatelessValidatorRethInputNoPk {
+        new_payload_request: reth_input.new_payload_request,
+        witness: reth_input.witness,
+        chain_config: reth_input.chain_config,
+    };
+    bincode::serialize(&input_no_pk).context("Failed to serialize reth input (no pk)")
+}
+
+/// Fetch block data from RPC and create a StatelessInput
+async fn fetch_stateless_input(rpc_url: &str, block_number: u64) -> Result<StatelessInput> {
     let start_rpc_connect = std::time::Instant::now();
     let provider = ProviderBuilder::new().connect(rpc_url).await?;
     let time_rpc_connect = start_rpc_connect.elapsed();
 
+    // Get the block
     let start_block_fetch = std::time::Instant::now();
-    let rpc_block = provider
+    let block = provider
         .get_block(block_number.into())
         .full()
         .await?
-        .with_context(|| format!("block {block_number} not found"))?;
+        .with_context(|| format!("Block #{block_number} not found"))?;
     let time_block_fetch = start_block_fetch.elapsed();
 
+    // Get the execution witness
     let start_witness_fetch = std::time::Instant::now();
     let witness = provider
-        .debug_execution_witness(rpc_block.number().into())
+        .debug_execution_witness(block_number.into())
         .await?;
     let time_witness_fetch = start_witness_fetch.elapsed();
 
-    let start_serialize_input = std::time::Instant::now();
-
-    let block = reth_ethereum_primitives::Block::from(rpc_block);
-
-    // Get chain config
+    // Get the chain config
     let chain_id = provider.get_chain_id().await?;
-    let chain = Chain::from_id(chain_id);
-    let (chain_config, chain_name) = match chain.named() {
-        Some(NamedChain::Mainnet) => (mainnet_chain_config(), "mainnet"),
-        Some(NamedChain::Sepolia) => (SEPOLIA.genesis.config.clone(), "sepolia"),
-        Some(NamedChain::Hoodi) => (HOODI.genesis.config.clone(), "hoodi"),
-        Some(NamedChain::Holesky) => (HOLESKY.genesis.config.clone(), "holesky"),
-        _ => anyhow::bail!("Unsupported chain ID: {}", chain_id),
-    };
+    let chain_config = get_chain_config(chain_id)?;
 
-    let tx_count = block.body.transactions.len();
-    let gas_used = block.header.gas_used;
-    let mgas = gas_used / 1_000_000;
-
-    // Create the fixture
-    let fixture_name = format!(
-        "{}_{}_{}_{}_zec_reth",
-        chain_name, block_number, tx_count, mgas
+    debug!(
+        "RPC timings for block {block_number}: connect: {:?}, block: {:?}, witness: {:?}",
+        time_rpc_connect, time_block_fetch, time_witness_fetch
     );
-    let stateless_input = StatelessInput {
-        block,
+
+    Ok(StatelessInput {
+        block: block.into(),
         witness,
-        chain_config: chain_config.clone(),
-    };
+        chain_config,
+    })
+}
 
-    // Generate reth input
-    let reth_input =
-        StatelessValidatorRethInput::new(&stateless_input, true).with_context(|| {
-            format!(
-                "Failed to create StatelessValidatorReth input for {}",
-                fixture_name
-            )
-        })?;
+/// Get chain config and name from chain ID
+fn get_chain_config(chain_id: u64) -> Result<ChainConfig> {
+    let chain = Chain::from_id(chain_id);
+    match chain.named() {
+        Some(NamedChain::Mainnet) => Ok(mainnet_chain_config()),
+        Some(NamedChain::Sepolia) => Ok(SEPOLIA.genesis.config.clone()),
+        Some(NamedChain::Hoodi) => Ok(HOODI.genesis.config.clone()),
+        Some(NamedChain::Holesky) => Ok(HOLESKY.genesis.config.clone()),
+        _ => anyhow::bail!("Unsupported chain ID: {}", chain_id),
+    }
+}
 
-    let input_bytes = bincode::serialize(&reth_input)
-        .with_context(|| format!("Failed to serialize reth input for block {}", block_number))?;
-
-    let time_serialize_input = start_serialize_input.elapsed();
-
-    debug!("Input generation timings for block {block_number}: rpc connect: {:?}, block fetch: {:?}, witness fetch: {:?}, serialize input: {:?}",
-        time_rpc_connect,
-        time_block_fetch,
-        time_witness_fetch,
-        time_serialize_input,
-    );
-
-    Ok(input_bytes)
+/// Generate reth input from a StatelessInput
+fn reth_input_from_stateless(
+    stateless_input: &StatelessInput,
+    success: bool,
+) -> Result<StatelessValidatorRethInput> {
+    StatelessValidatorRethInput::new(stateless_input, success)
+        .context("Failed to create StatelessValidatorRethInput")
 }
 
 // Recovers the signing [`UncompressedPublicKey`] from each transaction's signature, in parallel.

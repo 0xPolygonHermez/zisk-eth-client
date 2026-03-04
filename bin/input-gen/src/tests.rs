@@ -4,7 +4,7 @@ use tracing::{info, warn};
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
 
 use crate::{
-    common::{generate_reth_input_from_fixture, read_fixtures_from_path, save_reth_input_to_file},
+    common::{fixtures_from_path, reth_input_from_fixture, reth_input_to_file},
     types::OutputFormat,
 };
 
@@ -48,6 +48,8 @@ pub async fn reth_input_files_from_tests(
         .await
         .context("Failed to build EEST generator")?;
 
+    info!("Generating EEST fixtures...");
+
     // Generate fixtures to a temp directory, then convert to reth inputs
     let temp_dir = tempfile::tempdir().context("Failed to create temp directory")?;
 
@@ -61,14 +63,14 @@ pub async fn reth_input_files_from_tests(
         count
     );
 
-    let fixtures = read_fixtures_from_path(temp_dir.path())?;
+    let fixtures = fixtures_from_path(temp_dir.path())?;
 
     let mut success_count = 0;
     let mut error_count = 0;
     for fixture in &fixtures {
-        match generate_reth_input_from_fixture(fixture) {
+        match reth_input_from_fixture(fixture) {
             Ok(reth_input) => {
-                save_reth_input_to_file(reth_input, &fixture.name, output, format)?;
+                reth_input_to_file(reth_input, &fixture.name, output, format)?;
                 info!("Generated input for: {}", fixture.name);
                 success_count += 1;
             }

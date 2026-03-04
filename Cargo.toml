@@ -8,6 +8,8 @@ version = "0.5.0"
 edition = "2021"
 
 [workspace.dependencies]
+input = { path = "crates/input" }
+
 zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
 # local dev
 # zisk-sdk = { path = "../zisk/sdk" }
@@ -25,6 +27,7 @@ alloy-transport = "1.7.3"
 alloy-genesis = "1.7.3"
 alloy-eips = "1.7.3"
 alloy-rpc-types-eth = "1.7.3"
+alloy-rpc-types-debug = "1.7.3"
 
 # reth
 reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }

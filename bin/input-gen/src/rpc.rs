@@ -20,7 +20,7 @@ use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use witness_generator::StatelessValidationFixture;
 
 use crate::{
-    common::{generate_reth_input_from_fixture, save_reth_input_to_file},
+    common::{reth_input_from_fixture, reth_input_to_file},
     types::OutputFormat,
 };
 
@@ -72,7 +72,7 @@ pub async fn reth_input_files_from_rpc(
     for block_num in block_numbers {
         match fetch_and_generate_input(&client, block_num, &chain_config, chain_name).await {
             Ok((reth_input, fixture_name)) => {
-                save_reth_input_to_file(reth_input, &fixture_name, output, format)?;
+                reth_input_to_file(reth_input, &fixture_name, output, format)?;
                 info!("Generated input for block: {}", block_num);
                 success_count += 1;
             }
@@ -221,7 +221,7 @@ async fn process_new_blocks(
     for block_num in *next_block_num..=latest {
         match fetch_and_generate_input(client, block_num, chain_config, chain_name).await {
             Ok((reth_input, fixture_name)) => {
-                save_reth_input_to_file(reth_input, &fixture_name, output, format)?;
+                reth_input_to_file(reth_input, &fixture_name, output, format)?;
                 info!("Generated input for block: {}", block_num);
                 success_count += 1;
             }
@@ -301,7 +301,7 @@ async fn fetch_and_generate_input(
     };
 
     // Generate reth input
-    Ok((generate_reth_input_from_fixture(&fixture)?, fixture_name))
+    Ok((reth_input_from_fixture(&fixture)?, fixture_name))
 }
 
 // // TODO: The following simplified version should work when the method `debug_execution_witness_by_block_hash`
@@ -315,7 +315,7 @@ async fn fetch_and_generate_input(
 //     FixtureGenerator,
 // };
 
-// use crate::common::{generate_reth_input_from_fixture, read_fixtures_from_path, save_reth_input_to_file};
+// use crate::common::{reth_input_from_fixture, read_fixtures_from_path, reth_input_to_file};
 // use crate::OutputFormat;
 
 // /// Process blocks from an RPC endpoint to generate reth inputs.
@@ -391,9 +391,9 @@ async fn fetch_and_generate_input(
 //     let mut success_count = 0;
 //     let mut error_count = 0;
 //     for fixture in &fixtures {
-//         match generate_reth_input_from_fixture(fixture) {
+//         match reth_input_from_fixture(fixture) {
 //             Ok(reth_input) => {
-//                 save_reth_input_to_file(reth_input, &fixture.name, output, format)?;
+//                 reth_input_to_file(reth_input, &fixture.name, output, format)?;
 //                 info!("Generated input for: {}", fixture.name);
 //                 success_count += 1;
 //             }

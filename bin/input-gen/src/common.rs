@@ -6,10 +6,12 @@ use walkdir::WalkDir;
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use witness_generator::StatelessValidationFixture;
 
+use input::StatelessValidatorRethInputNoPk;
+
 use crate::types::OutputFormat;
 
 /// Reads fixture JSON files from a directory.
-pub fn read_fixtures_from_path(path: &Path) -> Result<Vec<StatelessValidationFixture>> {
+pub fn fixtures_from_path(path: &Path) -> Result<Vec<StatelessValidationFixture>> {
     WalkDir::new(path)
         .min_depth(1)
         .into_iter()
@@ -28,7 +30,7 @@ pub fn read_fixtures_from_path(path: &Path) -> Result<Vec<StatelessValidationFix
 }
 
 /// Generate a reth input from a fixture.
-pub fn generate_reth_input_from_fixture(
+pub fn reth_input_from_fixture(
     fixture: &StatelessValidationFixture,
 ) -> Result<StatelessValidatorRethInput> {
     let reth_input = StatelessValidatorRethInput::new(&fixture.stateless_input, fixture.success)
@@ -41,28 +43,42 @@ pub fn generate_reth_input_from_fixture(
     Ok(reth_input)
 }
 
-pub fn save_reth_input_to_file(
+pub fn reth_input_to_file(
     reth_input: StatelessValidatorRethInput,
     file_name: &str,
     output_dir: &Path,
     format: OutputFormat,
 ) -> Result<()> {
+    std::fs::create_dir_all(output_dir)?;
+
+    let extension = match format {
+        OutputFormat::Binary => "bin",
+        OutputFormat::Json => "json",
+    };
     let filename = sanitize_filename(file_name);
 
-    match format {
-        OutputFormat::Binary => {
-            std::fs::create_dir_all(output_dir)?;
-            let output_path = output_dir.join(format!("{}.bin", filename));
-            let bytes = bincode::serialize(&reth_input)?;
-            std::fs::write(&output_path, bytes)?;
-        }
-        OutputFormat::Json => {
-            std::fs::create_dir_all(output_dir)?;
-            let output_path = output_dir.join(format!("{}.json", filename));
-            let json = serde_json::to_string_pretty(&reth_input)?;
-            std::fs::write(&output_path, json)?;
-        }
-    }
+    // Save public keys
+    let pk_path = output_dir.join(format!("{}.pk.{}", filename, extension));
+    let pk_bytes = match format {
+        OutputFormat::Binary => bincode::serialize(&reth_input.public_keys)?,
+        OutputFormat::Json => serde_json::to_vec_pretty(&reth_input.public_keys)?,
+    };
+    std::fs::write(&pk_path, &pk_bytes)
+        .with_context(|| format!("Failed to write public keys to {}", pk_path.display()))?;
+
+    // Save main input
+    let main_input = StatelessValidatorRethInputNoPk {
+        new_payload_request: reth_input.new_payload_request,
+        witness: reth_input.witness,
+        chain_config: reth_input.chain_config,
+    };
+    let main_path = output_dir.join(format!("{}.wtns.{}", filename, extension));
+    let main_bytes = match format {
+        OutputFormat::Binary => bincode::serialize(&main_input)?,
+        OutputFormat::Json => serde_json::to_vec_pretty(&main_input)?,
+    };
+    std::fs::write(&main_path, &main_bytes)
+        .with_context(|| format!("Failed to write main input to {}", main_path.display()))?;
 
     Ok(())
 }

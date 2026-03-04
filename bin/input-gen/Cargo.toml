@@ -5,6 +5,8 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+input.workspace = true
+
 alloy-eips.workspace = true
 alloy-genesis.workspace = true
 alloy-rpc-types-eth.workspace = true
