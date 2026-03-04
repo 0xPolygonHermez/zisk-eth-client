@@ -44,9 +44,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-consensus"
-version = "1.6.3"
+version = "1.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e4ff99651d46cef43767b5e8262ea228cd05287409ccb0c947cc25e70a952f9"
+checksum = "b0c0dc44157867da82c469c13186015b86abef209bf0e41625e4b68bac61d728"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
@@ -137,9 +137,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-eips"
-version = "1.6.3"
+version = "1.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "def1626eea28d48c6cc0a6f16f34d4af0001906e4f889df6c660b39c86fd044d"
+checksum = "b9f7ef09f21bd1e9cb8a686f168cb4a206646804567f0889eadb8dcc4c9288c8"
 dependencies = [
  "alloy-eip2124",
  "alloy-eip2930",
@@ -163,25 +163,8 @@ dependencies = [
 
 [[package]]
 name = "alloy-evm"
-version = "0.26.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b99ba7b74a87176f31ee1cd26768f7155b0eeff61ed925f59b13085ffe5f891"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-hardforks",
- "alloy-primitives",
- "alloy-sol-types",
- "auto_impl",
- "derive_more",
- "revm",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "alloy-evm"
-version = "0.27.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git?branch=zisk-hints%2Fv0.27.2#ea6faeb3775786f9eadfc89c68ca6dbfab5d5f70"
+version = "0.27.3"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git?branch=zisk-hints%2Fv0.27.3#f61d14215cb4d727d13a6b75d2f3f91595c0bf3e"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -200,9 +183,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-genesis"
-version = "1.6.3"
+version = "1.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "55d9d1aba3f914f0e8db9e4616ae37f3d811426d95bdccf44e47d0605ab202f6"
+checksum = "7c9cf3b99f46615fbf7dc1add0c96553abb7bf88fc9ec70dfbe7ad0b47ba7fe8"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
@@ -294,9 +277,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-primitives"
-version = "1.5.4"
+version = "1.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b88cf92ed20685979ed1d8472422f0c6c2d010cec77caf63aaa7669cc1a7bc2"
+checksum = "de3b431b4e72cd8bd0ec7a50b4be18e73dab74de0dba180eef171055e5d5926e"
 dependencies = [
  "alloy-rlp",
  "bytes",
@@ -462,9 +445,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-serde"
-version = "1.6.3"
+version = "1.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e6d631f8b975229361d8af7b2c749af31c73b3cf1352f90e144ddb06227105e"
+checksum = "e2ce1e0dbf7720eee747700e300c99aac01b1a95bb93f493a01e78ee28bb1a37"
 dependencies = [
  "alloy-primitives",
  "serde",
@@ -613,9 +596,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-tx-macros"
-version = "1.6.3"
+version = "1.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "397406cf04b11ca2a48e6f81804c70af3f40a36abf648e11dc7416043eb0834d"
+checksum = "6fa0c53e8c1e1ef4d01066b01c737fb62fc9397ab52c6e7bb5669f97d281b9bc"
 dependencies = [
  "darling 0.21.3",
  "proc-macro2",
@@ -1960,8 +1943,8 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "ere-io"
-version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?tag=v0.2.0#a274f17c4a1a8843ccdb8febcf0ec56afb457745"
+version = "0.3.0"
+source = "git+https://github.com/eth-act/ere?tag=v0.3.0#ffc0e230cf4387fb22eb755f0fb323b38294520f"
 dependencies = [
  "bincode 2.0.1",
  "serde",
@@ -1969,8 +1952,8 @@ dependencies = [
 
 [[package]]
 name = "ere-platform-trait"
-version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?tag=v0.2.0#a274f17c4a1a8843ccdb8febcf0ec56afb457745"
+version = "0.3.0"
+source = "git+https://github.com/eth-act/ere?tag=v0.3.0#ffc0e230cf4387fb22eb755f0fb323b38294520f"
 dependencies = [
  "digest 0.10.7",
 ]
@@ -2325,16 +2308,16 @@ dependencies = [
  "alloy-primitives",
  "reth-chainspec",
  "reth-evm-ethereum",
- "reth-stateless",
- "sparsestate",
+ "stateless",
  "stateless-validator-common",
  "stateless-validator-reth",
+ "zeth-mpt-state",
 ]
 
 [[package]]
 name = "guest"
 version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=885398bc1478e777096a8456bc925b2ab28a8d0f#885398bc1478e777096a8456bc925b2ab28a8d0f"
+source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
 dependencies = [
  "ere-io",
  "ere-platform-trait",
@@ -2898,17 +2881,6 @@ dependencies = [
  "bindgen",
  "build-probe-mpi",
  "cc",
-]
-
-[[package]]
-name = "mpt"
-version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git?branch=zisk-hints%2Fv0.4.0#807eb96a28b8465b44dded64a767e9282804b13e"
-dependencies = [
- "alloy-primitives",
- "alloy-rlp",
- "alloy-trie 0.8.1",
- "arrayvec",
 ]
 
 [[package]]
@@ -3967,13 +3939,13 @@ checksum = "a96887878f22d7bad8a3b6dc5b7440e0ada9a245242924394987b21cf2210a4c"
 
 [[package]]
 name = "reth-chainspec"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-chains",
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm 0.27.2",
+ "alloy-evm",
  "alloy-genesis",
  "alloy-primitives",
  "alloy-trie 0.9.4",
@@ -3981,14 +3953,14 @@ dependencies = [
  "derive_more",
  "reth-ethereum-forks",
  "reth-network-peers",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
  "serde_json",
 ]
 
 [[package]]
 name = "reth-codecs"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4005,8 +3977,8 @@ dependencies = [
 
 [[package]]
 name = "reth-codecs-derive"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4015,66 +3987,45 @@ dependencies = [
 
 [[package]]
 name = "reth-consensus"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
  "auto_impl",
- "reth-execution-types 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-execution-types",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
  "thiserror 2.0.18",
 ]
 
 [[package]]
 name = "reth-consensus-common"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
  "reth-chainspec",
  "reth-consensus",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
 ]
 
 [[package]]
 name = "reth-db-models"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
-dependencies = [
- "alloy-eips",
- "alloy-primitives",
- "reth-primitives-traits 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
-]
-
-[[package]]
-name = "reth-db-models"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
  "bytes",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
  "serde",
 ]
 
 [[package]]
-name = "reth-errors"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
-dependencies = [
- "reth-consensus",
- "reth-execution-errors",
- "reth-storage-errors 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "thiserror 2.0.18",
-]
-
-[[package]]
 name = "reth-ethereum-consensus"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4082,15 +4033,15 @@ dependencies = [
  "reth-chainspec",
  "reth-consensus",
  "reth-consensus-common",
- "reth-execution-types 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-execution-types",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
  "tracing",
 ]
 
 [[package]]
 name = "reth-ethereum-forks"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-eip2124",
  "alloy-hardforks",
@@ -4102,20 +4053,8 @@ dependencies = [
 
 [[package]]
 name = "reth-ethereum-primitives"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-primitives",
- "alloy-rlp",
- "reth-primitives-traits 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
-]
-
-[[package]]
-name = "reth-ethereum-primitives"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4124,7 +4063,7 @@ dependencies = [
  "alloy-rpc-types-eth",
  "alloy-serde",
  "reth-codecs",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
  "reth-zstd-compressors",
  "serde",
  "serde_with",
@@ -4132,88 +4071,72 @@ dependencies = [
 
 [[package]]
 name = "reth-evm"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm 0.27.2",
+ "alloy-evm",
  "alloy-primitives",
  "auto_impl",
  "derive_more",
  "futures-util",
  "rayon",
  "reth-execution-errors",
- "reth-execution-types 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-storage-api 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-storage-errors 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-execution-types",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-storage-api",
+ "reth-storage-errors",
  "reth-trie-common",
  "revm",
 ]
 
 [[package]]
 name = "reth-evm-ethereum"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm 0.27.2",
+ "alloy-evm",
  "alloy-primitives",
  "alloy-rpc-types-engine",
  "derive_more",
  "reth-chainspec",
  "reth-ethereum-forks",
- "reth-ethereum-primitives 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-ethereum-primitives",
  "reth-evm",
- "reth-execution-types 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-storage-errors 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-execution-types",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-storage-errors",
  "revm",
 ]
 
 [[package]]
 name = "reth-execution-errors"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
- "alloy-evm 0.27.2",
+ "alloy-evm",
  "alloy-primitives",
  "alloy-rlp",
  "nybbles 0.4.8",
- "reth-storage-errors 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-storage-errors",
  "thiserror 2.0.18",
 ]
 
 [[package]]
 name = "reth-execution-types"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm 0.26.4",
+ "alloy-evm",
  "alloy-primitives",
  "derive_more",
- "reth-ethereum-primitives 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-primitives-traits 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-trie-common",
- "revm",
-]
-
-[[package]]
-name = "reth-execution-types"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-evm 0.27.2",
- "alloy-primitives",
- "derive_more",
- "reth-ethereum-primitives 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-ethereum-primitives",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
  "reth-trie-common",
  "revm",
  "serde",
@@ -4222,8 +4145,8 @@ dependencies = [
 
 [[package]]
 name = "reth-network-peers"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -4235,39 +4158,18 @@ dependencies = [
 
 [[package]]
 name = "reth-payload-validator"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-rpc-types-engine",
- "reth-primitives-traits 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
 ]
 
 [[package]]
 name = "reth-primitives-traits"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-genesis",
- "alloy-primitives",
- "alloy-rlp",
- "alloy-trie 0.9.4",
- "auto_impl",
- "bytes",
- "derive_more",
- "once_cell",
- "revm-bytecode",
- "revm-primitives",
- "revm-state",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "reth-primitives-traits"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4293,20 +4195,35 @@ dependencies = [
 ]
 
 [[package]]
-name = "reth-prune-types"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
+name = "reth-primitives-traits"
+version = "1.11.0"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.11.0#a068d98d78af4424847fa7fc2bb9d36bec101c0b"
 dependencies = [
+ "alloy-consensus",
+ "alloy-eips",
+ "alloy-genesis",
  "alloy-primitives",
+ "alloy-rlp",
+ "alloy-rpc-types-eth",
+ "alloy-trie 0.9.4",
+ "auto_impl",
+ "bytes",
  "derive_more",
- "strum",
+ "once_cell",
+ "op-alloy-consensus",
+ "revm-bytecode",
+ "revm-primitives",
+ "revm-state",
+ "secp256k1 0.30.0",
+ "serde",
+ "serde_with",
  "thiserror 2.0.18",
 ]
 
 [[package]]
 name = "reth-prune-types"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-primitives",
  "derive_more",
@@ -4317,42 +4234,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "reth-revm"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
-dependencies = [
- "alloy-primitives",
- "reth-primitives-traits 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-storage-api 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-storage-errors 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "revm",
-]
-
-[[package]]
-name = "reth-revm"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
-dependencies = [
- "alloy-primitives",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-storage-api 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-storage-errors 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "revm",
-]
-
-[[package]]
 name = "reth-stages-types"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
-dependencies = [
- "alloy-primitives",
- "reth-trie-common",
-]
-
-[[package]]
-name = "reth-stages-types"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-primitives",
  "bytes",
@@ -4361,62 +4245,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "reth-stateless"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
-dependencies = [
- "alloy-consensus",
- "alloy-genesis",
- "alloy-primitives",
- "alloy-rlp",
- "alloy-rpc-types-debug",
- "alloy-trie 0.9.4",
- "itertools 0.14.0",
- "k256",
- "reth-chainspec",
- "reth-consensus",
- "reth-errors",
- "reth-ethereum-consensus",
- "reth-ethereum-primitives 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-evm",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-revm 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-trie-common",
- "reth-trie-sparse",
- "serde",
- "serde_with",
- "thiserror 2.0.18",
-]
-
-[[package]]
 name = "reth-static-file-types"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-primitives",
  "derive_more",
  "fixed-map",
+ "reth-stages-types",
  "serde",
  "strum",
-]
-
-[[package]]
-name = "reth-static-file-types"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
-dependencies = [
- "alloy-primitives",
- "derive_more",
- "fixed-map",
- "reth-stages-types 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "serde",
- "strum",
+ "tracing",
 ]
 
 [[package]]
 name = "reth-storage-api"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4424,35 +4269,13 @@ dependencies = [
  "alloy-rpc-types-engine",
  "auto_impl",
  "reth-chainspec",
- "reth-db-models 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-ethereum-primitives 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-execution-types 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-primitives-traits 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-prune-types 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-stages-types 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-storage-errors 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-trie-common",
- "revm-database",
-]
-
-[[package]]
-name = "reth-storage-api"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-primitives",
- "alloy-rpc-types-engine",
- "auto_impl",
- "reth-chainspec",
- "reth-db-models 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-ethereum-primitives 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-execution-types 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-prune-types 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-stages-types 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-storage-errors 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-db-models",
+ "reth-ethereum-primitives",
+ "reth-execution-types",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-prune-types",
+ "reth-stages-types",
+ "reth-storage-errors",
  "reth-trie-common",
  "revm-database",
  "serde_json",
@@ -4460,33 +4283,16 @@ dependencies = [
 
 [[package]]
 name = "reth-storage-errors"
-version = "1.10.2"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.10.2#8e3b5e6a99439561b73c5dd31bd3eced2e994d60"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
  "alloy-rlp",
  "derive_more",
- "reth-primitives-traits 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-prune-types 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-static-file-types 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "revm-database-interface",
- "revm-state",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "reth-storage-errors"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
-dependencies = [
- "alloy-eips",
- "alloy-primitives",
- "alloy-rlp",
- "derive_more",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-prune-types 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
- "reth-static-file-types 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-prune-types",
+ "reth-static-file-types",
  "revm-database-interface",
  "revm-state",
  "thiserror 2.0.18",
@@ -4494,8 +4300,8 @@ dependencies = [
 
 [[package]]
 name = "reth-trie-common"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.11.0#a068d98d78af4424847fa7fc2bb9d36bec101c0b"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
@@ -4508,7 +4314,7 @@ dependencies = [
  "derive_more",
  "itertools 0.14.0",
  "nybbles 0.4.8",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.11.0)",
  "revm-database",
  "serde",
  "serde_with",
@@ -4516,23 +4322,24 @@ dependencies = [
 
 [[package]]
 name = "reth-trie-sparse"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
  "alloy-trie 0.9.4",
  "auto_impl",
  "reth-execution-errors",
- "reth-primitives-traits 1.10.2 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2)",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
  "reth-trie-common",
+ "smallvec",
  "tracing",
 ]
 
 [[package]]
 name = "reth-zstd-compressors"
-version = "1.10.2"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.10.2#fd93e2e1325fc4c74179588765f6d393f992e4f2"
+version = "1.11.0"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "zstd",
 ]
@@ -5314,22 +5121,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sparsestate"
-version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git?branch=zisk-hints%2Fv0.4.0#807eb96a28b8465b44dded64a767e9282804b13e"
-dependencies = [
- "alloy-primitives",
- "alloy-rlp",
- "alloy-trie 0.9.4",
- "itertools 0.14.0",
- "mpt",
- "reth-errors",
- "reth-revm 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-stateless",
- "reth-trie-common",
-]
-
-[[package]]
 name = "spki"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5362,9 +5153,37 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 
 [[package]]
+name = "stateless"
+version = "0.1.0"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-stateless.git?branch=zisk%2F68cd8e73#945aa9ff32b60b550c1ed351d78263e5e400ffb6"
+dependencies = [
+ "alloy-consensus",
+ "alloy-genesis",
+ "alloy-primitives",
+ "alloy-rlp",
+ "alloy-rpc-types-debug",
+ "alloy-trie 0.9.4",
+ "itertools 0.14.0",
+ "reth-chainspec",
+ "reth-consensus",
+ "reth-ethereum-consensus",
+ "reth-ethereum-primitives",
+ "reth-evm",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-trie-common",
+ "reth-trie-sparse",
+ "revm-bytecode",
+ "revm-database-interface",
+ "revm-state",
+ "serde",
+ "serde_with",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "stateless-validator-common"
 version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=885398bc1478e777096a8456bc925b2ab28a8d0f#885398bc1478e777096a8456bc925b2ab28a8d0f"
+source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
 dependencies = [
  "anyhow",
  "ethereum_ssz",
@@ -5381,7 +5200,7 @@ dependencies = [
 [[package]]
 name = "stateless-validator-reth"
 version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=885398bc1478e777096a8456bc925b2ab28a8d0f#885398bc1478e777096a8456bc925b2ab28a8d0f"
+source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -5392,22 +5211,22 @@ dependencies = [
  "anyhow",
  "ere-io",
  "ethereum_ssz",
- "guest 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=885398bc1478e777096a8456bc925b2ab28a8d0f)",
+ "guest 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a)",
  "once_cell",
  "reth-chainspec",
- "reth-ethereum-primitives 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
+ "reth-ethereum-primitives",
  "reth-evm-ethereum",
  "reth-payload-validator",
- "reth-primitives-traits 1.10.2 (git+https://github.com/paradigmxyz/reth?tag=v1.10.2)",
- "reth-stateless",
+ "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
  "serde",
  "serde_with",
  "sha2",
- "sparsestate",
  "ssz_types",
+ "stateless",
  "stateless-validator-common",
  "tree_hash",
  "tree_hash_derive",
+ "zeth-mpt-state",
 ]
 
 [[package]]
@@ -6709,6 +6528,32 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.114",
+]
+
+[[package]]
+name = "zeth-mpt"
+version = "0.1.0"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git?branch=zisk-hints%2Fv0.5.0#a1e3d24cb5b402b2b4ec03aa0101f631d98d19ba"
+dependencies = [
+ "alloy-primitives",
+ "alloy-rlp",
+ "alloy-trie 0.8.1",
+ "arrayvec",
+]
+
+[[package]]
+name = "zeth-mpt-state"
+version = "0.1.0"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git?branch=zisk-hints%2Fv0.5.0#a1e3d24cb5b402b2b4ec03aa0101f631d98d19ba"
+dependencies = [
+ "alloy-primitives",
+ "alloy-rlp",
+ "alloy-trie 0.9.4",
+ "itertools 0.14.0",
+ "reth-trie-common",
+ "revm-bytecode",
+ "stateless",
+ "zeth-mpt",
 ]
 
 [[package]]
