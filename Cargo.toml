@@ -15,33 +15,36 @@ zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-
 revm = { version = "34.0.0", default-features = false }
 
 # alloy (for reth)
-alloy-primitives = "1.5.4"
-alloy = "1.6.0"
-alloy-consensus = "1.6.0"
-alloy-json-rpc = "1.6.0"
-alloy-provider = "1.6.0"
-alloy-rpc-client = "1.6.0"
-alloy-transport = "1.6.0"
-alloy-genesis = "1.6.0"
-alloy-eips = "1.6.0"
-alloy-rpc-types-eth = "1.6.0"
+alloy-primitives = "1.5.6"
+alloy = "1.7.3"
+alloy-consensus = "1.7.3"
+alloy-json-rpc = "1.7.3"
+alloy-provider = "1.7.3"
+alloy-rpc-client = "1.7.3"
+alloy-transport = "1.7.3"
+alloy-genesis = "1.7.3"
+alloy-eips = "1.7.3"
+alloy-rpc-types-eth = "1.7.3"
 
 # reth
-reth-stateless = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
-reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
-reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
-reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
-reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.10.2" }
+reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
+reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
+reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
+reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
+
+# stateless
+stateless = { git = "https://github.com/paradigmxyz/stateless", rev = "68cd8e73682d21fed69670fc7eabe25e55c5cdbe" }
+
+zeth-mpt-state = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", tag = "v0.5.0" }
 
 # eth-act
-stateless-validator-common = { git = "https://github.com/eth-act/ere-guests.git", rev = "885398bc1478e777096a8456bc925b2ab28a8d0f" }
-stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "885398bc1478e777096a8456bc925b2ab28a8d0f" }
-stateless-validator-ethrex = { git = "https://github.com/eth-act/ere-guests.git", rev = "885398bc1478e777096a8456bc925b2ab28a8d0f", default-features = false, features = [
+stateless-validator-common = { git = "https://github.com/eth-act/ere-guests.git", rev = "40006b91edcf0b73f021988f982aea0bbec5039a" }
+stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "40006b91edcf0b73f021988f982aea0bbec5039a" }
+stateless-validator-ethrex = { git = "https://github.com/eth-act/ere-guests.git", rev = "40006b91edcf0b73f021988f982aea0bbec5039a", default-features = false, features = [
     "std",
 ] }
-witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "8907be92536696319f04e6fdf40a07ebc93e891a" }
-sparsestate = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", rev = "a1e44638c49c4e16751a0b915593fce98ab6bdef" }
-ere-io = { git = "https://github.com/eth-act/ere", tag = "v0.2.0" }
+witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "a1f5dc47df7735500c1d8dfe055e966ee9f8070e" }
+ere-io = { git = "https://github.com/eth-act/ere", tag = "v0.3.0" }
 
 # common dependencies
 anyhow = "1.0"

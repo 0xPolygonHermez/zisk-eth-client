@@ -3,7 +3,7 @@ use anyhow::{anyhow, Context, Result};
 use rayon::prelude::*;
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
 use reth_ethereum_primitives::TransactionSigned;
-use reth_stateless::{StatelessInput, UncompressedPublicKey};
+use stateless::{StatelessInput, UncompressedPublicKey};
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use tracing::debug;
 
