@@ -3974,6 +3974,7 @@ dependencies = [
  "alloy-genesis",
  "alloy-provider",
  "alloy-rpc-types-debug",
+ "alloy-rpc-types-eth",
  "anyhow",
  "bincode 1.3.3",
  "rayon",

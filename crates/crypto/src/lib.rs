@@ -7,9 +7,9 @@ use alloy_consensus::crypto::{CryptoProvider, RecoveryError};
 use alloy_primitives::Address;
 
 #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
-use k256::ecdsa::{signature::hazmat::PrehashVerifier, Signature, RecoveryId, VerifyingKey};
+use k256::ecdsa::{signature::hazmat::PrehashVerifier, RecoveryId, Signature, VerifyingKey};
 #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
-use alloy_consensus::crypto::secp256k1::public_key_to_address;
+use tiny_keccak::{Hasher, Keccak};
 
 #[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints_debug))]
 use std::os::raw::c_char;
@@ -944,8 +944,8 @@ impl CryptoProvider for CustomEvmCrypto {
             let _resume_hints_guard = ResumeHintsGuard { already_paused };
 
             // Direct k256 implementation (same as alloy_consensus::impl_k256)
-            let mut signature = Signature::from_slice(&sig[0..64])
-                .map_err(|_| RecoveryError::new())?;
+            let mut signature =
+                Signature::from_slice(&sig[0..64]).map_err(|_| RecoveryError::new())?;
             let mut recid = sig[64];
 
             // normalize signature and flip recovery id if needed.
@@ -953,13 +953,12 @@ impl CryptoProvider for CustomEvmCrypto {
                 signature = sig_normalized;
                 recid ^= 1;
             }
-            let recid = RecoveryId::from_byte(recid)
-                .ok_or_else(RecoveryError::new)?;
+            let recid = RecoveryId::from_byte(recid).ok_or_else(RecoveryError::new)?;
 
             // recover key
             let recovered_key = VerifyingKey::recover_from_prehash(&msg[..], &signature, recid)
                 .map_err(|_| RecoveryError::new())?;
-            Ok(public_key_to_address(recovered_key))
+            Ok(public_key_to_address(&recovered_key))
         }
     }
 
@@ -1027,7 +1026,18 @@ impl CryptoProvider for CustomEvmCrypto {
             vk.verify_prehash(msg, &signature)
                 .map_err(|_| RecoveryError::new())?;
 
-            Ok(public_key_to_address(vk))
+            Ok(public_key_to_address(&vk))
         }
     }
+}
+
+#[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+fn public_key_to_address(key: &VerifyingKey) -> Address {
+    let mut hasher = Keccak::v256();
+    hasher.update(&key.to_encoded_point(/* compress = */ false).as_bytes()[1..]);
+
+    let mut hash = [0u8; 32];
+    hasher.finalize(&mut hash);
+
+    Address::from_slice(&hash[12..])
 }

@@ -10,7 +10,7 @@ tiny-keccak.workspace = true
 
 revm.workspace = true
 
-alloy-consensus = { workspace = true, features = ["crypto-backend"] }
+alloy-consensus.workspace = true
 alloy-primitives.workspace = true
 
 [lints.rust]

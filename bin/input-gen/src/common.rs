@@ -6,7 +6,7 @@ use walkdir::WalkDir;
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use witness_generator::StatelessValidationFixture;
 
-use input::StatelessValidatorRethInputNoPk;
+use input::StatelessValidatorRethInputWitness;
 
 use crate::types::OutputFormat;
 
@@ -67,7 +67,7 @@ pub fn reth_input_to_file(
         .with_context(|| format!("Failed to write public keys to {}", pk_path.display()))?;
 
     // Save main input
-    let main_input = StatelessValidatorRethInputNoPk {
+    let main_input = StatelessValidatorRethInputWitness {
         new_payload_request: reth_input.new_payload_request,
         witness: reth_input.witness,
         chain_config: reth_input.chain_config,
