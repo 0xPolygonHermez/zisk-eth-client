@@ -1,7 +1,7 @@
 use primitive_types::{H256, U256};
 
-use ethrex_stateless::{
-    execution::{StatelessExecutionError, execution_program},
+use stateless_ethrex::{
+    execution::{execution_program, StatelessExecutionError},
     input::ProgramInput,
 };
 

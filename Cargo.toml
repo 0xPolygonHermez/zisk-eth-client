@@ -14,6 +14,9 @@ zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-
 
 revm = { version = "34.0.0", default-features = false }
 
+# ethereum-types (for ethrex)
+primitive-types = "0.13.1"
+
 # alloy (for reth)
 alloy-primitives = "1.5.6"
 alloy = "1.7.3"
@@ -33,7 +36,8 @@ reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 
 # stateless
-stateless = { git = "https://github.com/paradigmxyz/stateless", rev = "68cd8e73682d21fed69670fc7eabe25e55c5cdbe" }
+stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "68cd8e73682d21fed69670fc7eabe25e55c5cdbe", package = "stateless" }
+stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v9.0.0", default-features = false, package = "guest_program" }
 
 zeth-mpt-state = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", tag = "v0.5.0" }
 

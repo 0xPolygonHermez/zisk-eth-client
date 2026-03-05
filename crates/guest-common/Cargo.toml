@@ -1,0 +1,8 @@
+[package]
+name = "guest-common"
+description = ""
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+stateless-validator-common.workspace = true

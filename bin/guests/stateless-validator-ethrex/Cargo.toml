@@ -13,17 +13,12 @@ codegen-units = 1
 panic = "abort"
 
 [dependencies]
-guest = { path = "../../../crates/guest" }
+guest-common = { path = "../../../crates/guest-common" }
+guest-ethrex = { path = "../../../crates/guest-ethrex" }
 
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
 # Local development
 # ziskos = { path = "../../../zisk/ziskos/entrypoint" }
-
-# ethereum-types (for ethrex)
-primitive-types = "0.13.1"
-
-# ethrex
-ethrex-stateless = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v9.0.0", default-features = false, package = "guest_program" }
 
 # eth-act
 stateless-validator-ethrex = { git = "https://github.com/eth-act/ere-guests.git", rev = "40006b91edcf0b73f021988f982aea0bbec5039a", default-features =  false, features = [

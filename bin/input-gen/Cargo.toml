@@ -13,7 +13,7 @@ reth-chainspec.workspace = true
 reth-ethereum-primitives.workspace = true
 reth-rpc-api = { workspace = true, features = ["client"]}
 
-stateless.workspace = true
+stateless-reth.workspace = true
 
 stateless-validator-reth = { workspace = true, features = ["host"] }
 stateless-validator-ethrex = { workspace = true, features = ["host"] }

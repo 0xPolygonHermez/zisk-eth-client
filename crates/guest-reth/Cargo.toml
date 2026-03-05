@@ -1,5 +1,5 @@
 [package]
-name = "guest"
+name = "guest-reth"
 description = ""
 version.workspace = true
 edition.workspace = true
@@ -11,9 +11,8 @@ alloy-genesis.workspace = true
 reth-chainspec.workspace = true
 reth-evm-ethereum.workspace = true
 
-stateless.workspace = true
+stateless-reth.workspace = true
 
 zeth-mpt-state.workspace = true
 
-stateless-validator-common.workspace = true
 stateless-validator-reth.workspace = true

@@ -14,7 +14,7 @@ use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SE
 use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_api::{DebugApiClient, EthApiClient};
 
-use stateless::StatelessInput;
+use stateless_reth::StatelessInput;
 
 use witness_generator::StatelessValidationFixture;
 

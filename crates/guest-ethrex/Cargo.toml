@@ -1,0 +1,12 @@
+[package]
+name = "guest-ethrex"
+description = ""
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+primitive-types.workspace = true
+
+stateless-ethrex.workspace = true
+
+stateless-validator-ethrex.workspace = true

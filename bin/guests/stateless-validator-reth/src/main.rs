@@ -5,7 +5,8 @@ use std::sync::Arc;
 
 use alloy_consensus::crypto::install_default_provider;
 use crypto::CustomEvmCrypto;
-use guest::{chain_name, extract_block_info, validate_block};
+use guest_common::{chain_name, extract_block_info};
+use guest_reth::validate_block;
 use revm::install_crypto;
 use stateless_validator_reth::guest::StatelessValidatorRethInput;
 

@@ -4061,25 +4061,40 @@ dependencies = [
 [[package]]
 name = "guest"
 version = "0.5.0"
+source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
+dependencies = [
+ "ere-io",
+ "ere-platform-trait",
+ "sha2",
+]
+
+[[package]]
+name = "guest-common"
+version = "0.5.0"
+dependencies = [
+ "stateless-validator-common",
+]
+
+[[package]]
+name = "guest-ethrex"
+version = "0.5.0"
+dependencies = [
+ "guest_program",
+ "primitive-types 0.13.1",
+ "stateless-validator-ethrex",
+]
+
+[[package]]
+name = "guest-reth"
+version = "0.5.0"
 dependencies = [
  "alloy-genesis",
  "alloy-primitives",
  "reth-chainspec",
  "reth-evm-ethereum",
  "stateless",
- "stateless-validator-common",
  "stateless-validator-reth",
  "zeth-mpt-state 0.1.0 (git+https://github.com/eth-act/zkvm-ethereum-mpt.git?tag=v0.5.0)",
-]
-
-[[package]]
-name = "guest"
-version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
-dependencies = [
- "ere-io",
- "ere-platform-trait",
- "sha2",
 ]
 
 [[package]]
@@ -10843,7 +10858,7 @@ dependencies = [
  "ethrex-rlp",
  "ethrex-rpc",
  "ethrex-vm",
- "guest 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a)",
+ "guest",
  "guest_program",
  "rkyv",
  "stateless",
@@ -10866,7 +10881,7 @@ dependencies = [
  "ere-io",
  "ere-zkvm-interface",
  "ethereum_ssz",
- "guest 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a)",
+ "guest",
  "once_cell",
  "reth-chainspec",
  "reth-ethereum-primitives",
