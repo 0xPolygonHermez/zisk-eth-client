@@ -1,6 +1,8 @@
+#[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+use revm::precompile::DefaultCrypto;
 use revm::precompile::{
     bls12_381::{G1Point, G1PointScalar, G2Point, G2PointScalar},
-    Crypto, DefaultCrypto, PrecompileError,
+    Crypto, PrecompileError,
 };
 
 use alloy_consensus::crypto::{CryptoProvider, RecoveryError};
@@ -132,7 +134,7 @@ extern "C" {
 }
 
 #[cfg(zisk_hints_debug)]
-pub fn hint_log<S: AsRef<str>>(msg: S) {
+fn hint_log<S: AsRef<str>>(msg: S) {
     // On native we call external C function to log hints, since it controls if hints are paused or not
     #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
     {
@@ -151,12 +153,14 @@ pub fn hint_log<S: AsRef<str>>(msg: S) {
 
 #[derive(Debug)]
 pub struct CustomEvmCrypto {
-    pub default_crypto: DefaultCrypto,
+    #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    default_crypto: DefaultCrypto,
 }
 
 impl Default for CustomEvmCrypto {
     fn default() -> Self {
         Self {
+            #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
             default_crypto: DefaultCrypto,
         }
     }
@@ -865,17 +869,6 @@ impl Crypto for CustomEvmCrypto {
     }
 }
 
-#[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
-fn public_key_to_address(key: &VerifyingKey) -> Address {
-    let mut hasher = Keccak::v256();
-    hasher.update(&key.to_encoded_point(/* compress = */ false).as_bytes()[1..]);
-
-    let mut hash = [0u8; 32];
-    hasher.finalize(&mut hash);
-
-    Address::from_slice(&hash[12..])
-}
-
 impl CryptoProvider for CustomEvmCrypto {
     /// Recover signer from signature and message hash, without ensuring low S values.
     fn recover_signer_unchecked(
@@ -1055,4 +1048,15 @@ impl CryptoProvider for CustomEvmCrypto {
             Ok(public_key_to_address(&vk))
         }
     }
+}
+
+#[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+fn public_key_to_address(key: &VerifyingKey) -> Address {
+    let mut hasher = Keccak::v256();
+    hasher.update(&key.to_encoded_point(/* compress = */ false).as_bytes()[1..]);
+
+    let mut hash = [0u8; 32];
+    hasher.finalize(&mut hash);
+
+    Address::from_slice(&hash[12..])
 }

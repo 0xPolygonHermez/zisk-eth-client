@@ -13,7 +13,6 @@ codegen-units = 1
 panic = "abort"
 
 [dependencies]
-crypto = { path = "../../../crates/crypto" }
 guest-common = { path = "../../../crates/guest-common" }
 guest-reth = { path = "../../../crates/guest-reth" }
 
