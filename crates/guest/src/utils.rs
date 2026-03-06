@@ -1,16 +1,17 @@
 use std::sync::Arc;
 
+use alloy_genesis::{ChainConfig, Genesis};
 use reth_chainspec::ChainSpec;
 use reth_ethereum_primitives::Block;
 
-/// Get chain spec from chain ID
-pub fn get_chain_spec(chain_id: u64) -> Arc<ChainSpec> {
-    ChainSpec::from_chain_id(chain_id).unwrap_or_else(|| {
-        panic!(
-            "Unsupported chain ID: {}. Please add it to the chain spec mapping.",
-            chain_id
-        )
-    })
+/// Get chain spec from chain config
+pub fn get_chain_spec(chain_config: &ChainConfig) -> Arc<ChainSpec> {
+    let genesis = Genesis {
+        config: chain_config.clone(),
+        ..Default::default()
+    };
+
+    Arc::new(ChainSpec::from_genesis(genesis))
 }
 
 /// Get chain name from chain ID

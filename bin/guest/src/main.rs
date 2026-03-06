@@ -50,7 +50,7 @@ fn main() {
     );
 
     // Verify signatures
-    let chain_spec = get_chain_spec(chain_id);
+    let chain_spec = get_chain_spec(&chain_config);
     let block = verify_signatures(block, chain_spec.clone(), public.public_keys)
         .expect("Signature verification failed");
 
