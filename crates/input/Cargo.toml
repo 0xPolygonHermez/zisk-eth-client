@@ -24,6 +24,3 @@ reth-chainspec.workspace = true
 reth-ethereum-primitives.workspace = true
 
 stateless-reth.workspace = true
-
-stateless-validator-reth = { workspace = true, features = ["host"] }
-stateless-validator-common = { workspace = true, features = ["host"] }

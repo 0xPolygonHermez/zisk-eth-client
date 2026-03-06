@@ -19,7 +19,6 @@ reth-rpc-api = { workspace = true, features = ["client"]}
 
 stateless-reth.workspace = true
 
-stateless-validator-reth = { workspace = true, features = ["host"] }
 witness-generator.workspace = true
 
 # Common dependencies

@@ -23,6 +23,3 @@ reth-evm-ethereum.workspace = true
 zeth-mpt-state.workspace = true
 
 stateless-reth.workspace = true
-
-stateless-validator-common.workspace = true
-stateless-validator-reth.workspace = true

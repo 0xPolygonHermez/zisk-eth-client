@@ -1430,16 +1430,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bincode"
-version = "2.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36eaf5d7b090263e8150820482d5d93cd964a81e4019913c972f4edcc6edb740"
-dependencies = [
- "serde",
- "unty",
-]
-
-[[package]]
 name = "bindgen"
 version = "0.69.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2774,37 +2764,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ere-io"
-version = "0.3.0"
-source = "git+https://github.com/eth-act/ere?tag=v0.3.0#ffc0e230cf4387fb22eb755f0fb323b38294520f"
-dependencies = [
- "bincode 2.0.1",
- "serde",
-]
-
-[[package]]
-name = "ere-platform-trait"
-version = "0.3.0"
-source = "git+https://github.com/eth-act/ere?tag=v0.3.0#ffc0e230cf4387fb22eb755f0fb323b38294520f"
-dependencies = [
- "digest 0.10.7",
-]
-
-[[package]]
-name = "ere-zkvm-interface"
-version = "0.3.0"
-source = "git+https://github.com/eth-act/ere?tag=v0.3.0#ffc0e230cf4387fb22eb755f0fb323b38294520f"
-dependencies = [
- "anyhow",
- "auto_impl",
- "bincode 2.0.1",
- "indexmap 2.13.0",
- "serde",
- "strum",
- "thiserror 2.0.18",
-]
-
-[[package]]
 name = "errno"
 version = "0.3.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2812,17 +2771,6 @@ checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "ethereum_hashing"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c853bd72c9e5787f8aafc3df2907c2ed03cff3150c3acd94e2e53a98ab70a8ab"
-dependencies = [
- "cpufeatures",
- "ring",
- "sha2",
 ]
 
 [[package]]
@@ -3356,7 +3304,7 @@ dependencies = [
  "alloy-primitives",
  "alloy-rpc-types-debug",
  "anyhow",
- "bincode 1.3.3",
+ "bincode",
  "rayon",
  "reth-chainspec",
  "reth-ethereum-primitives",
@@ -3365,19 +3313,7 @@ dependencies = [
  "serde",
  "serde_with",
  "stateless",
- "stateless-validator-common",
- "stateless-validator-reth",
- "zeth-mpt-state 0.1.0 (git+https://github.com/eth-act/zkvm-ethereum-mpt.git?tag=v0.5.0)",
-]
-
-[[package]]
-name = "guest"
-version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
-dependencies = [
- "ere-io",
- "ere-platform-trait",
- "sha2",
+ "zeth-mpt-state",
 ]
 
 [[package]]
@@ -3985,16 +3921,14 @@ dependencies = [
  "alloy-rpc-types-eth",
  "anyhow",
  "async-trait",
- "bincode 1.3.3",
- "guest 0.5.0",
+ "bincode",
+ "guest",
  "rayon",
  "reth-chainspec",
  "reth-ethereum-primitives",
  "serde",
  "serde_with",
  "stateless",
- "stateless-validator-common",
- "stateless-validator-reth",
  "tracing",
 ]
 
@@ -4006,9 +3940,9 @@ dependencies = [
  "alloy-genesis",
  "alloy-rpc-types-eth",
  "anyhow",
- "bincode 1.3.3",
+ "bincode",
  "clap",
- "guest 0.5.0",
+ "guest",
  "http",
  "jsonrpsee",
  "rayon",
@@ -4017,7 +3951,6 @@ dependencies = [
  "reth-rpc-api",
  "serde_json",
  "stateless",
- "stateless-validator-reth",
  "tempfile",
  "tokio",
  "tokio-util",
@@ -5974,7 +5907,7 @@ name = "proofman"
 version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0#cc5f43d2076bab0ca71b1dfcc59e686cb4d0b084"
 dependencies = [
- "bincode 1.3.3",
+ "bincode",
  "blake3",
  "borsh",
  "bytemuck",
@@ -6010,7 +5943,7 @@ name = "proofman-common"
 version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0#cc5f43d2076bab0ca71b1dfcc59e686cb4d0b084"
 dependencies = [
- "bincode 1.3.3",
+ "bincode",
  "borsh",
  "bytemuck",
  "colored",
@@ -6074,7 +6007,7 @@ name = "proofman-util"
 version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0#cc5f43d2076bab0ca71b1dfcc59e686cb4d0b084"
 dependencies = [
- "bincode 1.3.3",
+ "bincode",
  "bytemuck",
  "colored",
  "serde",
@@ -7337,7 +7270,7 @@ version = "1.11.0"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "anyhow",
- "bincode 1.3.3",
+ "bincode",
  "derive_more",
  "lz4_flex",
  "memmap2",
@@ -7493,16 +7426,6 @@ dependencies = [
  "serde",
  "thiserror 2.0.18",
  "tokio",
-]
-
-[[package]]
-name = "reth-payload-validator"
-version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
-dependencies = [
- "alloy-consensus",
- "alloy-rpc-types-engine",
- "reth-primitives-traits",
 ]
 
 [[package]]
@@ -9185,22 +9108,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ssz_types"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75b55bedc9a18ed2860a46d6beb4f4082416ee1d60be0cc364cebdcdddc7afd4"
-dependencies = [
- "ethereum_serde_utils",
- "ethereum_ssz",
- "itertools 0.13.0",
- "serde",
- "serde_derive",
- "smallvec",
- "tree_hash",
- "typenum",
-]
-
-[[package]]
 name = "stable_deref_trait"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9232,58 +9139,6 @@ dependencies = [
  "serde",
  "serde_with",
  "thiserror 2.0.18",
-]
-
-[[package]]
-name = "stateless-validator-common"
-version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
-dependencies = [
- "alloy-eips",
- "alloy-primitives",
- "anyhow",
- "ethereum_ssz",
- "ethereum_ssz_derive",
- "serde",
- "serde_with",
- "sha2",
- "ssz_types",
- "tree_hash",
- "tree_hash_derive",
- "typenum",
-]
-
-[[package]]
-name = "stateless-validator-reth"
-version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-genesis",
- "alloy-primitives",
- "alloy-rlp",
- "alloy-rpc-types-engine",
- "anyhow",
- "ere-io",
- "ere-zkvm-interface",
- "ethereum_ssz",
- "guest 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a)",
- "once_cell",
- "reth-chainspec",
- "reth-ethereum-primitives",
- "reth-evm-ethereum",
- "reth-payload-validator",
- "reth-primitives-traits",
- "serde",
- "serde_with",
- "sha2",
- "ssz_types",
- "stateless",
- "stateless-validator-common",
- "tree_hash",
- "tree_hash_derive",
- "zeth-mpt-state 0.1.0 (git+https://github.com/eth-act/zkvm-ethereum-mpt.git?rev=0e7ec8ecccf0d00ed1b7981155433e34b8746cc5)",
 ]
 
 [[package]]
@@ -10043,31 +9898,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tree_hash"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee44f4cef85f88b4dea21c0b1f58320bdf35715cf56d840969487cff00613321"
-dependencies = [
- "alloy-primitives",
- "ethereum_hashing",
- "ethereum_ssz",
- "smallvec",
- "typenum",
-]
-
-[[package]]
-name = "tree_hash_derive"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0bee2ea1551f90040ab0e34b6fb7f2fa3bad8acc925837ac654f2c78a13e3089"
-dependencies = [
- "darling 0.20.11",
- "proc-macro2",
- "quote",
- "syn 2.0.116",
-]
-
-[[package]]
 name = "triehash"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10182,12 +10012,6 @@ name = "untrusted"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
-
-[[package]]
-name = "unty"
-version = "0.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d49784317cd0d1ee7ec5c716dd598ec5b4483ea832a2dced265471cc0f690ae"
 
 [[package]]
 name = "url"
@@ -11385,17 +11209,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "zeth-mpt"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/zkvm-ethereum-mpt.git?rev=0e7ec8ecccf0d00ed1b7981155433e34b8746cc5#0e7ec8ecccf0d00ed1b7981155433e34b8746cc5"
-dependencies = [
- "alloy-primitives",
- "alloy-rlp",
- "alloy-trie 0.8.1",
- "arrayvec",
-]
-
-[[package]]
 name = "zeth-mpt-state"
 version = "0.1.0"
 source = "git+https://github.com/eth-act/zkvm-ethereum-mpt.git?tag=v0.5.0#0e7ec8ecccf0d00ed1b7981155433e34b8746cc5"
@@ -11406,21 +11219,7 @@ dependencies = [
  "reth-trie-common",
  "revm-bytecode",
  "stateless",
- "zeth-mpt 0.1.0 (git+https://github.com/eth-act/zkvm-ethereum-mpt.git?tag=v0.5.0)",
-]
-
-[[package]]
-name = "zeth-mpt-state"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/zkvm-ethereum-mpt.git?rev=0e7ec8ecccf0d00ed1b7981155433e34b8746cc5#0e7ec8ecccf0d00ed1b7981155433e34b8746cc5"
-dependencies = [
- "alloy-primitives",
- "alloy-rlp",
- "alloy-trie 0.9.4",
- "reth-trie-common",
- "revm-bytecode",
- "stateless",
- "zeth-mpt 0.1.0 (git+https://github.com/eth-act/zkvm-ethereum-mpt.git?rev=0e7ec8ecccf0d00ed1b7981155433e34b8746cc5)",
+ "zeth-mpt",
 ]
 
 [[package]]
@@ -11442,7 +11241,7 @@ version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#c7594b42e66e84797adfb197a2f71203fb89ba70"
 dependencies = [
  "anyhow",
- "bincode 1.3.3",
+ "bincode",
  "fields",
  "libc",
  "mpi",
@@ -11520,7 +11319,7 @@ source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.1
 dependencies = [
  "anyhow",
  "asm-runner",
- "bincode 1.3.3",
+ "bincode",
  "colored",
  "executor",
  "fields",
@@ -11581,7 +11380,7 @@ version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#c7594b42e66e84797adfb197a2f71203fb89ba70"
 dependencies = [
  "anyhow",
- "bincode 1.3.3",
+ "bincode",
  "cfg-if",
  "fields",
  "getrandom 0.2.17",
