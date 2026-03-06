@@ -5,9 +5,12 @@ use std::sync::Arc;
 
 use alloy_consensus::crypto::install_default_provider;
 use crypto::CustomEvmCrypto;
-use guest::{chain_name, extract_block_info, validate_block};
 use revm::install_crypto;
-use stateless_validator_reth::guest::StatelessValidatorRethInput;
+
+use guest::{
+    chain_name, extract_block_info, get_chain_spec, validate_block_stateless, verify_signatures,
+};
+use input::{RethInputPublic, RethInputWitness};
 
 fn main() {
     #[cfg(zisk_hints)]
@@ -29,32 +32,45 @@ fn main() {
     install_crypto(CustomEvmCrypto::default());
     install_default_provider(Arc::new(CustomEvmCrypto::default())).unwrap();
 
-    // Read and deserialize input
-    let input: StatelessValidatorRethInput = ziskos::io::read();
+    // Read and deserialize the public input and the witness
+    let public: RethInputPublic = ziskos::io::read();
+    let witness: RethInputWitness = ziskos::io::read();
 
     // Get chain info
-    let chain_id = input.chain_config.chain_id;
-    let chain = chain_name(chain_id);
+    let chain_config = witness.chain_config().clone();
+    // let chain = chain_name(chain_config.chain_id);
 
-    // Extract useful information for logging
-    let (block_number, gas_used, tx_count) = extract_block_info(&input.new_payload_request);
+    // TODO:
+    // // Extract useful information for logging
+    // let (block_number, gas_used, tx_count) = extract_block_info(&input.new_payload_request);
+
+    // Get the chain spec
+    let chain_spec = get_chain_spec(chain_config);
+
+    let block = witness.block().clone();
+
+    // Verify signatures
+    let block = verify_signatures(block, chain_spec.clone(), public.public_keys)
+        .expect("Signature verification failed");
 
     // Validate the block
-    println!(
-        "Executing block validation for {} Block #{} ({} txs)",
-        chain, block_number, tx_count
-    );
-    let block_hash = validate_block(input).expect("Block validation failed");
+    // println!(
+    //     "Executing block validation for {} Block #{} ({} txs)",
+    //     chain, block_number, tx_count
+    // );
+    let execution_witness = witness.witness().clone();
+    let block_hash = validate_block_stateless(block, execution_witness, chain_spec)
+        .expect("Block validation failed");
 
     // Commit to block hash as the output
     ziskos::io::commit(&block_hash);
 
     // Print block number and calculated hash
     println!("Block validation succeeded!");
-    println!(
-        "Execution summary:\n  - Chain: {} (ID: {})\n  - Block Number: {}\n  - Block Hash: {}\n  - Transaction Count: {}\n  - Gas Consumed: {}",
-        chain, chain_id, block_number, block_hash, tx_count, gas_used
-    );
+    // println!(
+    //     "Execution summary:\n  - Chain: {} (ID: {})\n  - Block Number: {}\n  - Block Hash: {}\n  - Transaction Count: {}\n  - Gas Consumed: {}",
+    //     chain, chain_id, block_number, block_hash, tx_count, gas_used
+    // );
 
     #[cfg(zisk_hints)]
     {

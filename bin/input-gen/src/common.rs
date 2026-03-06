@@ -3,10 +3,11 @@ use rayon::iter::{ParallelBridge, ParallelIterator};
 use std::path::Path;
 use walkdir::WalkDir;
 
-use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use witness_generator::StatelessValidationFixture;
 
-use input::StatelessValidatorRethInputWitness;
+use zisk_sdk::{ZiskIO, ZiskStdin};
+
+use input::{RethInput, RethInputPublic, RethInputWitness};
 
 use crate::types::OutputFormat;
 
@@ -30,21 +31,14 @@ pub fn fixtures_from_path(path: &Path) -> Result<Vec<StatelessValidationFixture>
 }
 
 /// Generate a reth input from a fixture.
-pub fn reth_input_from_fixture(
-    fixture: &StatelessValidationFixture,
-) -> Result<StatelessValidatorRethInput> {
-    let reth_input = StatelessValidatorRethInput::new(&fixture.stateless_input, fixture.success)
-        .with_context(|| {
-            format!(
-                "Failed to create StatelessValidatorReth input for {}",
-                fixture.name
-            )
-        })?;
+pub fn reth_input_from_fixture(fixture: &StatelessValidationFixture) -> Result<RethInput> {
+    let reth_input = RethInput::new(&fixture.stateless_input)
+        .with_context(|| format!("Failed to create RethInput input for {}", fixture.name))?;
     Ok(reth_input)
 }
 
 pub fn reth_input_to_file(
-    reth_input: StatelessValidatorRethInput,
+    reth_input: RethInput,
     file_name: &str,
     output_dir: &Path,
     format: OutputFormat,
@@ -56,29 +50,31 @@ pub fn reth_input_to_file(
         OutputFormat::Json => "json",
     };
     let filename = sanitize_filename(file_name);
+    let output_path = output_dir.join(format!("{}.{}", filename, extension));
 
-    // Save public keys
-    let pk_path = output_dir.join(format!("{}.pk.{}", filename, extension));
+    let zisk_stdin = ZiskStdin::new();
+
+    // Write public
+    let public = RethInputPublic {
+        public_keys: reth_input.public_keys,
+    };
     let pk_bytes = match format {
-        OutputFormat::Binary => bincode::serialize(&reth_input.public_keys)?,
-        OutputFormat::Json => serde_json::to_vec_pretty(&reth_input.public_keys)?,
+        OutputFormat::Binary => bincode::serialize(&public)?,
+        OutputFormat::Json => serde_json::to_vec_pretty(&public)?,
     };
-    std::fs::write(&pk_path, &pk_bytes)
-        .with_context(|| format!("Failed to write public keys to {}", pk_path.display()))?;
+    zisk_stdin.write_slice(&pk_bytes);
 
-    // Save main input
-    let main_input = StatelessValidatorRethInputWitness {
-        new_payload_request: reth_input.new_payload_request,
-        witness: reth_input.witness,
-        chain_config: reth_input.chain_config,
+    // Write witness
+    let witness = RethInputWitness {
+        stateless_input: reth_input.stateless_input,
     };
-    let main_path = output_dir.join(format!("{}.wtns.{}", filename, extension));
     let main_bytes = match format {
-        OutputFormat::Binary => bincode::serialize(&main_input)?,
-        OutputFormat::Json => serde_json::to_vec_pretty(&main_input)?,
+        OutputFormat::Binary => bincode::serialize(&witness)?,
+        OutputFormat::Json => serde_json::to_vec_pretty(&witness)?,
     };
-    std::fs::write(&main_path, &main_bytes)
-        .with_context(|| format!("Failed to write main input to {}", main_path.display()))?;
+    zisk_stdin.write_slice(&main_bytes);
+
+    zisk_stdin.save(&output_path)?;
 
     Ok(())
 }

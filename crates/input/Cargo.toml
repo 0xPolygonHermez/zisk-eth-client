@@ -13,7 +13,7 @@ serde.workspace = true
 serde_with.workspace = true
 
 alloy-genesis.workspace = true
-alloy-provider = { workspace = true, features = ["debug-api", "reqwest", "reqwest-rustls-tls"] }
+alloy-provider = { workspace = true, features = ["debug-api"] }
 alloy-rpc-types-eth.workspace = true
 alloy-rpc-types-debug.workspace = true
 

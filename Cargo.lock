@@ -3354,8 +3354,12 @@ version = "0.5.0"
 dependencies = [
  "alloy-genesis",
  "alloy-primitives",
+ "alloy-rpc-types-debug",
+ "input",
  "reth-chainspec",
+ "reth-ethereum-primitives",
  "reth-evm-ethereum",
+ "reth-primitives-traits",
  "stateless",
  "stateless-validator-common",
  "stateless-validator-reth",
@@ -4015,6 +4019,7 @@ dependencies = [
  "tracing-subscriber 0.3.22",
  "walkdir",
  "witness-generator",
+ "zisk-sdk",
 ]
 
 [[package]]

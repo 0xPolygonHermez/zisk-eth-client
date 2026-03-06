@@ -1,53 +1,60 @@
 use std::sync::Arc;
 
-use alloy_genesis::Genesis;
+use alloy_genesis::{ChainConfig, Genesis};
 use alloy_primitives::B256;
+use alloy_rpc_types_debug::ExecutionWitness;
 
 use reth_chainspec::ChainSpec;
+use reth_ethereum_primitives::Block;
 use reth_evm_ethereum::EthEvmConfig;
+use reth_primitives_traits::RecoveredBlock;
 use stateless::{
     recover_block_with_public_keys, stateless_validation_recovered_with_trie,
-    validation::StatelessValidationError,
+    validation::StatelessValidationError, UncompressedPublicKey,
 };
 use zeth_mpt_state::SparseState;
 
 use stateless_validator_common::new_payload_request::NewPayloadRequest;
-use stateless_validator_reth::{
-    guest::StatelessValidatorRethInput, new_payload_request::new_payload_request_to_block,
-};
 
-/// Performs stateless validation of a block using the provided witness data.
-pub fn validate_block(
-    input: StatelessValidatorRethInput,
-) -> Result<B256, StatelessValidationError> {
-    // Build chain spec from input's chain config
-    let genesis = Genesis {
-        config: input.chain_config.clone(),
-        ..Default::default()
-    };
-    let chain_spec: Arc<ChainSpec> = Arc::new(genesis.into());
-    let evm_config = EthEvmConfig::new(chain_spec.clone());
-
-    // Convert new payload request to block
-    let block = new_payload_request_to_block(input.new_payload_request, chain_spec.clone())
-        .map_err(|err| {
-            println!("Failed to convert to reth block: {err}");
-            StatelessValidationError::Custom("Block conversion failed")
-        })?
-        .into_block();
-
+/// Verifies transaction signatures against provided public keys.
+pub fn verify_signatures(
+    block: Block,
+    chain_spec: Arc<ChainSpec>,
+    public_keys: Vec<UncompressedPublicKey>,
+) -> Result<RecoveredBlock<Block>, StatelessValidationError> {
     // Recover block with public keys while validating signatures
-    let recovered_block = recover_block_with_public_keys(block, input.public_keys, &*chain_spec)?;
+    let recovered_block = recover_block_with_public_keys(block, public_keys, &*chain_spec)?;
+
+    Ok(recovered_block)
+}
+
+/// Performs stateless validation of a block using pre-verified signatures.
+pub fn validate_block_stateless(
+    recovered_block: RecoveredBlock<Block>,
+    witness: ExecutionWitness,
+    chain_spec: Arc<ChainSpec>,
+) -> Result<B256, StatelessValidationError> {
+    // Create EVM config from chain spec
+    let evm_config = EthEvmConfig::new(chain_spec.clone());
 
     // Perform stateless validation
     let (hash, _) = stateless_validation_recovered_with_trie::<SparseState, _, _>(
         recovered_block,
-        input.witness,
+        witness,
         chain_spec,
         evm_config,
     )?;
 
     Ok(hash)
+}
+
+pub fn get_chain_spec(chain_config: ChainConfig) -> Arc<ChainSpec> {
+    // Build chain spec from chain config
+    let genesis = Genesis {
+        config: chain_config,
+        ..Default::default()
+    };
+    Arc::new(genesis.into())
 }
 
 /// Get chain name from chain ID

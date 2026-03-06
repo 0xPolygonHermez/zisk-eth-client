@@ -32,6 +32,7 @@ alloy-rpc-types-debug = "1.7.3"
 # reth
 reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
+reth-primitives-traits = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 

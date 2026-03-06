@@ -16,8 +16,9 @@ use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_api::{DebugApiClient, EthApiClient};
 use stateless::StatelessInput;
 
-use stateless_validator_reth::guest::StatelessValidatorRethInput;
 use witness_generator::StatelessValidationFixture;
+
+use input::RethInput;
 
 use crate::{
     common::{reth_input_from_fixture, reth_input_to_file},
@@ -273,7 +274,7 @@ async fn fetch_and_generate_input(
     block_num: u64,
     chain_config: &ChainConfig,
     chain_name: &str,
-) -> Result<(StatelessValidatorRethInput, String)> {
+) -> Result<(RethInput, String)> {
     // Fetch the execution witness using debug_execution_witness
     let witness =
         DebugApiClient::<()>::debug_execution_witness(client, BlockNumberOrTag::Number(block_num))

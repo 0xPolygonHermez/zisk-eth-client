@@ -8,29 +8,57 @@ use tracing::debug;
 use alloy_genesis::ChainConfig;
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
 use alloy_rpc_types_debug::ExecutionWitness;
-use alloy_rpc_types_eth::Block;
+use alloy_rpc_types_eth::Block as RpcBlock;
 
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
-use reth_ethereum_primitives::TransactionSigned;
+use reth_ethereum_primitives::{Block, TransactionSigned};
 
 use stateless::{StatelessInput, UncompressedPublicKey};
 
-use stateless_validator_common::new_payload_request::NewPayloadRequest;
-use stateless_validator_reth::guest::StatelessValidatorRethInput;
-
 #[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StatelessValidatorRethInputWitness {
-    /// New payload request data.
-    pub new_payload_request: NewPayloadRequest,
-    /// Execution witness for the EL block.
-    pub witness: ExecutionWitness,
-    /// Chain configuration for the stateless validation function
-    #[serde_as(as = "alloy_genesis::serde_bincode_compat::ChainConfig<'_>")]
-    pub chain_config: ChainConfig,
+pub struct RethInput {
+    /// The stateless input for the stateless validation function.
+    pub stateless_input: StatelessInput,
+    /// The recovered signers for the transactions in the block.
+    pub public_keys: Vec<UncompressedPublicKey>,
 }
 
-impl StatelessValidatorRethInputWitness {
+impl RethInput {
+    pub fn new(stateless_input: &StatelessInput) -> anyhow::Result<Self> {
+        let signers = recover_signers(&stateless_input.block.body.transactions)?;
+
+        Ok(Self {
+            stateless_input: stateless_input.clone(),
+            public_keys: signers,
+        })
+    }
+}
+
+/// Wrapper for witness part (StatelessInput without public keys)
+#[serde_as]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RethInputWitness {
+    /// The stateless input (block, witness, chain_config)
+    pub stateless_input: StatelessInput,
+}
+
+impl RethInputWitness {
+    /// Get the block
+    pub fn block(&self) -> &Block {
+        &self.stateless_input.block
+    }
+
+    /// Get the execution witness
+    pub fn witness(&self) -> &ExecutionWitness {
+        &self.stateless_input.witness
+    }
+
+    /// Get the chain config
+    pub fn chain_config(&self) -> &ChainConfig {
+        &self.stateless_input.chain_config
+    }
+
     /// Fetch witness data from RPC
     pub async fn from_rpc(rpc_url: &str, block_number: u64) -> Result<Self> {
         let provider = connect_provider(rpc_url).await?;
@@ -48,16 +76,11 @@ impl StatelessValidatorRethInputWitness {
 
         let stateless_input = StatelessInput {
             block: block.into(),
-            witness: witness.clone(),
-            chain_config: chain_config.clone(),
-        };
-        let reth_input = reth_input_from_stateless(&stateless_input, true)?;
-
-        Ok(Self {
-            new_payload_request: reth_input.new_payload_request,
             witness,
             chain_config,
-        })
+        };
+
+        Ok(Self { stateless_input })
     }
 
     /// Serialize to bytes
@@ -70,14 +93,14 @@ impl StatelessValidatorRethInputWitness {
         bincode::deserialize(bytes).context("Failed to deserialize witness")
     }
 }
-
+#[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StatelessValidatorRethInputPk {
+pub struct RethInputPublic {
     /// The recovered signers for the transactions in the block.
     pub public_keys: Vec<UncompressedPublicKey>,
 }
 
-impl StatelessValidatorRethInputPk {
+impl RethInputPublic {
     /// Fetch and recover public keys from RPC
     pub async fn from_rpc(rpc_url: &str, block_number: u64) -> Result<Self> {
         let provider = connect_provider(rpc_url).await?;
@@ -87,31 +110,25 @@ impl StatelessValidatorRethInputPk {
     /// Fetch and recover public keys using an existing provider
     pub async fn from_provider<P: Provider>(provider: &P, block_number: u64) -> Result<Self> {
         let block = fetch_block(provider, block_number).await?;
-        Self::from_block(&block)
+        let public_keys = Self::public_keys_from_block(&block)?;
+
+        Ok(Self { public_keys })
     }
 
     /// Recover public keys from a block
-    pub fn from_block(block: &Block) -> Result<Self> {
+    fn public_keys_from_block(block: &RpcBlock) -> Result<Vec<UncompressedPublicKey>> {
         let txs: Vec<TransactionSigned> = block
             .transactions
             .txns()
             .map(|tx| TransactionSigned::from(tx.clone()))
             .collect();
 
-        let public_keys = recover_signers(&txs)?;
-        Ok(Self { public_keys })
+        recover_signers(&txs)
     }
 
     /// Serialize to bytes
     pub fn to_bytes(&self) -> Result<Vec<u8>> {
         bincode::serialize(&self.public_keys).context("Failed to serialize public keys")
-    }
-
-    /// Deserialize from bytes
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        let public_keys =
-            bincode::deserialize(bytes).context("Failed to deserialize public keys")?;
-        Ok(Self { public_keys })
     }
 
     /// Number of public keys
@@ -125,26 +142,6 @@ impl StatelessValidatorRethInputPk {
     }
 }
 
-/// Fetch full input from RPC
-pub async fn reth_input_from_rpc(
-    rpc_url: &str,
-    block_number: u64,
-) -> Result<StatelessValidatorRethInput> {
-    let provider = connect_provider(rpc_url).await?;
-
-    let block = fetch_block(&provider, block_number).await?;
-    let witness = fetch_witness(&provider, block_number).await?;
-    let chain_config = fetch_chain_config(&provider).await?;
-
-    let stateless_input = StatelessInput {
-        block: block.into(),
-        witness: witness.clone(),
-        chain_config: chain_config.clone(),
-    };
-
-    reth_input_from_stateless(&stateless_input, true)
-}
-
 async fn connect_provider(rpc_url: &str) -> Result<impl Provider + DebugApi> {
     let start_rpc_connect = Instant::now();
     let provider = ProviderBuilder::new()
@@ -156,7 +153,7 @@ async fn connect_provider(rpc_url: &str) -> Result<impl Provider + DebugApi> {
     Ok(provider)
 }
 
-async fn fetch_block<P: Provider>(provider: &P, block_number: u64) -> Result<Block> {
+async fn fetch_block<P: Provider>(provider: &P, block_number: u64) -> Result<RpcBlock> {
     let start_block_fetch = Instant::now();
     let block = provider
         .get_block(block_number.into())
@@ -191,31 +188,19 @@ async fn fetch_witness<P: Provider + DebugApi>(
 async fn fetch_chain_config<P: Provider>(provider: &P) -> Result<ChainConfig> {
     let start_chain_config_fetch = Instant::now();
     let chain_id = provider.get_chain_id().await?;
-    let chain_config = get_chain_config(chain_id)?;
+
+    let chain = Chain::from_id(chain_id);
+    let chain_config = match chain.named() {
+        Some(NamedChain::Mainnet) => mainnet_chain_config(),
+        Some(NamedChain::Sepolia) => SEPOLIA.genesis.config.clone(),
+        Some(NamedChain::Hoodi) => HOODI.genesis.config.clone(),
+        Some(NamedChain::Holesky) => HOLESKY.genesis.config.clone(),
+        _ => anyhow::bail!("Unsupported chain ID: {}", chain_id),
+    };
+
     let time_chain_config_fetch = start_chain_config_fetch.elapsed();
     debug!("Chain config fetch time: {:?}", time_chain_config_fetch);
     Ok(chain_config)
-}
-
-/// Get chain config and name from chain ID
-fn get_chain_config(chain_id: u64) -> Result<ChainConfig> {
-    let chain = Chain::from_id(chain_id);
-    match chain.named() {
-        Some(NamedChain::Mainnet) => Ok(mainnet_chain_config()),
-        Some(NamedChain::Sepolia) => Ok(SEPOLIA.genesis.config.clone()),
-        Some(NamedChain::Hoodi) => Ok(HOODI.genesis.config.clone()),
-        Some(NamedChain::Holesky) => Ok(HOLESKY.genesis.config.clone()),
-        _ => anyhow::bail!("Unsupported chain ID: {}", chain_id),
-    }
-}
-
-/// Generate reth input from a StatelessInput
-fn reth_input_from_stateless(
-    stateless_input: &StatelessInput,
-    success: bool,
-) -> Result<StatelessValidatorRethInput> {
-    StatelessValidatorRethInput::new(stateless_input, success)
-        .context("Failed to create StatelessValidatorRethInput")
 }
 
 // Recovers the signing [`UncompressedPublicKey`] from each transaction's signature, in parallel.
@@ -237,4 +222,21 @@ fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<UncompressedPublicKe
             Ok(UncompressedPublicKey(encoded_point))
         })
         .collect()
+}
+
+/// Fetch full input from RPC
+pub async fn reth_input_from_rpc(rpc_url: &str, block_number: u64) -> Result<RethInput> {
+    let provider = connect_provider(rpc_url).await?;
+
+    let block = fetch_block(&provider, block_number).await?;
+    let witness = fetch_witness(&provider, block_number).await?;
+    let chain_config = fetch_chain_config(&provider).await?;
+
+    let stateless_input = StatelessInput {
+        block: block.into(),
+        witness: witness.clone(),
+        chain_config: chain_config.clone(),
+    };
+
+    RethInput::new(&stateless_input).context("Failed to create RethInput")
 }

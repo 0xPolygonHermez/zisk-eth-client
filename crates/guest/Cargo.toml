@@ -5,10 +5,15 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+input.workspace = true
+
 alloy-primitives.workspace = true
 alloy-genesis.workspace = true
+alloy-rpc-types-debug.workspace = true
 
 reth-chainspec.workspace = true
+reth-ethereum-primitives.workspace = true
+reth-primitives-traits.workspace = true
 reth-evm-ethereum.workspace = true
 
 zeth-mpt-state.workspace = true
