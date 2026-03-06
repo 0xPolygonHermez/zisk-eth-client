@@ -9,7 +9,7 @@ use crate::{
 };
 
 /// Process EEST (Ethereum Execution Specification Tests) to generate reth inputs.
-pub async fn reth_input_files_from_tests(
+pub async fn reth_input_files_from_eest(
     tag: Option<String>,
     include: Option<Vec<String>>,
     exclude: Option<Vec<String>>,

@@ -24,11 +24,13 @@ use crate::{
     types::OutputFormat,
 };
 
+#[allow(clippy::too_many_arguments)]
 pub async fn reth_input_files_from_rpc(
     rpc_url: &str,
     rpc_headers: Option<Vec<String>>,
     block: Option<u64>,
     last_n_blocks: Option<usize>,
+    range_of_blocks: Option<Vec<u64>>,
     follow: bool,
     output: &Path,
     format: OutputFormat,
@@ -43,14 +45,27 @@ pub async fn reth_input_files_from_rpc(
         chain_name, chain_config.chain_id
     );
 
+    // If follow is enabled, continuously listen for new blocks.
     if follow {
         return follow_new_blocks(&client, &chain_config, chain_name, output, format).await;
     }
 
-    // Determine which blocks to fetch
+    // Otherwise, process specified blocks.
     let block_numbers: Vec<u64> = if let Some(block_num) = block {
+        // Single block
         vec![block_num]
+    } else if let Some(range) = range_of_blocks {
+        // Range of blocks
+        if range.len() != 2 {
+            anyhow::bail!("Range requires exactly 2 values: START and END");
+        }
+        let (start, end) = (range[0], range[1]);
+        if start > end {
+            anyhow::bail!("Range START ({}) must be <= END ({})", start, end);
+        }
+        (start..=end).collect()
     } else {
+        // Last N blocks (default: 1)
         let n = last_n_blocks.unwrap_or(1);
         if n == 0 {
             info!("No blocks to process (last_n_blocks = 0)");

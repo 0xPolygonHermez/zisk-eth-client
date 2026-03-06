@@ -9,7 +9,7 @@ use std::path::PathBuf;
 use tracing_subscriber::EnvFilter;
 
 use rpc::reth_input_files_from_rpc;
-use tests::reth_input_files_from_tests;
+use tests::reth_input_files_from_eest;
 use types::OutputFormat;
 
 #[derive(Parser)]
@@ -32,8 +32,8 @@ struct Cli {
 
 #[derive(Subcommand, Clone, Debug)]
 enum SourceCommand {
-    /// Generate inputs from execution specification tests (EEST)
-    Tests {
+    /// Generate inputs from Ethereum Execution Specification Tests (EEST)
+    Eest {
         /// EEST release tag to use (e.g., "v0.1.0"). If empty, the latest release will be used.
         #[arg(short, long, conflicts_with = "eest_fixtures_path")]
         tag: Option<String>,
@@ -44,11 +44,11 @@ enum SourceCommand {
 
         /// Include only test names containing the provided strings.
         #[arg(short, long)]
-        include: Option<Vec<String>>,
+        includes: Option<Vec<String>>,
 
         /// Exclude all test names containing the provided strings.
         #[arg(short, long)]
-        exclude: Option<Vec<String>>,
+        excludes: Option<Vec<String>>,
 
         /// Number of threads for parallel processing (default: all available)
         #[arg(long, default_value = "10")]
@@ -66,15 +66,19 @@ enum SourceCommand {
         rpc_headers: Option<Vec<String>>,
 
         /// Specific block number to fetch
-        #[arg(long, conflicts_with_all = ["last_n_blocks", "follow"])]
+        #[arg(long, group = "block_selection")]
         block: Option<u64>,
 
         /// Number of last blocks to fetch
-        #[arg(long, conflicts_with_all = ["block", "follow"])]
+        #[arg(long, group = "block_selection")]
         last_n_blocks: Option<usize>,
 
+        /// Fetch blocks in a range (inclusive)
+        #[arg(long, num_args = 2, value_names = ["START", "END"], group = "block_selection")]
+        range_of_blocks: Option<Vec<u64>>,
+
         /// Listen for new blocks
-        #[arg(long, default_value_t = false, conflicts_with_all = ["last_n_blocks", "block"])]
+        #[arg(long, default_value_t = false, group = "block_selection")]
         follow: bool,
     },
 }
@@ -92,17 +96,17 @@ async fn main() -> Result<()> {
         .with_context(|| format!("Failed to create output folder: {}", cli.output.display()))?;
 
     match cli.source {
-        SourceCommand::Tests {
+        SourceCommand::Eest {
             tag,
-            include,
-            exclude,
+            includes,
+            excludes,
             eest_fixtures_path,
             threads,
         } => {
-            reth_input_files_from_tests(
+            reth_input_files_from_eest(
                 tag,
-                include,
-                exclude,
+                includes,
+                excludes,
                 eest_fixtures_path,
                 &cli.output,
                 cli.format,
@@ -116,6 +120,7 @@ async fn main() -> Result<()> {
             rpc_headers,
             block,
             last_n_blocks,
+            range_of_blocks,
             follow,
         } => {
             reth_input_files_from_rpc(
@@ -123,6 +128,7 @@ async fn main() -> Result<()> {
                 rpc_headers,
                 block,
                 last_n_blocks,
+                range_of_blocks,
                 follow,
                 &cli.output,
                 cli.format,
