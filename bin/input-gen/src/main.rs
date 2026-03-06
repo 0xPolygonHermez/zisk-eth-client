@@ -44,11 +44,11 @@ enum SourceCommand {
 
         /// Include only test names containing the provided strings.
         #[arg(short, long)]
-        includes: Option<Vec<String>>,
+        include: Option<Vec<String>>,
 
         /// Exclude all test names containing the provided strings.
         #[arg(short, long)]
-        excludes: Option<Vec<String>>,
+        exclude: Option<Vec<String>>,
 
         /// Number of threads for parallel processing (default: all available)
         #[arg(long, default_value = "10")]
@@ -98,15 +98,15 @@ async fn main() -> Result<()> {
     match cli.source {
         SourceCommand::Eest {
             tag,
-            includes,
-            excludes,
+            include,
+            exclude,
             eest_fixtures_path,
             threads,
         } => {
             reth_input_files_from_eest(
                 tag,
-                includes,
-                excludes,
+                include,
+                exclude,
                 eest_fixtures_path,
                 &cli.output,
                 cli.format,

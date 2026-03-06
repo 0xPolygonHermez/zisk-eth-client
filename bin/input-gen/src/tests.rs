@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use rayon::ThreadPoolBuilder;
 use std::path::{Path, PathBuf};
 use tracing::{info, warn};
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
@@ -19,7 +20,10 @@ pub async fn reth_input_files_from_eest(
     num_threads: Option<usize>,
 ) -> Result<()> {
     if let Some(threads) = num_threads {
-        std::env::set_var("RAYON_NUM_THREADS", threads.to_string());
+        ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build_global()
+            .expect("Failed to build global Rayon thread pool");
     }
 
     let mut builder = EESTFixtureGeneratorBuilder::default();

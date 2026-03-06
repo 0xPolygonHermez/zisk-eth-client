@@ -23,13 +23,10 @@ ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-de
 
 # alloy
 alloy-consensus = { version = "1.7.3", default-features = false }
+alloy-primitives = { version = "1.5.6", features = ["native-keccak"] } # Needed for ZisK-accelerated keccak
 
 # revm
 revm = { version = "34.0.0", default-features = false }
-
-[patch.crates-io]
-# This patch removes "ring" as a dependency, that is not compatible with the ZisK toolchain
-ethereum_hashing = { git = "https://github.com/jsign/ethereum_hashing", rev = "08c88633b700d7447ef840d19ce7b369c44311de" }
 
 # Needed for deterministic Hashmap sort
 alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.27.3" }

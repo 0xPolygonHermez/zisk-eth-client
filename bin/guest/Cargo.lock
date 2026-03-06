@@ -164,6 +164,27 @@ dependencies = [
 [[package]]
 name = "alloy-evm"
 version = "0.27.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b991c370ce44e70a3a9e474087e3d65e42e66f967644ad729dc4cec09a21fd09"
+dependencies = [
+ "alloy-consensus",
+ "alloy-eips",
+ "alloy-hardforks",
+ "alloy-primitives",
+ "alloy-rpc-types-engine",
+ "alloy-rpc-types-eth",
+ "alloy-sol-types",
+ "auto_impl",
+ "derive_more",
+ "op-alloy",
+ "op-revm",
+ "revm",
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "alloy-evm"
+version = "0.27.3"
 source = "git+https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git?branch=zisk-hints%2Fv0.27.3#f61d14215cb4d727d13a6b75d2f3f91595c0bf3e"
 dependencies = [
  "alloy-consensus",
@@ -1097,16 +1118,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bincode"
-version = "2.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36eaf5d7b090263e8150820482d5d93cd964a81e4019913c972f4edcc6edb740"
-dependencies = [
- "serde",
- "unty",
-]
-
-[[package]]
 name = "bindgen"
 version = "0.69.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1942,23 +1953,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
-name = "ere-io"
-version = "0.3.0"
-source = "git+https://github.com/eth-act/ere?tag=v0.3.0#ffc0e230cf4387fb22eb755f0fb323b38294520f"
-dependencies = [
- "bincode 2.0.1",
- "serde",
-]
-
-[[package]]
-name = "ere-platform-trait"
-version = "0.3.0"
-source = "git+https://github.com/eth-act/ere?tag=v0.3.0#ffc0e230cf4387fb22eb755f0fb323b38294520f"
-dependencies = [
- "digest 0.10.7",
-]
-
-[[package]]
 name = "errno"
 version = "0.3.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1966,15 +1960,6 @@ checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "ethereum_hashing"
-version = "0.7.0"
-source = "git+https://github.com/jsign/ethereum_hashing?rev=08c88633b700d7447ef840d19ce7b369c44311de#08c88633b700d7447ef840d19ce7b369c44311de"
-dependencies = [
- "cpufeatures",
- "sha2",
 ]
 
 [[package]]
@@ -2308,7 +2293,7 @@ dependencies = [
  "alloy-primitives",
  "alloy-rpc-types-debug",
  "anyhow",
- "bincode 1.3.3",
+ "bincode",
  "rayon",
  "reth-chainspec",
  "reth-ethereum-primitives",
@@ -2317,19 +2302,7 @@ dependencies = [
  "serde",
  "serde_with",
  "stateless",
- "stateless-validator-common",
- "stateless-validator-reth",
  "zeth-mpt-state",
-]
-
-[[package]]
-name = "guest"
-version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
-dependencies = [
- "ere-io",
- "ere-platform-trait",
- "sha2",
 ]
 
 [[package]]
@@ -3551,7 +3524,7 @@ name = "proofman"
 version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0#957aec4718875a62824837da0c29726a8bc90c9b"
 dependencies = [
- "bincode 1.3.3",
+ "bincode",
  "blake3",
  "borsh",
  "bytemuck",
@@ -3587,7 +3560,7 @@ name = "proofman-common"
 version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0#957aec4718875a62824837da0c29726a8bc90c9b"
 dependencies = [
- "bincode 1.3.3",
+ "bincode",
  "borsh",
  "bytemuck",
  "colored",
@@ -3651,7 +3624,7 @@ name = "proofman-util"
 version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0#957aec4718875a62824837da0c29726a8bc90c9b"
 dependencies = [
- "bincode 1.3.3",
+ "bincode",
  "bytemuck",
  "colored",
  "serde",
@@ -3953,7 +3926,7 @@ dependencies = [
  "alloy-chains",
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm",
+ "alloy-evm 0.27.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "alloy-genesis",
  "alloy-primitives",
  "alloy-trie 0.9.4",
@@ -4084,7 +4057,7 @@ source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8b
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm",
+ "alloy-evm 0.27.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "alloy-primitives",
  "auto_impl",
  "derive_more",
@@ -4106,7 +4079,7 @@ source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8b
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm",
+ "alloy-evm 0.27.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "alloy-primitives",
  "alloy-rpc-types-engine",
  "derive_more",
@@ -4125,7 +4098,7 @@ name = "reth-execution-errors"
 version = "1.11.0"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
- "alloy-evm",
+ "alloy-evm 0.27.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "alloy-primitives",
  "alloy-rlp",
  "nybbles 0.4.8",
@@ -4140,7 +4113,7 @@ source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8b
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm",
+ "alloy-evm 0.27.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "alloy-primitives",
  "derive_more",
  "reth-ethereum-primitives",
@@ -4162,16 +4135,6 @@ dependencies = [
  "serde_with",
  "thiserror 2.0.18",
  "url",
-]
-
-[[package]]
-name = "reth-payload-validator"
-version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
-dependencies = [
- "alloy-consensus",
- "alloy-rpc-types-engine",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
 ]
 
 [[package]]
@@ -5139,22 +5102,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ssz_types"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75b55bedc9a18ed2860a46d6beb4f4082416ee1d60be0cc364cebdcdddc7afd4"
-dependencies = [
- "ethereum_serde_utils",
- "ethereum_ssz",
- "itertools 0.13.0",
- "serde",
- "serde_derive",
- "smallvec",
- "tree_hash",
- "typenum",
-]
-
-[[package]]
 name = "stable_deref_trait"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5186,55 +5133,6 @@ dependencies = [
  "serde",
  "serde_with",
  "thiserror 2.0.18",
-]
-
-[[package]]
-name = "stateless-validator-common"
-version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
-dependencies = [
- "anyhow",
- "ethereum_ssz",
- "ethereum_ssz_derive",
- "serde",
- "serde_with",
- "sha2",
- "ssz_types",
- "tree_hash",
- "tree_hash_derive",
- "typenum",
-]
-
-[[package]]
-name = "stateless-validator-reth"
-version = "0.5.0"
-source = "git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a#40006b91edcf0b73f021988f982aea0bbec5039a"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-genesis",
- "alloy-primitives",
- "alloy-rlp",
- "alloy-rpc-types-engine",
- "anyhow",
- "ere-io",
- "ethereum_ssz",
- "guest 0.5.0 (git+https://github.com/eth-act/ere-guests.git?rev=40006b91edcf0b73f021988f982aea0bbec5039a)",
- "once_cell",
- "reth-chainspec",
- "reth-ethereum-primitives",
- "reth-evm-ethereum",
- "reth-payload-validator",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
- "serde",
- "serde_with",
- "sha2",
- "ssz_types",
- "stateless",
- "stateless-validator-common",
- "tree_hash",
- "tree_hash_derive",
- "zeth-mpt-state",
 ]
 
 [[package]]
@@ -5698,31 +5596,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tree_hash"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee44f4cef85f88b4dea21c0b1f58320bdf35715cf56d840969487cff00613321"
-dependencies = [
- "alloy-primitives",
- "ethereum_hashing",
- "ethereum_ssz",
- "smallvec",
- "typenum",
-]
-
-[[package]]
-name = "tree_hash_derive"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0bee2ea1551f90040ab0e34b6fb7f2fa3bad8acc925837ac654f2c78a13e3089"
-dependencies = [
- "darling 0.20.11",
- "proc-macro2",
- "quote",
- "syn 2.0.114",
-]
-
-[[package]]
 name = "typenum"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5781,12 +5654,6 @@ name = "untrusted"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
-
-[[package]]
-name = "unty"
-version = "0.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d49784317cd0d1ee7ec5c716dd598ec5b4483ea832a2dced265471cc0f690ae"
 
 [[package]]
 name = "url"
@@ -6436,8 +6303,10 @@ name = "zec-reth"
 version = "0.1.0"
 dependencies = [
  "alloy-consensus",
+ "alloy-evm 0.27.3 (git+https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git?branch=zisk-hints%2Fv0.27.3)",
+ "alloy-primitives",
  "crypto",
- "guest 0.5.0",
+ "guest",
  "revm",
  "ziskos",
 ]
@@ -6568,7 +6437,7 @@ version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#e59f12b322f93977fe2e486de889b6de5f7b3080"
 dependencies = [
  "anyhow",
- "bincode 1.3.3",
+ "bincode",
  "fields",
  "libc",
  "mpi",
@@ -6618,7 +6487,7 @@ version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#e59f12b322f93977fe2e486de889b6de5f7b3080"
 dependencies = [
  "anyhow",
- "bincode 1.3.3",
+ "bincode",
  "bytes",
  "cfg-if",
  "ctor",
@@ -6647,7 +6516,7 @@ version = "0.16.0"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#e59f12b322f93977fe2e486de889b6de5f7b3080"
 dependencies = [
  "anyhow",
- "bincode 1.3.3",
+ "bincode",
  "cfg-if",
  "fields",
  "getrandom 0.2.17",

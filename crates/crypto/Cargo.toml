@@ -11,7 +11,7 @@ tiny-keccak.workspace = true
 revm.workspace = true
 
 alloy-consensus = { workspace = true, default-features = false, features = ["crypto-backend", "k256"] }
-alloy-primitives = { workspace = true, features = ["native-keccak"] }
+alloy-primitives.workspace = true
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_vendor, values("zisk"))', 'cfg(zisk_hints)', 'cfg(zisk_hints_debug)'] }
