@@ -10,7 +10,7 @@ edition = "2021"
 [workspace.dependencies]
 guest = { path = "crates/guest" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/input-stream" }
 # local dev
 # zisk-sdk = { path = "../zisk/sdk" }
 

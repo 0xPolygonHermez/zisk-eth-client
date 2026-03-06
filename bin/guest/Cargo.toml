@@ -17,7 +17,7 @@ panic = "abort"
 crypto = { path = "../../crates/crypto" }
 guest = { path = "../../crates/guest" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/input-stream" }
 # Local development
 # ziskos = { path = "../../../zisk/ziskos/entrypoint" }
 

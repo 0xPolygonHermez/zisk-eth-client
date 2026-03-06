@@ -34,9 +34,7 @@ fn main() {
 
     // Read and deserialize the public input and the witness
     let public: RethInputPublic = ziskos::io::read();
-    println!("HEY");
     let witness: RethInputWitness = ziskos::io::read();
-    println!("HOY");
 
     // Get chain config
     let chain_config = witness.chain_config().clone();
