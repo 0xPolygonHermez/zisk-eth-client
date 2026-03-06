@@ -5,7 +5,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-input.workspace = true
+guest.workspace = true
 
 zisk-sdk.workspace = true
 
@@ -17,7 +17,7 @@ reth-chainspec.workspace = true
 reth-ethereum-primitives.workspace = true
 reth-rpc-api = { workspace = true, features = ["client"]}
 
-stateless.workspace = true
+stateless-reth.workspace = true
 
 stateless-validator-reth = { workspace = true, features = ["host"] }
 witness-generator.workspace = true

@@ -1,96 +1,116 @@
-use std::sync::Arc;
+use anyhow::{anyhow, Context, Result};
+use rayon::prelude::*;
+use serde::{Deserialize, Serialize};
+use serde_with::serde_as;
 
-use alloy_genesis::{ChainConfig, Genesis};
-use alloy_primitives::B256;
+use alloy_genesis::ChainConfig;
 use alloy_rpc_types_debug::ExecutionWitness;
 
-use reth_chainspec::ChainSpec;
-use reth_ethereum_primitives::Block;
-use reth_evm_ethereum::EthEvmConfig;
-use reth_primitives_traits::RecoveredBlock;
-use stateless::{
-    recover_block_with_public_keys, stateless_validation_recovered_with_trie,
-    validation::StatelessValidationError, UncompressedPublicKey,
-};
-use zeth_mpt_state::SparseState;
+use reth_ethereum_primitives::{Block, TransactionSigned};
+use stateless_reth::{StatelessInput, UncompressedPublicKey};
 
-use stateless_validator_common::new_payload_request::NewPayloadRequest;
+mod utils;
+mod validation;
 
-/// Verifies transaction signatures against provided public keys.
-pub fn verify_signatures(
-    block: Block,
-    chain_spec: Arc<ChainSpec>,
-    public_keys: Vec<UncompressedPublicKey>,
-) -> Result<RecoveredBlock<Block>, StatelessValidationError> {
-    // Recover block with public keys while validating signatures
-    let recovered_block = recover_block_with_public_keys(block, public_keys, &*chain_spec)?;
+pub use utils::*;
+pub use validation::*;
 
-    Ok(recovered_block)
+#[serde_as]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RethInput {
+    /// The stateless input for the stateless validation function.
+    pub stateless_input: StatelessInput,
+    /// The recovered signers for the transactions in the block.
+    pub public_keys: Vec<UncompressedPublicKey>,
 }
 
-/// Performs stateless validation of a block using pre-verified signatures.
-pub fn validate_block_stateless(
-    recovered_block: RecoveredBlock<Block>,
-    witness: ExecutionWitness,
-    chain_spec: Arc<ChainSpec>,
-) -> Result<B256, StatelessValidationError> {
-    // Create EVM config from chain spec
-    let evm_config = EthEvmConfig::new(chain_spec.clone());
+impl RethInput {
+    pub fn new(stateless_input: &StatelessInput) -> anyhow::Result<Self> {
+        let signers = recover_signers(&stateless_input.block.body.transactions)?;
 
-    // Perform stateless validation
-    let (hash, _) = stateless_validation_recovered_with_trie::<SparseState, _, _>(
-        recovered_block,
-        witness,
-        chain_spec,
-        evm_config,
-    )?;
-
-    Ok(hash)
-}
-
-pub fn get_chain_spec(chain_config: ChainConfig) -> Arc<ChainSpec> {
-    // Build chain spec from chain config
-    let genesis = Genesis {
-        config: chain_config,
-        ..Default::default()
-    };
-    Arc::new(genesis.into())
-}
-
-/// Get chain name from chain ID
-pub fn chain_name(chain_id: u64) -> &'static str {
-    match chain_id {
-        0x1 => "Mainnet",
-        0xaa36a7 => "Sepolia",
-        0x4268 => "Holesky",
-        0x5 => "Goerli",
-        _ => "Unknown",
-        // Add more chain IDs as needed
+        Ok(Self {
+            stateless_input: stateless_input.clone(),
+            public_keys: signers,
+        })
     }
 }
 
-/// Extract common execution payload information across forks.
-pub fn extract_block_info(req: &NewPayloadRequest) -> (u64, u64, usize) {
-    match req {
-        NewPayloadRequest::Bellatrix(r) => (
-            r.execution_payload.block_number,
-            r.execution_payload.gas_used,
-            r.execution_payload.transactions.len(),
-        ),
-        NewPayloadRequest::Capella(r) => (
-            r.execution_payload.block_number,
-            r.execution_payload.gas_used,
-            r.execution_payload.transactions.len(),
-        ),
-        NewPayloadRequest::Deneb(r) => (
-            r.execution_payload.block_number,
-            r.execution_payload.gas_used,
-            r.execution_payload.transactions.len(),
-        ),
-        NewPayloadRequest::ElectraFulu(r) => (
-            r.execution_payload.block_number,
-            r.execution_payload.gas_used,
-            r.execution_payload.transactions.len(),
-        ),
+/// Wrapper for witness part (StatelessInput without public keys)
+#[serde_as]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RethInputWitness {
+    /// The stateless input (block, witness, chain_config)
+    pub stateless_input: StatelessInput,
+}
+
+impl RethInputWitness {
+    /// Get the block
+    pub fn block(&self) -> &Block {
+        &self.stateless_input.block
     }
+
+    /// Get the execution witness
+    pub fn witness(&self) -> &ExecutionWitness {
+        &self.stateless_input.witness
+    }
+
+    /// Get the chain config
+    pub fn chain_config(&self) -> &ChainConfig {
+        &self.stateless_input.chain_config
+    }
+
+    /// Serialize to bytes
+    pub fn to_bytes(&self) -> Result<Vec<u8>> {
+        bincode::serialize(self).context("Failed to serialize witness")
+    }
+
+    /// Deserialize from bytes
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        bincode::deserialize(bytes).context("Failed to deserialize witness")
+    }
+}
+
+#[serde_as]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RethInputPublic {
+    /// The recovered signers for the transactions in the block.
+    pub public_keys: Vec<UncompressedPublicKey>,
+}
+
+impl RethInputPublic {
+    /// Get the public keys
+    pub fn public_keys(&self) -> &Vec<UncompressedPublicKey> {
+        &self.public_keys
+    }
+
+    /// Serialize to bytes
+    pub fn to_bytes(&self) -> Result<Vec<u8>> {
+        bincode::serialize(&self.public_keys).context("Failed to serialize public keys")
+    }
+
+    /// Deserialize from bytes
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        bincode::deserialize(bytes).context("Failed to deserialize public keys")
+    }
+}
+
+// Recovers the signing [`UncompressedPublicKey`] from each transaction's signature, in parallel.
+pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<UncompressedPublicKey>> {
+    txs.par_iter()
+        .enumerate()
+        .map(|(i, tx)| {
+            let keys = tx
+                .signature()
+                .recover_from_prehash(&tx.signature_hash())
+                .with_context(|| format!("Failed to recover signature for tx #{i}"))?;
+
+            let encoded_point: [u8; 65] = keys
+                .to_encoded_point(false)
+                .as_bytes()
+                .try_into()
+                .map_err(|e| anyhow!("Failed to encode public key for tx #{i}, error: {e}"))?;
+
+            Ok(UncompressedPublicKey(encoded_point))
+        })
+        .collect()
 }

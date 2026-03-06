@@ -14,11 +14,11 @@ use tracing::{info, warn};
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
 use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_api::{DebugApiClient, EthApiClient};
-use stateless::StatelessInput;
+use stateless_reth::StatelessInput;
 
 use witness_generator::StatelessValidationFixture;
 
-use input::RethInput;
+use guest::RethInput;
 
 use crate::{
     common::{reth_input_from_fixture, reth_input_to_file},

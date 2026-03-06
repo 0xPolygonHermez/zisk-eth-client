@@ -16,7 +16,6 @@ panic = "abort"
 # local
 crypto = { path = "../../crates/crypto" }
 guest = { path = "../../crates/guest" }
-input = { path = "../../crates/input" }
 
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
 # Local development

@@ -8,9 +8,9 @@ use crypto::CustomEvmCrypto;
 use revm::install_crypto;
 
 use guest::{
-    chain_name, extract_block_info, get_chain_spec, validate_block_stateless, verify_signatures,
+    RethInputPublic, RethInputWitness, extract_block_info, get_chain_name, get_chain_spec,
+    validate_block_stateless, verify_signatures,
 };
-use input::{RethInputPublic, RethInputWitness};
 
 fn main() {
     #[cfg(zisk_hints)]
@@ -38,14 +38,14 @@ fn main() {
 
     // Get chain info
     let chain_config = witness.chain_config().clone();
-    // let chain = chain_name(chain_config.chain_id);
+    // let chain = get_chain_name(chain_config.chain_id);
 
     // TODO:
     // // Extract useful information for logging
     // let (block_number, gas_used, tx_count) = extract_block_info(&input.new_payload_request);
 
     // Get the chain spec
-    let chain_spec = get_chain_spec(chain_config);
+    let chain_spec = get_chain_spec(chain_config.chain_id);
 
     let block = witness.block().clone();
 

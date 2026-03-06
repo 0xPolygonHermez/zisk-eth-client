@@ -5,10 +5,14 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-input.workspace = true
+anyhow.workspace = true
+bincode.workspace = true
+serde.workspace = true
+serde_with.workspace = true
+rayon.workspace = true
 
-alloy-primitives.workspace = true
 alloy-genesis.workspace = true
+alloy-primitives.workspace = true
 alloy-rpc-types-debug.workspace = true
 
 reth-chainspec.workspace = true
@@ -18,7 +22,7 @@ reth-evm-ethereum.workspace = true
 
 zeth-mpt-state.workspace = true
 
-stateless.workspace = true
+stateless-reth.workspace = true
 
 stateless-validator-common.workspace = true
 stateless-validator-reth.workspace = true

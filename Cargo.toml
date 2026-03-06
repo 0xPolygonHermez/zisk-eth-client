@@ -8,7 +8,7 @@ version = "0.5.0"
 edition = "2021"
 
 [workspace.dependencies]
-input = { path = "crates/input" }
+guest = { path = "crates/guest" }
 
 zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
 # local dev
@@ -37,7 +37,7 @@ reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 
 # stateless
-stateless = { git = "https://github.com/paradigmxyz/stateless", rev = "68cd8e73682d21fed69670fc7eabe25e55c5cdbe" }
+stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "68cd8e73682d21fed69670fc7eabe25e55c5cdbe", package = "stateless" }
 
 zeth-mpt-state = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", tag = "v0.5.0" }
 

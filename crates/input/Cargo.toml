@@ -5,6 +5,9 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+guest.workspace = true
+
+async-trait.workspace = true
 anyhow.workspace = true
 bincode.workspace = true
 rayon.workspace = true
@@ -20,7 +23,7 @@ alloy-rpc-types-debug.workspace = true
 reth-chainspec.workspace = true
 reth-ethereum-primitives.workspace = true
 
-stateless.workspace = true
+stateless-reth.workspace = true
 
 stateless-validator-reth = { workspace = true, features = ["host"] }
 stateless-validator-common = { workspace = true, features = ["host"] }
