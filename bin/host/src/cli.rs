@@ -110,11 +110,10 @@ pub enum GuestProgramCommand {
 }
 
 impl GuestProgramCommand {
-    /// Returns the display name including client if applicable
     pub fn display_name(&self) -> String {
         match self {
-            Self::StatelessValidator { client, .. } => {
-                format!("Stateless Validator ({:?})", client)
+            Self::StatelessValidator { .. } => {
+                "Stateless Validator".to_string()
             }
         }
     }
