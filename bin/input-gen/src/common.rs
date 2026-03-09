@@ -56,6 +56,8 @@ pub fn reth_input_to_file(
 
     // Write public
     let public = RethInputPublic {
+        block: reth_input.stateless_input.block.clone(),
+        chain_config: reth_input.stateless_input.chain_config.clone(),
         public_keys: reth_input.public_keys,
     };
     let pk_bytes = match format {
@@ -66,7 +68,7 @@ pub fn reth_input_to_file(
 
     // Write witness
     let witness = RethInputWitness {
-        stateless_input: reth_input.stateless_input,
+        witness: reth_input.stateless_input.witness.clone(),
     };
     let main_bytes = match format {
         OutputFormat::Binary => bincode::serialize(&witness)?,

@@ -8,10 +8,9 @@ use alloy_rpc_types_debug::ExecutionWitness;
 use alloy_rpc_types_eth::Block as RpcBlock;
 
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
-use reth_ethereum_primitives::TransactionSigned;
-use stateless_reth::{StatelessInput, UncompressedPublicKey};
+use stateless_reth::StatelessInput;
 
-use guest::{recover_signers, RethInput, RethInputPublic, RethInputWitness};
+use guest::{RethInput, RethInputPublic, RethInputWitness};
 
 #[async_trait::async_trait]
 pub trait FromRpc: Sized {
@@ -55,17 +54,9 @@ impl FromRpc for RethInputWitness {
         provider: &P,
         block_number: u64,
     ) -> Result<Self> {
-        let block = fetch_block(provider, block_number).await?;
         let witness = fetch_witness(provider, block_number).await?;
-        let chain_config = fetch_chain_config(provider).await?;
 
-        let stateless_input = StatelessInput {
-            block: block.into(),
-            witness,
-            chain_config,
-        };
-
-        Ok(Self { stateless_input })
+        Ok(RethInputWitness::new(witness))
     }
 }
 
@@ -77,21 +68,10 @@ impl FromRpc for RethInputPublic {
         block_number: u64,
     ) -> Result<Self> {
         let block = fetch_block(provider, block_number).await?;
-        let public_keys = public_keys_from_block(&block)?;
+        let chain_config = fetch_chain_config(provider).await?;
 
-        Ok(Self { public_keys })
+        RethInputPublic::new(block.into(), chain_config)
     }
-}
-
-/// Recover public keys from a block
-fn public_keys_from_block(block: &RpcBlock) -> Result<Vec<UncompressedPublicKey>> {
-    let txs: Vec<TransactionSigned> = block
-        .transactions
-        .txns()
-        .map(|tx| TransactionSigned::from(tx.clone()))
-        .collect();
-
-    recover_signers(&txs)
 }
 
 async fn connect_provider(rpc_url: &str) -> Result<impl Provider + DebugApi> {

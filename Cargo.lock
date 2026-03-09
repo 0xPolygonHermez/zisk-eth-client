@@ -3302,6 +3302,7 @@ dependencies = [
 name = "guest"
 version = "0.5.0"
 dependencies = [
+ "alloy-consensus",
  "alloy-genesis",
  "alloy-primitives",
  "alloy-rpc-types-debug",
@@ -3927,7 +3928,6 @@ dependencies = [
  "guest",
  "rayon",
  "reth-chainspec",
- "reth-ethereum-primitives",
  "serde",
  "serde_with",
  "stateless",

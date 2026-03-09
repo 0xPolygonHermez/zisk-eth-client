@@ -26,37 +26,32 @@ pub struct RethInput {
 
 impl RethInput {
     pub fn new(stateless_input: &StatelessInput) -> anyhow::Result<Self> {
-        let signers = recover_signers(&stateless_input.block.body.transactions)?;
+        let public_keys = public_keys_from_block(&stateless_input.block)
+            .context("Failed to recover public keys from block transactions")?;
 
         Ok(Self {
             stateless_input: stateless_input.clone(),
-            public_keys: signers,
+            public_keys,
         })
     }
 }
 
-/// Wrapper for witness part (StatelessInput without public keys)
+/// The witness part of the input
 #[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RethInputWitness {
-    /// The stateless input (block, witness, chain_config)
-    pub stateless_input: StatelessInput,
+    /// `ExecutionWitness` for the stateless validation function
+    pub witness: ExecutionWitness,
 }
 
 impl RethInputWitness {
-    /// Get the block
-    pub fn block(&self) -> &Block {
-        &self.stateless_input.block
+    pub fn new(witness: ExecutionWitness) -> Self {
+        Self { witness }
     }
 
     /// Get the execution witness
     pub fn witness(&self) -> &ExecutionWitness {
-        &self.stateless_input.witness
-    }
-
-    /// Get the chain config
-    pub fn chain_config(&self) -> &ChainConfig {
-        &self.stateless_input.chain_config
+        &self.witness
     }
 
     /// Serialize to bytes
@@ -70,14 +65,44 @@ impl RethInputWitness {
     }
 }
 
+/// The public input part of the input
 #[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RethInputPublic {
+    /// The block being executed in the stateless validation function
+    #[serde_as(
+        as = "reth_primitives_traits::serde_bincode_compat::Block<reth_ethereum_primitives::TransactionSigned, alloy_consensus::Header>"
+    )]
+    pub block: Block,
+    /// Chain configuration for the stateless validation function
+    #[serde_as(as = "alloy_genesis::serde_bincode_compat::ChainConfig<'_>")]
+    pub chain_config: ChainConfig,
     /// The recovered signers for the transactions in the block.
     pub public_keys: Vec<UncompressedPublicKey>,
 }
 
 impl RethInputPublic {
+    pub fn new(block: Block, chain_config: ChainConfig) -> anyhow::Result<Self> {
+        // Recover the public keys from the block's transactions
+        let public_keys = public_keys_from_block(&block)?;
+
+        Ok(Self {
+            block,
+            chain_config,
+            public_keys,
+        })
+    }
+
+    /// Get the block
+    pub fn block(&self) -> &Block {
+        &self.block
+    }
+
+    /// Get the chain config
+    pub fn chain_config(&self) -> &ChainConfig {
+        &self.chain_config
+    }
+
     /// Get the public keys
     pub fn public_keys(&self) -> &Vec<UncompressedPublicKey> {
         &self.public_keys
@@ -94,7 +119,12 @@ impl RethInputPublic {
     }
 }
 
-// Recovers the signing [`UncompressedPublicKey`] from each transaction's signature, in parallel.
+/// Recovers the public keys from a block
+fn public_keys_from_block(block: &Block) -> Result<Vec<UncompressedPublicKey>> {
+    recover_signers(&block.body.transactions)
+}
+
+// Recovers the public keys from a list of signed transactions
 pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<UncompressedPublicKey>> {
     txs.par_iter()
         .enumerate()

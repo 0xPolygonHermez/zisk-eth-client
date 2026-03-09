@@ -21,6 +21,5 @@ alloy-rpc-types-eth.workspace = true
 alloy-rpc-types-debug.workspace = true
 
 reth-chainspec.workspace = true
-reth-ethereum-primitives.workspace = true
 
 stateless-reth.workspace = true
