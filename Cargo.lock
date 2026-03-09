@@ -2070,17 +2070,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
 
 [[package]]
-name = "crypto"
-version = "0.5.0"
-dependencies = [
- "alloy-consensus",
- "alloy-primitives",
- "k256",
- "revm",
- "tiny-keccak",
-]
-
-[[package]]
 name = "crypto-bigint"
 version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3299,7 +3288,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "guest"
+name = "guest-reth"
 version = "0.5.0"
 dependencies = [
  "alloy-consensus",
@@ -3308,14 +3297,17 @@ dependencies = [
  "alloy-rpc-types-debug",
  "anyhow",
  "bincode",
+ "k256",
  "rayon",
  "reth-chainspec",
  "reth-ethereum-primitives",
  "reth-evm-ethereum",
  "reth-primitives-traits",
+ "revm",
  "serde",
  "serde_with",
  "stateless",
+ "tiny-keccak",
  "zeth-mpt-state",
 ]
 
@@ -3925,7 +3917,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bincode",
- "guest",
+ "guest-reth",
  "rayon",
  "reth-chainspec",
  "serde",
@@ -3944,7 +3936,7 @@ dependencies = [
  "anyhow",
  "bincode",
  "clap",
- "guest",
+ "guest-reth",
  "http",
  "jsonrpsee",
  "rayon",

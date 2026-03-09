@@ -13,9 +13,7 @@ codegen-units = 1
 panic = "abort"
 
 [dependencies]
-# local
-crypto = { path = "../../crates/crypto" }
-guest = { path = "../../crates/guest" }
+guest-reth = { path = "../../crates/guest-reth" }
 
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/input-stream" }
 # Local development

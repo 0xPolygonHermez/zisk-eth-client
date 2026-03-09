@@ -18,7 +18,7 @@ use stateless_reth::StatelessInput;
 
 use witness_generator::StatelessValidationFixture;
 
-use guest::RethInput;
+use guest_reth::RethInput;
 
 use crate::{
     common::{reth_input_from_fixture, reth_input_to_file},

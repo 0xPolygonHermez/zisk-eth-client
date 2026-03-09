@@ -7,7 +7,7 @@ use witness_generator::StatelessValidationFixture;
 
 use zisk_sdk::{ZiskIO, ZiskStdin};
 
-use guest::{RethInput, RethInputPublic, RethInputWitness};
+use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
 
 use crate::types::OutputFormat;
 

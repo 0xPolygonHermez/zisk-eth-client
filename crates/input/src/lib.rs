@@ -10,7 +10,7 @@ use alloy_rpc_types_eth::Block as RpcBlock;
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
 use stateless_reth::StatelessInput;
 
-use guest::{RethInput, RethInputPublic, RethInputWitness};
+use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
 
 #[async_trait::async_trait]
 pub trait FromRpc: Sized {

@@ -8,7 +8,8 @@ version = "0.5.0"
 edition = "2021"
 
 [workspace.dependencies]
-guest = { path = "crates/guest" }
+guest-reth = { path = "crates/guest-reth" }
+input = { path = "crates/input" }
 
 zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/input-stream" }
 # local dev
@@ -43,7 +44,7 @@ zeth-mpt-state = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", tag
 
 # eth-act
 stateless-validator-common = { git = "https://github.com/eth-act/ere-guests.git", rev = "40006b91edcf0b73f021988f982aea0bbec5039a" }
-stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "40006b91edcf0b73f021988f982aea0bbec5039a" }
+# stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "40006b91edcf0b73f021988f982aea0bbec5039a" }
 witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "a1f5dc47df7735500c1d8dfe055e966ee9f8070e" }
 
 # common dependencies

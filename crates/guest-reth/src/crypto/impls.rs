@@ -1,135 +1,26 @@
-use revm::precompile::{
-    bls12_381::{G1Point, G1PointScalar, G2Point, G2PointScalar},
-    Crypto, DefaultCrypto, PrecompileError,
-};
-
-use alloy_consensus::crypto::{CryptoProvider, RecoveryError};
-use alloy_primitives::Address;
-
 #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
 use k256::ecdsa::{signature::hazmat::PrehashVerifier, RecoveryId, Signature, VerifyingKey};
 #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
 use tiny_keccak::{Hasher, Keccak};
 
-#[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints_debug))]
-use std::os::raw::c_char;
+use alloy_consensus::crypto::{CryptoProvider, RecoveryError};
+use alloy_primitives::Address;
+
+use revm::precompile::{
+    bls12_381::{G1Point, G1PointScalar, G2Point, G2PointScalar},
+    Crypto, PrecompileError,
+};
+
+use super::CustomEvmCrypto;
 
 #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
-extern "C" {
-    fn sha256_c(input: *const u8, input_len: usize, output: *mut u8);
-
-    fn bn254_g1_add_c(p1: *const u8, p2: *const u8, ret: *mut u8) -> u8;
-
-    fn bn254_g1_mul_c(point: *const u8, scalar: *const u8, ret: *mut u8) -> u8;
-
-    fn bn254_pairing_check_c(pairs: *const u8, num_pairs: usize) -> u8;
-
-    fn secp256k1_ecdsa_verify_and_address_recover_c(
-        sig: *const u8,
-        msg: *const u8,
-        pk: *const u8,
-        output: *mut u8,
-    ) -> u8;
-
-    fn secp256k1_ecdsa_address_recover_c(
-        sig: *const u8,
-        recid: u8,
-        msg: *const u8,
-        output: *mut u8,
-    ) -> u8;
-
-    fn modexp_bytes_c(
-        base_ptr: *const u8,
-        base_len: usize,
-        exp_ptr: *const u8,
-        exp_len: usize,
-        modulus_ptr: *const u8,
-        modulus_len: usize,
-        ret_ptr: *mut u8,
-    ) -> usize;
-
-    fn blake2b_compress_c(rounds: u32, h: *mut u64, m: *const u64, t: *const u64, f: u8);
-
-    fn secp256r1_ecdsa_verify_c(msg: *const u8, sig: *const u8, pk: *const u8) -> bool;
-
-    fn verify_kzg_proof_c(
-        z: *const u8,
-        y: *const u8,
-        commitment: *const u8,
-        proof: *const u8,
-    ) -> bool;
-
-    fn bls12_381_g1_add_c(ret: *mut u8, a: *const u8, b: *const u8) -> u8;
-
-    fn bls12_381_g1_msm_c(ret: *mut u8, pairs: *const u8, num_pairs: usize) -> u8;
-
-    fn bls12_381_g2_add_c(ret: *mut u8, a: *const u8, b: *const u8) -> u8;
-
-    fn bls12_381_g2_msm_c(ret: *mut u8, pairs: *const u8, num_pairs: usize) -> u8;
-
-    fn bls12_381_pairing_check_c(pairs: *const u8, num_pairs: usize) -> u8;
-
-    fn bls12_381_fp_to_g1_c(ret: *mut u8, fp: *const u8) -> u8;
-
-    fn bls12_381_fp2_to_g2_c(ret: *mut u8, fp2: *const u8) -> u8;
-}
+use super::ffi::*;
 
 #[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints))]
-extern "C" {
-    fn hint_sha256(f: *const u8, len: usize);
-
-    fn hint_bn254_g1_add(p1: *const u8, p2: *const u8);
-
-    fn hint_bn254_g1_mul(point: *const u8, scalar: *const u8);
-
-    fn hint_bls12_381_g1_add(a: *const u8, b: *const u8);
-
-    fn hint_bls12_381_g2_add(a: *const u8, b: *const u8);
-
-    fn hint_secp256k1_ecdsa_verify_and_address_recover(
-        sig: *const u8,
-        msg: *const u8,
-        pk: *const u8,
-    );
-
-    fn hint_secp256k1_ecdsa_address_recover(sig: *const u8, recid: *const u8, msg: *const u8);
-
-    fn hint_modexp_bytes(
-        base_ptr: *const u8,
-        base_len: usize,
-        exp_ptr: *const u8,
-        exp_len: usize,
-        modulus_ptr: *const u8,
-        modulus_len: usize,
-    );
-
-    fn hint_blake2b_compress(rounds: u32, h: *mut u64, m: *const u64, t: *const u64, f: u8);
-
-    fn hint_secp256r1_ecdsa_verify(msg: *const u8, sig: *const u8, pk: *const u8);
-
-    fn hint_verify_kzg_proof(z: *const u8, y: *const u8, commitment: *const u8, proof: *const u8);
-
-    fn hint_bn254_pairing_check(pairs: *const u8, num_pairs: usize);
-
-    fn hint_bls12_381_g1_msm(pairs: *const u8, num_pairs: usize);
-
-    fn hint_bls12_381_g2_msm(pairs: *const u8, num_pairs: usize);
-
-    fn hint_bls12_381_pairing_check(pairs: *const u8, num_pairs: usize);
-
-    fn hint_bls12_381_fp_to_g1(fp: *const u8);
-
-    fn hint_bls12_381_fp2_to_g2(fp2: *const u8);
-
-    fn pause_hints() -> bool;
-
-    fn resume_hints();
-}
+use super::ffi::*;
 
 #[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints_debug))]
-extern "C" {
-    fn hint_log_c(msg: *const c_char);
-}
+use super::ffi::*;
 
 #[cfg(zisk_hints_debug)]
 pub fn hint_log<S: AsRef<str>>(msg: S) {
@@ -146,19 +37,6 @@ pub fn hint_log<S: AsRef<str>>(msg: S) {
     #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
     {
         println!("{}", msg.as_ref());
-    }
-}
-
-#[derive(Debug)]
-pub struct CustomEvmCrypto {
-    pub default_crypto: DefaultCrypto,
-}
-
-impl Default for CustomEvmCrypto {
-    fn default() -> Self {
-        Self {
-            default_crypto: DefaultCrypto,
-        }
     }
 }
 

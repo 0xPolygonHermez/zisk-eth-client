@@ -4,12 +4,11 @@ ziskos::entrypoint!(main);
 use std::sync::Arc;
 
 use alloy_consensus::crypto::install_default_provider;
-use crypto::CustomEvmCrypto;
 use revm::install_crypto;
 
-use guest::{
-    RethInputPublic, RethInputWitness, extract_block_info, get_chain_name, get_chain_spec,
-    validate_block_stateless, verify_signatures,
+use guest_reth::{
+    CustomEvmCrypto, RethInputPublic, RethInputWitness, extract_block_info, get_chain_name,
+    get_chain_spec, validate_block_stateless, verify_signatures,
 };
 
 fn main() {

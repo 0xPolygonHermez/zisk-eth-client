@@ -9,9 +9,11 @@ use alloy_rpc_types_debug::ExecutionWitness;
 use reth_ethereum_primitives::{Block, TransactionSigned};
 use stateless_reth::{StatelessInput, UncompressedPublicKey};
 
+mod crypto;
 mod utils;
 mod validation;
 
+pub use crypto::*;
 pub use utils::*;
 pub use validation::*;
 

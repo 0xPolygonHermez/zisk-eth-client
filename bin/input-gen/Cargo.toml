@@ -5,7 +5,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-guest.workspace = true
+guest-reth.workspace = true
 
 zisk-sdk.workspace = true
 
