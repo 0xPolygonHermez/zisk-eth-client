@@ -1,51 +1,37 @@
-use zisk_sdk::{ZiskIO, ZiskStdin};
+use tracing::{info, warn};
 
-use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
-
-pub enum ProcessingResult {
-    Reth(RethInput),
-    // Add more variants here for other clients
+pub struct ProcessingTracker {
+    client_name: String,
+    success_count: usize,
+    error_count: usize,
 }
 
-impl ProcessingResult {
-    pub fn save_to_file(
-        &self,
-        file_name: &str,
-        output_dir: &std::path::Path,
-    ) -> anyhow::Result<()> {
-        std::fs::create_dir_all(output_dir)?;
-
-        let filename = sanitize_filename(file_name);
-        let output_path = output_dir.join(format!("{}.bin", filename));
-
-        let zisk_stdin = ZiskStdin::new();
-
-        match self {
-            ProcessingResult::Reth(input) => {
-                // Write public
-                let public = RethInputPublic {
-                    block: input.stateless_input.block.clone(),
-                    chain_config: input.stateless_input.chain_config.clone(),
-                    public_keys: input.public_keys.clone(),
-                };
-                let public_bytes = RethInputPublic::serialize(&public)?;
-                zisk_stdin.write_slice(&public_bytes);
-
-                // Write witness
-                let witness = RethInputWitness {
-                    witness: input.stateless_input.witness.clone(),
-                };
-                let witness_bytes = RethInputWitness::serialize(&witness)?;
-                zisk_stdin.write_slice(&witness_bytes);
-            }
+impl ProcessingTracker {
+    pub fn new(client_name: &str) -> Self {
+        Self {
+            client_name: client_name.to_string(),
+            success_count: 0,
+            error_count: 0,
         }
-
-        zisk_stdin.save(&output_path)?;
-
-        Ok(())
     }
-}
 
-fn sanitize_filename(name: &str) -> String {
-    name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_")
+    pub fn record_success(&mut self, item: &str) {
+        self.success_count += 1;
+        info!("Generated {} input for: {}", self.client_name, item);
+    }
+
+    pub fn record_error(&mut self, item: &str, error: &anyhow::Error) {
+        self.error_count += 1;
+        warn!(
+            "Failed to generate {} input for {}: {}",
+            self.client_name, item, error
+        );
+    }
+
+    pub fn log_summary(&self) {
+        info!(
+            "Completed: {} succeeded, {} failed",
+            self.success_count, self.error_count
+        );
+    }
 }

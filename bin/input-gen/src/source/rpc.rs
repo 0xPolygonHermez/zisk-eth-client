@@ -7,7 +7,7 @@ use anyhow::{Context, Result};
 use jsonrpsee::http_client::{HeaderMap, HttpClient, HttpClientBuilder};
 use std::path::Path;
 use tokio_util::sync::CancellationToken;
-use tracing::{info, warn};
+use tracing::info;
 
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
 use reth_ethereum_primitives::TransactionSigned;
@@ -16,7 +16,7 @@ use stateless_reth::{ExecutionWitness, StatelessInput};
 
 use witness_generator::StatelessValidationFixture;
 
-use crate::client::ExecutionClient;
+use crate::{client::ExecutionClient, processor::ProcessingTracker};
 
 #[allow(clippy::too_many_arguments)]
 pub async fn zisk_inputs_from_rpc(
@@ -40,6 +40,10 @@ pub async fn zisk_inputs_from_rpc(
     let client_name = client.display_name();
     info!("Generating inputs for the {} client...", client_name);
 
+    // The RPC generator has two modes:
+    //  1. Follow mode: Continuously listen for new blocks and generate inputs as they arrive.
+    //  2. Batch mode: Process a specific block, a range of blocks, or the last N blocks, then exit.
+
     // If follow is enabled, continuously listen for new blocks.
     if follow {
         return follow_new_blocks(&rpc_client, &chain_config, chain_name, output, client).await;
@@ -59,7 +63,7 @@ pub async fn zisk_inputs_from_rpc(
             anyhow::bail!("Range START ({}) must be <= END ({})", start, end);
         }
         (start..=end).collect()
-    } else  {
+    } else {
         // Default to last N blocks (default N=1)
         let n = last_n_blocks.unwrap_or(1);
 
@@ -79,9 +83,11 @@ pub async fn zisk_inputs_from_rpc(
         block_numbers
     );
 
-    let mut success_count = 0;
-    let mut error_count = 0;
+    // Intitialize the tracker
+    let mut tracker = ProcessingTracker::new(client.display_name());
+
     for block_num in block_numbers {
+        let name = format!("Block #{}", block_num);
         match process_block(
             &rpc_client,
             block_num,
@@ -92,21 +98,12 @@ pub async fn zisk_inputs_from_rpc(
         )
         .await
         {
-            Ok(_) => {
-                info!("Generated {} input for block: {}", client_name, block_num);
-                success_count += 1;
-            }
-            Err(e) => {
-                warn!("Failed to generate {} input for block {}: {:?}", client_name, block_num, e);
-                error_count += 1;
-            }
+            Ok(_) => tracker.record_success(&name),
+            Err(e) => tracker.record_error(&name, &e),
         }
     }
 
-    info!(
-        "Completed: {} succeeded, {} failed",
-        success_count, error_count
-    );
+    tracker.log_summary();
 
     Ok(())
 }
@@ -172,12 +169,18 @@ async fn process_block(
     let (block, witness) = fetch_block_and_witness(rpc_client, block_num).await?;
 
     // Generate fixture for the block
-    let (fixture, fixture_name) =
-        generate_fixture(block_num, block, witness, chain_config, chain_name, client.name()).await?;
+    let fixture = generate_fixture(
+        block_num,
+        block,
+        witness,
+        chain_config,
+        chain_name,
+        client.name(),
+    )
+    .await?;
 
     // Generate input for the client and save to file
-    let result = client.generate_input(&fixture)?;
-    result.save_to_file(&fixture_name, output)?;
+    client.process_fixture(&fixture, output)?;
 
     Ok(())
 }
@@ -204,10 +207,11 @@ async fn follow_new_blocks(
         stop_clone.cancel();
     });
 
-    let mut next_block_num = fetch_latest_block_number(rpc_client).await?;
-    let mut success_count = 0;
-    let mut error_count = 0;
+    // Initialize the tracker
     let client_name = client.display_name();
+    let mut tracker = ProcessingTracker::new(client_name);
+
+    let mut next_block_num = fetch_latest_block_number(rpc_client).await?;
     loop {
         if stop.is_cancelled() {
             break;
@@ -217,15 +221,18 @@ async fn follow_new_blocks(
         let latest = fetch_latest_block_number(rpc_client).await?;
 
         for block_num in next_block_num..=latest {
-            match process_block(rpc_client, block_num, chain_config, chain_name, output, client).await {
-                Ok(_) => {
-                    info!("Generated {} input for block: {}", client_name, block_num);
-                    success_count += 1;
-                }
-                Err(e) => {
-                    warn!("Failed to generate {} input for block {}: {:?}", client_name, block_num, e);
-                    error_count += 1;
-                }
+            match process_block(
+                rpc_client,
+                block_num,
+                chain_config,
+                chain_name,
+                output,
+                client,
+            )
+            .await
+            {
+                Ok(_) => tracker.record_success(&format!("Block #{}", block_num)),
+                Err(e) => tracker.record_error(&format!("Block #{}", block_num), &e),
             }
         }
 
@@ -234,17 +241,13 @@ async fn follow_new_blocks(
         // Wait before polling again (average block time is ~12s)
         tokio::select! {
             _ = stop.cancelled() => {
-                info!("Stopped following blocks");
                 break;
             }
             _ = tokio::time::sleep(std::time::Duration::from_secs(6)) => {}
         }
     }
 
-    info!(
-        "Completed: {} succeeded, {} failed",
-        success_count, error_count
-    );
+    tracker.log_summary();
 
     Ok(())
 }
@@ -295,7 +298,7 @@ async fn generate_fixture(
     chain_config: &ChainConfig,
     chain_name: &str,
     client_name: &str,
-) -> Result<(StatelessValidationFixture, String)> {
+) -> Result<StatelessValidationFixture> {
     // Get transaction count and gas used from the block
     let tx_count = block.transactions.len();
     let gas_used = block.header.gas_used;
@@ -304,7 +307,11 @@ async fn generate_fixture(
     // Create the fixture
     let fixture_name = format!(
         "{}_{}_{}_{}_zec_{}",
-        chain_name.to_lowercase(), block_num, tx_count, mgas, client_name
+        chain_name.to_lowercase(),
+        block_num,
+        tx_count,
+        mgas,
+        client_name
     );
     let fixture = StatelessValidationFixture {
         name: fixture_name.clone(),
@@ -317,5 +324,5 @@ async fn generate_fixture(
     };
 
     // Generate reth input
-    Ok((fixture, fixture_name))
+    Ok(fixture)
 }

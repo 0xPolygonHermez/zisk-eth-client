@@ -1,10 +1,10 @@
 use anyhow::{Context, Result};
 use rayon::ThreadPoolBuilder;
 use std::path::{Path, PathBuf};
-use tracing::{info, warn};
+use tracing::info;
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
 
-use crate::{client::ExecutionClient, common::fixtures_from_path};
+use crate::{client::ExecutionClient, common::fixtures_from_path, processor::ProcessingTracker};
 
 /// Process EEST (Ethereum Execution Specification Tests) to generate reth inputs.
 pub async fn zisk_inputs_from_eest(
@@ -29,7 +29,7 @@ pub async fn zisk_inputs_from_eest(
         info!("Using EEST release tag: {}", tag);
         builder = builder.with_tag(tag);
     } else if let Some(input_folder) = eest_fixtures_path {
-        info!("Using local EEST fixtures from: {}", input_folder.display());
+        info!("Using local EEST from: {}", input_folder.display());
         builder = builder.with_input_folder(input_folder)?;
     } else {
         info!("Using latest EEST release");
@@ -64,33 +64,19 @@ pub async fn zisk_inputs_from_eest(
         count
     );
 
-    let fixtures = fixtures_from_path(temp_dir.path())?;
+    // Initialize the tracker
+    let mut tracker = ProcessingTracker::new(client.display_name());
 
-    let mut success_count = 0;
-    let mut error_count = 0;
+    let fixtures = fixtures_from_path(temp_dir.path())?;
     for fixture in &fixtures {
-        match client.generate_input(fixture) {
-            Ok(result) => {
-                result.save_to_file(&fixture.name, output)?;
-                info!("Generated {} input for: {}", client.name(), fixture.name);
-                success_count += 1;
-            }
-            Err(e) => {
-                warn!(
-                    "Failed to generate {} input for {}: {}",
-                    client.name(),
-                    fixture.name,
-                    e
-                );
-                error_count += 1;
-            }
+        let name = format!("EEST \"{}\"", fixture.name);
+        match client.process_fixture(fixture, output) {
+            Ok(_) => tracker.record_success(&name),
+            Err(e) => tracker.record_error(&name, &e),
         }
     }
 
-    info!(
-        "Completed: {} succeeded, {} failed",
-        success_count, error_count
-    );
+    tracker.log_summary();
 
     Ok(())
 }

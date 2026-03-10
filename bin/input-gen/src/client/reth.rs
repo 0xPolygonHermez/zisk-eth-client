@@ -1,11 +1,11 @@
 use anyhow::{Context, Result};
+use std::path::Path;
 
+use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
 use witness_generator::StatelessValidationFixture;
-
-use guest_reth::RethInput;
+use zisk_sdk::{ZiskIO, ZiskStdin};
 
 use super::ExecutionClient;
-use crate::processor::ProcessingResult;
 
 pub struct RethClient;
 
@@ -24,9 +24,48 @@ impl ExecutionClient for RethClient {
         "Reth"
     }
 
-    fn generate_input(&self, fixture: &StatelessValidationFixture) -> Result<ProcessingResult> {
-        let reth_input = RethInput::new(&fixture.stateless_input)
-            .with_context(|| format!("Failed to create {} input for {}", self.display_name(), fixture.name))?;
-        Ok(ProcessingResult::Reth(reth_input))
+    fn process_fixture(
+        &self,
+        fixture: &StatelessValidationFixture,
+        output_dir: &Path,
+    ) -> Result<(), anyhow::Error> {
+        // Generate the Reth input from the fixture
+        let input = RethInput::new(&fixture.stateless_input).with_context(|| {
+            format!(
+                "Failed to create {} input for {}",
+                self.display_name(),
+                fixture.name
+            )
+        })?;
+
+        // Save the input to a file
+        let zisk_stdin = ZiskStdin::new();
+
+        // Write public
+        let public = RethInputPublic {
+            block: input.stateless_input.block.clone(),
+            chain_config: input.stateless_input.chain_config.clone(),
+            public_keys: input.public_keys.clone(),
+        };
+        let public_bytes = RethInputPublic::serialize(&public)?;
+        zisk_stdin.write_slice(&public_bytes);
+
+        // Write witness
+        let witness = RethInputWitness {
+            witness: input.stateless_input.witness.clone(),
+        };
+        let witness_bytes = RethInputWitness::serialize(&witness)?;
+        zisk_stdin.write_slice(&witness_bytes);
+
+        // Sanitize filename and save
+        let filename = sanitize_filename(&fixture.name);
+        let output_path = output_dir.join(format!("{}.bin", filename));
+        zisk_stdin.save(&output_path)?;
+
+        Ok(())
     }
+}
+
+fn sanitize_filename(name: &str) -> String {
+    name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_")
 }

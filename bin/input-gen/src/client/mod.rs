@@ -1,10 +1,9 @@
-mod reth;
-
 use clap::ValueEnum;
+use std::path::Path;
 
 use witness_generator::StatelessValidationFixture;
 
-use crate::processor::ProcessingResult;
+mod reth;
 
 /// Available clients for CLI selection
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
@@ -24,11 +23,12 @@ pub trait ExecutionClient: Send + Sync {
         self.name()
     }
 
-    /// Generate input from a fixture
-    fn generate_input(
+    /// Process a fixture: generate input and save to output directory
+    fn process_fixture(
         &self,
         fixture: &StatelessValidationFixture,
-    ) -> Result<ProcessingResult, anyhow::Error>;
+        output_dir: &Path,
+    ) -> Result<(), anyhow::Error>;
 }
 
 /// Factory function to create an execution client
