@@ -1,7 +1,6 @@
 // TODO: Add old blocks via archive reth node
 // TODO: Simplify when the `debug_execution_witness_by_block_hash` method gets available
 
-use alloy_eips::BlockNumberOrTag;
 use alloy_genesis::ChainConfig;
 use alloy_rpc_types_eth::{Block, Header, Receipt, Transaction, TransactionRequest};
 use anyhow::{Context, Result};
@@ -13,7 +12,7 @@ use tracing::{info, warn};
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
 use reth_ethereum_primitives::TransactionSigned;
 use reth_rpc_api::{DebugApiClient, EthApiClient};
-use stateless_reth::StatelessInput;
+use stateless_reth::{ExecutionWitness, StatelessInput};
 
 use witness_generator::StatelessValidationFixture;
 
@@ -30,15 +29,16 @@ pub async fn zisk_inputs_from_rpc(
     output: &Path,
     client: &dyn ExecutionClient,
 ) -> Result<()> {
-    info!("Connecting to RPC: {}", rpc_url);
-
-    // Initialize RPC client
+    // Initialize the RPC client
     let (rpc_client, chain_config, chain_name) = init_rpc_client(rpc_url, rpc_headers).await?;
 
     info!(
         "Connected to chain: {} (ID: {})",
         chain_name, chain_config.chain_id
     );
+
+    let client_name = client.display_name();
+    info!("Generating inputs for the {} client...", client_name);
 
     // If follow is enabled, continuously listen for new blocks.
     if follow {
@@ -59,9 +59,11 @@ pub async fn zisk_inputs_from_rpc(
             anyhow::bail!("Range START ({}) must be <= END ({})", start, end);
         }
         (start..=end).collect()
-    } else {
-        // Last N blocks (default: 1)
+    } else  {
+        // Default to last N blocks (default N=1)
         let n = last_n_blocks.unwrap_or(1);
+
+        // Last N blocks
         if n == 0 {
             info!("No blocks to process (last_n_blocks = 0)");
             return Ok(());
@@ -80,7 +82,7 @@ pub async fn zisk_inputs_from_rpc(
     let mut success_count = 0;
     let mut error_count = 0;
     for block_num in block_numbers {
-        match process_block_for_client(
+        match process_block(
             &rpc_client,
             block_num,
             &chain_config,
@@ -91,11 +93,11 @@ pub async fn zisk_inputs_from_rpc(
         .await
         {
             Ok(_) => {
-                info!("Generated input for block: {}", block_num);
+                info!("Generated {} input for block: {}", client_name, block_num);
                 success_count += 1;
             }
             Err(e) => {
-                warn!("Failed to generate input for block {}: {:?}", block_num, e);
+                warn!("Failed to generate {} input for block {}: {:?}", client_name, block_num, e);
                 error_count += 1;
             }
         }
@@ -105,30 +107,6 @@ pub async fn zisk_inputs_from_rpc(
         "Completed: {} succeeded, {} failed",
         success_count, error_count
     );
-
-    Ok(())
-}
-
-/// Process a single block and generate input for the specified client
-async fn process_block_for_client(
-    rpc_client: &HttpClient,
-    block_num: u64,
-    chain_config: &ChainConfig,
-    chain_name: &str,
-    output: &Path,
-    client: &dyn ExecutionClient,
-) -> Result<()> {
-    let (fixture, fixture_name) = fetch_fixture(
-        rpc_client,
-        block_num,
-        chain_config,
-        chain_name,
-        client.name(),
-    )
-    .await?;
-
-    let result = client.generate_input(&fixture)?;
-    result.save_to_file(&fixture_name, output)?;
 
     Ok(())
 }
@@ -169,15 +147,39 @@ async fn init_rpc_client(
         .context("Chain ID not found")?;
 
     let chain = Chain::from_id(chain_id.to());
+
     let (chain_config, chain_name) = match chain.named() {
-        Some(NamedChain::Mainnet) => (mainnet_chain_config(), "mainnet"),
-        Some(NamedChain::Sepolia) => (SEPOLIA.genesis.config.clone(), "sepolia"),
-        Some(NamedChain::Hoodi) => (HOODI.genesis.config.clone(), "hoodi"),
-        Some(NamedChain::Holesky) => (HOLESKY.genesis.config.clone(), "holesky"),
+        Some(NamedChain::Mainnet) => (mainnet_chain_config(), "Mainnet"),
+        Some(NamedChain::Sepolia) => (SEPOLIA.genesis.config.clone(), "Sepolia"),
+        Some(NamedChain::Hoodi) => (HOODI.genesis.config.clone(), "Hoodi"),
+        Some(NamedChain::Holesky) => (HOLESKY.genesis.config.clone(), "Holesky"),
         _ => anyhow::bail!("Unsupported chain ID: {}", chain_id),
     };
 
     Ok((client, chain_config, chain_name))
+}
+
+/// Process a single block and generate input for the specified client
+async fn process_block(
+    rpc_client: &HttpClient,
+    block_num: u64,
+    chain_config: &ChainConfig,
+    chain_name: &str,
+    output: &Path,
+    client: &dyn ExecutionClient,
+) -> Result<()> {
+    // Fetch block and witness
+    let (block, witness) = fetch_block_and_witness(rpc_client, block_num).await?;
+
+    // Generate fixture for the block
+    let (fixture, fixture_name) =
+        generate_fixture(block_num, block, witness, chain_config, chain_name, client.name()).await?;
+
+    // Generate input for the client and save to file
+    let result = client.generate_input(&fixture)?;
+    result.save_to_file(&fixture_name, output)?;
+
+    Ok(())
 }
 
 /// Continuously follow and process new blocks
@@ -205,29 +207,34 @@ async fn follow_new_blocks(
     let mut next_block_num = fetch_latest_block_number(rpc_client).await?;
     let mut success_count = 0;
     let mut error_count = 0;
+    let client_name = client.display_name();
     loop {
-        tokio::select! {
-            _ = stop.cancelled() => {
-                info!("Stopped following blocks.");
-                break;
-            }
-            result = process_new_blocks(rpc_client, &mut next_block_num, chain_config, chain_name, output, client) => {
-                match result {
-                    Ok((successes, errors)) => {
-                        success_count += successes;
-                        error_count += errors;
-                    }
-                    Err(e) => {
-                        warn!("Error processing blocks: {:?}", e);
-                    }
+        if stop.is_cancelled() {
+            break;
+        }
+
+        // Check for new blocks
+        let latest = fetch_latest_block_number(rpc_client).await?;
+
+        for block_num in next_block_num..=latest {
+            match process_block(rpc_client, block_num, chain_config, chain_name, output, client).await {
+                Ok(_) => {
+                    info!("Generated {} input for block: {}", client_name, block_num);
+                    success_count += 1;
+                }
+                Err(e) => {
+                    warn!("Failed to generate {} input for block {}: {:?}", client_name, block_num, e);
+                    error_count += 1;
                 }
             }
         }
 
+        next_block_num = latest + 1;
+
         // Wait before polling again (average block time is ~12s)
         tokio::select! {
             _ = stop.cancelled() => {
-                info!("Stopped following blocks.");
+                info!("Stopped following blocks");
                 break;
             }
             _ = tokio::time::sleep(std::time::Duration::from_secs(6)) => {}
@@ -235,90 +242,32 @@ async fn follow_new_blocks(
     }
 
     info!(
-        "Follow mode completed: {} succeeded, {} failed",
+        "Completed: {} succeeded, {} failed",
         success_count, error_count
     );
 
     Ok(())
 }
 
-/// Process any new blocks from next_block_num to latest
-async fn process_new_blocks(
-    rpc_client: &HttpClient,
-    next_block_num: &mut u64,
-    chain_config: &ChainConfig,
-    chain_name: &str,
-    output: &Path,
-    client: &dyn ExecutionClient,
-) -> Result<(usize, usize)> {
-    let latest = fetch_latest_block_number(rpc_client).await?;
-
-    if *next_block_num > latest {
-        return Ok((0, 0));
-    }
-
-    let mut success_count = 0;
-    let mut error_count = 0;
-    for block_num in *next_block_num..=latest {
-        match process_block_for_client(
-            rpc_client,
-            block_num,
-            chain_config,
-            chain_name,
-            output,
-            client,
-        )
-        .await
-        {
-            Ok(_) => {
-                info!("Generated input for block: {}", block_num);
-                success_count += 1;
-            }
-            Err(e) => {
-                warn!("Failed to generate input for block {}: {:?}", block_num, e);
-                error_count += 1;
-            }
-        }
-    }
-
-    *next_block_num = latest + 1;
-
-    Ok((success_count, error_count))
-}
-
 async fn fetch_latest_block_number(client: &HttpClient) -> Result<u64> {
-    let block = EthApiClient::<
+    let block_number = EthApiClient::<
         TransactionRequest,
         Transaction,
         Block,
         Receipt,
         Header,
         TransactionSigned,
-    >::block_by_number(client, BlockNumberOrTag::Latest, false)
+    >::block_number(client)
     .await
-    .context("Failed to fetch latest block")?
-    .context("Latest block not found")?;
+    .context("Failed to fetch latest block number")?;
 
-    Ok(block.header.number)
+    Ok(block_number.to::<u64>())
 }
 
-/// Fetch block data and create a fixture for the specified client
-async fn fetch_fixture(
-    client: &HttpClient,
+async fn fetch_block_and_witness(
+    rpc_client: &HttpClient,
     block_num: u64,
-    chain_config: &ChainConfig,
-    chain_name: &str,
-    client_name: &str,
-) -> Result<(StatelessValidationFixture, String)> {
-    // Fetch the execution witness using debug_execution_witness
-    let witness =
-        DebugApiClient::<()>::debug_execution_witness(client, BlockNumberOrTag::Number(block_num))
-            .await
-            .with_context(|| {
-                format!("Failed to fetch execution witness for block {}", block_num)
-            })?;
-
-    // Fetch the block
+) -> Result<(Block<TransactionSigned>, ExecutionWitness)> {
     let block = EthApiClient::<
         TransactionRequest,
         Transaction,
@@ -326,11 +275,27 @@ async fn fetch_fixture(
         Receipt,
         Header,
         TransactionSigned,
-    >::block_by_number(client, BlockNumberOrTag::Number(block_num), true)
+    >::block_by_number(rpc_client, block_num.into(), true)
     .await
-    .with_context(|| format!("Failed to fetch block {}", block_num))?
+    .context("Failed to fetch block")?
     .with_context(|| format!("Block {} not found", block_num))?;
 
+    let witness = DebugApiClient::<()>::debug_execution_witness(rpc_client, block_num.into())
+        .await
+        .context("Failed to fetch execution witness for block")?;
+
+    Ok((block, witness))
+}
+
+/// Fetch block data and create a fixture for the specified client
+async fn generate_fixture(
+    block_num: u64,
+    block: Block<TransactionSigned>,
+    witness: ExecutionWitness,
+    chain_config: &ChainConfig,
+    chain_name: &str,
+    client_name: &str,
+) -> Result<(StatelessValidationFixture, String)> {
     // Get transaction count and gas used from the block
     let tx_count = block.transactions.len();
     let gas_used = block.header.gas_used;
@@ -339,7 +304,7 @@ async fn fetch_fixture(
     // Create the fixture
     let fixture_name = format!(
         "{}_{}_{}_{}_zec_{}",
-        chain_name, block_num, tx_count, mgas, client_name
+        chain_name.to_lowercase(), block_num, tx_count, mgas, client_name
     );
     let fixture = StatelessValidationFixture {
         name: fixture_name.clone(),

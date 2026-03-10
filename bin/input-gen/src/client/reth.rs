@@ -20,9 +20,13 @@ impl ExecutionClient for RethClient {
         "reth"
     }
 
+    fn display_name(&self) -> &'static str {
+        "Reth"
+    }
+
     fn generate_input(&self, fixture: &StatelessValidationFixture) -> Result<ProcessingResult> {
         let reth_input = RethInput::new(&fixture.stateless_input)
-            .with_context(|| format!("Failed to create Reth input for {}", fixture.name))?;
+            .with_context(|| format!("Failed to create {} input for {}", self.display_name(), fixture.name))?;
         Ok(ProcessingResult::Reth(reth_input))
     }
 }

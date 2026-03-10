@@ -38,7 +38,7 @@ enum SourceCommand {
         tag: Option<String>,
 
         /// Input folder for EEST files. If not provided, --tag is required.
-        #[arg(long, conflicts_with = "tag")]
+        #[arg(short = 'p', long, conflicts_with = "tag")]
         eest_fixtures_path: Option<PathBuf>,
 
         /// Include only test names containing the provided strings.
@@ -49,35 +49,35 @@ enum SourceCommand {
         #[arg(short, long)]
         exclude: Option<Vec<String>>,
 
-        /// Number of threads for parallel processing (default: all available)
-        #[arg(long, default_value = "10")]
+        /// Number of threads for parallel processing
+        #[arg(short, long, default_value = "10")]
         threads: Option<usize>,
     },
 
     /// Generate inputs from an RPC endpoint
     Rpc {
-        /// RPC URL to use (mandatory)
+        /// RPC URL to use
         #[arg(short = 'u', long)]
         rpc_url: String,
 
         /// Optional RPC headers (format: "Key:Value")
-        #[arg(short = 'h', long)]
+        #[arg(short = 'H', long)]
         rpc_headers: Option<Vec<String>>,
 
-        /// Specific block number to fetch
-        #[arg(long, group = "block_selection")]
-        block: Option<u64>,
-
-        /// Number of last blocks to fetch
-        #[arg(long, group = "block_selection")]
+        /// Number of last blocks to fetch (default: 1 if no other block selection method is used)
+        #[arg(short = 'l', long, group = "block_selection")]
         last_n_blocks: Option<usize>,
 
+        /// Specific block number to fetch
+        #[arg(short = 'b', long, group = "block_selection")]
+        block: Option<u64>,
+
         /// Fetch blocks in a range (inclusive)
-        #[arg(long, num_args = 2, value_names = ["START", "END"], group = "block_selection")]
+        #[arg(short = 'r', long, num_args = 2, value_names = ["START", "END"], group = "block_selection")]
         range_of_blocks: Option<Vec<u64>>,
 
         /// Listen for new blocks
-        #[arg(long, default_value_t = false, group = "block_selection")]
+        #[arg(short = 'f', long, default_value_t = false, group = "block_selection")]
         follow: bool,
     },
 }

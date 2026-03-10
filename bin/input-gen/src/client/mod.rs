@@ -19,6 +19,11 @@ pub trait ExecutionClient: Send + Sync {
     /// Human-readable name for this client
     fn name(&self) -> &'static str;
 
+    /// Display name for this client (used in logs and messages)
+    fn display_name(&self) -> &'static str {
+        self.name()
+    }
+
     /// Generate input from a fixture
     fn generate_input(
         &self,
