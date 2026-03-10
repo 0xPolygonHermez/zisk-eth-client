@@ -1,22 +1,19 @@
 use anyhow::{Context, Result};
 use rayon::ThreadPoolBuilder;
 use std::path::{Path, PathBuf};
-use tracing::{info, warn};
+use tracing::info;
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
 
-use crate::{
-    common::{fixtures_from_path, reth_input_from_fixture, reth_input_to_file},
-    types::OutputFormat,
-};
+use crate::{client::ExecutionClient, common::fixtures_from_path, processor::ProcessingTracker};
 
 /// Process EEST (Ethereum Execution Specification Tests) to generate reth inputs.
-pub async fn reth_input_files_from_eest(
+pub async fn zisk_inputs_from_eest(
     tag: Option<String>,
     include: Option<Vec<String>>,
     exclude: Option<Vec<String>>,
     eest_fixtures_path: Option<PathBuf>,
     output: &Path,
-    format: OutputFormat,
+    client: &dyn ExecutionClient,
     num_threads: Option<usize>,
 ) -> Result<()> {
     if let Some(threads) = num_threads {
@@ -32,7 +29,7 @@ pub async fn reth_input_files_from_eest(
         info!("Using EEST release tag: {}", tag);
         builder = builder.with_tag(tag);
     } else if let Some(input_folder) = eest_fixtures_path {
-        info!("Using local EEST fixtures from: {}", input_folder.display());
+        info!("Using local EEST from: {}", input_folder.display());
         builder = builder.with_input_folder(input_folder)?;
     } else {
         info!("Using latest EEST release");
@@ -54,7 +51,7 @@ pub async fn reth_input_files_from_eest(
 
     info!("Generating EEST fixtures...");
 
-    // Generate fixtures to a temp directory, then convert to reth inputs
+    // Generate fixtures to a temp directory, then convert to ZisK inputs
     let temp_dir = tempfile::tempdir().context("Failed to create temp directory")?;
 
     let count = generator
@@ -63,32 +60,23 @@ pub async fn reth_input_files_from_eest(
         .context("Failed to generate EEST fixtures")?;
 
     info!(
-        "Generated {} EEST fixtures, converting to reth inputs...",
+        "Generated {} EEST fixtures, converting to ZisK inputs...",
         count
     );
 
-    let fixtures = fixtures_from_path(temp_dir.path())?;
+    // Initialize the tracker
+    let mut tracker = ProcessingTracker::new(client.display_name());
 
-    let mut success_count = 0;
-    let mut error_count = 0;
+    let fixtures = fixtures_from_path(temp_dir.path())?;
     for fixture in &fixtures {
-        match reth_input_from_fixture(fixture) {
-            Ok(reth_input) => {
-                reth_input_to_file(reth_input, &fixture.name, output, format)?;
-                info!("Generated input for: {}", fixture.name);
-                success_count += 1;
-            }
-            Err(e) => {
-                warn!("Failed to generate input for {}: {}", fixture.name, e);
-                error_count += 1;
-            }
+        let name = format!("EEST \"{}\"", fixture.name);
+        match client.process_fixture(fixture, output) {
+            Ok(_) => tracker.record_success(&name),
+            Err(e) => tracker.record_error(&name, &e),
         }
     }
 
-    info!(
-        "Completed: {} succeeded, {} failed",
-        success_count, error_count
-    );
+    tracker.log_summary();
 
     Ok(())
 }

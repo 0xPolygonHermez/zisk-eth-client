@@ -36,6 +36,16 @@ impl RethInput {
             public_keys,
         })
     }
+
+    /// Serialize to bytes
+    pub fn serialize(&self) -> Result<Vec<u8>> {
+        bincode::serialize(self).context("Failed to serialize RethInput")
+    }
+
+    /// Deserialize from bytes
+    pub fn deserialize(bytes: &[u8]) -> Result<Self> {
+        bincode::deserialize(bytes).context("Failed to deserialize RethInput")
+    }
 }
 
 /// The witness part of the input
@@ -57,12 +67,12 @@ impl RethInputWitness {
     }
 
     /// Serialize to bytes
-    pub fn to_bytes(&self) -> Result<Vec<u8>> {
+    pub fn serialize(&self) -> Result<Vec<u8>> {
         bincode::serialize(self).context("Failed to serialize witness")
     }
 
     /// Deserialize from bytes
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
+    pub fn deserialize(bytes: &[u8]) -> Result<Self> {
         bincode::deserialize(bytes).context("Failed to deserialize witness")
     }
 }
@@ -111,12 +121,12 @@ impl RethInputPublic {
     }
 
     /// Serialize to bytes
-    pub fn to_bytes(&self) -> Result<Vec<u8>> {
-        bincode::serialize(&self.public_keys).context("Failed to serialize public keys")
+    pub fn serialize(&self) -> Result<Vec<u8>> {
+        bincode::serialize(self).context("Failed to serialize public keys")
     }
 
     /// Deserialize from bytes
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
+    pub fn deserialize(bytes: &[u8]) -> Result<Self> {
         bincode::deserialize(bytes).context("Failed to deserialize public keys")
     }
 }

@@ -112,9 +112,7 @@ pub enum GuestProgramCommand {
 impl GuestProgramCommand {
     pub fn display_name(&self) -> String {
         match self {
-            Self::StatelessValidator { .. } => {
-                "Stateless Validator".to_string()
-            }
+            Self::StatelessValidator { .. } => "Stateless Validator".to_string(),
         }
     }
 }
