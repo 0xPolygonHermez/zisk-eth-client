@@ -5,12 +5,6 @@ use walkdir::WalkDir;
 
 use witness_generator::StatelessValidationFixture;
 
-use zisk_sdk::{ZiskIO, ZiskStdin};
-
-use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
-
-use crate::types::OutputFormat;
-
 /// Reads fixture JSON files from a directory.
 pub fn fixtures_from_path(path: &Path) -> Result<Vec<StatelessValidationFixture>> {
     WalkDir::new(path)
@@ -28,59 +22,4 @@ pub fn fixtures_from_path(path: &Path) -> Result<Vec<StatelessValidationFixture>
             Ok(fixture)
         })
         .collect()
-}
-
-/// Generate a reth input from a fixture.
-pub fn reth_input_from_fixture(fixture: &StatelessValidationFixture) -> Result<RethInput> {
-    let reth_input = RethInput::new(&fixture.stateless_input)
-        .with_context(|| format!("Failed to create RethInput input for {}", fixture.name))?;
-    Ok(reth_input)
-}
-
-pub fn reth_input_to_file(
-    reth_input: RethInput,
-    file_name: &str,
-    output_dir: &Path,
-    format: OutputFormat,
-) -> Result<()> {
-    std::fs::create_dir_all(output_dir)?;
-
-    let extension = match format {
-        OutputFormat::Binary => "bin",
-        OutputFormat::Json => "json",
-    };
-    let filename = sanitize_filename(file_name);
-    let output_path = output_dir.join(format!("{}.{}", filename, extension));
-
-    let zisk_stdin = ZiskStdin::new();
-
-    // Write public
-    let public = RethInputPublic {
-        block: reth_input.stateless_input.block.clone(),
-        chain_config: reth_input.stateless_input.chain_config.clone(),
-        public_keys: reth_input.public_keys,
-    };
-    let pk_bytes = match format {
-        OutputFormat::Binary => bincode::serialize(&public)?,
-        OutputFormat::Json => serde_json::to_vec_pretty(&public)?,
-    };
-    zisk_stdin.write_slice(&pk_bytes);
-
-    // Write witness
-    let witness = RethInputWitness {
-        witness: reth_input.stateless_input.witness.clone(),
-    };
-    let main_bytes = match format {
-        OutputFormat::Binary => bincode::serialize(&witness)?,
-        OutputFormat::Json => serde_json::to_vec_pretty(&witness)?,
-    };
-    zisk_stdin.write_slice(&main_bytes);
-
-    zisk_stdin.save(&output_path)?;
-
-    Ok(())
-}
-
-fn sanitize_filename(name: &str) -> String {
-    name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_")
 }

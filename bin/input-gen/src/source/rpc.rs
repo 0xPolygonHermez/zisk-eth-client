@@ -1,6 +1,5 @@
 // TODO: Add old blocks via archive reth node
-// TODO: Substitute with commented code when `debug_execution_witness_by_block_hash` gets available for free-tiers RPC.
-// TODO: The previous two could get solved by using a premium RPC provider
+// TODO: Simplify when the `debug_execution_witness_by_block_hash` method gets available
 
 use alloy_eips::BlockNumberOrTag;
 use alloy_genesis::ChainConfig;
@@ -18,15 +17,10 @@ use stateless_reth::StatelessInput;
 
 use witness_generator::StatelessValidationFixture;
 
-use guest_reth::RethInput;
-
-use crate::{
-    common::{reth_input_from_fixture, reth_input_to_file},
-    types::OutputFormat,
-};
+use crate::client::ExecutionClient;
 
 #[allow(clippy::too_many_arguments)]
-pub async fn reth_input_files_from_rpc(
+pub async fn zisk_inputs_from_rpc(
     rpc_url: &str,
     rpc_headers: Option<Vec<String>>,
     block: Option<u64>,
@@ -34,12 +28,12 @@ pub async fn reth_input_files_from_rpc(
     range_of_blocks: Option<Vec<u64>>,
     follow: bool,
     output: &Path,
-    format: OutputFormat,
+    client: &dyn ExecutionClient,
 ) -> Result<()> {
     info!("Connecting to RPC: {}", rpc_url);
 
     // Initialize RPC client
-    let (client, chain_config, chain_name) = init_rpc_client(rpc_url, rpc_headers).await?;
+    let (rpc_client, chain_config, chain_name) = init_rpc_client(rpc_url, rpc_headers).await?;
 
     info!(
         "Connected to chain: {} (ID: {})",
@@ -48,7 +42,7 @@ pub async fn reth_input_files_from_rpc(
 
     // If follow is enabled, continuously listen for new blocks.
     if follow {
-        return follow_new_blocks(&client, &chain_config, chain_name, output, format).await;
+        return follow_new_blocks(&rpc_client, &chain_config, chain_name, output, client).await;
     }
 
     // Otherwise, process specified blocks.
@@ -72,7 +66,7 @@ pub async fn reth_input_files_from_rpc(
             info!("No blocks to process (last_n_blocks = 0)");
             return Ok(());
         }
-        let latest = fetch_latest_block_number(&client).await?;
+        let latest = fetch_latest_block_number(&rpc_client).await?;
         let start = latest.saturating_sub(n as u64 - 1);
         (start..=latest).collect()
     };
@@ -86,9 +80,17 @@ pub async fn reth_input_files_from_rpc(
     let mut success_count = 0;
     let mut error_count = 0;
     for block_num in block_numbers {
-        match fetch_and_generate_input(&client, block_num, &chain_config, chain_name).await {
-            Ok((reth_input, fixture_name)) => {
-                reth_input_to_file(reth_input, &fixture_name, output, format)?;
+        match process_block_for_client(
+            &rpc_client,
+            block_num,
+            &chain_config,
+            chain_name,
+            output,
+            client,
+        )
+        .await
+        {
+            Ok(_) => {
                 info!("Generated input for block: {}", block_num);
                 success_count += 1;
             }
@@ -103,6 +105,30 @@ pub async fn reth_input_files_from_rpc(
         "Completed: {} succeeded, {} failed",
         success_count, error_count
     );
+
+    Ok(())
+}
+
+/// Process a single block and generate input for the specified client
+async fn process_block_for_client(
+    rpc_client: &HttpClient,
+    block_num: u64,
+    chain_config: &ChainConfig,
+    chain_name: &str,
+    output: &Path,
+    client: &dyn ExecutionClient,
+) -> Result<()> {
+    let (fixture, fixture_name) = fetch_fixture(
+        rpc_client,
+        block_num,
+        chain_config,
+        chain_name,
+        client.name(),
+    )
+    .await?;
+
+    let result = client.generate_input(&fixture)?;
+    result.save_to_file(&fixture_name, output)?;
 
     Ok(())
 }
@@ -156,11 +182,11 @@ async fn init_rpc_client(
 
 /// Continuously follow and process new blocks
 async fn follow_new_blocks(
-    client: &HttpClient,
+    rpc_client: &HttpClient,
     chain_config: &ChainConfig,
     chain_name: &str,
     output: &Path,
-    format: OutputFormat,
+    client: &dyn ExecutionClient,
 ) -> Result<()> {
     info!("Following new blocks (press Ctrl+C to stop)...");
 
@@ -176,17 +202,16 @@ async fn follow_new_blocks(
         stop_clone.cancel();
     });
 
-    let mut next_block_num = fetch_latest_block_number(client).await?;
+    let mut next_block_num = fetch_latest_block_number(rpc_client).await?;
     let mut success_count = 0;
     let mut error_count = 0;
-
     loop {
         tokio::select! {
             _ = stop.cancelled() => {
                 info!("Stopped following blocks.");
                 break;
             }
-            result = process_new_blocks(client, &mut next_block_num, chain_config, chain_name, output, format) => {
+            result = process_new_blocks(rpc_client, &mut next_block_num, chain_config, chain_name, output, client) => {
                 match result {
                     Ok((successes, errors)) => {
                         success_count += successes;
@@ -219,14 +244,14 @@ async fn follow_new_blocks(
 
 /// Process any new blocks from next_block_num to latest
 async fn process_new_blocks(
-    client: &HttpClient,
+    rpc_client: &HttpClient,
     next_block_num: &mut u64,
     chain_config: &ChainConfig,
     chain_name: &str,
     output: &Path,
-    format: OutputFormat,
+    client: &dyn ExecutionClient,
 ) -> Result<(usize, usize)> {
-    let latest = fetch_latest_block_number(client).await?;
+    let latest = fetch_latest_block_number(rpc_client).await?;
 
     if *next_block_num > latest {
         return Ok((0, 0));
@@ -235,9 +260,17 @@ async fn process_new_blocks(
     let mut success_count = 0;
     let mut error_count = 0;
     for block_num in *next_block_num..=latest {
-        match fetch_and_generate_input(client, block_num, chain_config, chain_name).await {
-            Ok((reth_input, fixture_name)) => {
-                reth_input_to_file(reth_input, &fixture_name, output, format)?;
+        match process_block_for_client(
+            rpc_client,
+            block_num,
+            chain_config,
+            chain_name,
+            output,
+            client,
+        )
+        .await
+        {
+            Ok(_) => {
                 info!("Generated input for block: {}", block_num);
                 success_count += 1;
             }
@@ -269,12 +302,14 @@ async fn fetch_latest_block_number(client: &HttpClient) -> Result<u64> {
     Ok(block.header.number)
 }
 
-async fn fetch_and_generate_input(
+/// Fetch block data and create a fixture for the specified client
+async fn fetch_fixture(
     client: &HttpClient,
     block_num: u64,
     chain_config: &ChainConfig,
     chain_name: &str,
-) -> Result<(RethInput, String)> {
+    client_name: &str,
+) -> Result<(StatelessValidationFixture, String)> {
     // Fetch the execution witness using debug_execution_witness
     let witness =
         DebugApiClient::<()>::debug_execution_witness(client, BlockNumberOrTag::Number(block_num))
@@ -303,8 +338,8 @@ async fn fetch_and_generate_input(
 
     // Create the fixture
     let fixture_name = format!(
-        "{}_{}_{}_{}_zec_reth",
-        chain_name, block_num, tx_count, mgas
+        "{}_{}_{}_{}_zec_{}",
+        chain_name, block_num, tx_count, mgas, client_name
     );
     let fixture = StatelessValidationFixture {
         name: fixture_name.clone(),
@@ -317,113 +352,5 @@ async fn fetch_and_generate_input(
     };
 
     // Generate reth input
-    Ok((reth_input_from_fixture(&fixture)?, fixture_name))
+    Ok((fixture, fixture_name))
 }
-
-// // TODO: The following simplified version should work when the method `debug_execution_witness_by_block_hash`
-// //       gets available for free-tiers RPC. Otherwise, one should use `debug_execution_witness`
-// use anyhow::{anyhow, Context, Result};
-// use std::path::Path;
-// use tokio_util::sync::CancellationToken;
-// use tracing::{info, warn};
-// use witness_generator::{
-//     rpc_generator::{RpcBlocksAndWitnessesBuilder, RpcFlatHeaderKeyValues},
-//     FixtureGenerator,
-// };
-
-// use crate::common::{reth_input_from_fixture, read_fixtures_from_path, reth_input_to_file};
-// use crate::OutputFormat;
-
-// /// Process blocks from an RPC endpoint to generate reth inputs.
-// pub async fn reth_input_files_from_rpc(
-//     rpc_url: &str,
-//     rpc_headers: Option<Vec<String>>,
-//     block: Option<u64>,
-//     last_n_blocks: Option<usize>,
-//     follow: bool,
-//     output: &Path,
-//     format: OutputFormat,
-// ) -> Result<()> {
-//     info!("Connecting to RPC: {}", rpc_url);
-
-//     let mut builder = RpcBlocksAndWitnessesBuilder::new(rpc_url.to_string());
-
-//     if let Some(rpc_headers) = rpc_headers {
-//         let headers = RpcFlatHeaderKeyValues::new(rpc_headers)
-//             .try_into()
-//             .context("Failed to parse RPC headers")?;
-//         builder = builder.with_headers(headers);
-//     }
-
-//     // Determine which blocks to fetch
-//     if follow {
-//         let stop = CancellationToken::new();
-//         builder = builder.listen(stop.clone());
-
-//         tokio::spawn(async move {
-//             tokio::select! {
-//                 _ = tokio::signal::ctrl_c() => {
-//                     info!("Stopping...");
-//                     stop.cancel();
-//                 }
-//             }
-//         });
-//     } else if let Some(block_num) = block {
-//         builder = builder.block(block_num);
-//     } else {
-//         let n_blocks = last_n_blocks.unwrap_or(1);
-//         if n_blocks == 0 {
-//             return Err(anyhow!("Number of blocks must be greater than 0"));
-//         }
-//         builder = builder.last_n_blocks(n_blocks);
-//     }
-
-//     // info!(
-//     //     "Processing {} block(s): {:?}",
-//     //     block_numbers.len(),
-//     //     block_numbers
-//     // );
-
-//     let generator = builder
-//         .build()
-//         .await
-//         .context("Failed to build RPC generator")?;
-
-//     // Generate fixtures to a temp directory, then convert to reth inputs
-//     let temp_dir = tempfile::tempdir().context("Failed to create temp directory")?;
-
-//     let count = generator
-//         .generate_to_path(temp_dir.path())
-//         .await
-//         .context("Failed to generate RPC fixtures")?;
-
-//     info!(
-//         "Generated {} RPC fixtures, converting to reth inputs...",
-//         count
-//     );
-
-//     let fixtures = read_fixtures_from_path(temp_dir.path())?;
-
-//     let mut success_count = 0;
-//     let mut error_count = 0;
-//     for fixture in &fixtures {
-//         match reth_input_from_fixture(fixture) {
-//             Ok(reth_input) => {
-//                 reth_input_to_file(reth_input, &fixture.name, output, format)?;
-//                 info!("Generated input for: {}", fixture.name);
-//                 success_count += 1;
-//             }
-//             Err(e) => {
-//                 warn!("Failed to generate input for {}: {}", fixture.name, e);
-//                 error_count += 1;
-//             }
-//         }
-//     }
-
-//     info!(
-//         "Completed: {} succeeded, {} failed",
-//         success_count, error_count
-//     );
-
-//     Ok(())
-// }

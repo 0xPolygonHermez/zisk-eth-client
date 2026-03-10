@@ -4,19 +4,16 @@ use std::path::{Path, PathBuf};
 use tracing::{info, warn};
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
 
-use crate::{
-    common::{fixtures_from_path, reth_input_from_fixture, reth_input_to_file},
-    types::OutputFormat,
-};
+use crate::{client::ExecutionClient, common::fixtures_from_path};
 
 /// Process EEST (Ethereum Execution Specification Tests) to generate reth inputs.
-pub async fn reth_input_files_from_eest(
+pub async fn zisk_inputs_from_eest(
     tag: Option<String>,
     include: Option<Vec<String>>,
     exclude: Option<Vec<String>>,
     eest_fixtures_path: Option<PathBuf>,
     output: &Path,
-    format: OutputFormat,
+    client: &dyn ExecutionClient,
     num_threads: Option<usize>,
 ) -> Result<()> {
     if let Some(threads) = num_threads {
@@ -54,7 +51,7 @@ pub async fn reth_input_files_from_eest(
 
     info!("Generating EEST fixtures...");
 
-    // Generate fixtures to a temp directory, then convert to reth inputs
+    // Generate fixtures to a temp directory, then convert to ZisK inputs
     let temp_dir = tempfile::tempdir().context("Failed to create temp directory")?;
 
     let count = generator
@@ -63,7 +60,7 @@ pub async fn reth_input_files_from_eest(
         .context("Failed to generate EEST fixtures")?;
 
     info!(
-        "Generated {} EEST fixtures, converting to reth inputs...",
+        "Generated {} EEST fixtures, converting to ZisK inputs...",
         count
     );
 
@@ -72,14 +69,19 @@ pub async fn reth_input_files_from_eest(
     let mut success_count = 0;
     let mut error_count = 0;
     for fixture in &fixtures {
-        match reth_input_from_fixture(fixture) {
-            Ok(reth_input) => {
-                reth_input_to_file(reth_input, &fixture.name, output, format)?;
-                info!("Generated input for: {}", fixture.name);
+        match client.generate_input(fixture) {
+            Ok(result) => {
+                result.save_to_file(&fixture.name, output)?;
+                info!("Generated {} input for: {}", client.name(), fixture.name);
                 success_count += 1;
             }
             Err(e) => {
-                warn!("Failed to generate input for {}: {}", fixture.name, e);
+                warn!(
+                    "Failed to generate {} input for {}: {}",
+                    client.name(),
+                    fixture.name,
+                    e
+                );
                 error_count += 1;
             }
         }
