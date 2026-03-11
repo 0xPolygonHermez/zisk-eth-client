@@ -1362,7 +1362,6 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 
 [[package]]
 name = "clang-sys"
@@ -2688,12 +2687,10 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 [[package]]
 name = "lib-c"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 
 [[package]]
 name = "lib-float"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 
 [[package]]
 name = "libc"
@@ -3439,7 +3436,6 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -4535,7 +4531,6 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 
 [[package]]
 name = "rlp"
@@ -6400,7 +6395,6 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 dependencies = [
  "anyhow",
  "bincode",
@@ -6425,7 +6419,6 @@ dependencies = [
 [[package]]
 name = "zisk-core"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 dependencies = [
  "elf",
  "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
@@ -6445,12 +6438,10 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 
 [[package]]
 name = "zisk-verifier"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 dependencies = [
  "proofman-verifier",
 ]
@@ -6458,7 +6449,6 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 dependencies = [
  "anyhow",
  "bincode",
@@ -6488,7 +6478,6 @@ dependencies = [
 [[package]]
 name = "ziskos-hints"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream#ae8e82e9f076b4190de4d293f130eb05bcf4bc91"
 dependencies = [
  "anyhow",
  "bincode",

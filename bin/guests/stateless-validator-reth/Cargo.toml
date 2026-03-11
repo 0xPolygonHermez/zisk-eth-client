@@ -15,9 +15,9 @@ panic = "abort"
 [dependencies]
 guest-reth = { path = "../../../crates/guest-reth" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/input-stream" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/input-stream-merge" }
 # Local development
-# ziskos = { path = "../../../zisk/ziskos/entrypoint" }
+# ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 # alloy
 alloy-consensus = { version = "1.7.3", default-features = false }
