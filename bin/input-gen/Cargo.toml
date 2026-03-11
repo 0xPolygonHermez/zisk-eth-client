@@ -23,6 +23,7 @@ witness-generator.workspace = true
 
 # Common dependencies
 anyhow.workspace = true
+async-trait.workspace = true
 bincode.workspace = true
 clap.workspace = true
 rayon.workspace = true

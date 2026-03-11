@@ -9,10 +9,10 @@ mod processor;
 mod source;
 
 use client::{create_client, Client};
-use source::{eest::zisk_inputs_from_eest, rpc::zisk_inputs_from_rpc};
+use source::{eest::EestSource, rpc::RpcSource, InputSource};
 
 #[derive(Parser)]
-#[command(name = "reth-input-generator")]
+#[command(name = "zisk-input-generator")]
 #[command(about = "Generate ZisK inputs from a variety of sources")]
 #[command(version)]
 struct Cli {
@@ -31,55 +31,10 @@ struct Cli {
 
 #[derive(Subcommand, Clone, Debug)]
 enum SourceCommand {
-    /// Generate inputs from Ethereum Execution Specification Tests (EEST)
-    Eest {
-        /// EEST release tag to use (e.g., "v0.1.0"). If empty, the latest release will be used.
-        #[arg(short, long, conflicts_with = "eest_fixtures_path")]
-        tag: Option<String>,
-
-        /// Input folder for EEST files. If not provided, --tag is required.
-        #[arg(short = 'p', long, conflicts_with = "tag")]
-        eest_fixtures_path: Option<PathBuf>,
-
-        /// Include only test names containing the provided strings.
-        #[arg(short, long)]
-        include: Option<Vec<String>>,
-
-        /// Exclude all test names containing the provided strings.
-        #[arg(short, long)]
-        exclude: Option<Vec<String>>,
-
-        /// Number of threads for parallel processing
-        #[arg(short, long, default_value = "10")]
-        threads: Option<usize>,
-    },
-
-    /// Generate inputs from an RPC endpoint
-    Rpc {
-        /// RPC URL to use
-        #[arg(short = 'u', long)]
-        rpc_url: String,
-
-        /// Optional RPC headers (format: "Key:Value")
-        #[arg(short = 'H', long)]
-        rpc_headers: Option<Vec<String>>,
-
-        /// Number of last blocks to fetch (default: 1 if no other block selection method is used)
-        #[arg(short = 'l', long, group = "block_selection")]
-        last_n_blocks: Option<usize>,
-
-        /// Specific block number to fetch
-        #[arg(short = 'b', long, group = "block_selection")]
-        block: Option<u64>,
-
-        /// Fetch blocks in a range (inclusive)
-        #[arg(short = 'r', long, num_args = 2, value_names = ["START", "END"], group = "block_selection")]
-        range_of_blocks: Option<Vec<u64>>,
-
-        /// Listen for new blocks
-        #[arg(short = 'f', long, default_value_t = false, group = "block_selection")]
-        follow: bool,
-    },
+    /// Generate from EEST fixtures
+    Eest(#[command(flatten)] EestSource),
+    /// Generate from RPC endpoint  
+    Rpc(#[command(flatten)] RpcSource),
 }
 
 #[tokio::main]
@@ -103,44 +58,13 @@ async fn main() -> Result<()> {
         .with_context(|| format!("Failed to create output folder: {}", output.display()))?;
 
     match cli.source {
-        SourceCommand::Eest {
-            tag,
-            include,
-            exclude,
-            eest_fixtures_path,
-            threads,
-        } => {
-            zisk_inputs_from_eest(
-                tag,
-                include,
-                exclude,
-                eest_fixtures_path,
-                &output,
-                client.as_ref(),
-                threads,
-            )
-            .await?;
+        SourceCommand::Eest(eest_source) => {
+            eest_source
+                .generate_inputs(client.as_ref(), &output)
+                .await?;
         }
-
-        SourceCommand::Rpc {
-            rpc_url,
-            rpc_headers,
-            block,
-            last_n_blocks,
-            range_of_blocks,
-            follow,
-        } => {
-            zisk_inputs_from_rpc(
-                &rpc_url,
-                rpc_headers,
-                block,
-                last_n_blocks,
-                range_of_blocks,
-                follow,
-                &output,
-                client.as_ref(),
-            )
-            .await?;
+        SourceCommand::Rpc(rpc_source) => {
+            rpc_source.generate_inputs(client.as_ref(), &output).await?;
         }
     }
 
