@@ -3,7 +3,7 @@ use std::path::Path;
 
 use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
 use witness_generator::StatelessValidationFixture;
-use zisk_sdk::{ZiskIO, ZiskStdin};
+use zisk_sdk::ZiskStdin;
 
 use super::ExecutionClient;
 use crate::source::SourceKind;
