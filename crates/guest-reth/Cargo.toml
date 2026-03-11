@@ -5,6 +5,8 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+guest-common.workspace = true
+
 anyhow.workspace = true
 bincode.workspace = true
 serde.workspace = true
