@@ -3,6 +3,8 @@ use std::path::Path;
 
 use witness_generator::StatelessValidationFixture;
 
+use crate::source::SourceKind;
+
 mod reth;
 
 /// Available clients for CLI selection
@@ -23,7 +25,15 @@ pub trait ExecutionClient: Send + Sync {
         self.name()
     }
 
-    /// Process a fixture: generate input and save to output directory
+    /// Which source types this client supports
+    fn supported_sources(&self) -> &'static [SourceKind];
+
+    /// Check if this client supports a given source type
+    fn supports_source(&self, source: SourceKind) -> bool {
+        self.supported_sources().contains(&source)
+    }
+
+    /// Process from a fixture: generate input and save to output directory
     fn process_fixture(
         &self,
         fixture: &StatelessValidationFixture,
