@@ -35,20 +35,16 @@ pub struct Cli {
     /// Path to ziskemu binary
     #[arg(long)]
     pub ziskemu: Option<PathBuf>,
+
+    /// Use emulator backend (Emu) instead of assembly (Asm)
+    #[arg(short = 'l', long, default_value_t = false)]
+    pub emulator: bool,
 }
 
 impl Cli {
     pub fn validate(&self) -> Result<(), String> {
         match self.action {
-            Action::VerifyConstraints | Action::Prove => {
-                if self.proving_key.is_none() {
-                    error!("Proving key is required for action {:?}", self.action);
-                    return Err(format!(
-                        "Proving key is required for action {:?}",
-                        self.action
-                    ));
-                }
-
+            Action::VerifyConstraints | Action::Prove | Action::Execute => {
                 if self.ziskemu.is_some() {
                     warn!(
                         "ZisK Emulator path is ignored when action is {:?}",
@@ -56,7 +52,7 @@ impl Cli {
                     );
                 }
             }
-            Action::Execute => {
+            Action::Ziskemu => {
                 if self.proving_key.is_some() {
                     warn!("Proving key is ignored when action is {:?}", self.action);
                 }
@@ -80,6 +76,8 @@ impl Cli {
 /// Actions to perform
 #[derive(Debug, Clone, ValueEnum, serde::Serialize)]
 pub enum Action {
+    /// Ziskemu
+    Ziskemu,
     /// Execute
     Execute,
     /// Verify constraints

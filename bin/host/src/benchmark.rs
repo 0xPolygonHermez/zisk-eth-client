@@ -26,11 +26,11 @@ pub struct BenchmarkRunner<'a> {
 impl<'a> BenchmarkRunner<'a> {
     pub fn new(cli: &'a Cli) -> Self {
         // Setup things
-        let zisk = if matches!(cli.action, Action::Execute) {
+        let zisk = if matches!(cli.action, Action::Ziskemu) {
             Zisk::new(&cli.elf).with_ziskemu(cli.ziskemu.as_ref().unwrap())
         } else {
             Zisk::new(&cli.elf)
-                .with_proving_key(cli.proving_key.as_ref().unwrap())
+                .with_proving_key(cli.proving_key.clone(), cli.emulator)
                 .expect("Failed to setup Zisk with proving key")
         };
 
@@ -84,7 +84,7 @@ impl<'a> BenchmarkRunner<'a> {
             .and_then(|s| s.to_str())
             .unwrap_or("unknown");
 
-        if matches!(self.cli.action, Action::Execute) {
+        if matches!(self.cli.action, Action::Ziskemu) {
             // If output folder exists, check if output file exists and skip if it does
             if let Some(ref output_folder) = self.cli.output_folder {
                 let filename = input_file.file_name().unwrap_or_default();
@@ -99,8 +99,10 @@ impl<'a> BenchmarkRunner<'a> {
             info!("[{}/{}] Running: {}", current, total, test_name);
 
             let time = Instant::now();
-            let metrics = self.zisk.execute(input_file)?;
+            let metrics = self.zisk.ziskemu(input_file)?;
             let elapsed = time.elapsed();
+
+            info!("Execution metrics: {:?}", metrics);
 
             info!(
                 "[{}/{}] Completed in {:.2}s",
@@ -138,7 +140,11 @@ impl<'a> BenchmarkRunner<'a> {
                 Action::Prove => {
                     unimplemented!("Prove action is not implemented yet");
                 }
-                Action::Execute => unreachable!(),
+                Action::Execute => {
+                    let metrics = self.zisk.execute(input_file)?;
+                    info!("Execution metrics: {:?}", metrics);
+                }
+                Action::Ziskemu => unreachable!(), // Handled above
             };
             let elapsed = time.elapsed();
 
