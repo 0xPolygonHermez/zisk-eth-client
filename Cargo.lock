@@ -1250,7 +1250,7 @@ dependencies = [
 [[package]]
 name = "asm-runner"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "anyhow",
  "libc",
@@ -1934,7 +1934,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 
 [[package]]
 name = "clang-sys"
@@ -2407,7 +2407,7 @@ dependencies = [
 [[package]]
 name = "curves"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "fields",
  "num-bigint 0.4.6",
@@ -2510,7 +2510,7 @@ dependencies = [
 [[package]]
 name = "data-bus"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "zisk-common",
  "zisk-core",
@@ -3485,7 +3485,7 @@ dependencies = [
 [[package]]
 name = "executor"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "anyhow",
  "asm-runner",
@@ -3634,7 +3634,7 @@ checksum = "28dea519a9695b9977216879a3ebfddf92f1c08c05d984f8996aecd6ecdc811d"
 [[package]]
 name = "fields"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "cfg-if 1.0.4",
  "num-bigint 0.4.6",
@@ -5264,12 +5264,12 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 [[package]]
 name = "lib-c"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 
 [[package]]
 name = "lib-float"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 
 [[package]]
 name = "libc"
@@ -5559,7 +5559,7 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 [[package]]
 name = "mem-common"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "clap",
  "fields",
@@ -5579,7 +5579,7 @@ dependencies = [
 [[package]]
 name = "mem-planner-cpp"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "mem-common",
  "proofman-common",
@@ -6735,7 +6735,7 @@ dependencies = [
 [[package]]
 name = "pil-std-lib"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "colored",
  "fields",
@@ -6854,7 +6854,7 @@ dependencies = [
 [[package]]
 name = "precomp-arith-eq"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
@@ -6891,7 +6891,7 @@ dependencies = [
 [[package]]
 name = "precomp-arith-eq-384"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -6928,7 +6928,7 @@ dependencies = [
 [[package]]
 name = "precomp-big-int"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "generic-array",
@@ -6950,7 +6950,7 @@ dependencies = [
 [[package]]
 name = "precomp-blake2"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "mem-common",
@@ -6970,7 +6970,7 @@ dependencies = [
 [[package]]
 name = "precomp-dma"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "generic-array",
@@ -6994,7 +6994,7 @@ dependencies = [
 [[package]]
 name = "precomp-keccakf"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "circuit",
  "fields",
@@ -7016,7 +7016,7 @@ dependencies = [
 [[package]]
 name = "precomp-poseidon2"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "mem-common",
@@ -7037,7 +7037,7 @@ dependencies = [
 [[package]]
 name = "precomp-sha256f"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "mem-common",
@@ -7057,7 +7057,7 @@ dependencies = [
 [[package]]
 name = "precompiles-common"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "mem-common",
@@ -7069,7 +7069,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -7087,7 +7087,7 @@ dependencies = [
 [[package]]
 name = "precompiles-hints"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "anyhow",
  "borsh",
@@ -7242,7 +7242,7 @@ dependencies = [
 [[package]]
 name = "proofman"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "bincode",
  "blake3",
@@ -7277,7 +7277,7 @@ dependencies = [
 [[package]]
 name = "proofman-common"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "bincode",
  "borsh",
@@ -7308,7 +7308,7 @@ dependencies = [
 [[package]]
 name = "proofman-hints"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "fields",
  "itoa",
@@ -7321,7 +7321,7 @@ dependencies = [
 [[package]]
 name = "proofman-macros"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7331,7 +7331,7 @@ dependencies = [
 [[package]]
 name = "proofman-starks-lib-c"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "crossbeam-channel 0.5.15",
  "tracing",
@@ -7340,7 +7340,7 @@ dependencies = [
 [[package]]
 name = "proofman-util"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "bincode",
  "bytemuck",
@@ -7352,7 +7352,7 @@ dependencies = [
 [[package]]
 name = "proofman-verifier"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "bytemuck",
  "fields",
@@ -9613,7 +9613,7 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 
 [[package]]
 name = "rkyv"
@@ -9687,7 +9687,7 @@ dependencies = [
 [[package]]
 name = "rom-setup"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "anyhow",
  "blake3",
@@ -10495,7 +10495,7 @@ dependencies = [
 [[package]]
 name = "sm-arith"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "num-bigint 0.4.6",
@@ -10516,7 +10516,7 @@ dependencies = [
 [[package]]
 name = "sm-binary"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "num-bigint 0.4.6",
@@ -10536,7 +10536,7 @@ dependencies = [
 [[package]]
 name = "sm-frequent-ops"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "clap",
  "fields",
@@ -10552,7 +10552,7 @@ dependencies = [
 [[package]]
 name = "sm-main"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "mem-common",
@@ -10572,7 +10572,7 @@ dependencies = [
 [[package]]
 name = "sm-mem"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "mem-common",
@@ -10593,7 +10593,7 @@ dependencies = [
 [[package]]
 name = "sm-rom"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "asm-runner",
  "fields",
@@ -12683,7 +12683,7 @@ dependencies = [
 [[package]]
 name = "witness"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#ed06d7825cfa7f2cf09da804da1f8bd0a84187c8"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#05531ae9f2f2a9003fbd8de044a6697709d34a13"
 dependencies = [
  "colored",
  "fields",
@@ -12927,7 +12927,7 @@ dependencies = [
 [[package]]
 name = "zisk-build"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -12940,7 +12940,7 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "anyhow",
  "bincode",
@@ -12965,7 +12965,7 @@ dependencies = [
 [[package]]
 name = "zisk-core"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "elf",
  "fields",
@@ -12985,12 +12985,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 
 [[package]]
 name = "zisk-distributed-common"
 version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "anyhow",
  "borsh",
@@ -13011,7 +13011,7 @@ dependencies = [
 [[package]]
 name = "zisk-pil"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "fields",
  "proofman-common",
@@ -13024,7 +13024,7 @@ dependencies = [
 [[package]]
 name = "zisk-sdk"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "anyhow",
  "asm-runner",
@@ -13032,6 +13032,7 @@ dependencies = [
  "colored",
  "executor",
  "fields",
+ "precompiles-hints",
  "proofman",
  "proofman-common",
  "proofman-util",
@@ -13050,7 +13051,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "proofman-verifier",
 ]
@@ -13058,7 +13059,7 @@ dependencies = [
 [[package]]
 name = "ziskemu"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "clap",
  "data-bus",
@@ -13085,7 +13086,7 @@ dependencies = [
 [[package]]
 name = "ziskos-hints"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fzisklib-func#6aada21401aa67a842210557f3150889c9f497d3"
 dependencies = [
  "anyhow",
  "bincode",

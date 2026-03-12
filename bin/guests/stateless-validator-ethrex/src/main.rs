@@ -16,7 +16,7 @@ fn main() {
 
     // Extract useful information for logging
     let block = input.block();
-    let (block_number, gas_used, tx_count) = extract_block_info(&block);
+    let (block_number, gas_used, tx_count) = extract_block_info(block);
     let chain_id = chain_config.chain_id;
     let chain = get_chain_name(chain_id);
     println!(
