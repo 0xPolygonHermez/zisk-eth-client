@@ -1362,7 +1362,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 
 [[package]]
 name = "clang-sys"
@@ -1616,9 +1616,9 @@ dependencies = [
 [[package]]
 name = "curves"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
+ "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
  "num-bigint",
  "num-traits",
 ]
@@ -2044,7 +2044,7 @@ dependencies = [
 [[package]]
 name = "fields"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
  "cfg-if",
  "num-bigint",
@@ -2688,12 +2688,12 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 [[package]]
 name = "lib-c"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 
 [[package]]
 name = "lib-float"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 
 [[package]]
 name = "libc"
@@ -3341,10 +3341,10 @@ dependencies = [
 [[package]]
 name = "pil-std-lib"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
  "colored",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
+ "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
  "num-bigint",
  "num-traits",
  "proofman-common",
@@ -3439,7 +3439,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -3517,7 +3517,7 @@ dependencies = [
 [[package]]
 name = "proofman"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
  "bincode",
  "blake3",
@@ -3528,7 +3528,7 @@ dependencies = [
  "crossbeam-channel",
  "csv",
  "curves",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
+ "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
  "libloading",
  "mpi",
  "num-bigint",
@@ -3540,7 +3540,6 @@ dependencies = [
  "proofman-starks-lib-c",
  "proofman-util",
  "proofman-verifier",
- "rand 0.9.2",
  "rayon",
  "serde",
  "serde_json",
@@ -3553,7 +3552,7 @@ dependencies = [
 [[package]]
 name = "proofman-common"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
  "bincode",
  "borsh",
@@ -3563,7 +3562,7 @@ dependencies = [
  "crossbeam-queue",
  "csv",
  "env",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
+ "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
  "lazy_static",
  "libloading",
  "mpi",
@@ -3584,9 +3583,9 @@ dependencies = [
 [[package]]
 name = "proofman-hints"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
+ "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
  "itoa",
  "proofman-common",
  "proofman-starks-lib-c",
@@ -3597,7 +3596,7 @@ dependencies = [
 [[package]]
 name = "proofman-macros"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3607,7 +3606,7 @@ dependencies = [
 [[package]]
 name = "proofman-starks-lib-c"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
  "crossbeam-channel",
  "tracing",
@@ -3616,7 +3615,7 @@ dependencies = [
 [[package]]
 name = "proofman-util"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
  "bincode",
  "bytemuck",
@@ -3628,10 +3627,10 @@ dependencies = [
 [[package]]
 name = "proofman-verifier"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
  "bytemuck",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
+ "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
  "proofman-util",
  "rayon",
  "tracing",
@@ -4535,7 +4534,7 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 
 [[package]]
 name = "rlp"
@@ -6183,10 +6182,10 @@ checksum = "d7249219f66ced02969388cf2bb044a09756a083d0fab1e566056b04d9fbcaa5"
 [[package]]
 name = "witness"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof#cf622d299875c45eebfc4c4b205012ab6bb76875"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
 dependencies = [
  "colored",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
+ "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
  "libloading",
  "proofman-common",
  "proofman-util",
@@ -6400,11 +6399,11 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 dependencies = [
  "anyhow",
  "bincode",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
+ "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
  "libc",
  "mpi",
  "proofman",
@@ -6425,10 +6424,10 @@ dependencies = [
 [[package]]
 name = "zisk-core"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 dependencies = [
  "elf",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
+ "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
  "lib-c",
  "lib-float",
  "paste",
@@ -6445,12 +6444,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 
 [[package]]
 name = "zisk-verifier"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 dependencies = [
  "proofman-verifier",
 ]
@@ -6458,7 +6457,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 dependencies = [
  "anyhow",
  "bincode",
@@ -6488,12 +6487,12 @@ dependencies = [
 [[package]]
 name = "ziskos-hints"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Finput-stream-merge#5f6816d77a1320b15abfee3087334555ebc6e88e"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.16.0#5a4a57c6795af3b74a791576cf7e1bee7dec7d93"
 dependencies = [
  "anyhow",
  "bincode",
  "cfg-if",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fwrite-proof)",
+ "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
  "getrandom 0.2.17",
  "lazy_static",
  "lib-c",

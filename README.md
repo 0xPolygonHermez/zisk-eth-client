@@ -1,64 +1,81 @@
-# Zisk Ethereum Client
+# ZisK Ethereum Client
 
-An experimental Ethereum execution client built for the ZisK zkVM.
-It allows you to build, run, and test Ethereum block execution inside the ZisK emulator.
+An experimental Ethereum execution client built for the [ZisK zkVM](https://github.com/0xPolygonHermez/zisk).
 
-## Prerequisites
+This project enables **stateless block validation** to run, verifying Ethereum blocks without maintaining full blockchain state by using execution witnesses. The validation runs inside the ZisK zkVM, allowing blocks to be proven in real-time.
 
-- [Rust](https://www.rust-lang.org/tools/install) (latest stable recommended).
-- [cargo-zisk](https://0xpolygonhermez.github.io/zisk/getting_started/installation.html) (ZisK’s Cargo wrapper).
-- A working Ethereum RPC endpoint (e.g. Infura, Alchemy, or your own node) for input files generation.
+## Project Structure
 
-## Build the guest program (zec-reth)
+```
+zisk-eth-client/
+├── bin/
+│   ├── guests/                  # zkVM guest programs
+│   │   └── stateless-validator-reth/  # Reth-based stateless validator
+│   ├── host/                    # Benchmark runner for guest programs
+│   └── input-gen/               # Input file generator
+└── crates/
+    ├── guest-reth/              # Core validation library for reth
+    └── input/                   # RPC data fetching utilities
+```
+
+## Quick Start
+
+### Prerequisites
+
+- [Rust](https://www.rust-lang.org/tools/install) (latest stable)
+- [cargo-zisk](https://0xpolygonhermez.github.io/zisk/getting_started/installation.html)
+- Ethereum RPC endpoint (Infura, Alchemy, or your own node) for input generation
+
+### 1. Build the Guest Program
 
 ```bash
-cd bin/guest
+cd bin/guests/stateless-validator-reth
 cargo-zisk build --release
 ```
 
-The compiled ELF file will be generated at:
-
-```bash
-./target/riscv64ima-zisk-zkvm-elf/release/zec-reth
+The ELF binary will be located at:
+```
+target/riscv64ima-zisk-zkvm-elf/release
 ```
 
-### Execute Ethereum Blocks
+### 2. Generate Input Files
 
-Sample input files for Ethereum blocks are provided in the `inputs` folder
-
-To run a block in the ZisK emulator, use:
+Generate an input file for a specific block:
 
 ```bash
-cargo-zisk run --release -i ./inputs/23583300_208_18_mainnet_24341035_74_5_zec_reth.bin
+cargo run --release --bin input-gen -- rpc -u <RPC_URL>
 ```
 
-Or, directly via the `ziskemu` tool:
+This command will fetch the latest block from the specified RPC endpoint and create a serialized input file `<chain>_<block_number>_<txs>_<mgas>_zec_reth.bin` in the `reth-inputs/` folder. 
+
+You can specify options to target specific blocks or ranges as needed. Refer to the [input-gen README](bin/input-gen/README.md) for detailed usage instructions.
+
+### 3. Execute in ZisK
+
+Run the block validation:
 
 ```bash
-ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zec-reth -i ./inputs/mainnet_24341035_74_5_zec_reth.bin
+ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
+        -i reth-inputs/*.bin
 ```
 
-## Generate Input Block Files
+## Components
 
-To generate your own input files, you can use the `input-gen` tool.
+| Component | Description |
+|-----------|-------------|
+| [**stateless-validator-reth**](bin/guests/stateless-validator-reth/) | zkVM guest program that validates Ethereum blocks statelessly |
+| [**host**](bin/host/) | Benchmark runner for executing/proving guest programs |
+| [**input-gen**](bin/input-gen/) | Generate inputs from RPC endpoints or EEST test fixtures |
+| [**guest-reth**](crates/guest-reth/) | Core library: crypto, validation logic, input types |
+| [**input**](crates/input/) | RPC data fetching with `FromRpc` trait |
 
-Example, generate an input file for block `22767493`:
+## Supported Chains
 
-```bash
-cargo build --release
-target/release/input-gen rpc --block 22767493 -u <RPC_URL>
-```
+- Ethereum Mainnet
+- Sepolia
+- Holesky
+- Hoodi
 
-Replace `<RPC_URL>` with the URL of an Ethereum Mainnet RPC endpoint.
+## License
 
-The command will create a file named `cccccc_22767493_xxx_yy_zec_reth.bin` in the default `reth-inputs` folder, where:
-
-- `cccccc` is the chain name (i.e. mainnet)
-- `xxx` is the number of transactions in the block
-- `yy` is the gas used in megagas (MGas)
-
-To place the file elsewhere, use the `-o` flag:
-
-```bash
-target/release/input-gen -o ./output rpc --block 22767493 -u <RPC_URL>
-```
+Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT License](LICENSE-MIT) at your option.
