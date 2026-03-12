@@ -4,10 +4,12 @@ ziskos::entrypoint!(main);
 use std::sync::Arc;
 
 use alloy_consensus::crypto::install_default_provider;
-use crypto::CustomEvmCrypto;
-use guest::{chain_name, extract_block_info, validate_block};
 use revm::install_crypto;
-use stateless_validator_reth::guest::StatelessValidatorRethInput;
+
+use guest_reth::{
+    CustomEvmCrypto, RethInputPublic, RethInputWitness, extract_block_info, get_chain_name,
+    get_chain_spec, validate_block_stateless, verify_signatures,
+};
 
 fn main() {
     #[cfg(zisk_hints)]
@@ -29,22 +31,34 @@ fn main() {
     install_crypto(CustomEvmCrypto::default());
     install_default_provider(Arc::new(CustomEvmCrypto::default())).unwrap();
 
-    // Read and deserialize input
-    let input: StatelessValidatorRethInput = ziskos::io::read();
+    // Read the public input
+    let public: RethInputPublic = ziskos::io::read();
 
-    // Get chain info
-    let chain_id = input.chain_config.chain_id;
-    let chain = chain_name(chain_id);
+    // Get chain config
+    let chain_config = public.chain_config().clone();
 
     // Extract useful information for logging
-    let (block_number, gas_used, tx_count) = extract_block_info(&input.new_payload_request);
-
-    // Validate the block
+    let block = public.block().clone();
+    let (block_number, gas_used, tx_count) = extract_block_info(&block);
+    let chain_id = chain_config.chain_id;
+    let chain = get_chain_name(chain_id);
     println!(
         "Executing block validation for {} Block #{} ({} txs)",
         chain, block_number, tx_count
     );
-    let block_hash = validate_block(input).expect("Block validation failed");
+
+    // Verify signatures
+    let chain_spec = get_chain_spec(&chain_config);
+    let block = verify_signatures(block, chain_spec.clone(), public.public_keys)
+        .expect("Signature verification failed");
+
+    // Read the witness
+    let witness: RethInputWitness = ziskos::io::read();
+
+    // Validate the block
+    let execution_witness = witness.witness().clone();
+    let block_hash = validate_block_stateless(block, execution_witness, chain_spec)
+        .expect("Block validation failed");
 
     // Commit to block hash as the output
     ziskos::io::commit(&block_hash);

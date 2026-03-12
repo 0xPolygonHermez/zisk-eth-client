@@ -13,27 +13,18 @@ codegen-units = 1
 panic = "abort"
 
 [dependencies]
-# local
-crypto = { path = "../../crates/crypto" }
-guest = { path = "../../crates/guest" }
+guest-reth = { path = "../../../crates/guest-reth" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.16.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/input-stream-merge" }
 # Local development
-# ziskos = { path = "../../../zisk/ziskos/entrypoint" }
+# ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 # alloy
-alloy-primitives = { version = "1.5.6", default-features = false, features = ["native-keccak"] }
-alloy-consensus = { version = "1.7.3", default-features = false, features = ["crypto-backend"] }
+alloy-consensus = { version = "1.7.3", default-features = false }
+alloy-primitives = { version = "1.5.6", features = ["native-keccak"] } # Needed for ZisK-accelerated keccak
 
 # revm
 revm = { version = "34.0.0", default-features = false }
-
-#ere
-stateless-validator-reth = { git = "https://github.com/eth-act/ere-guests.git", rev = "40006b91edcf0b73f021988f982aea0bbec5039a" }
-
-[patch.crates-io]
-# This patch removes "ring" as a dependency, that is not compatible with the ZisK toolchain
-ethereum_hashing = { git = "https://github.com/jsign/ethereum_hashing", rev = "08c88633b700d7447ef840d19ce7b369c44311de" }
 
 # Needed for deterministic Hashmap sort
 alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.27.3" }

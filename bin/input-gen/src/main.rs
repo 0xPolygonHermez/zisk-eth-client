@@ -1,82 +1,40 @@
-mod common;
-mod rpc;
-mod tests;
-mod types;
-
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 use tracing_subscriber::EnvFilter;
 
-use rpc::reth_input_files_from_rpc;
-use tests::reth_input_files_from_tests;
-use types::OutputFormat;
+mod client;
+mod common;
+mod processor;
+mod source;
+
+use client::{create_client, Client};
+use source::{eest::EestSource, rpc::RpcSource, InputSource};
 
 #[derive(Parser)]
-#[command(name = "reth-input-generator")]
-#[command(about = "Generate Reth zkVM inputs from StatelessValidationFixture files")]
+#[command(name = "zisk-input-generator")]
+#[command(about = "Generate ZisK inputs from a variety of sources")]
 #[command(version)]
 struct Cli {
-    /// Output format
-    #[arg(short, long, default_value = "binary")]
-    format: OutputFormat,
-
-    /// Output folder for generated Reth input files
-    #[arg(short, long, default_value = "reth-inputs")]
-    output: PathBuf,
+    /// Execution client to generate inputs for
+    #[arg(short, long, value_enum, default_value = "reth")]
+    client: Client,
 
     /// Source of inputs
     #[command(subcommand)]
     source: SourceCommand,
+
+    /// Output folder for the generated ZisK input files (default: <client>-inputs)
+    #[arg(short, long)]
+    output: Option<PathBuf>,
 }
 
 #[derive(Subcommand, Clone, Debug)]
 enum SourceCommand {
-    /// Generate inputs from execution specification tests (EEST)
-    Tests {
-        /// EEST release tag to use (e.g., "v0.1.0"). If empty, the latest release will be used.
-        #[arg(short, long, conflicts_with = "eest_fixtures_path")]
-        tag: Option<String>,
-
-        /// Input folder for EEST files. If not provided, --tag is required.
-        #[arg(long, conflicts_with = "tag")]
-        eest_fixtures_path: Option<PathBuf>,
-
-        /// Include only test names containing the provided strings.
-        #[arg(short, long)]
-        include: Option<Vec<String>>,
-
-        /// Exclude all test names containing the provided strings.
-        #[arg(short, long)]
-        exclude: Option<Vec<String>>,
-
-        /// Number of threads for parallel processing (default: all available)
-        #[arg(long, default_value = "10")]
-        threads: Option<usize>,
-    },
-
-    /// Generate inputs from an RPC endpoint
-    Rpc {
-        /// RPC URL to use (mandatory)
-        #[arg(short = 'u', long)]
-        rpc_url: String,
-
-        /// Optional RPC headers (format: "Key:Value")
-        #[arg(short = 'h', long)]
-        rpc_headers: Option<Vec<String>>,
-
-        /// Specific block number to fetch
-        #[arg(long, conflicts_with_all = ["last_n_blocks", "follow"])]
-        block: Option<u64>,
-
-        /// Number of last blocks to fetch
-        #[arg(long, conflicts_with_all = ["block", "follow"])]
-        last_n_blocks: Option<usize>,
-
-        /// Listen for new blocks
-        #[arg(long, default_value_t = false, conflicts_with_all = ["last_n_blocks", "block"])]
-        follow: bool,
-    },
+    /// Generate from EEST fixtures
+    Eest(#[command(flatten)] EestSource),
+    /// Generate from RPC endpoint  
+    Rpc(#[command(flatten)] RpcSource),
 }
 
 #[tokio::main]
@@ -87,47 +45,26 @@ async fn main() -> Result<()> {
 
     let cli = Cli::parse();
 
+    // Create execution client
+    let client = create_client(&cli.client);
+
+    // Define output directory
+    let output = cli
+        .output
+        .unwrap_or_else(|| PathBuf::from(format!("{}-inputs", client.name())));
+
     // Create output directory if it doesn't exist
-    std::fs::create_dir_all(&cli.output)
-        .with_context(|| format!("Failed to create output folder: {}", cli.output.display()))?;
+    std::fs::create_dir_all(&output)
+        .with_context(|| format!("Failed to create output folder: {}", output.display()))?;
 
     match cli.source {
-        SourceCommand::Tests {
-            tag,
-            include,
-            exclude,
-            eest_fixtures_path,
-            threads,
-        } => {
-            reth_input_files_from_tests(
-                tag,
-                include,
-                exclude,
-                eest_fixtures_path,
-                &cli.output,
-                cli.format,
-                threads,
-            )
-            .await?;
+        SourceCommand::Eest(eest_source) => {
+            eest_source
+                .generate_inputs(client.as_ref(), &output)
+                .await?;
         }
-
-        SourceCommand::Rpc {
-            rpc_url,
-            rpc_headers,
-            block,
-            last_n_blocks,
-            follow,
-        } => {
-            reth_input_files_from_rpc(
-                &rpc_url,
-                rpc_headers,
-                block,
-                last_n_blocks,
-                follow,
-                &cli.output,
-                cli.format,
-            )
-            .await?;
+        SourceCommand::Rpc(rpc_source) => {
+            rpc_source.generate_inputs(client.as_ref(), &output).await?;
         }
     }
 

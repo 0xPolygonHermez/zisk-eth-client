@@ -22,17 +22,22 @@ fn main() -> Result<()> {
         write_metadata(&cli)?;
     }
 
-    info!("ZisK Ethereum Client Host");
-    info!(" Guest Program: {}", cli.guest_program.display_name());
+    info!("ZisK Host");
     info!(" Action: {:?}", cli.action);
-    info!(" ELF: {}\n", cli.elf.display());
+    info!(" ELF: {}", cli.elf.display());
+    info!(" Guest Program: {}", cli.guest_program.display_name());
 
     match &cli.guest_program {
         GuestProgramCommand::StatelessValidator {
             input_folder,
-            client: _,
+            client,
             gas_millions,
         } => {
+            info!(" Client: {:?}", client);
+            info!(" Input Folder: {}", input_folder.display());
+            if let Some(gas) = gas_millions {
+                info!(" Gas Filter: {}M", gas);
+            }
             let runner = BenchmarkRunner::new(&cli);
             runner.run(input_folder, *gas_millions)?;
         }
@@ -52,11 +57,11 @@ fn write_metadata(cli: &Cli) -> Result<()> {
 
     let mut file = File::create(&log_path)?;
 
-    writeln!(file, "ZisK Ethereum Client Host")?;
+    writeln!(file, "ZisK Host")?;
     writeln!(file, "=========================")?;
-    writeln!(file, "Guest Program: {}", cli.guest_program.display_name())?;
     writeln!(file, "Action: {:?}", cli.action)?;
     writeln!(file, "ELF: {}", cli.elf.display())?;
+    writeln!(file, "Guest Program: {}", cli.guest_program.display_name())?;
 
     // Add per-guest metadata
     match &cli.guest_program {
@@ -65,8 +70,8 @@ fn write_metadata(cli: &Cli) -> Result<()> {
             client,
             gas_millions,
         } => {
-            writeln!(file, "Input Folder: {}", input_folder.display())?;
             writeln!(file, "Client: {:?}", client)?;
+            writeln!(file, "Input Folder: {}", input_folder.display())?;
             if let Some(gas) = gas_millions {
                 writeln!(file, "Gas Filter: {}M", gas)?;
             }
