@@ -1,5 +1,5 @@
 [workspace]
-members = ["bin/host", "bin/input-gen", "crates/*"]
+members = ["bin/host", "bin/input-gen", "bin/input-gen-ethrex", "crates/*"]
 exclude = []
 resolver = "2"
 
@@ -8,16 +8,21 @@ version = "0.7.0"
 edition = "2021"
 
 [workspace.dependencies]
+guest-common = { path = "crates/guest-common" }
+guest-ethrex = { path = "crates/guest-ethrex" }
 guest-reth = { path = "crates/guest-reth" }
 input = { path = "crates/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.16.0" }
-# local dev
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/zisklib-func" }
 # zisk-sdk = { path = "../zisk/sdk" }
 
 revm = { version = "34.0.0", default-features = false }
 
-# alloy
+# types (for ethrex)
+primitive-types = "0.13.1"
+ethereum-types = "0.15.1"
+
+# types (for reth)
 alloy-primitives = "1.5.6"
 alloy = "1.7.3"
 alloy-consensus = { version = "1.7.3", default-features = false }
@@ -37,8 +42,15 @@ reth-primitives-traits = { git = "https://github.com/paradigmxyz/reth", tag = "v
 reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 
+# ethrex
+ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad" }
+ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad", default-features = false }
+ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad" }
+ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad", default-features = false }
+
 # stateless
 stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "68cd8e73682d21fed69670fc7eabe25e55c5cdbe", package = "stateless" }
+stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad", default-features = false, package = "ethrex-guest-program" }
 
 zeth-mpt-state = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", tag = "v0.5.0" }
 
@@ -70,6 +82,7 @@ walkdir = "2"
 jsonrpsee = { version = "0.26", features = ["http-client"] }
 http = "1.4.0"
 tempfile = "3"
+rkyv = { version = "0.8.10", features = ["std", "unaligned"] }
 
 [patch."https://github.com/paradigmxyz/stateless.git"]
 stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/68cd8e73" }

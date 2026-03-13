@@ -3,6 +3,8 @@ use std::os::raw::c_char;
 
 #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
 extern "C" {
+    pub fn keccak256_c(input: *const u8, input_len: usize, output: *mut u8);
+
     pub fn sha256_c(input: *const u8, input_len: usize, output: *mut u8);
 
     pub fn bn254_g1_add_c(p1: *const u8, p2: *const u8, ret: *mut u8) -> u8;
@@ -59,6 +61,8 @@ extern "C" {
     pub fn bls12_381_fp_to_g1_c(ret: *mut u8, fp: *const u8) -> u8;
 
     pub fn bls12_381_fp2_to_g2_c(ret: *mut u8, fp2: *const u8) -> u8;
+
+    pub fn mulmod256_c(a: *const u64, b: *const u64, m: *const u64, result: *mut u64);
 }
 
 #[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints))]

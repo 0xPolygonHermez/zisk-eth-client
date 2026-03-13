@@ -11,16 +11,14 @@ use revm::precompile::{
     Crypto, PrecompileError,
 };
 
-use super::CustomEvmCrypto;
-
 #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
-use super::ffi::*;
-
+use guest_common::ffi::*;
 #[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints))]
-use super::ffi::*;
-
+use guest_common::ffi::*;
 #[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints_debug))]
-use super::ffi::*;
+use guest_common::ffi::*;
+
+use super::CustomEvmCrypto;
 
 #[cfg(zisk_hints_debug)]
 pub fn hint_log<S: AsRef<str>>(msg: S) {
