@@ -47,8 +47,9 @@ Some input files are available in the `bin/guests/stateless-validator-reth/input
 Run the block validation:
 
 ```bash
+cd bin/guests/stateless-validator-reth
 ziskemu -e target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
-        -i bin/guests/stateless-validator-reth/inputs/<input_file>.bin
+        -i inputs/<input_file>.bin
 ```
 You can also generate your own inputs using the `input-gen` tool.
 
