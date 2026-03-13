@@ -11,7 +11,7 @@ cargo build --release -p host
 ## Usage
 
 ```bash
-zec-host [OPTIONS] --elf <ELF> <COMMAND>
+zec-host [OPTIONS] <COMMAND>
 ```
 
 ### Global Options
@@ -19,7 +19,6 @@ zec-host [OPTIONS] --elf <ELF> <COMMAND>
 | Option | Description | Default |
 |--------|-------------|---------|
 | `-a, --action <ACTION>` | Action to perform: `execute`, `ziskemu`, `verify-constraints`, `prove` | `execute` |
-| `-e, --elf <ELF>` | Path to the compiled ZisK ELF binary | Required |
 | `-l, --emulator` | Use emulator backend instead of assembly | `false` |
 | `--ziskemu <PATH>` | Path to ziskemu binary | Required for `execute` |
 | `-p, --proving-key <PATH>` | Path to the proving key file | Required for `verify-constraints`/`prove`. Defaults to installed one |
@@ -33,7 +32,7 @@ zec-host [OPTIONS] --elf <ELF> <COMMAND>
 Run stateless validator benchmarks.
 
 ```bash
-zec-host --elf <ELF> stateless-validator [OPTIONS]
+zec-host stateless-validator [OPTIONS]
 ```
 
 | Option | Description | Default |
@@ -47,30 +46,25 @@ zec-host --elf <ELF> stateless-validator [OPTIONS]
 ```bash
 # Run stateless validator benchmarks (execute action)
 zec-host --ziskemu /path/to/ziskemu \
-    --elf target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
     stateless-validator -i zkevm-fixtures-input
 
 # Filter by gas value (only run 10M gas tests)
 zec-host --ziskemu /path/to/ziskemu \
-    --elf target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
     stateless-validator -i zkevm-fixtures-input -g 10
 
 # Verify constraints
 zec-host -a verify-constraints \
     -p /path/to/proving-key.bin \
-    --elf target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
     stateless-validator -i zkevm-fixtures-input
 
 # Generate proofs
 zec-host -a prove \
     -p /path/to/proving-key.bin \
-    --elf target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
     stateless-validator -i zkevm-fixtures-input
 
 # Force rerun all benchmarks with custom output folder
 zec-host --force-rerun -o my-results \
     --ziskemu /path/to/ziskemu \
-    --elf target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
     stateless-validator -i zkevm-fixtures-input
 ```
 

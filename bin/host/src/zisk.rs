@@ -4,9 +4,7 @@ use std::{
     process::Command,
 };
 
-use zisk_sdk::{Asm, ElfBinaryFromFile, Emu, ProverClient, ZiskProgramPK, ZiskProver, ZiskStdin};
-
-use crate::elfs::{ELF_ETHREX, ELF_RETH};
+use zisk_sdk::{Asm, ElfBinary, Emu, ProverClient, ZiskProgramPK, ZiskProver, ZiskStdin};
 
 #[derive(Debug, serde::Serialize)]
 pub struct ZiskExecutionMetrics {
@@ -23,18 +21,18 @@ pub enum ZiskClient {
 }
 
 pub struct Zisk {
-    pub elf: PathBuf,
+    pub elf: ElfBinary,
+    pub zisk_client: Option<ZiskClient>,
     pub ziskemu: Option<PathBuf>,
-    pub client: Option<ZiskClient>,
     pub pk: Option<ZiskProgramPK>,
 }
 
 impl Zisk {
-    pub fn new(elf: impl Into<PathBuf>) -> Self {
+    pub fn new(elf: ElfBinary) -> Self {
         Self {
-            elf: elf.into(),
+            elf,
             ziskemu: None,
-            client: None,
+            zisk_client: None,
             pk: None,
         }
     }
@@ -51,8 +49,6 @@ impl Zisk {
         port: Option<u16>,
         unlock_mapped_memory: bool,
     ) -> Result<Self> {
-        let elf = ElfBinaryFromFile::new(&self.elf, false).context("Failed to load ELF binary")?;
-
         let client = if use_emulator {
             let prover = ProverClient::builder()
                 .emu()
@@ -61,7 +57,7 @@ impl Zisk {
                 .build()
                 .context("Failed to build ProverClient builder")?;
 
-            let (pk, _) = prover.setup(&elf).context("Failed to setup program")?;
+            let (pk, _) = prover.setup(&self.elf).context("Failed to setup program")?;
             self.pk = Some(pk);
             ZiskClient::Emu(prover)
         } else {
@@ -74,12 +70,12 @@ impl Zisk {
                 .build()
                 .context("Failed to build ProverClient builder")?;
 
-            let (pk, _) = prover.setup(&ELF_RETH).context("Failed to setup program")?;
+            let (pk, _) = prover.setup(&self.elf).context("Failed to setup program")?;
             self.pk = Some(pk);
             ZiskClient::Asm(prover)
         };
 
-        self.client = Some(client);
+        self.zisk_client = Some(client);
 
         Ok(self)
     }
@@ -90,7 +86,8 @@ impl Zisk {
             .ziskemu
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("ZisK Emulator path is required for execution"))?;
-        let elf_path = ELF_RETH
+        let elf_path = self
+            .elf
             .path()
             .ok_or_else(|| anyhow::anyhow!("ELF path not available"))?;
         let output = Command::new(ziskemu)
@@ -121,7 +118,7 @@ impl Zisk {
             .ok_or_else(|| anyhow::anyhow!("Proving key is not set up"))?;
 
         let client = self
-            .client
+            .zisk_client
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("Client is not set up"))?;
 
@@ -142,7 +139,7 @@ impl Zisk {
             .ok_or_else(|| anyhow::anyhow!("Proving key is not set up"))?;
 
         let client = self
-            .client
+            .zisk_client
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("Client is not set up"))?;
 

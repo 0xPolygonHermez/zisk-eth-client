@@ -6,11 +6,12 @@ use zisk_sdk::VerboseMode;
 
 mod benchmark;
 mod cli;
-mod zisk;
 mod elfs;
+mod zisk;
 
 use benchmark::BenchmarkRunner;
-use cli::{Cli, GuestProgramCommand};
+use cli::{Cli, Client, GuestProgramCommand};
+use elfs::{ELF_ETHREX, ELF_RETH};
 
 fn main() -> Result<()> {
     zisk_sdk::setup_logger(VerboseMode::Info);
@@ -25,7 +26,6 @@ fn main() -> Result<()> {
 
     info!("ZisK Host");
     info!(" Action: {:?}", cli.action);
-    info!(" ELF: {}", cli.elf.display());
     info!(" Guest Program: {}", cli.guest_program.display_name());
 
     match &cli.guest_program {
@@ -35,11 +35,22 @@ fn main() -> Result<()> {
             gas_millions,
         } => {
             info!(" Client: {:?}", client);
+
+            let elf = match client {
+                Client::Reth => ELF_RETH,
+                Client::EthRex => ELF_ETHREX,
+            };
+
+            info!(
+                " ELF Path: {}",
+                elf.path().unwrap_or_else(|| "N/A".to_string())
+            );
             info!(" Input Folder: {}", input_folder.display());
             if let Some(gas) = gas_millions {
                 info!(" Gas Filter: {}M", gas);
             }
-            let runner = BenchmarkRunner::new(&cli);
+
+            let runner = BenchmarkRunner::new(&cli, elf);
             runner.run(input_folder, *gas_millions)?;
         }
     }
@@ -61,7 +72,6 @@ fn write_metadata(cli: &Cli) -> Result<()> {
     writeln!(file, "ZisK Host")?;
     writeln!(file, "=========================")?;
     writeln!(file, "Action: {:?}", cli.action)?;
-    writeln!(file, "ELF: {}", cli.elf.display())?;
     writeln!(file, "Guest Program: {}", cli.guest_program.display_name())?;
 
     // Add per-guest metadata

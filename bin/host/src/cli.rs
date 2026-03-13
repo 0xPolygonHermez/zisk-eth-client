@@ -24,10 +24,6 @@ pub struct Cli {
     #[arg(short, long)]
     pub output_folder: Option<PathBuf>,
 
-    /// Path to the compiled guest program ELF binary
-    #[arg(short, long)]
-    pub elf: PathBuf,
-
     /// Path to the proving key file (default: installed one)
     #[arg(short, long)]
     pub proving_key: Option<PathBuf>,
@@ -124,6 +120,9 @@ impl GuestProgramCommand {
 /// Execution clients for the stateless validator
 #[derive(Debug, Copy, Clone, ValueEnum, serde::Serialize)]
 pub enum Client {
+    /// Reth execution client
     Reth,
+    /// EthRex execution client
+    EthRex,
     //Add more execution clients here as needed
 }

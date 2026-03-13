@@ -1,5 +1,4 @@
-
-use zisk_sdk::{include_elf, ElfBinary};
+use zisk_sdk::{ElfBinary, include_elf};
 
 pub(crate) const ELF_RETH: ElfBinary = include_elf!("zec-reth");
 

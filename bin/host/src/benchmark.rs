@@ -5,6 +5,7 @@ use std::{
     time::Instant,
 };
 use tracing::{error, info};
+use zisk_sdk::ElfBinary;
 
 use crate::{
     cli::{Action, Cli},
@@ -24,13 +25,18 @@ pub struct BenchmarkRunner<'a> {
 }
 
 impl<'a> BenchmarkRunner<'a> {
-    pub fn new(cli: &'a Cli) -> Self {
+    pub fn new(cli: &'a Cli, elf: ElfBinary) -> Self {
         // Setup things
         let zisk = if matches!(cli.action, Action::Ziskemu) {
-            Zisk::new(&cli.elf).with_ziskemu(cli.ziskemu.as_ref().unwrap())
+            Zisk::new(elf).with_ziskemu(cli.ziskemu.as_ref().unwrap())
         } else {
-            Zisk::new(&cli.elf)
-                .with_proving_key(cli.proving_key.clone(), cli.emulator, cli.port, cli.unlock_mapped_memory)
+            Zisk::new(elf)
+                .with_proving_key(
+                    cli.proving_key.clone(),
+                    cli.emulator,
+                    cli.port,
+                    cli.unlock_mapped_memory,
+                )
                 .expect("Failed to setup Zisk with proving key")
         };
 
