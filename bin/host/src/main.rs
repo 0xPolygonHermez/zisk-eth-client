@@ -7,6 +7,7 @@ use zisk_sdk::VerboseMode;
 mod benchmark;
 mod cli;
 mod zisk;
+mod elfs;
 
 use benchmark::BenchmarkRunner;
 use cli::{Cli, GuestProgramCommand};

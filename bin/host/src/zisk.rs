@@ -6,6 +6,8 @@ use std::{
 
 use zisk_sdk::{Asm, ElfBinaryFromFile, Emu, ProverClient, ZiskProgramPK, ZiskProver, ZiskStdin};
 
+use crate::elfs::{/*ELF_ETHREX,*/ ELF_RETH};
+
 #[derive(Debug, serde::Serialize)]
 pub struct ZiskExecutionMetrics {
     pub steps: u64,
@@ -20,7 +22,6 @@ pub enum ZiskClient {
     Asm(ZiskProver<Asm>),
 }
 
-// #[derive(Debug, Clone)]
 pub struct Zisk {
     pub elf: PathBuf,
     pub ziskemu: Option<PathBuf>,
@@ -73,7 +74,7 @@ impl Zisk {
                 .build()
                 .context("Failed to build ProverClient builder")?;
 
-            let (pk, _) = prover.setup(&elf).context("Failed to setup program")?;
+            let (pk, _) = prover.setup(&ELF_RETH).context("Failed to setup program")?;
             self.pk = Some(pk);
             ZiskClient::Asm(prover)
         };
@@ -91,7 +92,7 @@ impl Zisk {
             .ok_or_else(|| anyhow::anyhow!("ZisK Emulator path is required for execution"))?;
         let output = Command::new(ziskemu)
             .arg("-e")
-            .arg(&self.elf)
+            .arg(&ELF_RETH.path())
             .arg("-i")
             .arg(input_file)
             .arg("--stats")
