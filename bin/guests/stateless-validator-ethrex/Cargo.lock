@@ -1778,11 +1778,11 @@ dependencies = [
 
 [[package]]
 name = "guest-common"
-version = "0.5.0"
+version = "0.7.0"
 
 [[package]]
 name = "guest-ethrex"
-version = "0.5.0"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "bincode",
