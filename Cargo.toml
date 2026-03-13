@@ -43,15 +43,14 @@ reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 
 # ethrex
-ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", rev = "93a7b16d600ae3f588ae5bde9d922a6c20d157ea" }
-ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", rev = "93a7b16d600ae3f588ae5bde9d922a6c20d157ea", default-features = false }
-ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", rev = "93a7b16d600ae3f588ae5bde9d922a6c20d157ea" }
-ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", rev = "93a7b16d600ae3f588ae5bde9d922a6c20d157ea", default-features = false }
-ethrex-vm = { git = "https://github.com/lambdaclass/ethrex.git", rev = "93a7b16d600ae3f588ae5bde9d922a6c20d157ea", default-features = false }
+ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad" }
+ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad", default-features = false }
+ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad" }
+ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad", default-features = false }
 
 # stateless
 stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "68cd8e73682d21fed69670fc7eabe25e55c5cdbe", package = "stateless" }
-stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", rev = "93a7b16d600ae3f588ae5bde9d922a6c20d157ea", default-features = false, package = "ethrex-guest-program" }
+stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad", default-features = false, package = "ethrex-guest-program" }
 
 zeth-mpt-state = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", tag = "v0.5.0" }
 
