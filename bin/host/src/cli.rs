@@ -13,7 +13,7 @@ pub struct Cli {
     pub action: Action,
 
     /// Force rerun even if results exist
-    #[arg(long, default_value_t = false)]
+    #[arg(short, long, default_value_t = false)]
     pub force_rerun: bool,
 
     /// Guest program to benchmark
@@ -25,10 +25,10 @@ pub struct Cli {
     pub output_folder: Option<PathBuf>,
 
     /// Path to the compiled guest program ELF binary
-    #[arg(long)]
+    #[arg(short, long)]
     pub elf: PathBuf,
 
-    /// Path to the proving key file
+    /// Path to the proving key file (default: installed one)
     #[arg(short, long)]
     pub proving_key: Option<PathBuf>,
 
@@ -76,10 +76,10 @@ impl Cli {
 /// Actions to perform
 #[derive(Debug, Clone, ValueEnum, serde::Serialize)]
 pub enum Action {
-    /// Ziskemu
-    Ziskemu,
     /// Execute
     Execute,
+    /// Ziskemu
+    Ziskemu,
     /// Verify constraints
     VerifyConstraints,
     /// Generate proof

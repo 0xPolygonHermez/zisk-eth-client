@@ -18,12 +18,13 @@ zec-host [OPTIONS] --elf <ELF> <COMMAND>
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-a, --action <ACTION>` | Action to perform: `execute`, `verify-constraints`, `prove` | `execute` |
-| `--elf <ELF>` | Path to the compiled ZisK ELF binary | Required |
+| `-a, --action <ACTION>` | Action to perform: `execute`, `ziskemu`, `verify-constraints`, `prove` | `execute` |
+| `-e, --elf <ELF>` | Path to the compiled ZisK ELF binary | Required |
+| `-l, --emulator` | Use emulator backend instead of assembly | `false` |
 | `--ziskemu <PATH>` | Path to ziskemu binary | Required for `execute` |
-| `-p, --proving-key <PATH>` | Path to the proving key file | Required for `verify-constraints`/`prove` |
+| `-p, --proving-key <PATH>` | Path to the proving key file | Required for `verify-constraints`/`prove`. Defaults to installed one |
 | `-o, --output-folder <PATH>` | Output folder for benchmark results | None |
-| `--force-rerun` | Force rerun even if results exist | `false` |
+| `-f, --force-rerun` | Force rerun even if results exist | `false` |
 
 ### Commands
 

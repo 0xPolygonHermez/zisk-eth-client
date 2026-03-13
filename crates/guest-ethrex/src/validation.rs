@@ -3,9 +3,7 @@ use std::sync::Arc;
 
 use ethrex_crypto::Crypto;
 use stateless_ethrex::{
-    common::ExecutionError,
-    execution::execution_program,
-    input::ProgramInput,
+    common::ExecutionError, execution::execution_program, input::ProgramInput,
     output::ProgramOutput,
 };
 
@@ -21,8 +19,7 @@ pub fn validate_block(input: EthrexInput, crypto: Arc<dyn Crypto>) -> Result<H25
 
     // Perform stateless validation
     let ProgramOutput {
-        last_block_hash,
-        ..
+        last_block_hash, ..
     } = execution_program(input, crypto)?;
 
     Ok(last_block_hash)
