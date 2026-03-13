@@ -56,7 +56,7 @@ input-gen rpc -u <RPC_URL> -l 5
 input-gen rpc -u <RPC_URL> -f
 
 # With custom headers
-input-gen rpc -u $RPC_URL -H "Authorization:Bearer TOKEN" -b 22767493
+input-gen rpc -u <RPC_URL> -H "Authorization:Bearer TOKEN" -b 22767493
 ```
 
 #### `eest` — Generate from EEST fixtures
