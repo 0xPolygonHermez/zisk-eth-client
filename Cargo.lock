@@ -1273,7 +1273,7 @@ dependencies = [
 [[package]]
 name = "asm-runner"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "anyhow",
  "libc",
@@ -1957,7 +1957,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 
 [[package]]
 name = "clang-sys"
@@ -1972,9 +1972,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.5.61"
+version = "4.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52fa72306bb30daf11bc97773431628e5b4916e97aaa74b7d3f625d4d495da02"
+checksum = "b193af5b67834b676abd72466a96c1024e6a6ad978a1f484bd90b85c94041351"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -1982,9 +1982,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.5.61"
+version = "4.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2071365c5c56eae7d77414029dde2f4f4ba151cf68d5a3261c9a40de428ace93"
+checksum = "714a53001bf66416adb0e2ef5ac857140e7dc3a0c48fb28b2f10762fc4b5069f"
 dependencies = [
  "anstream 1.0.0",
  "anstyle",
@@ -1994,9 +1994,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "4.5.61"
+version = "4.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dec5be1eea072311774b7b84ded287adbd9f293f9d23456817605c6042f4f5e0"
+checksum = "1110bd8a634a1ab8cb04345d8d878267d57c3cf1b38d91b71af6686408bbca6a"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -2006,9 +2006,9 @@ dependencies = [
 
 [[package]]
 name = "clap_lex"
-version = "1.0.1"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e78417baa3b3114dc0e95e7357389a249c4da97c3c2b540700079db6171bfd7"
+checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
 name = "cmake"
@@ -2533,7 +2533,7 @@ dependencies = [
 [[package]]
 name = "data-bus"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "zisk-common",
  "zisk-core",
@@ -3333,7 +3333,7 @@ dependencies = [
  "thiserror 2.0.18",
  "tokio",
  "tracing",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
 ]
 
 [[package]]
@@ -3428,7 +3428,7 @@ dependencies = [
  "tokio-util",
  "tower-http",
  "tracing",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
  "uuid",
 ]
 
@@ -3508,7 +3508,7 @@ dependencies = [
 [[package]]
 name = "executor"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "anyhow",
  "asm-runner",
@@ -4823,7 +4823,7 @@ dependencies = [
  "tokio",
  "tokio-util",
  "tracing",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
  "walkdir",
  "witness-generator",
  "zisk-sdk",
@@ -4842,7 +4842,7 @@ dependencies = [
  "tokio",
  "tokio-util",
  "tracing",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
  "url",
  "zisk-sdk",
 ]
@@ -5286,12 +5286,12 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 [[package]]
 name = "lib-c"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 
 [[package]]
 name = "lib-float"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 
 [[package]]
 name = "libc"
@@ -5582,7 +5582,7 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 [[package]]
 name = "mem-common"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "clap",
  "fields",
@@ -5602,7 +5602,7 @@ dependencies = [
 [[package]]
 name = "mem-planner-cpp"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "mem-common",
  "proofman-common",
@@ -6883,7 +6883,7 @@ dependencies = [
 [[package]]
 name = "precomp-arith-eq"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
@@ -6920,7 +6920,7 @@ dependencies = [
 [[package]]
 name = "precomp-arith-eq-384"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -6957,7 +6957,7 @@ dependencies = [
 [[package]]
 name = "precomp-big-int"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "generic-array",
@@ -6979,7 +6979,7 @@ dependencies = [
 [[package]]
 name = "precomp-blake2"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "mem-common",
@@ -6999,7 +6999,7 @@ dependencies = [
 [[package]]
 name = "precomp-dma"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "generic-array",
@@ -7023,7 +7023,7 @@ dependencies = [
 [[package]]
 name = "precomp-keccakf"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "circuit",
  "fields",
@@ -7045,7 +7045,7 @@ dependencies = [
 [[package]]
 name = "precomp-poseidon2"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "mem-common",
@@ -7066,7 +7066,7 @@ dependencies = [
 [[package]]
 name = "precomp-sha256f"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "mem-common",
@@ -7086,7 +7086,7 @@ dependencies = [
 [[package]]
 name = "precompiles-common"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "mem-common",
@@ -7098,7 +7098,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -7116,7 +7116,7 @@ dependencies = [
 [[package]]
 name = "precompiles-hints"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "anyhow",
  "borsh",
@@ -7330,7 +7330,7 @@ dependencies = [
  "sysinfo 0.35.2",
  "thiserror 2.0.18",
  "tracing",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
  "yansi",
 ]
 
@@ -9242,7 +9242,7 @@ dependencies = [
  "tracing-journald",
  "tracing-logfmt",
  "tracing-samply",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
 ]
 
 [[package]]
@@ -9258,7 +9258,7 @@ dependencies = [
  "opentelemetry_sdk",
  "tracing",
  "tracing-opentelemetry",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
  "url",
 ]
 
@@ -9648,7 +9648,7 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 
 [[package]]
 name = "rkyv"
@@ -9722,7 +9722,7 @@ dependencies = [
 [[package]]
 name = "rom-setup"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "anyhow",
  "blake3",
@@ -10530,7 +10530,7 @@ dependencies = [
 [[package]]
 name = "sm-arith"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "num-bigint 0.4.6",
@@ -10551,7 +10551,7 @@ dependencies = [
 [[package]]
 name = "sm-binary"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "num-bigint 0.4.6",
@@ -10571,7 +10571,7 @@ dependencies = [
 [[package]]
 name = "sm-frequent-ops"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "clap",
  "fields",
@@ -10587,7 +10587,7 @@ dependencies = [
 [[package]]
 name = "sm-main"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "mem-common",
@@ -10607,7 +10607,7 @@ dependencies = [
 [[package]]
 name = "sm-mem"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "mem-common",
@@ -10628,7 +10628,7 @@ dependencies = [
 [[package]]
 name = "sm-rom"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "asm-runner",
  "fields",
@@ -10769,7 +10769,7 @@ dependencies = [
  "tokio-stream",
  "tokio-util",
  "tracing",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
 ]
 
 [[package]]
@@ -11459,7 +11459,7 @@ dependencies = [
  "crossbeam-channel 0.5.15",
  "thiserror 2.0.18",
  "time",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
 ]
 
 [[package]]
@@ -11501,7 +11501,7 @@ checksum = "2d3a81ed245bfb62592b1e2bc153e77656d94ee6a0497683a65a12ccaf2438d0"
 dependencies = [
  "libc",
  "tracing-core",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
 ]
 
 [[package]]
@@ -11524,7 +11524,7 @@ dependencies = [
  "time",
  "tracing",
  "tracing-core",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
 ]
 
 [[package]]
@@ -11539,7 +11539,7 @@ dependencies = [
  "tracing",
  "tracing-core",
  "tracing-log",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
  "web-time",
 ]
 
@@ -11556,7 +11556,7 @@ dependencies = [
  "memmap2",
  "smallvec",
  "tracing-core",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
 ]
 
 [[package]]
@@ -11580,9 +11580,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-subscriber"
-version = "0.3.22"
+version = "0.3.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f30143827ddab0d256fd843b7a66d164e9f271cfa0dde49142c5ca0ca291f1e"
+checksum = "cb7f578e5945fb242538965c2d0b04418d38ec25c79d160cd279bf0731c8d319"
 dependencies = [
  "matchers",
  "nu-ansi-term",
@@ -12971,7 +12971,7 @@ dependencies = [
 [[package]]
 name = "zisk-build"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -12984,7 +12984,7 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "anyhow",
  "bincode",
@@ -13002,14 +13002,14 @@ dependencies = [
  "thiserror 2.0.18",
  "tokio",
  "tracing",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
  "zisk-core",
 ]
 
 [[package]]
 name = "zisk-core"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "elf",
  "fields",
@@ -13029,12 +13029,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 
 [[package]]
 name = "zisk-distributed-common"
 version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "anyhow",
  "borsh",
@@ -13047,7 +13047,7 @@ dependencies = [
  "thiserror 2.0.18",
  "tracing",
  "tracing-appender",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
  "uuid",
  "zisk-common",
 ]
@@ -13055,7 +13055,7 @@ dependencies = [
 [[package]]
 name = "zisk-pil"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "fields",
  "proofman-common",
@@ -13068,7 +13068,7 @@ dependencies = [
 [[package]]
 name = "zisk-sdk"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "anyhow",
  "asm-runner",
@@ -13095,7 +13095,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "proofman-verifier",
 ]
@@ -13103,7 +13103,7 @@ dependencies = [
 [[package]]
 name = "ziskemu"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "clap",
  "data-bus",
@@ -13130,7 +13130,7 @@ dependencies = [
 [[package]]
 name = "ziskos-hints"
 version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#66cb01b7770134ea7519a4bb3a7aed086739e397"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=fix%2Fexecute-cost#d8f48f285cc5d34d047a47b302cf389db8589af5"
 dependencies = [
  "anyhow",
  "bincode",

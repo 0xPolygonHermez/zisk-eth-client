@@ -6,7 +6,7 @@ use std::{
 
 use zisk_sdk::{Asm, ElfBinaryFromFile, Emu, ProverClient, ZiskProgramPK, ZiskProver, ZiskStdin};
 
-use crate::elfs::{/*ELF_ETHREX,*/ ELF_RETH};
+use crate::elfs::{ELF_ETHREX, ELF_RETH};
 
 #[derive(Debug, serde::Serialize)]
 pub struct ZiskExecutionMetrics {
@@ -90,9 +90,12 @@ impl Zisk {
             .ziskemu
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("ZisK Emulator path is required for execution"))?;
+        let elf_path = ELF_RETH
+            .path()
+            .ok_or_else(|| anyhow::anyhow!("ELF path not available"))?;
         let output = Command::new(ziskemu)
             .arg("-e")
-            .arg(&ELF_RETH.path())
+            .arg(&elf_path)
             .arg("-i")
             .arg(input_file)
             .arg("--stats")
