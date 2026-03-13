@@ -1,78 +1,105 @@
-# Stateless Validator Input Generator
+# ZisK Input Generator
 
 Generates serialized input files for the ZisK Ethereum Client stateless validator guest programs.
 
-## Prerequisites
+## Building
 
-The tool clones [zkevm-benchmark-workload](https://github.com/eth-act/zkevm-benchmark-workload) to generate witness data from Ethereum test fixtures.
+```bash
+cargo build --release -p input-gen
+```
 
 ## Usage
 
-Input generation is a two-step process:
-
-### Step 1: Generate Witness Fixtures
-
-First, run the script to download and generate witness fixtures from Ethereum test cases:
-
 ```bash
-./scripts/generate-witness.sh [OPTIONS]
+input-gen [OPTIONS] <COMMAND>
 ```
 
-This creates witness fixtures organized by gas category in `zkevm-fixtures-input/`.
+### Global Options
 
-#### Script Options
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-c, --client <CLIENT>` | Execution client: `reth` | `reth` |
+| `-o, --output <PATH>` | Output folder | `<client>-inputs` |
 
-All options are passed directly to `witness-generator-cli`. Common options include:
+### Commands
 
-- `--include <PATTERN>` - Filter tests by name pattern
-- `--tag <FORK>` - Specify EEST release tag
+#### `rpc` — Generate from RPC endpoint
 
-Check [witness-generator-cli](https://github.com/eth-act/zkevm-benchmark-workload/tree/master/crates/witness-generator-cli) for extensive documentation.
-
-#### Environment Variables
-
-- `RAYON_NUM_THREADS` - Number of parallel threads (default: 10)
-- `RUST_LOG` - Log level (default: `info`)
-
-### Step 2: Generate Reth Inputs
-
-Then, run the CLI tool to convert the witness fixtures into serialized inputs for the reth-based guest program:
+Fetch blocks directly from an Ethereum RPC endpoint.
 
 ```bash
-cargo run --release -- [OPTIONS]
+input-gen rpc -u <RPC_URL> [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `-u, --rpc-url <URL>` | RPC endpoint URL (required) |
+| `-H, --rpc-headers <K:V>` | Custom headers (repeatable) |
+| `-l, --last-n-blocks <N>` | Last N blocks |
+| `-b, --block <N>` | Specific block number |
+| `-r, --range-of-blocks <START> <END>` | Block range (inclusive) |
+| `-f, --follow` | Continuously follow new blocks |
+
+**Examples:**
+
+```bash
+# Single block
+input-gen rpc -u <RPC_URL> -b 22767493
+
+# Range of blocks
+input-gen rpc -u <RPC_URL> -r 22767490 22767500
+
+# Last 5 blocks
+input-gen rpc -u <RPC_URL> -l 5
+
+# Follow new blocks (Ctrl+C to stop)
+input-gen rpc -u <RPC_URL> -f
+
+# With custom headers
+input-gen rpc -u $RPC_URL -H "Authorization:Bearer TOKEN" -b 22767493
+```
+
+#### `eest` — Generate from EEST fixtures
+
+Generate inputs from [Ethereum Execution Spec Tests](https://github.com/ethereum/execution-spec-tests) fixtures.
+
+```bash
+input-gen eest [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `-t, --tag <TAG>` | EEST release tag |
+| `-p, --eest-fixtures-path <PATH>` | Path to fixtures |
+| `-i, --include <PATTERN>` | Filter tests by name (repeatable) |
+| `-e, --exclude <PATTERN>` | Exclude tests by name (repeatable) |
+| `-t, --threads <N>` | Number of threads for processing |
+
+**Examples:**
+
+```bash
+# Generate from default fixtures
+input-gen eest
+
+# Use specific release tag
+input-gen eest --tag v3.0.0
+
+# Filter by test name pattern
+input-gen eest --include modexp
 ```
 
 ## Output
 
-Generated inputs are organized by gas category in `zkevm-fixtures-input/`:
+Generated inputs are saved as `.bin` files with the naming convention:
 
 ```
-zkevm-fixtures-input/
-  1M/
-    test_foo.bin
-    test_bar.bin
-  10M/
-    ...
-  30M/
-    ...
-  100M/
-    ...
-  uncategorized/
-    ...
+<chain>_<block>_<txs>_<mgas>_zec_<client>.bin
 ```
 
-## Example
+Example: `mainnet_22767493_156_12_zec_reth.bin`
 
-```bash
-# Step 1: Generate witness fixtures
-./scripts/generate-witness.sh
-
-# Step 1 (filtered): Generate only modexp tests
-./scripts/generate-witness.sh --filter modexp
-
-# Step 1 (custom parallelism)
-RAYON_NUM_THREADS=4 ./scripts/generate-witness.sh
-
-# Step 2: Generate reth inputs
-cargo run --release
-```
+- **chain**: Network name (mainnet, sepolia, holesky, hoodi)
+- **block**: Block number
+- **txs**: Number of transactions
+- **mgas**: Gas used in megagas (MGas)
+- **client**: Target execution client
