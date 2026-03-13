@@ -32,13 +32,14 @@ fn main() -> Result<()> {
         GuestProgramCommand::StatelessValidator {
             input_folder,
             client,
-            gas_millions,
+            include,
+            exclude,
         } => {
             info!(" Client: {:?}", client);
 
             let elf = match client {
                 Client::Reth => ELF_RETH,
-                Client::EthRex => ELF_ETHREX,
+                Client::Ethrex => ELF_ETHREX,
             };
 
             info!(
@@ -46,12 +47,15 @@ fn main() -> Result<()> {
                 elf.path().unwrap_or_else(|| "N/A".to_string())
             );
             info!(" Input Folder: {}", input_folder.display());
-            if let Some(gas) = gas_millions {
-                info!(" Gas Filter: {}M", gas);
+            if let Some(include) = include {
+                info!(" Include Patterns: {:?}", include);
+            }
+            if let Some(exclude) = exclude {
+                info!(" Exclude Patterns: {:?}", exclude);
             }
 
             let runner = BenchmarkRunner::new(&cli, elf);
-            runner.run(input_folder, *gas_millions)?;
+            runner.run(input_folder, include.as_deref(), exclude.as_deref())?;
         }
     }
 
@@ -79,12 +83,16 @@ fn write_metadata(cli: &Cli) -> Result<()> {
         GuestProgramCommand::StatelessValidator {
             input_folder,
             client,
-            gas_millions,
+            include,
+            exclude,
         } => {
             writeln!(file, "Client: {:?}", client)?;
             writeln!(file, "Input Folder: {}", input_folder.display())?;
-            if let Some(gas) = gas_millions {
-                writeln!(file, "Gas Filter: {}M", gas)?;
+            if let Some(include) = include {
+                writeln!(file, "Include Patterns: {:?}", include)?;
+            }
+            if let Some(exclude) = exclude {
+                writeln!(file, "Exclude Patterns: {:?}", exclude)?;
             }
         }
     }

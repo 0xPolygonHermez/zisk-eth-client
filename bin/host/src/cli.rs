@@ -101,10 +101,13 @@ pub enum GuestProgramCommand {
         #[arg(short, long, default_value = "reth")]
         client: Client,
 
-        /// Filter tests by gas value in millions (e.g., 1, 5, 10, 20, 30, 60).
-        /// Only tests with "gas-value_XM" matching this value will be run.
-        #[arg(short = 'g', long)]
-        gas_millions: Option<u32>,
+        /// Include only files containing the provided strings.
+        #[arg(long)]
+        include: Option<Vec<String>>,
+
+        /// Exclude files containing the provided strings.
+        #[arg(long)]
+        exclude: Option<Vec<String>>,
     },
     // Add more guest programs here as needed
 }
@@ -123,6 +126,6 @@ pub enum Client {
     /// Reth execution client
     Reth,
     /// EthRex execution client
-    EthRex,
+    Ethrex,
     //Add more execution clients here as needed
 }
