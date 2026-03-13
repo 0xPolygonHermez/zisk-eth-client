@@ -11,7 +11,7 @@ edition = "2021"
 guest-reth = { path = "crates/guest-reth" }
 input = { path = "crates/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/input-stream-merge" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.16.0" }
 # local dev
 # zisk-sdk = { path = "../zisk/sdk" }
 
