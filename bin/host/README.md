@@ -11,19 +11,19 @@ cargo build --release -p host
 ## Usage
 
 ```bash
-zec-host [OPTIONS] --elf <ELF> <COMMAND>
+zec-host [OPTIONS] <COMMAND>
 ```
 
 ### Global Options
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-a, --action <ACTION>` | Action to perform: `execute`, `verify-constraints`, `prove` | `execute` |
-| `--elf <ELF>` | Path to the compiled ZisK ELF binary | Required |
+| `-a, --action <ACTION>` | Action to perform: `execute`, `ziskemu`, `verify-constraints`, `prove` | `execute` |
+| `-l, --emulator` | Use emulator backend instead of assembly | `false` |
 | `--ziskemu <PATH>` | Path to ziskemu binary | Required for `execute` |
-| `-p, --proving-key <PATH>` | Path to the proving key file | Required for `verify-constraints`/`prove` |
+| `-p, --proving-key <PATH>` | Path to the proving key file | Required for `verify-constraints`/`prove`. Defaults to installed one |
 | `-o, --output-folder <PATH>` | Output folder for benchmark results | None |
-| `--force-rerun` | Force rerun even if results exist | `false` |
+| `-f, --force-rerun` | Force rerun even if results exist | `false` |
 
 ### Commands
 
@@ -32,45 +32,50 @@ zec-host [OPTIONS] --elf <ELF> <COMMAND>
 Run stateless validator benchmarks.
 
 ```bash
-zec-host --elf <ELF> stateless-validator [OPTIONS]
+zec-host stateless-validator [OPTIONS]
 ```
 
 | Option | Description | Default |
 |--------|-------------|---------|
 | `-i, --input-folder <PATH>` | Input folder | Required |
-| `-c, --client <CLIENT>` | Execution client: `reth` | `reth` |
-| `-g, --gas-millions <N>` | Filter tests by gas value (e.g., 1, 5, 10, 20, 30, 60) | None (all tests) |
+| `-c, --client <CLIENT>` | Execution client: `reth`, `ethrex` | `reth` |
+| `--include <PATTERN>` | Include only tests matching pattern (repeatable) | None |
+| `--exclude <PATTERN>` | Exclude tests matching pattern (repeatable) | | None |
 
 ## Examples
 
 ```bash
-# Run stateless validator benchmarks (execute action)
-zec-host --ziskemu /path/to/ziskemu \
-    --elf target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
-    stateless-validator -i zkevm-fixtures-input
+# Run stateless validator benchmarks with ziskemu (uses installed proving key)
+zec-host -a ziskemu --ziskemu /path/to/ziskemu \
+    stateless-validator -i /path/to/input/folder
 
-# Filter by gas value (only run 10M gas tests)
-zec-host --ziskemu /path/to/ziskemu \
-    --elf target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
-    stateless-validator -i zkevm-fixtures-input -g 10
+# Filter by pattern (only 10M gas tests)
+zec-host -a ziskemu --ziskemu /path/to/ziskemu \
+    stateless-validator -i /path/to/input/folder --include gas-value_10M
+
+# Multiple include patterns (1M or 5M gas tests)
+zec-host -a ziskemu --ziskemu /path/to/ziskemu \
+    stateless-validator -i /path/to/input/folder --include gas-value_1M --include gas-value_5M
+
+# Exclude blob tests
+zec-host -a ziskemu --ziskemu /path/to/ziskemu \
+    stateless-validator -i /path/to/input/folder --exclude blob
+
+# Use ethrex client
+zec-host -a ziskemu --ziskemu /path/to/ziskemu \
+    stateless-validator -c ethrex -i /path/to/input/folder
+
+# Execute with SDK
+zec-host -a execute \
+    stateless-validator -i /path/to/input/folder
 
 # Verify constraints
 zec-host -a verify-constraints \
-    -p /path/to/proving-key.bin \
-    --elf target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
-    stateless-validator -i zkevm-fixtures-input
-
-# Generate proofs
-zec-host -a prove \
-    -p /path/to/proving-key.bin \
-    --elf target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
-    stateless-validator -i zkevm-fixtures-input
+    stateless-validator -i /path/to/input/folder
 
 # Force rerun all benchmarks with custom output folder
-zec-host --force-rerun -o my-results \
-    --ziskemu /path/to/ziskemu \
-    --elf target/riscv64ima-zisk-zkvm-elf/release/zec-reth \
-    stateless-validator -i zkevm-fixtures-input
+zec-host -a ziskemu -f -o my-results --ziskemu /path/to/ziskemu \
+    stateless-validator -i /path/to/input/folder
 ```
 
 ## Output

@@ -4,7 +4,7 @@ use std::{
     process::Command,
 };
 
-use zisk_sdk::{ElfBinaryFromFile, Emu, ProverClient, ZiskProgramPK, ZiskProver, ZiskStdin};
+use zisk_sdk::{Asm, ElfBinary, Emu, ProverClient, ZiskProgramPK, ZiskProver, ZiskStdin};
 
 #[derive(Debug, serde::Serialize)]
 pub struct ZiskExecutionMetrics {
@@ -14,20 +14,25 @@ pub struct ZiskExecutionMetrics {
     pub gas_used: Option<u64>,
 }
 
-// #[derive(Debug, Clone)]
+/// ZisK client backend wrapper
+pub enum ZiskClient {
+    Emu(ZiskProver<Emu>),
+    Asm(ZiskProver<Asm>),
+}
+
 pub struct Zisk {
-    pub elf: PathBuf,
+    pub elf: ElfBinary,
+    pub zisk_client: Option<ZiskClient>,
     pub ziskemu: Option<PathBuf>,
-    pub client: Option<ZiskProver<Emu>>,
     pub pk: Option<ZiskProgramPK>,
 }
 
 impl Zisk {
-    pub fn new(elf: impl Into<PathBuf>) -> Self {
+    pub fn new(elf: ElfBinary) -> Self {
         Self {
-            elf: elf.into(),
+            elf,
             ziskemu: None,
-            client: None,
+            zisk_client: None,
             pk: None,
         }
     }
@@ -37,33 +42,57 @@ impl Zisk {
         self
     }
 
-    pub fn with_proving_key(mut self, proving_key: impl Into<PathBuf>) -> Result<Self> {
-        let elf = ElfBinaryFromFile::new(&self.elf, false).context("Failed to load ELF binary")?;
+    pub fn with_proving_key(
+        mut self,
+        proving_key: Option<PathBuf>,
+        use_emulator: bool,
+        port: Option<u16>,
+        unlock_mapped_memory: bool,
+    ) -> Result<Self> {
+        let client = if use_emulator {
+            let prover = ProverClient::builder()
+                .emu()
+                .verify_constraints()
+                .proving_key_path_opt(proving_key)
+                .build()
+                .context("Failed to build ProverClient builder")?;
 
-        let client = ProverClient::builder()
-            .emu()
-            .verify_constraints()
-            .proving_key_path(proving_key.into())
-            .build()
-            .context("Failed to build ProverClient builder")?;
+            let (pk, _) = prover.setup(&self.elf).context("Failed to setup program")?;
+            self.pk = Some(pk);
+            ZiskClient::Emu(prover)
+        } else {
+            let prover = ProverClient::builder()
+                .asm()
+                .verify_constraints()
+                .proving_key_path_opt(proving_key)
+                .base_port_opt(port)
+                .unlock_mapped_memory(unlock_mapped_memory)
+                .build()
+                .context("Failed to build ProverClient builder")?;
 
-        let (pk, _) = client.setup(&elf).context("Failed to setup program")?;
+            let (pk, _) = prover.setup(&self.elf).context("Failed to setup program")?;
+            self.pk = Some(pk);
+            ZiskClient::Asm(prover)
+        };
 
-        self.client = Some(client);
-        self.pk = Some(pk);
+        self.zisk_client = Some(client);
 
         Ok(self)
     }
 
     /// Execute the guest program and return metrics
-    pub fn execute(&self, input_file: &Path) -> Result<ZiskExecutionMetrics> {
+    pub fn ziskemu(&self, input_file: &Path) -> Result<ZiskExecutionMetrics> {
         let ziskemu = self
             .ziskemu
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("ZisK Emulator path is required for execution"))?;
+        let elf_path = self
+            .elf
+            .path()
+            .ok_or_else(|| anyhow::anyhow!("ELF path not available"))?;
         let output = Command::new(ziskemu)
             .arg("-e")
-            .arg(&self.elf)
+            .arg(&elf_path)
             .arg("-i")
             .arg(input_file)
             .arg("--stats")
@@ -88,13 +117,43 @@ impl Zisk {
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("Proving key is not set up"))?;
 
-        self.client
+        let client = self
+            .zisk_client
             .as_ref()
-            .ok_or_else(|| anyhow::anyhow!("Client is not set up"))?
-            .verify_constraints(pk, stdin)
-            .context("Failed to verify constraints")?;
+            .ok_or_else(|| anyhow::anyhow!("Client is not set up"))?;
+
+        match client {
+            ZiskClient::Emu(prover) => prover.verify_constraints(pk, stdin)?,
+            ZiskClient::Asm(prover) => prover.verify_constraints(pk, stdin)?,
+        };
 
         Ok(())
+    }
+
+    pub fn execute(&self, input_file: &Path) -> Result<ZiskExecutionMetrics> {
+        let stdin = ZiskStdin::from_file(input_file).context("Failed to load input file")?;
+
+        let pk = self
+            .pk
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("Proving key is not set up"))?;
+
+        let client = self
+            .zisk_client
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("Client is not set up"))?;
+
+        let result = match client {
+            ZiskClient::Emu(prover) => prover.execute(pk, stdin)?,
+            ZiskClient::Asm(prover) => prover.execute(pk, stdin)?,
+        };
+
+        Ok(ZiskExecutionMetrics {
+            steps: result.get_execution_steps(),
+            cost: result.get_execution_total_cost(),
+            tx_count: None,
+            gas_used: None,
+        })
     }
 }
 

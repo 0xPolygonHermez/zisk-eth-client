@@ -13,6 +13,9 @@ serde_json.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
 
+[build-dependencies]
+zisk-sdk.workspace = true
+
 [features]
 default = []
 gpu = [ "zisk-sdk/gpu"]

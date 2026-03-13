@@ -5,6 +5,7 @@ use std::{
     time::Instant,
 };
 use tracing::{error, info};
+use zisk_sdk::ElfBinary;
 
 use crate::{
     cli::{Action, Cli},
@@ -24,30 +25,46 @@ pub struct BenchmarkRunner<'a> {
 }
 
 impl<'a> BenchmarkRunner<'a> {
-    pub fn new(cli: &'a Cli) -> Self {
+    pub fn new(cli: &'a Cli, elf: ElfBinary) -> Self {
         // Setup things
-        let zisk = if matches!(cli.action, Action::Execute) {
-            Zisk::new(&cli.elf).with_ziskemu(cli.ziskemu.as_ref().unwrap())
+        let zisk = if matches!(cli.action, Action::Ziskemu) {
+            Zisk::new(elf).with_ziskemu(cli.ziskemu.as_ref().unwrap())
         } else {
-            Zisk::new(&cli.elf)
-                .with_proving_key(cli.proving_key.as_ref().unwrap())
+            Zisk::new(elf)
+                .with_proving_key(
+                    cli.proving_key.clone(),
+                    cli.emulator,
+                    cli.port,
+                    cli.unlock_mapped_memory,
+                )
                 .expect("Failed to setup Zisk with proving key")
         };
 
         Self { cli, zisk }
     }
 
-    pub fn run(&self, input_folder: &Path, gas_millions: Option<u32>) -> Result<()> {
+    pub fn run(
+        &self,
+        input_folder: &Path,
+        include: Option<&[String]>,
+        exclude: Option<&[String]>,
+    ) -> Result<()> {
         let mut input_files = collect_input_files(input_folder)?;
 
-        // Filter by gas value if specified
-        if let Some(gas_mb) = gas_millions {
-            let gas_pattern = format!("gas-value_{}M", gas_mb);
-            info!(
-                "Filtering for gas value: {} (pattern: {})",
-                gas_mb, gas_pattern
-            );
-            input_files.retain(|file| file.to_string_lossy().contains(&gas_pattern));
+        if let Some(patterns) = include {
+            info!("Include patterns: {:?}", patterns);
+            input_files.retain(|file| {
+                let name = file.to_string_lossy();
+                patterns.iter().any(|p| name.contains(p))
+            });
+        }
+
+        if let Some(patterns) = exclude {
+            info!("Exclude patterns: {:?}", patterns);
+            input_files.retain(|file| {
+                let name = file.to_string_lossy();
+                !patterns.iter().any(|p| name.contains(p))
+            });
         }
 
         let total = input_files.len();
@@ -84,70 +101,79 @@ impl<'a> BenchmarkRunner<'a> {
             .and_then(|s| s.to_str())
             .unwrap_or("unknown");
 
-        if matches!(self.cli.action, Action::Execute) {
-            // If output folder exists, check if output file exists and skip if it does
-            if let Some(ref output_folder) = self.cli.output_folder {
-                let filename = input_file.file_name().unwrap_or_default();
-                let output_file = output_folder.join(filename).with_extension("json");
+        match self.cli.action {
+            Action::Ziskemu | Action::Execute => {
+                // If output folder exists, check if output file exists and skip if it does
+                if let Some(ref output_folder) = self.cli.output_folder {
+                    let filename = input_file.file_name().unwrap_or_default();
+                    let output_file = output_folder.join(filename).with_extension("json");
 
-                if output_file.exists() && !self.cli.force_rerun {
-                    info!("[{}/{}] Skipping {}", current, total, test_name);
-                    return Ok(false);
-                }
-            }
-
-            info!("[{}/{}] Running: {}", current, total, test_name);
-
-            let time = Instant::now();
-            let metrics = self.zisk.execute(input_file)?;
-            let elapsed = time.elapsed();
-
-            info!(
-                "[{}/{}] Completed in {:.2}s",
-                current,
-                total,
-                elapsed.as_secs_f64(),
-            );
-
-            // Write metrics to output folder if specified
-            if let Some(ref output_folder) = self.cli.output_folder {
-                let filename = input_file.file_name().unwrap_or_default();
-                let output_file = output_folder.join(filename).with_extension("json");
-
-                if let Some(parent) = output_file.parent() {
-                    fs::create_dir_all(parent)?;
+                    if output_file.exists() && !self.cli.force_rerun {
+                        info!("[{}/{}] Skipping {}", current, total, test_name);
+                        return Ok(false);
+                    }
                 }
 
-                let result = BenchmarkResult {
-                    test_name: test_name.to_string(),
-                    time: elapsed.as_secs_f64(),
-                    metrics,
+                info!("[{}/{}] Running: {}", current, total, test_name);
+
+                let time = Instant::now();
+                let metrics = match self.cli.action {
+                    Action::Ziskemu => self.zisk.ziskemu(input_file)?,
+                    Action::Execute => self.zisk.execute(input_file)?,
+                    _ => unreachable!(),
                 };
+                let elapsed = time.elapsed();
 
-                let output_json = serde_json::to_string_pretty(&result)?;
-                fs::write(&output_file, output_json)?;
+                info!("Execution metrics: {:?}", metrics);
+
+                info!(
+                    "[{}/{}] Completed in {:.2}s",
+                    current,
+                    total,
+                    elapsed.as_secs_f64(),
+                );
+
+                // Write metrics to output folder if specified
+                if let Some(ref output_folder) = self.cli.output_folder {
+                    let filename = input_file.file_name().unwrap_or_default();
+                    let output_file = output_folder.join(filename).with_extension("json");
+
+                    if let Some(parent) = output_file.parent() {
+                        fs::create_dir_all(parent)?;
+                    }
+
+                    let result = BenchmarkResult {
+                        test_name: test_name.to_string(),
+                        time: elapsed.as_secs_f64(),
+                        metrics,
+                    };
+
+                    let output_json = serde_json::to_string_pretty(&result)?;
+                    fs::write(&output_file, output_json)?;
+                }
             }
-        } else {
-            info!("[{}/{}] Testing: {}", current, total, test_name);
 
-            let time = Instant::now();
-            match self.cli.action {
-                Action::VerifyConstraints => {
-                    self.zisk.verify_constraints(input_file)?;
-                }
-                Action::Prove => {
-                    unimplemented!("Prove action is not implemented yet");
-                }
-                Action::Execute => unreachable!(),
-            };
-            let elapsed = time.elapsed();
+            Action::VerifyConstraints => {
+                info!(
+                    "[{}/{}] Verifying constraints: {}",
+                    current, total, test_name
+                );
 
-            info!(
-                "[{}/{}] PASSED in {:.2}s",
-                current,
-                total,
-                elapsed.as_secs_f64(),
-            );
+                let time = Instant::now();
+                self.zisk.verify_constraints(input_file)?;
+                let elapsed = time.elapsed();
+
+                info!(
+                    "[{}/{}] PASSED in {:.2}s",
+                    current,
+                    total,
+                    elapsed.as_secs_f64(),
+                );
+            }
+
+            Action::Prove => {
+                unimplemented!("Prove action is not implemented yet");
+            }
         }
 
         Ok(true)
