@@ -47,6 +47,8 @@ impl Zisk {
         mut self,
         proving_key: Option<PathBuf>,
         use_emulator: bool,
+        port: Option<u16>,
+        unlock_mapped_memory: bool,
     ) -> Result<Self> {
         let elf = ElfBinaryFromFile::new(&self.elf, false).context("Failed to load ELF binary")?;
 
@@ -66,6 +68,8 @@ impl Zisk {
                 .asm()
                 .verify_constraints()
                 .proving_key_path_opt(proving_key)
+                .base_port_opt(port)
+                .unlock_mapped_memory(unlock_mapped_memory)
                 .build()
                 .context("Failed to build ProverClient builder")?;
 

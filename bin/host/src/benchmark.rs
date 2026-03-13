@@ -30,7 +30,7 @@ impl<'a> BenchmarkRunner<'a> {
             Zisk::new(&cli.elf).with_ziskemu(cli.ziskemu.as_ref().unwrap())
         } else {
             Zisk::new(&cli.elf)
-                .with_proving_key(cli.proving_key.clone(), cli.emulator)
+                .with_proving_key(cli.proving_key.clone(), cli.emulator, cli.port, cli.unlock_mapped_memory)
                 .expect("Failed to setup Zisk with proving key")
         };
 
