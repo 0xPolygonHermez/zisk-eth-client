@@ -18,9 +18,8 @@ zec-host [OPTIONS] <COMMAND>
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-a, --action <ACTION>` | Action to perform: `execute`, `ziskemu`, `verify-constraints`, `prove` | `execute` |
+| `-a, --action <ACTION>` | Action to perform: `execute`, `verify-constraints`, `prove` | `execute` |
 | `-l, --emulator` | Use emulator backend instead of assembly | `false` |
-| `--ziskemu <PATH>` | Path to ziskemu binary | Required for `execute` |
 | `-p, --proving-key <PATH>` | Path to the proving key file | Required for `verify-constraints`/`prove`. Defaults to installed one |
 | `-o, --output-folder <PATH>` | Output folder for benchmark results | None |
 | `-f, --force-rerun` | Force rerun even if results exist | `false` |
@@ -45,37 +44,35 @@ zec-host stateless-validator [OPTIONS]
 ## Examples
 
 ```bash
-# Run stateless validator benchmarks with ziskemu (uses installed proving key)
-zec-host -a ziskemu --ziskemu /path/to/ziskemu \
-    stateless-validator -i /path/to/input/folder
+# Execute benchmarks (default action)
+zec-host stateless-validator -i /path/to/input/folder
+
+# Execute with emulator backend
+zec-host -l stateless-validator -i /path/to/input/folder
 
 # Filter by pattern (only 10M gas tests)
-zec-host -a ziskemu --ziskemu /path/to/ziskemu \
-    stateless-validator -i /path/to/input/folder --include gas-value_10M
+zec-host stateless-validator -i /path/to/input/folder --include gas-value_10M
 
 # Multiple include patterns (1M or 5M gas tests)
-zec-host -a ziskemu --ziskemu /path/to/ziskemu \
-    stateless-validator -i /path/to/input/folder --include gas-value_1M --include gas-value_5M
+zec-host stateless-validator -i /path/to/input/folder --include gas-value_1M --include gas-value_5M
 
 # Exclude blob tests
-zec-host -a ziskemu --ziskemu /path/to/ziskemu \
-    stateless-validator -i /path/to/input/folder --exclude blob
+zec-host stateless-validator -i /path/to/input/folder --exclude blob
 
 # Use ethrex client
-zec-host -a ziskemu --ziskemu /path/to/ziskemu \
-    stateless-validator -c ethrex -i /path/to/input/folder
-
-# Execute with SDK
-zec-host -a execute \
-    stateless-validator -i /path/to/input/folder
+zec-host stateless-validator -c ethrex -i /path/to/input/folder
 
 # Verify constraints
-zec-host -a verify-constraints \
-    stateless-validator -i /path/to/input/folder
+zec-host -a verify-constraints stateless-validator -i /path/to/input/folder
+
+# Generate proof
+zec-host -a prove stateless-validator -i /path/to/input/folder
 
 # Force rerun all benchmarks with custom output folder
-zec-host -a ziskemu -f -o my-results --ziskemu /path/to/ziskemu \
-    stateless-validator -i /path/to/input/folder
+zec-host -f -o my-results stateless-validator -i /path/to/input/folder
+
+# Use custom proving key
+zec-host -a prove -p /path/to/proving.key stateless-validator -i /path/to/input/folder
 ```
 
 ## Output

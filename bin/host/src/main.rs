@@ -17,7 +17,6 @@ fn main() -> Result<()> {
     zisk_sdk::setup_logger(VerboseMode::Info);
 
     let cli = Cli::parse();
-    cli.validate().map_err(|e| anyhow::anyhow!(e))?;
 
     // Write metadata to a separate file
     if cli.output_folder.is_some() {
@@ -27,7 +26,6 @@ fn main() -> Result<()> {
     info!("ZisK Host");
     info!(" Action: {:?}", cli.action);
     info!(" Guest Program: {}", cli.guest_program.display_name());
-
     match &cli.guest_program {
         GuestProgramCommand::StatelessValidator {
             input_folder,
@@ -54,7 +52,17 @@ fn main() -> Result<()> {
                 info!(" Exclude Patterns: {:?}", exclude);
             }
 
-            let runner = BenchmarkRunner::new(&cli, elf);
+            // Create benchmark runner and execute benchmarks
+            let runner = BenchmarkRunner::new(
+                elf,
+                cli.action,
+                cli.output_folder.clone(),
+                cli.force_rerun,
+                cli.proving_key.clone(),
+                cli.emulator,
+                cli.port,
+                cli.unlock_mapped_memory,
+            )?;
             runner.run(input_folder, include.as_deref(), exclude.as_deref())?;
         }
     }
