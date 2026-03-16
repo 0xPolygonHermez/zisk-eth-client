@@ -6,23 +6,23 @@ use tracing_subscriber::EnvFilter;
 mod client;
 mod common;
 mod processor;
-mod source;
+mod provider;
 
 use client::{create_client, Client};
-use source::{eest::EestSource, rpc::RpcSource, InputSource};
+use provider::{eest::EestProvider, rpc::RpcProvider, InputProvider};
 
 #[derive(Parser)]
 #[command(name = "zisk-input-generator")]
-#[command(about = "Generate ZisK inputs from a variety of sources")]
+#[command(about = "Generate ZisK inputs from a variety of providers for different execution clients", long_about = None)]
 #[command(version)]
 struct Cli {
     /// Execution client to generate inputs for
     #[arg(short, long, value_enum, default_value = "reth")]
     client: Client,
 
-    /// Source of inputs
+    /// Provider of inputs
     #[command(subcommand)]
-    source: SourceCommand,
+    provider: ProviderCommand,
 
     /// Output folder for the generated ZisK input files (default: <client>-inputs)
     #[arg(short, long)]
@@ -30,11 +30,11 @@ struct Cli {
 }
 
 #[derive(Subcommand, Clone, Debug)]
-enum SourceCommand {
+enum ProviderCommand {
     /// Generate from EEST fixtures
-    Eest(#[command(flatten)] EestSource),
+    Eest(#[command(flatten)] EestProvider),
     /// Generate from RPC endpoint  
-    Rpc(#[command(flatten)] RpcSource),
+    Rpc(#[command(flatten)] RpcProvider),
 }
 
 #[tokio::main]
@@ -57,14 +57,14 @@ async fn main() -> Result<()> {
     std::fs::create_dir_all(&output)
         .with_context(|| format!("Failed to create output folder: {}", output.display()))?;
 
-    match cli.source {
-        SourceCommand::Eest(eest_source) => {
-            eest_source
+    match cli.provider {
+        ProviderCommand::Eest(eest_provider) => {
+            eest_provider
                 .generate_inputs(client.as_ref(), &output)
                 .await?;
         }
-        SourceCommand::Rpc(rpc_source) => {
-            rpc_source.generate_inputs(client.as_ref(), &output).await?;
+        ProviderCommand::Rpc(rpc_provider) => {
+            rpc_provider.generate_inputs(client.as_ref(), &output).await?;
         }
     }
 
