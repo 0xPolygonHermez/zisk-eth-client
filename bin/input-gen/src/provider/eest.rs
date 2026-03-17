@@ -28,7 +28,7 @@ pub struct EestProvider {
     exclude: Option<Vec<String>>,
 
     /// Number of threads for parallel processing
-    #[arg(short, long, default_value = "10")]
+    #[arg(long, default_value = "10")]
     threads: Option<usize>,
 }
 

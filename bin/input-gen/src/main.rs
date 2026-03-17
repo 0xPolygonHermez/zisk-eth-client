@@ -12,9 +12,7 @@ use client::{create_client, Client};
 use provider::{eest::EestProvider, rpc::RpcProvider, InputProvider};
 
 #[derive(Parser)]
-#[command(name = "zisk-input-generator")]
-#[command(about = "Generate ZisK inputs from a variety of providers for different execution clients", long_about = None)]
-#[command(version)]
+#[command(version, about = "Generate ZisK inputs from a variety of providers for different execution clients", long_about = None)]
 struct Cli {
     /// Execution client to generate inputs for
     #[arg(short, long, value_enum, default_value = "reth")]
@@ -64,7 +62,9 @@ async fn main() -> Result<()> {
                 .await?;
         }
         ProviderCommand::Rpc(rpc_provider) => {
-            rpc_provider.generate_inputs(client.as_ref(), &output).await?;
+            rpc_provider
+                .generate_inputs(client.as_ref(), &output)
+                .await?;
         }
     }
 
