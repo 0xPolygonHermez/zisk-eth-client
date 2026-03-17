@@ -2,15 +2,22 @@ use anyhow::Result;
 use std::{
     fs,
     path::{Path, PathBuf},
-    time::Instant,
 };
 use tracing::{error, info};
+
 use zisk_sdk::ElfBinary;
 
 use crate::{
-    cli::{Action, Cli},
-    zisk::{Zisk, ZiskExecutionMetrics},
+    cli::Action,
+    zisk::{ZiskClient, ZiskExecutionMetrics},
 };
+
+pub struct BenchmarkRunner {
+    action: Action,
+    output_folder: Option<PathBuf>,
+    force_rerun: bool,
+    zisk_client: ZiskClient,
+}
 
 #[derive(Debug, serde::Serialize)]
 struct BenchmarkResult {
@@ -19,28 +26,31 @@ struct BenchmarkResult {
     metrics: ZiskExecutionMetrics,
 }
 
-pub struct BenchmarkRunner<'a> {
-    cli: &'a Cli,
-    zisk: Zisk,
-}
+impl BenchmarkRunner {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        elf: ElfBinary,
+        action: Action,
+        output_folder: Option<PathBuf>,
+        force_rerun: bool,
+        proving_key: Option<PathBuf>,
+        emulator: bool,
+        port: Option<u16>,
+        unlock_mapped_memory: bool,
+    ) -> Result<Self> {
+        let zisk_client = ZiskClient::new(elf).with_proving_key(
+            proving_key,
+            emulator,
+            port,
+            unlock_mapped_memory,
+        )?;
 
-impl<'a> BenchmarkRunner<'a> {
-    pub fn new(cli: &'a Cli, elf: ElfBinary) -> Self {
-        // Setup things
-        let zisk = if matches!(cli.action, Action::Ziskemu) {
-            Zisk::new(elf).with_ziskemu(cli.ziskemu.as_ref().unwrap())
-        } else {
-            Zisk::new(elf)
-                .with_proving_key(
-                    cli.proving_key.clone(),
-                    cli.emulator,
-                    cli.port,
-                    cli.unlock_mapped_memory,
-                )
-                .expect("Failed to setup Zisk with proving key")
-        };
-
-        Self { cli, zisk }
+        Ok(Self {
+            action,
+            output_folder,
+            force_rerun,
+            zisk_client,
+        })
     }
 
     pub fn run(
@@ -94,21 +104,20 @@ impl<'a> BenchmarkRunner<'a> {
         Ok(())
     }
 
-    /// Returns Ok(true) if ran, Ok(false) if skipped, Err if failed
     fn run_single(&self, input_file: &Path, current: usize, total: usize) -> Result<bool> {
         let test_name = input_file
             .file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or("unknown");
 
-        match self.cli.action {
-            Action::Ziskemu | Action::Execute => {
-                // If output folder exists, check if output file exists and skip if it does
-                if let Some(ref output_folder) = self.cli.output_folder {
+        match self.action {
+            Action::Execute => {
+                // Check if output file exists and skip if it does
+                if let Some(ref output_folder) = self.output_folder {
                     let filename = input_file.file_name().unwrap_or_default();
                     let output_file = output_folder.join(filename).with_extension("json");
 
-                    if output_file.exists() && !self.cli.force_rerun {
+                    if output_file.exists() && !self.force_rerun {
                         info!("[{}/{}] Skipping {}", current, total, test_name);
                         return Ok(false);
                     }
@@ -116,25 +125,15 @@ impl<'a> BenchmarkRunner<'a> {
 
                 info!("[{}/{}] Running: {}", current, total, test_name);
 
-                let time = Instant::now();
-                let metrics = match self.cli.action {
-                    Action::Ziskemu => self.zisk.ziskemu(input_file)?,
-                    Action::Execute => self.zisk.execute(input_file)?,
-                    _ => unreachable!(),
-                };
-                let elapsed = time.elapsed();
+                let metrics = self.zisk_client.execute(input_file)?;
+                let elapsed = metrics.duration.as_secs_f64();
 
                 info!("Execution metrics: {:?}", metrics);
 
-                info!(
-                    "[{}/{}] Completed in {:.2}s",
-                    current,
-                    total,
-                    elapsed.as_secs_f64(),
-                );
+                info!("[{}/{}] Completed in {:.2}s", current, total, elapsed);
 
-                // Write metrics to output folder if specified
-                if let Some(ref output_folder) = self.cli.output_folder {
+                // Write metrics to output file
+                if let Some(ref output_folder) = self.output_folder {
                     let filename = input_file.file_name().unwrap_or_default();
                     let output_file = output_folder.join(filename).with_extension("json");
 
@@ -144,7 +143,7 @@ impl<'a> BenchmarkRunner<'a> {
 
                     let result = BenchmarkResult {
                         test_name: test_name.to_string(),
-                        time: elapsed.as_secs_f64(),
+                        time: elapsed,
                         metrics,
                     };
 
@@ -159,16 +158,10 @@ impl<'a> BenchmarkRunner<'a> {
                     current, total, test_name
                 );
 
-                let time = Instant::now();
-                self.zisk.verify_constraints(input_file)?;
-                let elapsed = time.elapsed();
+                let metrics = self.zisk_client.verify_constraints(input_file)?;
+                let elapsed = metrics.duration.as_secs_f64();
 
-                info!(
-                    "[{}/{}] PASSED in {:.2}s",
-                    current,
-                    total,
-                    elapsed.as_secs_f64(),
-                );
+                info!("[{}/{}] PASSED in {:.2}s", current, total, elapsed);
             }
 
             Action::Prove => {

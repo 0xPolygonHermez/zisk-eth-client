@@ -811,7 +811,7 @@ impl CryptoProvider for CustomEvmCrypto {
                 }
             }
 
-            // Pause hint emission here so non-Zisk target execution cannot produce extra hints (e.g. keccak256)
+            // Pause hint emission here so non-ZisK target execution cannot produce extra hints (e.g. keccak256)
             #[cfg(zisk_hints)]
             let already_paused = unsafe { pause_hints() };
 

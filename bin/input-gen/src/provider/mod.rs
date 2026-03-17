@@ -4,18 +4,18 @@ pub mod rpc;
 use crate::client::ExecutionClient;
 use std::path::Path;
 
-/// Source type identifier
+/// Provider type identifier
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SourceKind {
+pub enum ProviderKind {
     Eest,
     Rpc,
 }
 
-/// Common trait for all input sources
+/// Common trait for all input providers
 #[async_trait::async_trait]
-pub trait InputSource: Send + Sync {
-    /// Identifier for the source type
-    fn kind(&self) -> SourceKind;
+pub trait InputProvider: Send + Sync {
+    /// Identifier for the provider type
+    fn kind(&self) -> ProviderKind;
 
     /// Generate ZisK inputs for the given client
     async fn generate_inputs(

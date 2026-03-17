@@ -1,6 +1,5 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
-use tracing::{error, warn};
 
 /// ZisK Ethereum Client Host - Benchmark runner
 #[derive(Parser, Debug)]
@@ -28,10 +27,6 @@ pub struct Cli {
     #[arg(short, long)]
     pub proving_key: Option<PathBuf>,
 
-    /// Path to ziskemu binary
-    #[arg(long)]
-    pub ziskemu: Option<PathBuf>,
-
     /// Use emulator backend (Emu) instead of assembly (Asm)
     #[arg(short = 'l', long, default_value_t = false)]
     pub emulator: bool,
@@ -43,45 +38,11 @@ pub struct Cli {
     pub unlock_mapped_memory: bool,
 }
 
-impl Cli {
-    pub fn validate(&self) -> Result<(), String> {
-        match self.action {
-            Action::VerifyConstraints | Action::Prove | Action::Execute => {
-                if self.ziskemu.is_some() {
-                    warn!(
-                        "ZisK Emulator path is ignored when action is {:?}",
-                        self.action
-                    );
-                }
-            }
-            Action::Ziskemu => {
-                if self.proving_key.is_some() {
-                    warn!("Proving key is ignored when action is {:?}", self.action);
-                }
-
-                if self.ziskemu.is_none() {
-                    error!(
-                        "ZisK Emulator path is required for action {:?}",
-                        self.action
-                    );
-                    return Err(format!(
-                        "ZisK Emulator path is required for action {:?}",
-                        self.action
-                    ));
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
 /// Actions to perform
 #[derive(Debug, Clone, ValueEnum, serde::Serialize)]
 pub enum Action {
     /// Execute
     Execute,
-    /// Ziskemu
-    Ziskemu,
     /// Verify constraints
     VerifyConstraints,
     /// Generate proof
