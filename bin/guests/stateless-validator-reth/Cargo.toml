@@ -35,15 +35,12 @@ alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git
 reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.11.0" }
 # reth-trie-common = { path = "../../../zisk-patch-reth/crates/trie/common" }
 
-[patch."https://github.com/eth-act/zkvm-ethereum-mpt.git"]
-# Needed for deterministic Hashmap sort
-zeth-mpt-state = { git = "https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git", branch = "zisk-hints/v0.5.0" }
-# zeth-mpt-state = { path = "../../../zisk-patch-zkvm-ethereum-mpt/crates/zeth-mpt-state" }
-
 [patch."https://github.com/paradigmxyz/stateless.git"]
-# Needed for function visibility
-stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/68cd8e73" }
+# Needed for function visibility and deterministic Hashmap sort
+stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
+tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
 # stateless = { path = "../zisk-patch-stateless/crates/stateless" }
+# tries = { path = "../zisk-patch-stateless/crates/tries" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }
