@@ -2921,7 +2921,7 @@ dependencies = [
 [[package]]
 name = "ef-tests"
 version = "0.1.0"
-source = "git+https://github.com/paradigmxyz/stateless?rev=68cd8e73682d21fed69670fc7eabe25e55c5cdbe#68cd8e73682d21fed69670fc7eabe25e55c5cdbe"
+source = "git+https://github.com/paradigmxyz/stateless?rev=ed189a51931e8589102f3139d48fdbb3bbe4c1f7#ed189a51931e8589102f3139d48fdbb3bbe4c1f7"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -2950,6 +2950,7 @@ dependencies = [
  "serde_json",
  "stateless",
  "thiserror 2.0.18",
+ "tries",
  "walkdir",
 ]
 
@@ -4089,7 +4090,7 @@ dependencies = [
  "serde_with",
  "stateless",
  "tiny-keccak",
- "zeth-mpt-state",
+ "tries",
 ]
 
 [[package]]
@@ -10797,15 +10798,13 @@ checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 [[package]]
 name = "stateless"
 version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-stateless.git?branch=zisk%2F68cd8e73#0663f63729085bd4aa061be6e97f23d1109c371e"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-stateless.git?branch=zisk%2Fed189a5#f6b0b763be923dfd5334d6762bb51173afabad90"
 dependencies = [
  "alloy-consensus",
  "alloy-genesis",
  "alloy-primitives",
  "alloy-rlp",
  "alloy-rpc-types-debug",
- "alloy-trie 0.9.5",
- "itertools 0.14.0",
  "reth-chainspec",
  "reth-consensus",
  "reth-ethereum-consensus",
@@ -10813,13 +10812,13 @@ dependencies = [
  "reth-evm",
  "reth-primitives-traits",
  "reth-trie-common",
- "reth-trie-sparse",
  "revm-bytecode",
  "revm-database-interface",
  "revm-state",
  "serde",
  "serde_with",
  "thiserror 2.0.18",
+ "tries",
 ]
 
 [[package]]
@@ -11607,6 +11606,24 @@ checksum = "a1631b201eb031b563d2e85ca18ec8092508e262a3196ce9bd10a67ec87b9f5c"
 dependencies = [
  "hash-db",
  "rlp 0.5.2",
+]
+
+[[package]]
+name = "tries"
+version = "0.1.0"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-stateless.git?branch=zisk%2Fed189a5#f6b0b763be923dfd5334d6762bb51173afabad90"
+dependencies = [
+ "alloy-primitives",
+ "alloy-rlp",
+ "alloy-rpc-types-debug",
+ "alloy-trie 0.9.5",
+ "itertools 0.14.0",
+ "reth-trie-common",
+ "reth-trie-sparse",
+ "revm-bytecode",
+ "revm-database-interface",
+ "thiserror 2.0.18",
+ "zeth-mpt",
 ]
 
 [[package]]
@@ -12741,7 +12758,7 @@ dependencies = [
 [[package]]
 name = "witness-generator"
 version = "0.1.0"
-source = "git+https://github.com/eth-act/zkevm-benchmark-workload.git?rev=a1f5dc47df7735500c1d8dfe055e966ee9f8070e#a1f5dc47df7735500c1d8dfe055e966ee9f8070e"
+source = "git+https://github.com/eth-act/zkevm-benchmark-workload.git?rev=63da9dde9b284dc4845cf7128c3f0d7c53d21654#63da9dde9b284dc4845cf7128c3f0d7c53d21654"
 dependencies = [
  "alloy-eips",
  "alloy-genesis",
@@ -12946,26 +12963,12 @@ dependencies = [
 [[package]]
 name = "zeth-mpt"
 version = "0.1.0"
-source = "git+https://github.com/eth-act/zkvm-ethereum-mpt.git?tag=v0.5.0#0e7ec8ecccf0d00ed1b7981155433e34b8746cc5"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-stateless.git?branch=zisk%2Fed189a5#f6b0b763be923dfd5334d6762bb51173afabad90"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
  "alloy-trie 0.8.1",
  "arrayvec",
-]
-
-[[package]]
-name = "zeth-mpt-state"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/zkvm-ethereum-mpt.git?tag=v0.5.0#0e7ec8ecccf0d00ed1b7981155433e34b8746cc5"
-dependencies = [
- "alloy-primitives",
- "alloy-rlp",
- "alloy-trie 0.9.5",
- "reth-trie-common",
- "revm-bytecode",
- "stateless",
- "zeth-mpt",
 ]
 
 [[package]]

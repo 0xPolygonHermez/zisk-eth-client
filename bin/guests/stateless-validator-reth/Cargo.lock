@@ -2314,7 +2314,7 @@ dependencies = [
  "serde_with",
  "stateless",
  "tiny-keccak",
- "zeth-mpt-state",
+ "tries",
 ]
 
 [[package]]
@@ -5149,15 +5149,13 @@ checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 [[package]]
 name = "stateless"
 version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-stateless.git?branch=zisk%2F68cd8e73#0663f63729085bd4aa061be6e97f23d1109c371e"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-stateless.git?branch=zisk%2Fed189a5#f6b0b763be923dfd5334d6762bb51173afabad90"
 dependencies = [
  "alloy-consensus",
  "alloy-genesis",
  "alloy-primitives",
  "alloy-rlp",
  "alloy-rpc-types-debug",
- "alloy-trie 0.9.5",
- "itertools 0.14.0",
  "reth-chainspec",
  "reth-consensus",
  "reth-ethereum-consensus",
@@ -5165,13 +5163,13 @@ dependencies = [
  "reth-evm",
  "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
  "reth-trie-common",
- "reth-trie-sparse",
  "revm-bytecode",
  "revm-database-interface",
  "revm-state",
  "serde",
  "serde_with",
  "thiserror 2.0.18",
+ "tries",
 ]
 
 [[package]]
@@ -5611,6 +5609,24 @@ dependencies = [
  "tracing-core",
  "tracing-log",
  "tracing-serde",
+]
+
+[[package]]
+name = "tries"
+version = "0.1.0"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-stateless.git?branch=zisk%2Fed189a5#f6b0b763be923dfd5334d6762bb51173afabad90"
+dependencies = [
+ "alloy-primitives",
+ "alloy-rlp",
+ "alloy-rpc-types-debug",
+ "alloy-trie 0.9.5",
+ "itertools 0.14.0",
+ "reth-trie-common",
+ "reth-trie-sparse",
+ "revm-bytecode",
+ "revm-database-interface",
+ "thiserror 2.0.18",
+ "zeth-mpt",
 ]
 
 [[package]]
@@ -6544,27 +6560,12 @@ dependencies = [
 [[package]]
 name = "zeth-mpt"
 version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git?branch=zisk-hints%2Fv0.5.0#a1e3d24cb5b402b2b4ec03aa0101f631d98d19ba"
+source = "git+https://github.com/0xPolygonHermez/zisk-patch-stateless.git?branch=zisk%2Fed189a5#f6b0b763be923dfd5334d6762bb51173afabad90"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
  "alloy-trie 0.8.1",
  "arrayvec",
-]
-
-[[package]]
-name = "zeth-mpt-state"
-version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git?branch=zisk-hints%2Fv0.5.0#a1e3d24cb5b402b2b4ec03aa0101f631d98d19ba"
-dependencies = [
- "alloy-primitives",
- "alloy-rlp",
- "alloy-trie 0.9.5",
- "itertools 0.14.0",
- "reth-trie-common",
- "revm-bytecode",
- "stateless",
- "zeth-mpt",
 ]
 
 [[package]]
