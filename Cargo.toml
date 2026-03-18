@@ -13,7 +13,8 @@ guest-ethrex = { path = "crates/guest-ethrex" }
 guest-reth = { path = "crates/guest-reth" }
 input = { path = "crates/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.0" }
+zisk-sdk = { git = "https://github.com/eth-act/zisk.git", branch = "feature/accelerator-spec-conformance" }
+# local dev
 # zisk-sdk = { path = "../zisk/sdk" }
 
 revm = { version = "34.0.0", default-features = false }
