@@ -3172,9 +3172,10 @@ dependencies = [
 [[package]]
 name = "ethrex-blockchain"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "bytes",
+ "crossbeam 0.8.4",
  "ethrex-common",
  "ethrex-crypto",
  "ethrex-metrics",
@@ -3193,7 +3194,7 @@ dependencies = [
 [[package]]
 name = "ethrex-common"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "bytes",
  "crc32fast",
@@ -3204,6 +3205,7 @@ dependencies = [
  "hex",
  "hex-literal",
  "hex-simd",
+ "indexmap 2.13.0",
  "k256",
  "kzg-rs",
  "lazy_static",
@@ -3225,7 +3227,7 @@ dependencies = [
 [[package]]
 name = "ethrex-config"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "ethrex-common",
  "ethrex-p2p",
@@ -3237,7 +3239,7 @@ dependencies = [
 [[package]]
 name = "ethrex-crypto"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "ark-bn254",
  "ark-ec",
@@ -3258,7 +3260,7 @@ dependencies = [
 [[package]]
 name = "ethrex-guest-program"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -3277,7 +3279,7 @@ dependencies = [
 [[package]]
 name = "ethrex-l2-common"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -3300,7 +3302,7 @@ dependencies = [
 [[package]]
 name = "ethrex-levm"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "bitvec",
  "bytes",
@@ -3324,11 +3326,11 @@ dependencies = [
 [[package]]
 name = "ethrex-metrics"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "axum",
  "ethrex-common",
- "prometheus 0.13.4",
+ "prometheus",
  "serde",
  "serde_json",
  "thiserror 2.0.18",
@@ -3340,7 +3342,7 @@ dependencies = [
 [[package]]
 name = "ethrex-p2p"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "aes",
  "aes-gcm",
@@ -3362,7 +3364,7 @@ dependencies = [
  "hmac",
  "indexmap 2.13.0",
  "lazy_static",
- "prometheus 0.14.0",
+ "prometheus",
  "rand 0.8.5",
  "rayon",
  "rustc-hash 2.1.1",
@@ -3383,7 +3385,7 @@ dependencies = [
 [[package]]
 name = "ethrex-rlp"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -3397,7 +3399,7 @@ dependencies = [
 [[package]]
 name = "ethrex-rpc"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "axum",
  "axum-extra",
@@ -3436,7 +3438,7 @@ dependencies = [
 [[package]]
 name = "ethrex-storage"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -3461,7 +3463,7 @@ dependencies = [
 [[package]]
 name = "ethrex-trie"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "anyhow",
  "bytes",
@@ -3485,7 +3487,7 @@ dependencies = [
 [[package]]
 name = "ethrex-vm"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=c1de67502f9ac49791c4a8efd654286a0b3b1bad#c1de67502f9ac49791c4a8efd654286a0b3b1bad"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=thread-crypto-through-keccak#c14a977800172dc34c6e62660e62c8e4476236d5"
 dependencies = [
  "bincode",
  "bytes",
@@ -7216,42 +7218,24 @@ dependencies = [
 
 [[package]]
 name = "procfs"
-version = "0.16.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "731e0d9356b0c25f16f33b5be79b1c57b562f141ebfcdb0ad8ac2c13a24293b4"
+checksum = "cc5b72d8145275d844d4b5f6d4e1eef00c8cd889edb6035c21675d1bb1f45c9f"
 dependencies = [
  "bitflags 2.11.0",
  "hex",
- "lazy_static",
  "procfs-core",
  "rustix 0.38.44",
 ]
 
 [[package]]
 name = "procfs-core"
-version = "0.16.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d3554923a69f4ce04c4a754260c338f505ce22642d3830e049a399fc2059a29"
+checksum = "239df02d8349b06fc07398a3a1697b06418223b1c7725085e801e7c0fc6a12ec"
 dependencies = [
  "bitflags 2.11.0",
  "hex",
-]
-
-[[package]]
-name = "prometheus"
-version = "0.13.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d33c28a30771f7f96db69893f78b857f7450d7e0237e9c8fc6427a81bae7ed1"
-dependencies = [
- "cfg-if 1.0.4",
- "fnv",
- "lazy_static",
- "libc",
- "memchr",
- "parking_lot",
- "procfs",
- "protobuf 2.28.0",
- "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -7263,9 +7247,11 @@ dependencies = [
  "cfg-if 1.0.4",
  "fnv",
  "lazy_static",
+ "libc",
  "memchr",
  "parking_lot",
- "protobuf 3.7.2",
+ "procfs",
+ "protobuf",
  "thiserror 2.0.18",
 ]
 
@@ -7453,12 +7439,6 @@ dependencies = [
  "quote",
  "syn 2.0.117",
 ]
-
-[[package]]
-name = "protobuf"
-version = "2.28.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "106dd99e98437432fed6519dedecfade6a06a73bb7b2a1e019fdd2bee5778d94"
 
 [[package]]
 name = "protobuf"
