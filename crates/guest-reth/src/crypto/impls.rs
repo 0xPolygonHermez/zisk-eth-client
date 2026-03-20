@@ -40,13 +40,24 @@ pub fn hint_log<S: AsRef<str>>(msg: S) {
 impl Crypto for CustomEvmCrypto {
     #[inline]
     fn ripemd160(&self, input: &[u8]) -> [u8; 32] {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            let mut output = zkvm_ripemd160_hash { data: [0u8; 32] };
+            #[cfg(zisk_hints)]
             unsafe {
-                zkvm_ripemd160(input.as_ptr(), input.len(), &mut output);
+                hint_ripemd160(input.as_ptr(), input.len());
             }
-            return output.data;
+
+            #[cfg(zisk_hints_debug)]
+            hint_log(format!("hint_ripemd160 (input len: {})", input.len()));
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut output = zkvm_ripemd160_hash { data: [0u8; 32] };
+                unsafe {
+                    zkvm_ripemd160(input.as_ptr(), input.len(), &mut output);
+                }
+                return output.data;
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]

@@ -24,6 +24,8 @@ pub use zkvm_api::*;
 extern "C" {
     pub fn hint_sha256(f: *const u8, len: usize);
 
+    pub fn hint_ripemd160(data_ptr: *const u8, data_len: usize);
+
     pub fn hint_bn254_g1_add(p1: *const u8, p2: *const u8);
 
     pub fn hint_bn254_g1_mul(point: *const u8, scalar: *const u8);
