@@ -222,18 +222,14 @@ impl Crypto for CustomEvmCrypto {
             #[cfg(zisk_hints)]
             unsafe {
                 let recid_bytes = (recid as u64).to_le_bytes();
-                hint_secp256k1_ecdsa_address_recover(
-                    sig.as_ptr(),
-                    recid_bytes.as_ptr(),
-                    msg.as_ptr(),
-                );
+                hint_secp256k1_ecrecover(sig.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr());
             }
 
             #[cfg(zisk_hints_debug)]
             {
                 let recid_bytes = (recid as u64).to_le_bytes();
                 hint_log(format!(
-                    "hint_secp256k1_ecdsa_address_recover (sig: {:x?}, recid: {:x?}, msg: {:x?})",
+                    "hint_secp256k1_ecrecover (sig: {:x?}, recid: {:x?}, msg: {:x?})",
                     &sig, &recid_bytes, &msg
                 ));
             }
@@ -808,18 +804,14 @@ impl CryptoProvider for CustomEvmCrypto {
             #[cfg(zisk_hints)]
             unsafe {
                 let recid_bytes = (recid as u64).to_le_bytes();
-                hint_secp256k1_ecdsa_address_recover(
-                    sig_bytes.as_ptr(),
-                    recid_bytes.as_ptr(),
-                    msg.as_ptr(),
-                );
+                hint_secp256k1_ecrecover(sig_bytes.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr());
             }
 
             #[cfg(zisk_hints_debug)]
             {
                 let recid_bytes = (recid as u64).to_le_bytes();
                 hint_log(format!(
-                    "hint_secp256k1_ecdsa_address_recover (sig: {:x?}, recid: {:x?}, msg: {:x?})",
+                    "hint_secp256k1_ecrecover (sig: {:x?}, recid: {:x?}, msg: {:x?})",
                     &sig_bytes, &recid_bytes, &msg
                 ));
             }
@@ -905,17 +897,13 @@ impl CryptoProvider for CustomEvmCrypto {
 
             #[cfg(zisk_hints)]
             unsafe {
-                hint_secp256k1_ecdsa_verify_and_address_recover(
-                    sig.as_ptr(),
-                    msg.as_ptr(),
-                    pk_bytes.as_ptr(),
-                );
+                hint_secp256k1_ecdsa_verify(sig.as_ptr(), msg.as_ptr(), pk_bytes.as_ptr());
             }
 
             #[cfg(zisk_hints_debug)]
             {
                 hint_log(format!(
-                    "hint_secp256k1_ecdsa_verify_and_address_recover (sig: {:x?}, msg: {:x?}, pk: {:x?})",
+                    "hint_secp256k1_ecdsa_verify (sig: {:x?}, msg: {:x?}, pk: {:x?})",
                     &sig, &msg, &pk_bytes
                 ));
             }

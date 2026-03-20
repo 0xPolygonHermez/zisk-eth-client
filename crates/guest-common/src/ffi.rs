@@ -32,13 +32,9 @@ extern "C" {
 
     pub fn hint_bls12_381_g2_add(a: *const u8, b: *const u8);
 
-    pub fn hint_secp256k1_ecdsa_verify_and_address_recover(
-        sig: *const u8,
-        msg: *const u8,
-        pk: *const u8,
-    );
+    pub fn hint_secp256k1_ecrecover(sig: *const u8, recid: *const u8, msg: *const u8);
 
-    pub fn hint_secp256k1_ecdsa_address_recover(sig: *const u8, recid: *const u8, msg: *const u8);
+    pub fn hint_secp256k1_ecdsa_verify(sig: *const u8, msg: *const u8, pk: *const u8);
 
     pub fn hint_modexp_bytes(
         base_ptr: *const u8,
