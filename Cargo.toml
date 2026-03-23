@@ -45,11 +45,11 @@ primitive-types = "0.13.1"
 ethereum-types = "0.15.1"
 
 # ethrex
-ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad" }
-ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad", default-features = false }
-ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad" }
-ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad", default-features = false }
-stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", rev = "c1de67502f9ac49791c4a8efd654286a0b3b1bad", default-features = false, package = "ethrex-guest-program" }
+ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969" }
+ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969", default-features = false }
+ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969" }
+ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969", default-features = false }
+stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969", default-features = false, package = "ethrex-guest-program" }
 
 # eth-act
 witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "63da9dde9b284dc4845cf7128c3f0d7c53d21654" }
