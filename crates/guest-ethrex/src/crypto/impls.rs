@@ -248,13 +248,7 @@ impl Crypto for ZiskCrypto {
                     )
                 };
                 return match ret {
-                    0 | 1 => Ok(result.data),
-                    2 => Err(CryptoError::Other(
-                        "bn254_g1_add inputs not in field".to_string(),
-                    )),
-                    3 => Err(CryptoError::Other(
-                        "bn254_g1_add point not a member of the field".to_string(),
-                    )),
+                    0 => Ok(result.data),
                     _ => Err(CryptoError::Other("bn254_g1_add failed".to_string())),
                 };
             }
@@ -285,13 +279,7 @@ impl Crypto for ZiskCrypto {
                     )
                 };
                 return match ret {
-                    0 | 1 => Ok(result.data),
-                    2 => Err(CryptoError::Other(
-                        "bn254_g1_mul inputs not in field".to_string(),
-                    )),
-                    3 => Err(CryptoError::Other(
-                        "bn254_g1_mul point not a member of the field".to_string(),
-                    )),
+                    0 => Ok(result.data),
                     _ => Err(CryptoError::Other("bn254_g1_mul failed".to_string())),
                 };
             }
@@ -329,23 +317,7 @@ impl Crypto for ZiskCrypto {
                     )
                 };
                 return match ret {
-                    0 => Ok(true),
-                    1 => Ok(false),
-                    2 => Err(CryptoError::Other(
-                        "bn254 G1 inputs not in field".to_string(),
-                    )),
-                    3 => Err(CryptoError::Other(
-                        "bn254 G1 point not a member of the field".to_string(),
-                    )),
-                    4 => Err(CryptoError::Other(
-                        "bn254 G2 inputs not in field".to_string(),
-                    )),
-                    5 => Err(CryptoError::Other(
-                        "bn254 G2 point not on curve".to_string(),
-                    )),
-                    6 => Err(CryptoError::Other(
-                        "bn254 pairing check subgroup check failed".to_string(),
-                    )),
+                    0 => Ok(verified),
                     _ => Err(CryptoError::Other("bn254_pairing_check failed".to_string())),
                 };
             }
@@ -516,9 +488,9 @@ impl Crypto for ZiskCrypto {
                     )
                 };
                 return match ret_code {
-                    0 | 1 => Ok(result.data),
+                    0 => Ok(result.data),
                     _ => Err(CryptoError::Other(
-                        "BLS12-381 G1 addition point not on curve".to_string(),
+                        "BLS12-381 G1 addition failed".to_string(),
                     )),
                 };
             }
@@ -561,13 +533,7 @@ impl Crypto for ZiskCrypto {
                     )
                 };
                 return match ret_code {
-                    0 | 1 => Ok(result.data),
-                    2 => Err(CryptoError::Other(
-                        "bls12_381_g1_msm points not in group".to_string(),
-                    )),
-                    3 => Err(CryptoError::Other(
-                        "bls12_381_g1_msm points not in subgroup".to_string(),
-                    )),
+                    0 => Ok(result.data),
                     _ => Err(CryptoError::Other("bls12_381_g1_msm failed".to_string())),
                 };
             }
@@ -615,9 +581,9 @@ impl Crypto for ZiskCrypto {
                     )
                 };
                 return match ret_code {
-                    0 | 1 => Ok(result.data),
+                    0 => Ok(result.data),
                     _ => Err(CryptoError::Other(
-                        "BLS12-381 G2 addition point not on curve".to_string(),
+                        "BLS12-381 G2 addition failed".to_string(),
                     )),
                 };
             }
@@ -662,13 +628,7 @@ impl Crypto for ZiskCrypto {
                     )
                 };
                 return match ret_code {
-                    0 | 1 => Ok(result.data),
-                    2 => Err(CryptoError::Other(
-                        "bls12_381_g2_msm points not in group".to_string(),
-                    )),
-                    3 => Err(CryptoError::Other(
-                        "bls12_381_g2_msm points not in subgroup".to_string(),
-                    )),
+                    0 => Ok(result.data),
                     _ => Err(CryptoError::Other("bls12_381_g2_msm failed".to_string())),
                 };
             }
@@ -717,18 +677,6 @@ impl Crypto for ZiskCrypto {
                 };
                 return match ret_code {
                     0 => Ok(verified),
-                    2 => Err(CryptoError::Other(
-                        "bls12_381_pairing_check G1 inputs not in group".to_string(),
-                    )),
-                    3 => Err(CryptoError::Other(
-                        "bls12_381_pairing_check G1 inputs not in subgroup".to_string(),
-                    )),
-                    4 => Err(CryptoError::Other(
-                        "bls12_381_pairing_check G2 inputs not in group".to_string(),
-                    )),
-                    5 => Err(CryptoError::Other(
-                        "bls12_381_pairing_check G2 inputs not in subgroup".to_string(),
-                    )),
                     _ => Err(CryptoError::Other(
                         "bls12_381_pairing_check failed".to_string(),
                     )),
