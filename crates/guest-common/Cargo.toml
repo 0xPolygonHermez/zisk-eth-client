@@ -4,10 +4,8 @@ description = ""
 version.workspace = true
 edition.workspace = true
 
-[build-dependencies]
-bindgen = "0.72"
-
 [dependencies]
+zkvm-interface.workspace = true
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_vendor, values("zisk"))', 'cfg(zisk_hints)', 'cfg(zisk_hints_debug)'] }

@@ -726,7 +726,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 
 [[package]]
 name = "clang-sys"
@@ -1789,7 +1789,7 @@ dependencies = [
 name = "guest-common"
 version = "0.7.0"
 dependencies = [
- "bindgen 0.72.1",
+ "zkvm-interface",
 ]
 
 [[package]]
@@ -2277,12 +2277,12 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 [[package]]
 name = "lib-c"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 
 [[package]]
 name = "lib-float"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 
 [[package]]
 name = "libc"
@@ -2990,7 +2990,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -3480,7 +3480,7 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 
 [[package]]
 name = "rkyv"
@@ -5208,7 +5208,7 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 dependencies = [
  "anyhow",
  "bincode",
@@ -5233,7 +5233,7 @@ dependencies = [
 [[package]]
 name = "zisk-core"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 dependencies = [
  "elf",
  "fields",
@@ -5253,12 +5253,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 
 [[package]]
 name = "zisk-verifier"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 dependencies = [
  "proofman-verifier",
 ]
@@ -5266,11 +5266,10 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 dependencies = [
  "anyhow",
  "bincode",
- "bindgen 0.72.1",
  "bytes",
  "cfg-if",
  "ctor",
@@ -5293,16 +5292,16 @@ dependencies = [
  "zisk-common",
  "zisk-definitions",
  "zisk-verifier",
+ "zkvm-interface",
 ]
 
 [[package]]
 name = "ziskos-hints"
 version = "0.17.0"
-source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#c932028c5022552c76612c02c6e2c4c8ca0fd262"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
 dependencies = [
  "anyhow",
  "bincode",
- "bindgen 0.72.1",
  "cfg-if",
  "fields",
  "getrandom 0.2.17",
@@ -5319,6 +5318,7 @@ dependencies = [
  "sha2",
  "tiny-keccak",
  "zisk-verifier",
+ "zkvm-interface",
 ]
 
 [[package]]
@@ -5346,6 +5346,14 @@ dependencies = [
  "sha2",
  "sha3",
  "subtle",
+]
+
+[[package]]
+name = "zkvm-interface"
+version = "0.17.0"
+source = "git+https://github.com/eth-act/zisk.git?branch=feature%2Faccelerator-spec-conformance#8b1006281cc06ce2005cf1c47d32fe3b354ecedc"
+dependencies = [
+ "bindgen 0.72.1",
 ]
 
 [[package]]

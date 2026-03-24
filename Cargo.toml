@@ -16,6 +16,7 @@ input = { path = "crates/input" }
 zisk-sdk = { git = "https://github.com/eth-act/zisk.git", branch = "feature/accelerator-spec-conformance" }
 # local dev
 # zisk-sdk = { path = "../zisk/sdk" }
+zkvm-interface = { git = "https://github.com/eth-act/zisk.git", branch = "feature/accelerator-spec-conformance" }
 
 revm = { version = "34.0.0", default-features = false }
 
