@@ -1,6 +1,7 @@
 use ethereum_types::Address;
-
 use ethrex_crypto::{Crypto, CryptoError};
+#[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+use tiny_keccak::{Hasher, Keccak};
 
 #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
 use guest_common::ffi::*;
@@ -11,92 +12,54 @@ use guest_common::ffi::*;
 
 use super::ZiskCrypto;
 
+// mulmod256_c is exported by ziskos but not declared in zkvm_accelerators.h.
+// Declare it here so the linker can find it on the zkvm target.
+#[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+extern "C" {
+    fn mulmod256_c(a: *const u8, b: *const u8, m: *const u8, result: *mut u8);
+}
+
 impl Crypto for ZiskCrypto {
-    fn secp256k1_ecrecover(
-        &self,
-        sig: &[u8; 64],
-        recid: u8,
-        msg: &[u8; 32],
-    ) -> Result<[u8; 32], CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    fn ripemd160(&self, input: &[u8]) -> [u8; 32] {
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            let mut output = [0u8; 32];
-            let ret = unsafe {
-                secp256k1_ecdsa_address_recover_c(
-                    sig.as_ptr(),
-                    recid,
-                    msg.as_ptr(),
-                    output.as_mut_ptr(),
-                )
-            };
-            match ret {
-                0 => Ok(output),
-                _ => Err(CryptoError::RecoveryFailed),
-            }
-        }
-
-        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
-        {
-            self.native_crypto.secp256k1_ecrecover(sig, recid, msg)
-        }
-    }
-
-    fn recover_signer(&self, sig: &[u8; 65], msg: &[u8; 32]) -> Result<Address, CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
-        {
-            // Extract signature (first 64 bytes) and recovery id (last byte)
-            let mut sig_bytes = [0u8; 64];
-            sig_bytes.copy_from_slice(&sig[..64]);
-            let recid = sig[64];
-
-            let mut output = [0u8; 32];
-            let ret = unsafe {
-                secp256k1_ecdsa_address_recover_c(
-                    sig_bytes.as_ptr(),
-                    recid,
-                    msg.as_ptr(),
-                    output.as_mut_ptr(),
-                )
-            };
-            match ret {
-                0 => {
-                    // The output is already the keccak256 hash of the public key (last 20 bytes = address)
-                    Ok(Address::from_slice(&output[12..]))
-                }
-                _ => Err(CryptoError::RecoveryFailed),
-            }
-        }
-
-        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
-        {
-            self.native_crypto.recover_signer(sig, msg)
-        }
-    }
-
-    fn keccak256(&self, input: &[u8]) -> [u8; 32] {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
-        {
-            let mut output = [0u8; 32];
+            #[cfg(zisk_hints)]
             unsafe {
-                keccak256_c(input.as_ptr(), input.len(), output.as_mut_ptr());
+                hint_ripemd160(input.as_ptr(), input.len());
             }
-            output
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut output = zkvm_ripemd160_hash { data: [0u8; 32] };
+                unsafe {
+                    zkvm_ripemd160(input.as_ptr(), input.len(), &mut output);
+                }
+                return output.data;
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
         {
-            self.native_crypto.keccak256(input)
+            self.native_crypto.ripemd160(input)
         }
     }
 
     fn sha256(&self, input: &[u8]) -> [u8; 32] {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            let mut output = [0u8; 32];
+            #[cfg(zisk_hints)]
             unsafe {
-                sha256_c(input.as_ptr(), input.len(), output.as_mut_ptr());
+                hint_sha256(input.as_ptr(), input.len());
             }
-            output
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut output = zkvm_sha256_hash { data: [0u8; 32] };
+                unsafe {
+                    zkvm_sha256(input.as_ptr(), input.len(), &mut output);
+                }
+                return output.data;
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -105,10 +68,41 @@ impl Crypto for ZiskCrypto {
         }
     }
 
-    fn blake2_compress(&self, rounds: u32, h: &mut [u64; 8], m: [u64; 16], t: [u64; 2], f: bool) {
+    fn keccak256(&self, input: &[u8]) -> [u8; 32] {
         #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
-        unsafe {
-            blake2b_compress_c(rounds, h.as_mut_ptr(), m.as_ptr(), t.as_ptr(), f as u8);
+        {
+            let mut output = zkvm_keccak256_hash { data: [0u8; 32] };
+            unsafe {
+                zkvm_keccak256(input.as_ptr(), input.len(), &mut output);
+            }
+            return output.data;
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_crypto.keccak256(input)
+        }
+    }
+
+    fn blake2_compress(&self, rounds: u32, h: &mut [u64; 8], m: [u64; 16], t: [u64; 2], f: bool) {
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
+        {
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_blake2b_compress(rounds, h.as_mut_ptr(), m.as_ptr(), t.as_ptr(), f as u8);
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            unsafe {
+                zkvm_blake2f(
+                    rounds,
+                    h.as_mut_ptr() as *mut zkvm_blake2f_state,
+                    m.as_ptr() as *const zkvm_blake2f_message,
+                    t.as_ptr() as *const zkvm_blake2f_offset,
+                    f as u8,
+                );
+                return;
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -117,25 +111,146 @@ impl Crypto for ZiskCrypto {
         }
     }
 
-    // TODO
-    // fn ripemd160(&self, input: &[u8]) -> [u8; 32] {
-    //
-    // }
+    fn secp256k1_ecrecover(
+        &self,
+        sig: &[u8; 64],
+        recid: u8,
+        msg: &[u8; 32],
+    ) -> Result<[u8; 32], CryptoError> {
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
+        {
+            #[cfg(zisk_hints)]
+            unsafe {
+                let recid_bytes = (recid as u64).to_le_bytes();
+                hint_secp256k1_ecrecover(sig.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr());
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                // zkvm_secp256k1_ecrecover returns the raw 64-byte pubkey (x || y).
+                // Compute keccak256(pubkey) in software to derive the address hash.
+                let mut pubkey_out = zkvm_secp256k1_pubkey { data: [0u8; 64] };
+                let ret = unsafe {
+                    zkvm_secp256k1_ecrecover(
+                        msg.as_ptr() as *const zkvm_secp256k1_hash,
+                        sig.as_ptr() as *const zkvm_secp256k1_signature,
+                        recid,
+                        &mut pubkey_out,
+                    )
+                };
+                return match ret {
+                    0 => {
+                        let mut hasher = Keccak::v256();
+                        hasher.update(&pubkey_out.data);
+                        let mut hash = [0u8; 32];
+                        hasher.finalize(&mut hash);
+                        // EVM spec: ecrecover output is a left-zero-padded address.
+                        // First 12 bytes must be zero; only bytes 12..32 contain the address.
+                        hash[..12].fill(0);
+                        Ok(hash)
+                    }
+                    _ => Err(CryptoError::RecoveryFailed),
+                };
+            }
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            // Pause hint emission so native ecrecover cannot produce extra hints (e.g. keccak256)
+            #[cfg(zisk_hints)]
+            let already_paused = unsafe { pause_hints() };
+
+            let result = self.native_crypto.secp256k1_ecrecover(sig, recid, msg);
+
+            #[cfg(zisk_hints)]
+            {
+                if !already_paused {
+                    unsafe { resume_hints() };
+                }
+            }
+
+            result
+        }
+    }
+
+    fn recover_signer(&self, sig: &[u8; 65], msg: &[u8; 32]) -> Result<Address, CryptoError> {
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
+        {
+            // Extract signature (first 64 bytes) and recovery id (last byte)
+            let mut sig_bytes = [0u8; 64];
+            sig_bytes.copy_from_slice(&sig[..64]);
+            let recid = sig[64];
+
+            #[cfg(zisk_hints)]
+            unsafe {
+                let recid_bytes = (recid as u64).to_le_bytes();
+                hint_secp256k1_ecrecover(sig_bytes.as_ptr(), recid_bytes.as_ptr(), msg.as_ptr());
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut pubkey_out = zkvm_secp256k1_pubkey { data: [0u8; 64] };
+                let ret = unsafe {
+                    zkvm_secp256k1_ecrecover(
+                        msg.as_ptr() as *const zkvm_secp256k1_hash,
+                        sig_bytes.as_ptr() as *const zkvm_secp256k1_signature,
+                        recid,
+                        &mut pubkey_out,
+                    )
+                };
+                return match ret {
+                    0 => {
+                        let mut hasher = Keccak::v256();
+                        hasher.update(&pubkey_out.data);
+                        let mut hash = [0u8; 32];
+                        hasher.finalize(&mut hash);
+                        Ok(Address::from_slice(&hash[12..]))
+                    }
+                    _ => Err(CryptoError::RecoveryFailed),
+                };
+            }
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            #[cfg(zisk_hints)]
+            let already_paused = unsafe { pause_hints() };
+
+            let result = self.native_crypto.recover_signer(sig, msg);
+
+            #[cfg(zisk_hints)]
+            {
+                if !already_paused {
+                    unsafe { resume_hints() };
+                }
+            }
+
+            result
+        }
+    }
 
     fn bn254_g1_add(&self, p1: &[u8], p2: &[u8]) -> Result<[u8; 64], CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            let mut result = [0u8; 64];
-            let ret = unsafe { bn254_g1_add_c(p1.as_ptr(), p2.as_ptr(), result.as_mut_ptr()) };
-            match ret {
-                0 | 1 => Ok(result),
-                2 => Err(CryptoError::Other(
-                    "bn254_g1_add inputs not in field".to_string(),
-                )),
-                3 => Err(CryptoError::Other(
-                    "bn254_g1_add point not a member of the field".to_string(),
-                )),
-                _ => Err(CryptoError::Other("bn254_g1_add failed".to_string())),
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bn254_g1_add(p1.as_ptr(), p2.as_ptr());
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut result = zkvm_bn254_g1_point { data: [0u8; 64] };
+                let ret = unsafe {
+                    zkvm_bn254_g1_add(
+                        p1.as_ptr() as *const zkvm_bn254_g1_point,
+                        p2.as_ptr() as *const zkvm_bn254_g1_point,
+                        &mut result,
+                    )
+                };
+                return match ret {
+                    0 => Ok(result.data),
+                    _ => Err(CryptoError::Other("bn254_g1_add failed".to_string())),
+                };
             }
         }
 
@@ -146,20 +261,27 @@ impl Crypto for ZiskCrypto {
     }
 
     fn bn254_g1_mul(&self, point: &[u8], scalar: &[u8]) -> Result<[u8; 64], CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            let mut result = [0u8; 64];
-            let ret =
-                unsafe { bn254_g1_mul_c(point.as_ptr(), scalar.as_ptr(), result.as_mut_ptr()) };
-            match ret {
-                0 | 1 => Ok(result), // 0=success, 1=success_infinity
-                2 => Err(CryptoError::Other(
-                    "bn254_g1_mul inputs not in field".to_string(),
-                )),
-                3 => Err(CryptoError::Other(
-                    "bn254_g1_mul point not a member of the field".to_string(),
-                )),
-                _ => Err(CryptoError::Other("bn254_g1_mul failed".to_string())),
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bn254_g1_mul(point.as_ptr(), scalar.as_ptr());
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut result = zkvm_bn254_g1_point { data: [0u8; 64] };
+                let ret = unsafe {
+                    zkvm_bn254_g1_mul(
+                        point.as_ptr() as *const zkvm_bn254_g1_point,
+                        scalar.as_ptr() as *const zkvm_bn254_scalar,
+                        &mut result,
+                    )
+                };
+                return match ret {
+                    0 => Ok(result.data),
+                    _ => Err(CryptoError::Other("bn254_g1_mul failed".to_string())),
+                };
             }
         }
 
@@ -170,35 +292,34 @@ impl Crypto for ZiskCrypto {
     }
 
     fn bn254_pairing_check(&self, pairs: &[(&[u8], &[u8])]) -> Result<bool, CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            // Each pair is G1 (64 bytes) + G2 (128 bytes) = 192 bytes
-            let mut pairs_bytes = Vec::new();
+            // Each pair is G1 (64 bytes) + G2 (128 bytes) = 192 bytes laid out contiguously.
+            let mut pairs_bytes: Vec<u8> = Vec::with_capacity(pairs.len() * 192);
             for (g1, g2) in pairs {
                 pairs_bytes.extend_from_slice(g1);
                 pairs_bytes.extend_from_slice(g2);
             }
 
-            let ret = unsafe { bn254_pairing_check_c(pairs_bytes.as_ptr(), pairs.len()) };
-            match ret {
-                0 => Ok(true),
-                1 => Ok(false),
-                2 => Err(CryptoError::Other(
-                    "bn254 G1 inputs not in field".to_string(),
-                )),
-                3 => Err(CryptoError::Other(
-                    "bn254 G1 point not a member of the field".to_string(),
-                )),
-                4 => Err(CryptoError::Other(
-                    "bn254 G2 inputs not in field".to_string(),
-                )),
-                5 => Err(CryptoError::Other(
-                    "bn254 G2 point not on curve".to_string(),
-                )),
-                6 => Err(CryptoError::Other(
-                    "bn254 pairing check subgroup check failed".to_string(),
-                )),
-                _ => Err(CryptoError::Other("bn254_pairing_check failed".to_string())),
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bn254_pairing_check(pairs_bytes.as_ptr(), pairs.len());
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut verified = false;
+                let ret = unsafe {
+                    zkvm_bn254_pairing(
+                        pairs_bytes.as_ptr() as *const zkvm_bn254_pairing_pair,
+                        pairs.len(),
+                        &mut verified,
+                    )
+                };
+                return match ret {
+                    0 => Ok(verified),
+                    _ => Err(CryptoError::Other("bn254_pairing_check failed".to_string())),
+                };
             }
         }
 
@@ -209,21 +330,36 @@ impl Crypto for ZiskCrypto {
     }
 
     fn modexp(&self, base: &[u8], exp: &[u8], modulus: &[u8]) -> Result<Vec<u8>, CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            let mut result = vec![0u8; modulus.len()];
+            #[cfg(zisk_hints)]
             unsafe {
-                modexp_bytes_c(
+                hint_modexp_bytes(
                     base.as_ptr(),
                     base.len(),
                     exp.as_ptr(),
                     exp.len(),
                     modulus.as_ptr(),
                     modulus.len(),
-                    result.as_mut_ptr(),
                 );
             }
-            Ok(result)
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut result = vec![0u8; modulus.len()];
+                unsafe {
+                    zkvm_modexp(
+                        base.as_ptr(),
+                        base.len(),
+                        exp.as_ptr(),
+                        exp.len(),
+                        modulus.as_ptr(),
+                        modulus.len(),
+                        result.as_mut_ptr(),
+                    );
+                }
+                return Ok(result);
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -238,14 +374,9 @@ impl Crypto for ZiskCrypto {
         {
             let mut result = [0u8; 32];
             unsafe {
-                mulmod256_c(
-                    a.as_ptr() as *const u64,
-                    b.as_ptr() as *const u64,
-                    m.as_ptr() as *const u64,
-                    result.as_mut_ptr() as *mut u64,
-                );
+                mulmod256_c(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr());
             }
-            result
+            return result;
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -255,9 +386,26 @@ impl Crypto for ZiskCrypto {
     }
 
     fn secp256r1_verify(&self, msg: &[u8; 32], sig: &[u8; 64], pk: &[u8; 64]) -> bool {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            unsafe { secp256r1_ecdsa_verify_c(msg.as_ptr(), sig.as_ptr(), pk.as_ptr()) }
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_secp256r1_ecdsa_verify(msg.as_ptr(), sig.as_ptr(), pk.as_ptr());
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut verified = false;
+                unsafe {
+                    zkvm_secp256r1_verify(
+                        msg.as_ptr() as *const zkvm_secp256r1_hash,
+                        sig.as_ptr() as *const zkvm_secp256r1_signature,
+                        pk.as_ptr() as *const zkvm_secp256r1_pubkey,
+                        &mut verified,
+                    );
+                }
+                return verified;
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -273,17 +421,33 @@ impl Crypto for ZiskCrypto {
         commitment: &[u8; 48],
         proof: &[u8; 48],
     ) -> Result<(), CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            let valid = unsafe {
-                verify_kzg_proof_c(z.as_ptr(), y.as_ptr(), commitment.as_ptr(), proof.as_ptr())
-            };
-            if !valid {
-                return Err(CryptoError::Other(
-                    "KZG proof verification failed".to_string(),
-                ));
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_verify_kzg_proof(z.as_ptr(), y.as_ptr(), commitment.as_ptr(), proof.as_ptr());
             }
-            Ok(())
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut verified = false;
+                unsafe {
+                    zkvm_kzg_point_eval(
+                        commitment.as_ptr() as *const zkvm_kzg_commitment,
+                        z.as_ptr() as *const zkvm_kzg_field_element,
+                        y.as_ptr() as *const zkvm_kzg_field_element,
+                        proof.as_ptr() as *const zkvm_kzg_proof,
+                        &mut verified,
+                    );
+                }
+                return if !verified {
+                    Err(CryptoError::Other(
+                        "KZG proof verification failed".to_string(),
+                    ))
+                } else {
+                    Ok(())
+                };
+            }
         }
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
@@ -292,22 +456,12 @@ impl Crypto for ZiskCrypto {
         }
     }
 
-    // TODO
-    // fn verify_blob_kzg_proof(
-    //     &self,
-    //     blob: &[u8],
-    //     commitment: &[u8; 48],
-    //     proof: &[u8; 48],
-    // ) -> Result<bool, CryptoError> {
-
-    // }
-
     fn bls12_381_g1_add(
         &self,
         a: ([u8; 48], [u8; 48]),
         b: ([u8; 48], [u8; 48]),
     ) -> Result<[u8; 96], CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             // G1Point is ([u8; 48], [u8; 48])
             let mut a_bytes = [0u8; 96];
@@ -318,16 +472,27 @@ impl Crypto for ZiskCrypto {
             b_bytes[..48].copy_from_slice(&b.0);
             b_bytes[48..].copy_from_slice(&b.1);
 
-            let mut result = [0u8; 96];
-            let ret_code = unsafe {
-                bls12_381_g1_add_c(result.as_mut_ptr(), a_bytes.as_ptr(), b_bytes.as_ptr())
-            };
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bls12_381_g1_add(a_bytes.as_ptr(), b_bytes.as_ptr());
+            }
 
-            match ret_code {
-                0 | 1 => Ok(result),
-                _ => Err(CryptoError::Other(
-                    "BLS12-381 G1 addition point not on curve".to_string(),
-                )),
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut result = zkvm_bls12_381_g1_point { data: [0u8; 96] };
+                let ret_code = unsafe {
+                    zkvm_bls12_g1_add(
+                        a_bytes.as_ptr() as *const zkvm_bls12_381_g1_point,
+                        b_bytes.as_ptr() as *const zkvm_bls12_381_g1_point,
+                        &mut result,
+                    )
+                };
+                return match ret_code {
+                    0 => Ok(result.data),
+                    _ => Err(CryptoError::Other(
+                        "BLS12-381 G1 addition failed".to_string(),
+                    )),
+                };
             }
         }
 
@@ -341,32 +506,36 @@ impl Crypto for ZiskCrypto {
         &self,
         pairs: &[(([u8; 48], [u8; 48]), [u8; 32])],
     ) -> Result<[u8; 96], CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            // Input is (G1Point, [u8; 32]) = (([u8; 48], [u8; 48]), [u8; 32])
-            // Each pair is 96 + 32 = 128 bytes
-            let mut pairs_bytes = Vec::new();
-            let mut num_pairs = 0usize;
+            // Each pair is G1Point (96 bytes) || scalar (32 bytes) = 128 bytes.
+            let num_pairs = pairs.len();
+            let mut pairs_bytes: Vec<u8> = Vec::with_capacity(num_pairs * 128);
             for (point, scalar) in pairs {
                 pairs_bytes.extend_from_slice(&point.0);
                 pairs_bytes.extend_from_slice(&point.1);
                 pairs_bytes.extend_from_slice(scalar);
-                num_pairs += 1;
             }
 
-            let mut result = [0u8; 96];
-            let ret_code =
-                unsafe { bls12_381_g1_msm_c(result.as_mut_ptr(), pairs_bytes.as_ptr(), num_pairs) };
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bls12_381_g1_msm(pairs_bytes.as_ptr(), num_pairs);
+            }
 
-            match ret_code {
-                0 | 1 => Ok(result),
-                2 => Err(CryptoError::Other(
-                    "bls12_381_g1_msm points not in group".to_string(),
-                )),
-                3 => Err(CryptoError::Other(
-                    "bls12_381_g1_msm points not in subgroup".to_string(),
-                )),
-                _ => Err(CryptoError::Other("bls12_381_g1_msm failed".to_string())),
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut result = zkvm_bls12_381_g1_point { data: [0u8; 96] };
+                let ret_code = unsafe {
+                    zkvm_bls12_g1_msm(
+                        pairs_bytes.as_ptr() as *const zkvm_bls12_381_g1_msm_pair,
+                        num_pairs,
+                        &mut result,
+                    )
+                };
+                return match ret_code {
+                    0 => Ok(result.data),
+                    _ => Err(CryptoError::Other("bls12_381_g1_msm failed".to_string())),
+                };
             }
         }
 
@@ -381,7 +550,7 @@ impl Crypto for ZiskCrypto {
         a: ([u8; 48], [u8; 48], [u8; 48], [u8; 48]),
         b: ([u8; 48], [u8; 48], [u8; 48], [u8; 48]),
     ) -> Result<[u8; 192], CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             // G2Point is ([u8; 48], [u8; 48], [u8; 48], [u8; 48])
             let mut a_bytes = [0u8; 192];
@@ -396,15 +565,27 @@ impl Crypto for ZiskCrypto {
             b_bytes[96..144].copy_from_slice(&b.2);
             b_bytes[144..].copy_from_slice(&b.3);
 
-            let mut result = [0u8; 192];
-            let ret_code = unsafe {
-                bls12_381_g2_add_c(result.as_mut_ptr(), a_bytes.as_ptr(), b_bytes.as_ptr())
-            };
-            match ret_code {
-                0 | 1 => Ok(result),
-                _ => Err(CryptoError::Other(
-                    "BLS12-381 G2 addition point not on curve".to_string(),
-                )),
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bls12_381_g2_add(a_bytes.as_ptr(), b_bytes.as_ptr());
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut result = zkvm_bls12_381_g2_point { data: [0u8; 192] };
+                let ret_code = unsafe {
+                    zkvm_bls12_g2_add(
+                        a_bytes.as_ptr() as *const zkvm_bls12_381_g2_point,
+                        b_bytes.as_ptr() as *const zkvm_bls12_381_g2_point,
+                        &mut result,
+                    )
+                };
+                return match ret_code {
+                    0 => Ok(result.data),
+                    _ => Err(CryptoError::Other(
+                        "BLS12-381 G2 addition failed".to_string(),
+                    )),
+                };
             }
         }
 
@@ -418,33 +599,38 @@ impl Crypto for ZiskCrypto {
         &self,
         pairs: &[(([u8; 48], [u8; 48], [u8; 48], [u8; 48]), [u8; 32])],
     ) -> Result<[u8; 192], CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            // Input is (G2Point, [u8; 32]) = (([u8; 48], [u8; 48], [u8; 48], [u8; 48]), [u8; 32])
-            // Each pair is 192 + 32 = 224 bytes
-            let mut pairs_bytes = Vec::new();
-            let mut num_pairs = 0usize;
+            // Each pair is G2Point (192 bytes) || scalar (32 bytes) = 224 bytes.
+            let num_pairs = pairs.len();
+            let mut pairs_bytes: Vec<u8> = Vec::with_capacity(num_pairs * 224);
             for (point, scalar) in pairs {
                 pairs_bytes.extend_from_slice(&point.0);
                 pairs_bytes.extend_from_slice(&point.1);
                 pairs_bytes.extend_from_slice(&point.2);
                 pairs_bytes.extend_from_slice(&point.3);
                 pairs_bytes.extend_from_slice(scalar);
-                num_pairs += 1;
             }
 
-            let mut result = [0u8; 192];
-            let ret_code =
-                unsafe { bls12_381_g2_msm_c(result.as_mut_ptr(), pairs_bytes.as_ptr(), num_pairs) };
-            match ret_code {
-                0 | 1 => Ok(result),
-                2 => Err(CryptoError::Other(
-                    "bls12_381_g2_msm points not in group".to_string(),
-                )),
-                3 => Err(CryptoError::Other(
-                    "bls12_381_g2_msm points not in subgroup".to_string(),
-                )),
-                _ => Err(CryptoError::Other("bls12_381_g2_msm failed".to_string())),
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bls12_381_g2_msm(pairs_bytes.as_ptr(), num_pairs);
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut result = zkvm_bls12_381_g2_point { data: [0u8; 192] };
+                let ret_code = unsafe {
+                    zkvm_bls12_g2_msm(
+                        pairs_bytes.as_ptr() as *const zkvm_bls12_381_g2_msm_pair,
+                        num_pairs,
+                        &mut result,
+                    )
+                };
+                return match ret_code {
+                    0 => Ok(result.data),
+                    _ => Err(CryptoError::Other("bls12_381_g2_msm failed".to_string())),
+                };
             }
         }
 
@@ -461,40 +647,40 @@ impl Crypto for ZiskCrypto {
             ([u8; 48], [u8; 48], [u8; 48], [u8; 48]),
         )],
     ) -> Result<bool, CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            // Each pair is G1Point (96 bytes) + G2Point (192 bytes) = 288 bytes
-            let mut pairs_bytes = Vec::new();
+            // Each pair is G1Point (96 bytes) || G2Point (192 bytes) = 288 bytes.
+            let mut pairs_bytes: Vec<u8> = Vec::with_capacity(pairs.len() * 288);
             for (g1, g2) in pairs {
-                // G1Point: ([u8; 48], [u8; 48])
                 pairs_bytes.extend_from_slice(&g1.0);
                 pairs_bytes.extend_from_slice(&g1.1);
-                // G2Point: ([u8; 48], [u8; 48], [u8; 48], [u8; 48])
                 pairs_bytes.extend_from_slice(&g2.0);
                 pairs_bytes.extend_from_slice(&g2.1);
                 pairs_bytes.extend_from_slice(&g2.2);
                 pairs_bytes.extend_from_slice(&g2.3);
             }
 
-            let ret_code = unsafe { bls12_381_pairing_check_c(pairs_bytes.as_ptr(), pairs.len()) };
-            match ret_code {
-                0 => Ok(true),
-                1 => Ok(false),
-                2 => Err(CryptoError::Other(
-                    "bls12_381_pairing_check G1 inputs not in group".to_string(),
-                )),
-                3 => Err(CryptoError::Other(
-                    "bls12_381_pairing_check G1 inputs not in subgroup".to_string(),
-                )),
-                4 => Err(CryptoError::Other(
-                    "bls12_381_pairing_check G2 inputs not in group".to_string(),
-                )),
-                5 => Err(CryptoError::Other(
-                    "bls12_381_pairing_check G2 inputs not in subgroup".to_string(),
-                )),
-                _ => Err(CryptoError::Other(
-                    "bls12_381_pairing_check failed".to_string(),
-                )),
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bls12_381_pairing_check(pairs_bytes.as_ptr(), pairs.len());
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut verified = false;
+                let ret_code = unsafe {
+                    zkvm_bls12_pairing(
+                        pairs_bytes.as_ptr() as *const zkvm_bls12_381_pairing_pair,
+                        pairs.len(),
+                        &mut verified,
+                    )
+                };
+                return match ret_code {
+                    0 => Ok(verified),
+                    _ => Err(CryptoError::Other(
+                        "bls12_381_pairing_check failed".to_string(),
+                    )),
+                };
             }
         }
 
@@ -505,13 +691,23 @@ impl Crypto for ZiskCrypto {
     }
 
     fn bls12_381_fp_to_g1(&self, fp: &[u8; 48]) -> Result<[u8; 96], CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
-            let mut result = [0u8; 96];
-            let ret_code = unsafe { bls12_381_fp_to_g1_c(result.as_mut_ptr(), fp.as_ptr()) };
-            match ret_code {
-                0 => Ok(result),
-                _ => Err(CryptoError::Other("bls12_381_fp_to_g1 failed".to_string())),
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bls12_381_fp_to_g1(fp.as_ptr());
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let mut result = zkvm_bls12_381_g1_point { data: [0u8; 96] };
+                let ret_code = unsafe {
+                    zkvm_bls12_map_fp_to_g1(fp.as_ptr() as *const zkvm_bls12_381_fp, &mut result)
+                };
+                return match ret_code {
+                    0 => Ok(result.data),
+                    _ => Err(CryptoError::Other("bls12_381_fp_to_g1 failed".to_string())),
+                };
             }
         }
 
@@ -522,18 +718,26 @@ impl Crypto for ZiskCrypto {
     }
 
     fn bls12_381_fp2_to_g2(&self, fp2: ([u8; 48], [u8; 48])) -> Result<[u8; 192], CryptoError> {
-        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
             let mut fp2_bytes = [0u8; 96];
             fp2_bytes[..48].copy_from_slice(&fp2.0);
             fp2_bytes[48..].copy_from_slice(&fp2.1);
 
-            let mut result = [0u8; 192];
-            let ret_code =
-                unsafe { bls12_381_fp2_to_g2_c(result.as_mut_ptr(), fp2_bytes.as_ptr()) };
-            match ret_code {
-                0 => Ok(result),
-                _ => Err(CryptoError::Other("bls12_381_fp2_to_g2 failed".to_string())),
+            #[cfg(zisk_hints)]
+            unsafe {
+                hint_bls12_381_fp2_to_g2(fp2_bytes.as_ptr());
+            }
+
+            #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+            {
+                let fp2_struct = zkvm_bls12_381_fp2 { data: fp2_bytes };
+                let mut result = zkvm_bls12_381_g2_point { data: [0u8; 192] };
+                let ret_code = unsafe { zkvm_bls12_map_fp2_to_g2(&fp2_struct, &mut result) };
+                return match ret_code {
+                    0 => Ok(result.data),
+                    _ => Err(CryptoError::Other("bls12_381_fp2_to_g2 failed".to_string())),
+                };
             }
         }
 
