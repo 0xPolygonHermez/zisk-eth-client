@@ -62,7 +62,7 @@ impl Crypto for CustomEvmCrypto {
 
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
         {
-            self.default_crypto.sha256(input)
+            self.default_crypto.ripemd160(input)
         }
     }
 
