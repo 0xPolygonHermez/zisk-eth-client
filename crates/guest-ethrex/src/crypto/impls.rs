@@ -17,7 +17,12 @@ use super::ZiskAccelerator;
 // Declare them here so the linker can find them on the zkvm target.
 #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
 extern "C" {
-    fn mulmod256_c(a: *const u8, b: *const u8, m: *const u8, result: *mut u8);
+    fn mul_mod_bytes256_c(
+        a_ptr: *const u8,
+        b_ptr: *const u8,
+        m_ptr: *const u8,
+        result_ptr: *mut u8,
+    );
 
     fn overflowing_add256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
 
@@ -403,7 +408,7 @@ impl Crypto for ZiskAccelerator {
         {
             let mut result = [0u8; 32];
             unsafe {
-                mulmod256_c(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr());
+                mul_mod_bytes256_c(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr());
             }
             return result;
         }
