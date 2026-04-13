@@ -15,8 +15,10 @@ panic = "abort"
 [dependencies]
 guest-ethrex = { path = "../../../crates/guest-ethrex" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "ziskos-enlarge" }
 # ziskos = { path = "../../../../../zisk/ziskos/entrypoint" }
+
+ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", branch = "feat/switchable-u256-backend", default-features = false }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

@@ -35,7 +35,7 @@ version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b169f7a6d4742236a0a00c541b845991d0ac43e546831af1249753ab4c3aa3a0"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "cipher",
  "cpufeatures",
 ]
@@ -60,7 +60,7 @@ version = "0.8.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "getrandom 0.3.4",
  "once_cell",
  "version_check",
@@ -366,7 +366,7 @@ dependencies = [
  "alloy-rlp",
  "arbitrary",
  "bytes",
- "cfg-if 1.0.4",
+ "cfg-if",
  "const-hex",
  "derive_more 2.1.1",
  "foldhash 0.2.0",
@@ -1249,7 +1249,7 @@ dependencies = [
 [[package]]
 name = "asm-runner"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "anyhow",
  "libc",
@@ -1646,7 +1646,7 @@ dependencies = [
  "arrayref",
  "arrayvec",
  "cc",
- "cfg-if 1.0.4",
+ "cfg-if",
  "constant_time_eq",
  "cpufeatures",
 ]
@@ -1667,6 +1667,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8894febbff9f758034a5b8e12d87918f56dfc64a8e1fe757d65e29041538d93"
 dependencies = [
  "generic-array",
+]
+
+[[package]]
+name = "block2"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cdeb9d870516001442e364c5220d3574d2da8dc765554b4a617230d33fa58ef5"
+dependencies = [
+ "objc2",
 ]
 
 [[package]]
@@ -1893,12 +1902,6 @@ dependencies = [
 
 [[package]]
 name = "cfg-if"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
-
-[[package]]
-name = "cfg-if"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
@@ -1936,7 +1939,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 
 [[package]]
 name = "clang-sys"
@@ -2038,7 +2041,7 @@ version = "1.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "531185e432bb31db1ecda541e9e7ab21468d4d844ad7505e0546a49b4945d49b"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "cpufeatures",
  "proptest",
  "serde_core",
@@ -2150,7 +2153,7 @@ version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0667304c32ea56cb4cd6d2d7c0cfe9a2f8041229db8c033af7f8d69492429def"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
 ]
 
 [[package]]
@@ -2183,7 +2186,7 @@ version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9481c1c90cbf2ac953f07c8d4a58aa3945c425b7185c9154d67a65e4230da511"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
 ]
 
 [[package]]
@@ -2194,39 +2197,15 @@ checksum = "790eea4361631c5e7d22598ecd5723ff611904e3344ce8720784c93e3d83d40b"
 
 [[package]]
 name = "crossbeam"
-version = "0.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69323bff1fb41c635347b8ead484a5ca6c3f11914d784170b158d8449ab07f8e"
-dependencies = [
- "cfg-if 0.1.10",
- "crossbeam-channel 0.4.4",
- "crossbeam-deque 0.7.4",
- "crossbeam-epoch 0.8.2",
- "crossbeam-queue 0.2.3",
- "crossbeam-utils 0.7.2",
-]
-
-[[package]]
-name = "crossbeam"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1137cd7e7fc0fb5d3c5a8678be38ec56e819125d8d7907411fe24ccb943faca8"
 dependencies = [
- "crossbeam-channel 0.5.15",
- "crossbeam-deque 0.8.6",
- "crossbeam-epoch 0.9.18",
- "crossbeam-queue 0.3.12",
- "crossbeam-utils 0.8.21",
-]
-
-[[package]]
-name = "crossbeam-channel"
-version = "0.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b153fe7cbef478c567df0f972e02e6d736db11affe43dfc9c56a9374d1adfb87"
-dependencies = [
- "crossbeam-utils 0.7.2",
- "maybe-uninit",
+ "crossbeam-channel",
+ "crossbeam-deque",
+ "crossbeam-epoch",
+ "crossbeam-queue",
+ "crossbeam-utils",
 ]
 
 [[package]]
@@ -2235,18 +2214,7 @@ version = "0.5.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "82b8f8f868b36967f9606790d1903570de9ceaf870a7bf9fbbd3016d636a2cb2"
 dependencies = [
- "crossbeam-utils 0.8.21",
-]
-
-[[package]]
-name = "crossbeam-deque"
-version = "0.7.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c20ff29ded3204c5106278a81a38f4b482636ed4fa1e6cfbeef193291beb29ed"
-dependencies = [
- "crossbeam-epoch 0.8.2",
- "crossbeam-utils 0.7.2",
- "maybe-uninit",
+ "crossbeam-utils",
 ]
 
 [[package]]
@@ -2255,23 +2223,8 @@ version = "0.8.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9dd111b7b7f7d55b72c0a6ae361660ee5853c9af73f70c3c2ef6858b950e2e51"
 dependencies = [
- "crossbeam-epoch 0.9.18",
- "crossbeam-utils 0.8.21",
-]
-
-[[package]]
-name = "crossbeam-epoch"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "058ed274caafc1f60c4997b5fc07bf7dc7cca454af7c6e81edffe5f33f70dace"
-dependencies = [
- "autocfg",
- "cfg-if 0.1.10",
- "crossbeam-utils 0.7.2",
- "lazy_static",
- "maybe-uninit",
- "memoffset",
- "scopeguard",
+ "crossbeam-epoch",
+ "crossbeam-utils",
 ]
 
 [[package]]
@@ -2280,18 +2233,7 @@ version = "0.9.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b82ac4a3c2ca9c3460964f020e1402edd5753411d7737aa39c3714ad1b5420e"
 dependencies = [
- "crossbeam-utils 0.8.21",
-]
-
-[[package]]
-name = "crossbeam-queue"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "774ba60a54c213d409d5353bda12d49cd68d14e45036a285234c8d6f91f92570"
-dependencies = [
- "cfg-if 0.1.10",
- "crossbeam-utils 0.7.2",
- "maybe-uninit",
+ "crossbeam-utils",
 ]
 
 [[package]]
@@ -2300,18 +2242,7 @@ version = "0.3.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0f58bbc28f91df819d0aa2a2c00cd19754769c2fad90579b3592b1c9ba7a3115"
 dependencies = [
- "crossbeam-utils 0.8.21",
-]
-
-[[package]]
-name = "crossbeam-utils"
-version = "0.7.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3c7c73a2d1e9fc0886a08b93e98eb643461230d5f1925e4036204d5f2e261a8"
-dependencies = [
- "autocfg",
- "cfg-if 0.1.10",
- "lazy_static",
+ "crossbeam-utils",
 ]
 
 [[package]]
@@ -2380,12 +2311,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "ctrlc"
+version = "3.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0b1fab2ae45819af2d0731d60f2afe17227ebb1a1538a236da84c93e9a60162"
+dependencies = [
+ "dispatch2",
+ "nix",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
 name = "curve25519-dalek"
 version = "4.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97fb8b7c4503de7d6ae7b42ab72a5a59857b4c937ec27a3d4539dba95b5ab2be"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "cpufeatures",
  "curve25519-dalek-derive",
  "digest 0.10.7",
@@ -2534,8 +2476,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5041cc499144891f3790297212f32a74fb938e5136a14943f338ef9e0ae276cf"
 dependencies = [
  "arbitrary",
- "cfg-if 1.0.4",
- "crossbeam-utils 0.8.21",
+ "cfg-if",
+ "crossbeam-utils",
  "hashbrown 0.14.5",
  "lock_api",
  "once_cell",
@@ -2546,7 +2488,7 @@ dependencies = [
 [[package]]
 name = "data-bus"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "zisk-common",
  "zisk-core",
@@ -2576,18 +2518,6 @@ checksum = "7ab67060fc6b8ef687992d439ca0fa36e7ed17e9a0b16b25b601e8757df720de"
 dependencies = [
  "data-encoding",
  "syn 2.0.117",
-]
-
-[[package]]
-name = "datatest-stable"
-version = "0.2.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "833306ca7eec4d95844e65f0d7502db43888c5c1006c6c517e8cf51a27d15431"
-dependencies = [
- "camino",
- "fancy-regex",
- "libtest-mimic",
- "walkdir",
 ]
 
 [[package]]
@@ -2796,7 +2726,7 @@ version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b98cf8ebf19c3d1b223e151f99a4f9f0690dca41414773390fc824184ac833e1"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "dirs-sys-next",
 ]
 
@@ -2854,6 +2784,18 @@ dependencies = [
  "tracing",
  "uint 0.10.0",
  "zeroize",
+]
+
+[[package]]
+name = "dispatch2"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e0e367e4e7da84520dedcac1901e4da967309406d1e51017ae1abfb97adbd38"
+dependencies = [
+ "bitflags 2.11.0",
+ "block2",
+ "libc",
+ "objc2",
 ]
 
 [[package]]
@@ -3009,7 +2951,7 @@ version = "0.8.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75030f3c4f45dafd7586dd6780965a8c7e8e285a5ecb86713e63a79c5b2766f3"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
 ]
 
 [[package]]
@@ -3110,12 +3052,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "escape8259"
-version = "0.5.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5692dd7b5a1978a5aeb0ce83b7655c58ca8efdcb79d21036ea249da95afec2c6"
-
-[[package]]
 name = "ethbloom"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3185,10 +3121,10 @@ dependencies = [
 [[package]]
 name = "ethrex-blockchain"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "bytes",
- "crossbeam 0.8.4",
+ "crossbeam",
  "ethrex-common",
  "ethrex-crypto",
  "ethrex-metrics",
@@ -3196,7 +3132,6 @@ dependencies = [
  "ethrex-storage",
  "ethrex-trie",
  "ethrex-vm",
- "hex",
  "rustc-hash 2.1.1",
  "thiserror 2.0.18",
  "tokio",
@@ -3207,7 +3142,7 @@ dependencies = [
 [[package]]
 name = "ethrex-common"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "bytes",
  "crc32fast",
@@ -3219,10 +3154,10 @@ dependencies = [
  "hex-literal",
  "hex-simd",
  "indexmap 2.13.0",
- "k256",
  "kzg-rs",
  "lazy_static",
  "libc",
+ "lru 0.16.3",
  "once_cell",
  "rayon",
  "rkyv",
@@ -3230,17 +3165,14 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "sha3",
  "thiserror 2.0.18",
- "tinyvec",
  "tracing",
- "url",
 ]
 
 [[package]]
 name = "ethrex-config"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "ethrex-common",
  "ethrex-p2p",
@@ -3252,7 +3184,7 @@ dependencies = [
 [[package]]
 name = "ethrex-crypto"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "ark-bn254",
  "ark-ec",
@@ -3273,7 +3205,7 @@ dependencies = [
 [[package]]
 name = "ethrex-guest-program"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -3292,22 +3224,17 @@ dependencies = [
 [[package]]
 name = "ethrex-l2-common"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "bytes",
  "ethereum-types",
  "ethrex-common",
  "ethrex-crypto",
- "ethrex-rlp",
- "ethrex-trie",
- "ethrex-vm",
- "hex",
  "k256",
  "lambdaworks-crypto",
  "rkyv",
  "serde",
  "serde_with",
- "sha3",
  "thiserror 2.0.18",
  "tracing",
 ]
@@ -3315,31 +3242,25 @@ dependencies = [
 [[package]]
 name = "ethrex-levm"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
- "bitvec",
  "bytes",
- "datatest-stable",
  "derive_more 1.0.0",
  "ethrex-common",
  "ethrex-crypto",
  "ethrex-rlp",
- "lazy_static",
  "malachite",
  "rayon",
  "rustc-hash 2.1.1",
  "serde",
- "serde_json",
- "sha3",
  "strum",
  "thiserror 2.0.18",
- "walkdir",
 ]
 
 [[package]]
 name = "ethrex-metrics"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "axum",
  "ethrex-common",
@@ -3355,14 +3276,13 @@ dependencies = [
 [[package]]
 name = "ethrex-p2p"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "aes",
  "aes-gcm",
- "async-trait",
  "bytes",
  "concat-kdf",
- "crossbeam 0.8.4",
+ "crossbeam",
  "ctr",
  "ethereum-types",
  "ethrex-blockchain",
@@ -3383,7 +3303,6 @@ dependencies = [
  "rustc-hash 2.1.1",
  "secp256k1 0.30.0",
  "serde",
- "serde_json",
  "sha2",
  "snap",
  "spawned-concurrency",
@@ -3398,21 +3317,17 @@ dependencies = [
 [[package]]
 name = "ethrex-rlp"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "bytes",
  "ethereum-types",
- "hex",
- "lazy_static",
- "snap",
  "thiserror 2.0.18",
- "tinyvec",
 ]
 
 [[package]]
 name = "ethrex-rpc"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "axum",
  "axum-extra",
@@ -3451,18 +3366,15 @@ dependencies = [
 [[package]]
 name = "ethrex-storage"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "anyhow",
- "async-trait",
  "bytes",
- "ethereum-types",
  "ethrex-common",
  "ethrex-crypto",
  "ethrex-rlp",
  "ethrex-trie",
  "fastbloom",
- "hex",
  "lru 0.16.3",
  "rayon",
  "rustc-hash 2.1.1",
@@ -3476,45 +3388,35 @@ dependencies = [
 [[package]]
 name = "ethrex-trie"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
  "anyhow",
  "bytes",
- "crossbeam 0.8.4",
- "digest 0.10.7",
+ "crossbeam",
  "ethereum-types",
  "ethrex-crypto",
  "ethrex-rlp",
- "hex",
  "lazy_static",
  "rayon",
  "rkyv",
  "rustc-hash 2.1.1",
  "serde",
- "serde_json",
- "smallvec",
  "thiserror 2.0.18",
- "tracing",
 ]
 
 [[package]]
 name = "ethrex-vm"
 version = "9.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
+source = "git+https://github.com/lambdaclass/ethrex.git?branch=feat%2Fswitchable-u256-backend#3115d3d4c1e0d3df7749fa2309340d00ef51aae6"
 dependencies = [
- "bincode",
  "bytes",
  "derive_more 1.0.0",
  "dyn-clone",
- "ethereum-types",
  "ethrex-common",
  "ethrex-crypto",
  "ethrex-levm",
  "ethrex-rlp",
- "ethrex-trie",
- "lazy_static",
  "rayon",
- "rkyv",
  "rustc-hash 2.1.1",
  "serde",
  "thiserror 2.0.18",
@@ -3524,11 +3426,11 @@ dependencies = [
 [[package]]
 name = "executor"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "anyhow",
  "asm-runner",
- "crossbeam 0.8.4",
+ "crossbeam",
  "data-bus",
  "fields",
  "itertools 0.14.0",
@@ -3572,17 +3474,6 @@ checksum = "7cd915d99f24784cdc19fd37ef22b97e3ff0ae756c7e492e9fbfe897d61e2aec"
 dependencies = [
  "indenter",
  "once_cell",
-]
-
-[[package]]
-name = "fancy-regex"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e24cb5a94bcae1e5408b0effca5cd7172ea3c5755049c5f3af4cd283a165298"
-dependencies = [
- "bit-set",
- "regex-automata",
- "regex-syntax",
 ]
 
 [[package]]
@@ -3675,7 +3566,7 @@ name = "fields"
 version = "0.16.1"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "num-bigint 0.4.6",
  "paste",
  "serde",
@@ -3687,7 +3578,7 @@ version = "0.2.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f98844151eee8917efc50bd9e8318cb963ae8b297431495d3f758616ea5c57db"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "libc",
  "libredox",
 ]
@@ -3931,7 +3822,7 @@ version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff2abc00be7fca6ebc474524697ae276ad847ad0a6b3faa4bcb027e9a4614ad0"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "js-sys",
  "libc",
  "wasi",
@@ -3944,7 +3835,7 @@ version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "js-sys",
  "libc",
  "r-efi 5.3.0",
@@ -3958,7 +3849,7 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0de51e6874e94e7bf76d726fc5d13ba782deca734ff60d5bb2fb2607c7406555"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "libc",
  "r-efi 6.0.0",
  "wasip2",
@@ -4288,7 +4179,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8a6fe56c0038198998a6f217ca4e7ef3a5e51f46163bd6dd60b5c71ca6c6502"
 dependencies = [
  "async-trait",
- "cfg-if 1.0.4",
+ "cfg-if",
  "data-encoding",
  "enum-as-inner",
  "futures-channel",
@@ -4313,7 +4204,7 @@ version = "0.25.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc62a9a99b0bfb44d2ab95a7208ac952d31060efc16241c87eaf36406fecf87a"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "futures-util",
  "hickory-proto",
  "ipconfig",
@@ -4950,7 +4841,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1a87aa2bb7d2af34197c04845522473242e1aa17c12f4935d5856491a7fb8c97"
 dependencies = [
  "cesu8",
- "cfg-if 1.0.4",
+ "cfg-if",
  "combine",
  "jni-sys",
  "log",
@@ -5192,7 +5083,7 @@ version = "0.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f6e3919bbaa2945715f0bb6d3934a173d1e9a59ac23767fbaaef277265a7411b"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "ecdsa",
  "elliptic-curve",
  "once_cell",
@@ -5306,12 +5197,12 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 [[package]]
 name = "lib-c"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 
 [[package]]
 name = "lib-float"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 
 [[package]]
 name = "libc"
@@ -5356,7 +5247,7 @@ version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "windows-link 0.2.1",
 ]
 
@@ -5395,18 +5286,6 @@ dependencies = [
  "libc",
  "plain",
  "redox_syscall 0.7.3",
-]
-
-[[package]]
-name = "libtest-mimic"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14e6ba06f0ade6e504aff834d7c34298e5155c6baca353cc6a4aaff2f9fd7f33"
-dependencies = [
- "anstream",
- "anstyle",
- "clap",
- "escape8259",
 ]
 
 [[package]]
@@ -5594,15 +5473,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47e1ffaa40ddd1f3ed91f717a33c8c0ee23fff369e3aa8772b9605cc1d22f4c3"
 
 [[package]]
-name = "maybe-uninit"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
-
-[[package]]
 name = "mem-common"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "clap",
  "fields",
@@ -5622,7 +5495,7 @@ dependencies = [
 [[package]]
 name = "mem-planner-cpp"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "mem-common",
  "proofman-common",
@@ -5645,15 +5518,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "714098028fe011992e1c3962653c96b2d578c4b4bce9036e15ff220319b1e0e3"
 dependencies = [
  "libc",
-]
-
-[[package]]
-name = "memoffset"
-version = "0.5.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "043175f069eda7b85febe4a74abbaeff828d9f8b448515d3151a14a3542811aa"
-dependencies = [
- "autocfg",
 ]
 
 [[package]]
@@ -5744,9 +5608,9 @@ version = "0.12.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85f8024e1c8e71c778968af91d43700ce1d11b219d127d79fb2934153b82b42b"
 dependencies = [
- "crossbeam-channel 0.5.15",
- "crossbeam-epoch 0.9.18",
- "crossbeam-utils 0.8.21",
+ "crossbeam-channel",
+ "crossbeam-epoch",
+ "crossbeam-utils",
  "equivalent",
  "parking_lot",
  "portable-atomic",
@@ -5884,6 +5748,18 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "tempfile",
+]
+
+[[package]]
+name = "nix"
+version = "0.31.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d6d0705320c1e6ba1d912b5e37cf18071b6c2e9b7fa8215a1e8a7651966f5d3"
+dependencies = [
+ "bitflags 2.11.0",
+ "cfg-if",
+ "cfg_aliases",
+ "libc",
 ]
 
 [[package]]
@@ -6101,11 +5977,20 @@ checksum = "0d49ff0c0d00d4a502b39df9af3a525e1efeb14b9dabb5bb83335284c1309210"
 dependencies = [
  "alloy-rlp",
  "arbitrary",
- "cfg-if 1.0.4",
+ "cfg-if",
  "proptest",
  "ruint",
  "serde",
  "smallvec",
+]
+
+[[package]]
+name = "objc2"
+version = "0.6.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a12a8ed07aefc768292f076dc3ac8c48f3781c8f2d5851dd3d98950e8c5a89f"
+dependencies = [
+ "objc2-encode",
 ]
 
 [[package]]
@@ -6116,6 +6001,12 @@ checksum = "2a180dd8642fa45cdb7dd721cd4c11b1cadd4929ce112ebd8b9f5803cc79d536"
 dependencies = [
  "bitflags 2.11.0",
 ]
+
+[[package]]
+name = "objc2-encode"
+version = "4.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef25abbcd74fb2609453eb695bd2f860d389e457f67dc17cafc8b8cbc89d0c33"
 
 [[package]]
 name = "objc2-io-kit"
@@ -6292,7 +6183,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "951c002c75e16ea2c65b8c7e4d3d51d5530d8dfa7d060b4776828c88cfb18ecf"
 dependencies = [
  "bitflags 2.11.0",
- "cfg-if 1.0.4",
+ "cfg-if",
  "foreign-types",
  "libc",
  "once_cell",
@@ -6648,7 +6539,7 @@ version = "0.9.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2621685985a2ebf1c516881c026032ac7deafcda1a2c9b7850dc81e3dfcb64c1"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "libc",
  "redox_syscall 0.5.18",
  "smallvec",
@@ -6864,7 +6755,7 @@ version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d1fe60d06143b2430aa532c94cfe9e29783047f06c0d7fd359a9a51b729fa25"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "cpufeatures",
  "opaque-debug",
  "universal-hash",
@@ -6903,7 +6794,7 @@ dependencies = [
 [[package]]
 name = "precomp-arith-eq"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
@@ -6940,7 +6831,7 @@ dependencies = [
 [[package]]
 name = "precomp-arith-eq-384"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -6977,7 +6868,7 @@ dependencies = [
 [[package]]
 name = "precomp-big-int"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "generic-array",
@@ -6999,7 +6890,7 @@ dependencies = [
 [[package]]
 name = "precomp-blake2"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "mem-common",
@@ -7019,7 +6910,7 @@ dependencies = [
 [[package]]
 name = "precomp-dma"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "generic-array",
@@ -7043,7 +6934,7 @@ dependencies = [
 [[package]]
 name = "precomp-keccakf"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "circuit",
  "fields",
@@ -7065,7 +6956,7 @@ dependencies = [
 [[package]]
 name = "precomp-poseidon2"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "mem-common",
@@ -7086,7 +6977,7 @@ dependencies = [
 [[package]]
 name = "precomp-sha256f"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "mem-common",
@@ -7106,7 +6997,7 @@ dependencies = [
 [[package]]
 name = "precompiles-common"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "mem-common",
@@ -7118,7 +7009,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -7126,8 +7017,9 @@ dependencies = [
  "ark-secp256k1",
  "ark-secp256r1",
  "ark-std 0.5.0",
- "cfg-if 1.0.4",
+ "cfg-if",
  "circuit",
+ "crunchy",
  "lib-c",
  "num-bigint 0.4.6",
  "num-traits",
@@ -7136,7 +7028,7 @@ dependencies = [
 [[package]]
 name = "precompiles-hints"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "anyhow",
  "borsh",
@@ -7261,7 +7153,7 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ca5326d8d0b950a9acd87e6a3f94745394f62e4dae1b1ee22b2bc0c394af43a"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "fnv",
  "lazy_static",
  "libc",
@@ -7283,7 +7175,7 @@ dependencies = [
  "bytemuck",
  "chrono",
  "colored",
- "crossbeam-channel 0.5.15",
+ "crossbeam-channel",
  "csv",
  "curves",
  "fields",
@@ -7316,8 +7208,8 @@ dependencies = [
  "borsh",
  "bytemuck",
  "colored",
- "crossbeam-channel 0.5.15",
- "crossbeam-queue 0.3.12",
+ "crossbeam-channel",
+ "crossbeam-queue",
  "csv",
  "env",
  "fields",
@@ -7367,7 +7259,7 @@ name = "proofman-starks-lib-c"
 version = "0.16.1"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
- "crossbeam-channel 0.5.15",
+ "crossbeam-channel",
  "tracing",
 ]
 
@@ -7703,8 +7595,8 @@ version = "1.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "22e18b0f0062d30d4230b2e85ff77fdfe4326feb054b9783a3460d8435c8ab91"
 dependencies = [
- "crossbeam-deque 0.8.6",
- "crossbeam-utils 0.8.21",
+ "crossbeam-deque",
+ "crossbeam-utils",
 ]
 
 [[package]]
@@ -7956,7 +7848,7 @@ source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8b
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
- "cfg-if 1.0.4",
+ "cfg-if",
  "eyre",
  "libc",
  "rand 0.8.5",
@@ -9440,7 +9332,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "892ff3e6a566cf8d72ffb627fdced3becebbd9ba64089c25975b9b028af326a5"
 dependencies = [
  "bitvec",
- "cfg-if 1.0.4",
+ "cfg-if",
  "derive-where",
  "revm-bytecode",
  "revm-context-interface",
@@ -9577,7 +9469,7 @@ dependencies = [
  "aurora-engine-modexp",
  "blst",
  "c-kzg",
- "cfg-if 1.0.4",
+ "cfg-if",
  "k256",
  "p256",
  "revm-primitives",
@@ -9628,7 +9520,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4689e6c2294d81e88dc6261c768b63bc4fcdb852be6d1352498b114f61383b7"
 dependencies = [
  "cc",
- "cfg-if 1.0.4",
+ "cfg-if",
  "getrandom 0.2.17",
  "libc",
  "untrusted",
@@ -9647,7 +9539,7 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 
 [[package]]
 name = "rkyv"
@@ -9721,7 +9613,7 @@ dependencies = [
 [[package]]
 name = "rom-setup"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "anyhow",
  "blake3",
@@ -10058,7 +9950,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "356285bbf17bea63d9e52e96bd18f039672ac92b55b8cb997d6162a2a37d1649"
 dependencies = [
  "ahash",
- "cfg-if 1.0.4",
+ "cfg-if",
  "hashbrown 0.13.2",
 ]
 
@@ -10322,7 +10214,7 @@ version = "0.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e3bf829a2d51ab4a5ddf1352d8470c140cadc8301b2ae1789db023f01cedd6ba"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "cpufeatures",
  "digest 0.10.7",
 ]
@@ -10333,7 +10225,7 @@ version = "0.10.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "cpufeatures",
  "digest 0.10.7",
 ]
@@ -10355,7 +10247,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b31139435f327c93c6038ed350ae4588e2c70a13d50599509fee6349967ba35a"
 dependencies = [
  "cc",
- "cfg-if 1.0.4",
+ "cfg-if",
 ]
 
 [[package]]
@@ -10529,7 +10421,7 @@ dependencies = [
 [[package]]
 name = "sm-arith"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "num-bigint 0.4.6",
@@ -10550,7 +10442,7 @@ dependencies = [
 [[package]]
 name = "sm-binary"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "num-bigint 0.4.6",
@@ -10570,7 +10462,7 @@ dependencies = [
 [[package]]
 name = "sm-frequent-ops"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "clap",
  "fields",
@@ -10586,7 +10478,7 @@ dependencies = [
 [[package]]
 name = "sm-main"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "mem-common",
@@ -10606,7 +10498,7 @@ dependencies = [
 [[package]]
 name = "sm-mem"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "mem-common",
@@ -10627,7 +10519,7 @@ dependencies = [
 [[package]]
 name = "sm-rom"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "asm-runner",
  "fields",
@@ -10735,7 +10627,7 @@ version = "0.8.0-sp1-6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f23e41cd36168cc2e51e5d3e35ff0c34b204d945769a65591a76286d04b51e43"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "ff 0.13.1",
  "group 0.13.0",
  "pairing 0.23.0",
@@ -10746,24 +10638,36 @@ dependencies = [
 
 [[package]]
 name = "spawned-concurrency"
-version = "0.4.5"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d3ec6b3c003075f7d1c4c6475308243e853c9a78149b84b1f8b64d5bed49d49"
+checksum = "bc21166874e8cd7584ea795c223303160461f0bb1b571bc23e92ca2abb7c5149"
 dependencies = [
  "futures",
  "pin-project-lite",
+ "spawned-macros",
  "spawned-rt",
  "thiserror 2.0.18",
  "tracing",
 ]
 
 [[package]]
-name = "spawned-rt"
-version = "0.4.5"
+name = "spawned-macros"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cca60c56b1c60b94dd314edce5ea1a98b6037cca3b44d73828e647bad4dae46c"
+checksum = "5d64742b41741dfebd5b5ba4dbc4cbc5cc91f4a2cf8107191007d64295682973"
 dependencies = [
- "crossbeam 0.7.3",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "spawned-rt"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e9e270e6606a118708120671f2d171316762fa832cab73699c714c23aaafe6eb"
+dependencies = [
+ "ctrlc",
  "tokio",
  "tokio-stream",
  "tokio-util",
@@ -11068,7 +10972,7 @@ version = "1.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f60246a4944f24f6e018aa17cdeffb7818b76356965d03b07d6a9886e8962185"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
 ]
 
 [[package]]
@@ -11453,7 +11357,7 @@ version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "786d480bce6247ab75f005b14ae1624ad978d3029d9113f0a22fa1ac773faeaf"
 dependencies = [
- "crossbeam-channel 0.5.15",
+ "crossbeam-channel",
  "thiserror 2.0.18",
  "time",
  "tracing-subscriber 0.3.23",
@@ -11546,7 +11450,7 @@ version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c175f7ecc002b6ef04776a39f440503e4e788790ddbdbfac8259b7a069526334"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "itoa",
  "libc",
  "mach2",
@@ -11917,7 +11821,7 @@ version = "0.2.114"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6532f9a5c1ece3798cb1c2cfdba640b9b3ba884f5db45973a6f442510a87d38e"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "once_cell",
  "rustversion",
  "wasm-bindgen-macro",
@@ -11930,7 +11834,7 @@ version = "0.4.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e9c5522b3a28661442748e09d40924dfb9ca614b21c00d3fd135720e48b67db8"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "futures-util",
  "js-sys",
  "once_cell",
@@ -12656,7 +12560,7 @@ version = "0.50.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "524e57b2c537c0f9b1e69f1965311ec12182b4122e45035b1508cd24d2adadb1"
 dependencies = [
- "cfg-if 1.0.4",
+ "cfg-if",
  "windows-sys 0.48.0",
 ]
 
@@ -12981,7 +12885,7 @@ dependencies = [
 [[package]]
 name = "zisk-build"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -12994,7 +12898,7 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "anyhow",
  "bincode",
@@ -13019,7 +12923,7 @@ dependencies = [
 [[package]]
 name = "zisk-core"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "elf",
  "fields",
@@ -13039,12 +12943,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 
 [[package]]
 name = "zisk-distributed-common"
 version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "anyhow",
  "borsh",
@@ -13065,7 +12969,7 @@ dependencies = [
 [[package]]
 name = "zisk-pil"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "fields",
  "proofman-common",
@@ -13078,7 +12982,7 @@ dependencies = [
 [[package]]
 name = "zisk-sdk"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "anyhow",
  "asm-runner",
@@ -13105,7 +13009,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "proofman-verifier",
 ]
@@ -13113,7 +13017,7 @@ dependencies = [
 [[package]]
 name = "ziskemu"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "clap",
  "data-bus",
@@ -13140,11 +13044,11 @@ dependencies = [
 [[package]]
 name = "ziskos-hints"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "anyhow",
  "bincode",
- "cfg-if 1.0.4",
+ "cfg-if",
  "fields",
  "getrandom 0.2.17",
  "lazy_static",
@@ -13175,7 +13079,7 @@ dependencies = [
  "blake2",
  "bls12_381 0.7.1",
  "byteorder",
- "cfg-if 1.0.4",
+ "cfg-if",
  "group 0.12.1",
  "group 0.13.0",
  "halo2",
@@ -13193,7 +13097,7 @@ dependencies = [
 [[package]]
 name = "zkvm-interface"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#9a8530f2ba94a6ab01e0f185537583cea7b6faba"
 dependencies = [
  "bindgen 0.72.1",
 ]
