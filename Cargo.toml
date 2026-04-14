@@ -84,6 +84,9 @@ http = "1.4.0"
 tempfile = "3"
 rkyv = { version = "0.8.10", features = ["std", "unaligned"] }
 
+[patch.crates-io]
+revm = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+
 [patch."https://github.com/paradigmxyz/stateless.git"]
 stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
 tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }

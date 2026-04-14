@@ -30,6 +30,9 @@ revm = { version = "34.0.0", default-features = false }
 alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.27.3" }
 # alloy-evm = { path = "../../../zisk-patch-alloy-evm/crates/evm" }
 
+[patch.crates-io]
+revm = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+
 [patch."https://github.com/paradigmxyz/reth.git"]
 # Needed for deterministic Hashmap sort
 reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.11.0" }
