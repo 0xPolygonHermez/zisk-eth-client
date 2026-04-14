@@ -2347,7 +2347,7 @@ dependencies = [
 name = "guest-common"
 version = "0.7.0"
 dependencies = [
- "zkvm-interface",
+ "zkvm-interface 0.17.0 (git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge)",
 ]
 
 [[package]]
@@ -6723,7 +6723,7 @@ dependencies = [
  "zisk-common",
  "zisk-definitions",
  "zisk-verifier",
- "zkvm-interface",
+ "zkvm-interface 0.17.0 (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0)",
 ]
 
 [[package]]
@@ -6749,13 +6749,21 @@ dependencies = [
  "sha2",
  "tiny-keccak",
  "zisk-verifier",
- "zkvm-interface",
+ "zkvm-interface 0.17.0 (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0)",
 ]
 
 [[package]]
 name = "zkvm-interface"
 version = "0.17.0"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#42001a0448fcbfe9f459b2a2782b73f5e370f5cb"
+dependencies = [
+ "bindgen 0.72.1",
+]
+
+[[package]]
+name = "zkvm-interface"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#f8027d7aee97d83b4d98b740a62cccb2b8101763"
 dependencies = [
  "bindgen 0.72.1",
 ]
