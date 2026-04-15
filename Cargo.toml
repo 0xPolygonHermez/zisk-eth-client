@@ -88,8 +88,5 @@ rkyv = { version = "0.8.10", features = ["std", "unaligned"] }
 revm = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
 
 [patch."https://github.com/paradigmxyz/stateless.git"]
-# Use local path to apply U256 type compatibility fixes
-stateless = { path = "../stateless/crates/stateless" }
-tries = { path = "../stateless/crates/tries" }
-# stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
-# tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
+stateless = { git = "https://github.com/eth-act/zisk-patch-stateless.git", branch = "feature/switchable-u256-backend" }
+tries = { git = "https://github.com/eth-act/zisk-patch-stateless.git", branch = "feature/switchable-u256-backend" }
