@@ -5,6 +5,7 @@ use std::sync::Arc;
 
 use alloy_consensus::crypto::install_default_provider;
 use revm::install_crypto;
+use revm::primitives::install_uint256_backend;
 
 use guest_reth::{
     CustomEvmCrypto, RethInputPublic, RethInputWitness, extract_block_info, get_chain_name,
@@ -26,6 +27,9 @@ fn main() {
             panic!("Failed to init hints, error: {}", e);
         }
     }
+
+    // Install U256 backend.
+    install_uint256_backend(CustomEvmCrypto::default());
 
     // Install custom EVM crypto
     install_crypto(CustomEvmCrypto::default());

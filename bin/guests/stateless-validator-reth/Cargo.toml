@@ -15,7 +15,7 @@ panic = "abort"
 [dependencies]
 guest-reth = { path = "../../../crates/guest-reth" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "ziskos-enlarge" }
 # Local development
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
@@ -26,24 +26,46 @@ alloy-primitives = { version = "1.5.6", features = ["native-keccak"] } # Needed 
 # revm
 revm = { version = "34.0.0", default-features = false }
 
-# Needed for deterministic Hashmap sort
-alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.27.3" }
-# alloy-evm = { path = "../../../zisk-patch-alloy-evm/crates/evm" }
+# Needed for deterministic Hashmap sort + U256 type compatibility with revm fork
+alloy-evm = { path = "../../../../alloy-evm/crates/evm" }
 
 [patch.crates-io]
 revm = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-bytecode = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-context = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-database = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-handler = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-inspector = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-interpreter = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-precompile = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-primitives = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-state = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-database-interface = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-context-interface = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+alloy-evm = { path = "../../../../alloy-evm/crates/evm" }
 
 [patch."https://github.com/paradigmxyz/reth.git"]
-# Needed for deterministic Hashmap sort
-reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.11.0" }
-# reth-trie-common = { path = "../../../zisk-patch-reth/crates/trie/common" }
+# Needed for deterministic Hashmap sort + U256 type compatibility with revm fork
+reth-trie-common = { path = "../../../../reth/crates/trie/common" }
+reth-primitives-traits = { path = "../../../../reth/crates/primitives-traits" }
+reth-execution-types = { path = "../../../../reth/crates/evm/execution-types" }
+reth-evm = { path = "../../../../reth/crates/evm/evm" }
+reth-evm-ethereum = { path = "../../../../reth/crates/ethereum/evm" }
+reth-ethereum-forks = { path = "../../../../reth/crates/ethereum/hardforks" }
+reth-chainspec = { path = "../../../../reth/crates/chainspec" }
+# Needed so serde feature unification works when reth-execution-types is patched locally
+reth-ethereum-primitives = { path = "../../../../reth/crates/ethereum/primitives" }
+
+[patch."https://github.com/0xPolygonHermez/zisk-patch-reth.git"]
+reth-primitives-traits = { path = "../../../../reth/crates/primitives-traits" }
+reth-ethereum-primitives = { path = "../../../../reth/crates/ethereum/primitives" }
 
 [patch."https://github.com/paradigmxyz/stateless.git"]
-# Needed for function visibility and deterministic Hashmap sort
-stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
-tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
-# stateless = { path = "../zisk-patch-stateless/crates/stateless" }
-# tries = { path = "../zisk-patch-stateless/crates/tries" }
+# Use local path to apply U256 type compatibility fixes
+stateless = { path = "../../../../stateless/crates/stateless" }
+tries = { path = "../../../../stateless/crates/tries" }
+# stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
+# tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }
