@@ -24,17 +24,17 @@ extern "C" {
         result_ptr: *mut u8,
     );
 
-    fn overflowing_add256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+    // fn overflowing_add256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
 
-    fn overflowing_sub256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+    // fn overflowing_sub256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
 
     fn overflowing_mul256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
 
     fn overflowing_pow256_c(base: *const u64, exp: *const u64, result: *mut u64) -> u8;
 
-    fn checked_add256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+    // fn checked_add256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
 
-    fn checked_sub256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+    // fn checked_sub256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
 
     fn checked_mul256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
 
@@ -42,9 +42,9 @@ extern "C" {
 
     fn checked_rem256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
 
-    fn saturating_add256_c(a: *const u64, b: *const u64, result: *mut u64);
+    // fn saturating_add256_c(a: *const u64, b: *const u64, result: *mut u64);
 
-    fn saturating_sub256_c(a: *const u64, b: *const u64, result: *mut u64);
+    // fn saturating_sub256_c(a: *const u64, b: *const u64, result: *mut u64);
 
     fn saturating_mul256_c(a: *const u64, b: *const u64, result: *mut u64);
 
