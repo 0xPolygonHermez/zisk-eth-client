@@ -9,6 +9,7 @@ use revm::precompile::{
     bls12_381::{G1Point, G1PointScalar, G2Point, G2PointScalar},
     Crypto, PrecompileError,
 };
+use revm::primitives::Uint256Ops;
 
 #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
 use guest_common::ffi::*;
@@ -794,6 +795,186 @@ impl Crypto for CustomEvmCrypto {
         #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
         {
             self.default_crypto.bls12_381_fp2_to_g2(fp2)
+        }
+    }
+}
+
+// Additional ZisK U256 accelerators not declared in zkvm_accelerators.h.
+// Declare them here so the linker can find them on the zkvm target.
+#[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+extern "C" {
+    fn overflowing_mul256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    fn overflowing_pow256_c(base: *const u64, exp: *const u64, result: *mut u64) -> u8;
+
+    fn checked_mul256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    fn checked_div256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    fn saturating_mul256_c(a: *const u64, b: *const u64, result: *mut u64);
+
+    fn wrapping_div256_c(a: *const u64, b: *const u64, result: *mut u64);
+
+    fn wrapping_rem256_c(a: *const u64, b: *const u64, result: *mut u64);
+}
+
+impl Uint256Ops for CustomEvmCrypto {
+    // TODO: Investigate
+    // fn overflowing_add(&self, a: [u64; 4], b: [u64; 4]) -> ([u64; 4], bool) {
+    //     #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    //     {
+    //         let mut result = [0u64; 4];
+    //         let overflow =
+    //             unsafe { overflowing_add256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+    //         (result, overflow != 0)
+    //     }
+
+    //     #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    //     {
+    //         self.native_uint256_ops.overflowing_add(a, b)
+    //     }
+    // }
+
+    // TODO: Investigate
+    // fn overflowing_sub(&self, a: [u64; 4], b: [u64; 4]) -> ([u64; 4], bool) {
+    //     #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    //     {
+    //         let mut result = [0u64; 4];
+    //         let overflow =
+    //             unsafe { overflowing_sub256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+    //         (result, overflow != 0)
+    //     }
+
+    //     #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    //     {
+    //         self.native_uint256_ops.overflowing_sub(a, b)
+    //     }
+    // }
+
+    fn overflowing_mul(&self, a: [u64; 4], b: [u64; 4]) -> ([u64; 4], bool) {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            let overflow =
+                unsafe { overflowing_mul256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            return (result, overflow != 0);
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.overflowing_mul(a, b)
+        }
+    }
+
+    fn pow(&self, base: [u64; 4], exp: [u64; 4]) -> [u64; 4] {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            unsafe { overflowing_pow256_c(base.as_ptr(), exp.as_ptr(), result.as_mut_ptr()) };
+            return result;
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.pow(base, exp)
+        }
+    }
+
+    fn checked_mul(&self, a: [u64; 4], b: [u64; 4]) -> Option<[u64; 4]> {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            let success = unsafe { checked_mul256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            return if success == 1 { Some(result) } else { None };
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.checked_mul(a, b)
+        }
+    }
+
+    fn checked_div(&self, a: [u64; 4], b: [u64; 4]) -> Option<[u64; 4]> {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            let success = unsafe { checked_div256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            return if success == 1 { Some(result) } else { None };
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.checked_div(a, b)
+        }
+    }
+
+    fn saturating_mul(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            unsafe { saturating_mul256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            return result;
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.saturating_mul(a, b)
+        }
+    }
+
+    fn wrapping_div(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            unsafe { wrapping_div256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            return result;
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.wrapping_div(a, b)
+        }
+    }
+
+    fn wrapping_rem(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            unsafe { wrapping_rem256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            return result;
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.wrapping_rem(a, b)
+        }
+    }
+
+    fn div(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            unsafe { wrapping_div256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            return result;
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.div(a, b)
+        }
+    }
+
+    fn rem(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            unsafe { wrapping_rem256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            return result;
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.rem(a, b)
         }
     }
 }

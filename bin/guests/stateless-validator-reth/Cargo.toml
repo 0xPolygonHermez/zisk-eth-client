@@ -15,7 +15,7 @@ panic = "abort"
 [dependencies]
 guest-reth = { path = "../../../crates/guest-reth" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "ziskos-enlarge" }
 # Local development
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
@@ -26,21 +26,43 @@ alloy-primitives = { version = "1.5.6", features = ["native-keccak"] } # Needed 
 # revm
 revm = { version = "34.0.0", default-features = false }
 
-# Needed for deterministic Hashmap sort
-alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.27.3" }
-# alloy-evm = { path = "../../../zisk-patch-alloy-evm/crates/evm" }
+# Needed for deterministic Hashmap sort + U256 type compatibility with revm fork
+alloy-evm = { git = "https://github.com/eth-act/zisk-patch-alloy-evm.git", branch = "feature/switchable-u256-backend" }
+
+[patch.crates-io]
+revm = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-bytecode = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-context = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-database = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-handler = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-inspector = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-interpreter = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-precompile = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-primitives = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-state = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-database-interface = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+revm-context-interface = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-v34.0.0" }
+alloy-evm = { git = "https://github.com/eth-act/zisk-patch-alloy-evm.git", branch = "feature/switchable-u256-backend" }
 
 [patch."https://github.com/paradigmxyz/reth.git"]
-# Needed for deterministic Hashmap sort
-reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.11.0" }
-# reth-trie-common = { path = "../../../zisk-patch-reth/crates/trie/common" }
+# Needed for deterministic Hashmap sort + U256 type compatibility with revm fork
+reth-trie-common = { git = "https://github.com/eth-act/zisk-patch-reth.git", branch = "feature/switchable-u256-backend" }
+reth-primitives-traits = { git = "https://github.com/eth-act/zisk-patch-reth.git", branch = "feature/switchable-u256-backend" }
+reth-execution-types = { git = "https://github.com/eth-act/zisk-patch-reth.git", branch = "feature/switchable-u256-backend" }
+reth-evm = { git = "https://github.com/eth-act/zisk-patch-reth.git", branch = "feature/switchable-u256-backend" }
+reth-evm-ethereum = { git = "https://github.com/eth-act/zisk-patch-reth.git", branch = "feature/switchable-u256-backend" }
+reth-ethereum-forks = { git = "https://github.com/eth-act/zisk-patch-reth.git", branch = "feature/switchable-u256-backend" }
+reth-chainspec = { git = "https://github.com/eth-act/zisk-patch-reth.git", branch = "feature/switchable-u256-backend" }
+# Needed so serde feature unification works when reth-execution-types is patched
+reth-ethereum-primitives = { git = "https://github.com/eth-act/zisk-patch-reth.git", branch = "feature/switchable-u256-backend" }
+
+[patch."https://github.com/0xPolygonHermez/zisk-patch-reth.git"]
+reth-primitives-traits = { git = "https://github.com/eth-act/zisk-patch-reth.git", branch = "feature/switchable-u256-backend" }
+reth-ethereum-primitives = { git = "https://github.com/eth-act/zisk-patch-reth.git", branch = "feature/switchable-u256-backend" }
 
 [patch."https://github.com/paradigmxyz/stateless.git"]
-# Needed for function visibility and deterministic Hashmap sort
-stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
-tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
-# stateless = { path = "../zisk-patch-stateless/crates/stateless" }
-# tries = { path = "../zisk-patch-stateless/crates/tries" }
+stateless = { git = "https://github.com/eth-act/zisk-patch-stateless.git", branch = "feature/switchable-u256-backend" }
+tries = { git = "https://github.com/eth-act/zisk-patch-stateless.git", branch = "feature/switchable-u256-backend" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }
