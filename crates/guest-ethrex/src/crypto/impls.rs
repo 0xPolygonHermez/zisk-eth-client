@@ -1,4 +1,5 @@
 use ethereum_types::Address;
+use ethrex_common::Uint256Ops;
 use ethrex_crypto::{Crypto, CryptoError};
 #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
 use tiny_keccak::{Hasher, Keccak};
@@ -10,16 +11,49 @@ use guest_common::ffi::*;
 #[cfg(all(not(all(target_os = "zkvm", target_vendor = "zisk")), zisk_hints_debug))]
 use guest_common::ffi::*;
 
-use super::ZiskCrypto;
+use super::ZiskAccelerator;
 
-// mulmod256_c is exported by ziskos but not declared in zkvm_accelerators.h.
-// Declare it here so the linker can find it on the zkvm target.
+// Additional ZisK accelerators not declared in zkvm_accelerators.h.
+// Declare them here so the linker can find them on the zkvm target.
 #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
 extern "C" {
-    fn mulmod256_c(a: *const u8, b: *const u8, m: *const u8, result: *mut u8);
+    fn mul_mod_bytes256_c(
+        a_ptr: *const u8,
+        b_ptr: *const u8,
+        m_ptr: *const u8,
+        result_ptr: *mut u8,
+    );
+
+    // fn overflowing_add256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    // fn overflowing_sub256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    fn overflowing_mul256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    fn overflowing_pow256_c(base: *const u64, exp: *const u64, result: *mut u64) -> u8;
+
+    // fn checked_add256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    // fn checked_sub256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    fn checked_mul256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    fn checked_div256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    fn checked_rem256_c(a: *const u64, b: *const u64, result: *mut u64) -> u8;
+
+    // fn saturating_add256_c(a: *const u64, b: *const u64, result: *mut u64);
+
+    // fn saturating_sub256_c(a: *const u64, b: *const u64, result: *mut u64);
+
+    fn saturating_mul256_c(a: *const u64, b: *const u64, result: *mut u64);
+
+    fn wrapping_div256_c(a: *const u64, b: *const u64, result: *mut u64);
+
+    fn wrapping_rem256_c(a: *const u64, b: *const u64, result: *mut u64);
 }
 
-impl Crypto for ZiskCrypto {
+impl Crypto for ZiskAccelerator {
     fn ripemd160(&self, input: &[u8]) -> [u8; 32] {
         #[cfg(any(all(target_os = "zkvm", target_vendor = "zisk"), zisk_hints))]
         {
@@ -374,7 +408,7 @@ impl Crypto for ZiskCrypto {
         {
             let mut result = [0u8; 32];
             unsafe {
-                mulmod256_c(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr());
+                mul_mod_bytes256_c(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr());
             }
             return result;
         }
@@ -746,4 +780,330 @@ impl Crypto for ZiskCrypto {
             self.native_crypto.bls12_381_fp2_to_g2(fp2)
         }
     }
+}
+
+impl Uint256Ops for ZiskAccelerator {
+    // TODO: Investigate
+    // fn overflowing_add(&self, a: [u64; 4], b: [u64; 4]) -> ([u64; 4], bool) {
+    //     #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    //     {
+    //         let mut result = [0u64; 4];
+    //         let overflow =
+    //             unsafe { overflowing_add256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+    //         (result, overflow != 0)
+    //     }
+
+    //     #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    //     {
+    //         self.native_uint256_ops.overflowing_add(a, b)
+    //     }
+    // }
+
+    // TODO: Investigate
+    // fn overflowing_sub(&self, a: [u64; 4], b: [u64; 4]) -> ([u64; 4], bool) {
+    //     #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    //     {
+    //         let mut result = [0u64; 4];
+    //         let overflow =
+    //             unsafe { overflowing_sub256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+    //         (result, overflow != 0)
+    //     }
+
+    //     #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    //     {
+    //         self.native_uint256_ops.overflowing_sub(a, b)
+    //     }
+    // }
+
+    fn overflowing_mul(&self, a: [u64; 4], b: [u64; 4]) -> ([u64; 4], bool) {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            let overflow =
+                unsafe { overflowing_mul256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            (result, overflow != 0)
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.overflowing_mul(a, b)
+        }
+    }
+
+    fn overflowing_pow(&self, base: [u64; 4], exp: [u64; 4]) -> ([u64; 4], bool) {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            let overflow =
+                unsafe { overflowing_pow256_c(base.as_ptr(), exp.as_ptr(), result.as_mut_ptr()) };
+            (result, overflow != 0)
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.overflowing_pow(base, exp)
+        }
+    }
+
+    // TODO: Investigate
+    // fn checked_add(&self, a: [u64; 4], b: [u64; 4]) -> Option<[u64; 4]> {
+    //     #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    //     {
+    //         let mut result = [0u64; 4];
+    //         let success = unsafe { checked_add256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+    //         if success == 1 {
+    //             Some(result)
+    //         } else {
+    //             None
+    //         }
+    //     }
+
+    //     #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    //     {
+    //         self.native_uint256_ops.checked_add(a, b)
+    //     }
+    // }
+
+    // TODO: Investigate
+    // fn checked_sub(&self, a: [u64; 4], b: [u64; 4]) -> Option<[u64; 4]> {
+    //     #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    //     {
+    //         let mut result = [0u64; 4];
+    //         let success = unsafe { checked_sub256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+    //         if success == 1 {
+    //             Some(result)
+    //         } else {
+    //             None
+    //         }
+    //     }
+
+    //     #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    //     {
+    //         self.native_uint256_ops.checked_sub(a, b)
+    //     }
+    // }
+
+    fn checked_mul(&self, a: [u64; 4], b: [u64; 4]) -> Option<[u64; 4]> {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            let success = unsafe { checked_mul256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            if success == 1 {
+                Some(result)
+            } else {
+                None
+            }
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.checked_mul(a, b)
+        }
+    }
+
+    fn checked_div(&self, a: [u64; 4], b: [u64; 4]) -> Option<[u64; 4]> {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            let success = unsafe { checked_div256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            if success == 1 {
+                Some(result)
+            } else {
+                None
+            }
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.checked_div(a, b)
+        }
+    }
+
+    fn checked_rem(&self, a: [u64; 4], b: [u64; 4]) -> Option<[u64; 4]> {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            let success = unsafe { checked_rem256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            if success == 1 {
+                Some(result)
+            } else {
+                None
+            }
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.checked_rem(a, b)
+        }
+    }
+
+    // TODO: Investigate
+    // fn saturating_add(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+    //     #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    //     {
+    //         let mut result = [0u64; 4];
+    //         unsafe { saturating_add256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+    //         result
+    //     }
+
+    //     #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    //     {
+    //         self.native_uint256_ops.saturating_add(a, b)
+    //     }
+    // }
+
+    // TODO: Investigate
+    // fn saturating_sub(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+    //     #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+    //     {
+    //         let mut result = [0u64; 4];
+    //         unsafe { saturating_sub256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+    //         result
+    //     }
+
+    //     #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+    //     {
+    //         self.native_uint256_ops.saturating_sub(a, b)
+    //     }
+    // }
+
+    fn saturating_mul(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            unsafe { saturating_mul256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            result
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.saturating_mul(a, b)
+        }
+    }
+
+    // ── U256 bitwise & inspection ───────────────────────────────────
+
+    // fn not(&self, a: [u64; 4]) -> [u64; 4] {
+    //     [!a[0], !a[1], !a[2], !a[3]]
+    // }
+
+    // fn bitand(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+    //     [a[0] & b[0], a[1] & b[1], a[2] & b[2], a[3] & b[3]]
+    // }
+
+    // fn bitor(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+    //     [a[0] | b[0], a[1] | b[1], a[2] | b[2], a[3] | b[3]]
+    // }
+
+    // fn bitxor(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+    //     [a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2], a[3] ^ b[3]]
+    // }
+
+    // fn shl(&self, a: [u64; 4], shift: usize) -> [u64; 4] {
+    //     let a = ethereum_types::U256(a);
+    //     (a << shift).0
+    // }
+
+    // fn shr(&self, a: [u64; 4], shift: usize) -> [u64; 4] {
+    //     let a = ethereum_types::U256(a);
+    //     (a >> shift).0
+    // }
+
+    fn div(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            unsafe { wrapping_div256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            result
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.div(a, b)
+        }
+    }
+
+    fn rem(&self, a: [u64; 4], b: [u64; 4]) -> [u64; 4] {
+        #[cfg(all(target_os = "zkvm", target_vendor = "zisk"))]
+        {
+            let mut result = [0u64; 4];
+            unsafe { wrapping_rem256_c(a.as_ptr(), b.as_ptr(), result.as_mut_ptr()) };
+            result
+        }
+
+        #[cfg(not(all(target_os = "zkvm", target_vendor = "zisk")))]
+        {
+            self.native_uint256_ops.rem(a, b)
+        }
+    }
+
+    // fn leading_zeros(&self, a: [u64; 4]) -> u32 {
+    //     ethereum_types::U256(a).leading_zeros()
+    // }
+
+    // fn bits(&self, a: [u64; 4]) -> usize {
+    //     ethereum_types::U256(a).bits()
+    // }
+
+    // fn bit(&self, a: [u64; 4], index: usize) -> bool {
+    //     ethereum_types::U256(a).bit(index)
+    // }
+
+    // fn byte(&self, a: [u64; 4], index: usize) -> u8 {
+    //     ethereum_types::U256(a).byte(index)
+    // }
+
+    // ── U256 byte conversion ────────────────────────────────────────
+
+    // fn to_big_endian(&self, a: [u64; 4]) -> [u8; 32] {
+    //     ethereum_types::U256(a).to_big_endian()
+    // }
+
+    // fn from_big_endian(&self, bytes: &[u8]) -> [u64; 4] {
+    //     ethereum_types::U256::from_big_endian(bytes).0
+    // }
+
+    // fn from_little_endian(&self, bytes: &[u8]) -> [u64; 4] {
+    //     ethereum_types::U256::from_little_endian(bytes).0
+    // }
+
+    // ── U256 string parsing ─────────────────────────────────────────
+
+    // fn from_dec_str(&self, s: &str) -> Result<[u64; 4], ParseU256Error> {
+    //     ethereum_types::U256::from_dec_str(s)
+    //         .map(|v| v.0)
+    //         .map_err(|e| ParseU256Error(e.to_string()))
+    // }
+
+    // fn from_str_radix(&self, s: &str, radix: u32) -> Result<[u64; 4], ParseU256Error> {
+    //     ethereum_types::U256::from_str_radix(s, radix)
+    //         .map(|v| v.0)
+    //         .map_err(|_| ParseU256Error("invalid string for radix".to_string()))
+    // }
+
+    // ── U512 operations (for ADDMOD) ────────────────────────────────
+
+    // fn u512_from_u256(&self, a: [u64; 4]) -> [u64; 8] {
+    //     let v = ethereum_types::U512::from(ethereum_types::U256(a));
+    //     v.0
+    // }
+
+    // fn u512_overflowing_add(&self, a: [u64; 8], b: [u64; 8]) -> ([u64; 8], bool) {
+    //     let a = ethereum_types::U512(a);
+    //     let b = ethereum_types::U512(b);
+    //     let (v, o) = a.overflowing_add(b);
+    //     (v.0, o)
+    // }
+
+    // fn u512_rem(&self, a: [u64; 8], b: [u64; 8]) -> [u64; 8] {
+    //     let a = ethereum_types::U512(a);
+    //     let b = ethereum_types::U512(b);
+    //     (a % b).0
+    // }
+
+    // fn u512_rem_u256(&self, a: [u64; 8], b: [u64; 4]) -> [u64; 8] {
+    //     let a = ethereum_types::U512(a);
+    //     let b = ethereum_types::U512::from(ethereum_types::U256(b));
+    //     (a % b).0
+    // }
 }

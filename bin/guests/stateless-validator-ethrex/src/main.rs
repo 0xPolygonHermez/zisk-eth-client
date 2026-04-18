@@ -3,9 +3,14 @@ ziskos::entrypoint!(main);
 
 use std::sync::Arc;
 
-use guest_ethrex::{EthrexInput, ZiskCrypto, extract_block_info, get_chain_name, validate_block};
+use guest_ethrex::{
+    EthrexInput, ZiskAccelerator, extract_block_info, get_chain_name, validate_block,
+};
 
 fn main() {
+    // Install U256 backend.
+    ethrex_common::install_uint256_backend(ZiskAccelerator::default());
+
     // Read the input
     let input: Vec<u8> = ziskos::io::read_vec();
     let input: EthrexInput =
@@ -25,8 +30,8 @@ fn main() {
     );
 
     // Validate the block
-    let crypto = ZiskCrypto::default();
-    let block_hash = validate_block(input, Arc::new(crypto)).expect("Block validation failed");
+    let accelerator = ZiskAccelerator::default();
+    let block_hash = validate_block(input, Arc::new(accelerator)).expect("Block validation failed");
 
     // Commit to block hash as the output
     ziskos::io::commit(&block_hash);
