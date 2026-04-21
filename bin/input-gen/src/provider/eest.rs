@@ -6,11 +6,11 @@ use tracing::info;
 
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
 
-use super::{InputSource, SourceKind};
+use super::{InputProvider, ProviderKind};
 use crate::{client::ExecutionClient, common::fixtures_from_path, processor::ProcessingTracker};
 
 #[derive(Debug, Clone, Args)]
-pub struct EestSource {
+pub struct EestProvider {
     /// EEST release tag to use (e.g., "v0.1.0"). If empty, the latest release will be used.
     #[arg(short, long, conflicts_with = "eest_fixtures_path")]
     tag: Option<String>,
@@ -28,14 +28,14 @@ pub struct EestSource {
     exclude: Option<Vec<String>>,
 
     /// Number of threads for parallel processing
-    #[arg(short, long, default_value = "10")]
+    #[arg(long, default_value = "10")]
     threads: Option<usize>,
 }
 
 #[async_trait::async_trait]
-impl InputSource for EestSource {
-    fn kind(&self) -> SourceKind {
-        SourceKind::Eest
+impl InputProvider for EestProvider {
+    fn kind(&self) -> ProviderKind {
+        ProviderKind::Eest
     }
 
     async fn generate_inputs(
@@ -43,8 +43,8 @@ impl InputSource for EestSource {
         client: &dyn ExecutionClient,
         output: &Path,
     ) -> anyhow::Result<()> {
-        if !client.supports_source(self.kind()) {
-            anyhow::bail!("{} doesn't support EEST source", client.display_name());
+        if !client.supports_provider(self.kind()) {
+            anyhow::bail!("{} doesn't support EEST provider", client.display_name());
         }
 
         if let Some(threads) = self.threads {

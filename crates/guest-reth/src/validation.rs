@@ -11,7 +11,7 @@ use stateless_reth::{
     recover_block_with_public_keys, stateless_validation_recovered_with_trie,
     validation::StatelessValidationError, UncompressedPublicKey,
 };
-use zeth_mpt_state::SparseState;
+use stateless_reth_tries::zeth::SparseState;
 
 /// Verifies transaction signatures against provided public keys.
 pub fn verify_signatures(

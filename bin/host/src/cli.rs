@@ -1,6 +1,5 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
-use tracing::{error, warn};
 
 /// ZisK Ethereum Client Host - Benchmark runner
 #[derive(Parser, Debug)]
@@ -13,7 +12,7 @@ pub struct Cli {
     pub action: Action,
 
     /// Force rerun even if results exist
-    #[arg(long, default_value_t = false)]
+    #[arg(short, long, default_value_t = false)]
     pub force_rerun: bool,
 
     /// Guest program to benchmark
@@ -24,57 +23,19 @@ pub struct Cli {
     #[arg(short, long)]
     pub output_folder: Option<PathBuf>,
 
-    /// Path to the compiled guest program ELF binary
-    #[arg(long)]
-    pub elf: PathBuf,
-
-    /// Path to the proving key file
+    /// Path to the proving key file (default: installed one)
     #[arg(short, long)]
     pub proving_key: Option<PathBuf>,
 
-    /// Path to ziskemu binary
-    #[arg(long)]
-    pub ziskemu: Option<PathBuf>,
-}
+    /// Use emulator backend (Emu) instead of assembly (Asm)
+    #[arg(short = 'l', long, default_value_t = false)]
+    pub emulator: bool,
 
-impl Cli {
-    pub fn validate(&self) -> Result<(), String> {
-        match self.action {
-            Action::VerifyConstraints | Action::Prove => {
-                if self.proving_key.is_none() {
-                    error!("Proving key is required for action {:?}", self.action);
-                    return Err(format!(
-                        "Proving key is required for action {:?}",
-                        self.action
-                    ));
-                }
+    #[arg(long, conflicts_with = "emulator")]
+    pub port: Option<u16>,
 
-                if self.ziskemu.is_some() {
-                    warn!(
-                        "ZisK Emulator path is ignored when action is {:?}",
-                        self.action
-                    );
-                }
-            }
-            Action::Execute => {
-                if self.proving_key.is_some() {
-                    warn!("Proving key is ignored when action is {:?}", self.action);
-                }
-
-                if self.ziskemu.is_none() {
-                    error!(
-                        "ZisK Emulator path is required for action {:?}",
-                        self.action
-                    );
-                    return Err(format!(
-                        "ZisK Emulator path is required for action {:?}",
-                        self.action
-                    ));
-                }
-            }
-        }
-        Ok(())
-    }
+    #[arg(long, conflicts_with = "emulator", default_value_t = false)]
+    pub unlock_mapped_memory: bool,
 }
 
 /// Actions to perform
@@ -101,10 +62,13 @@ pub enum GuestProgramCommand {
         #[arg(short, long, default_value = "reth")]
         client: Client,
 
-        /// Filter tests by gas value in millions (e.g., 1, 5, 10, 20, 30, 60).
-        /// Only tests with "gas-value_XM" matching this value will be run.
-        #[arg(short = 'g', long)]
-        gas_millions: Option<u32>,
+        /// Include only files containing the provided strings.
+        #[arg(long)]
+        include: Option<Vec<String>>,
+
+        /// Exclude files containing the provided strings.
+        #[arg(long)]
+        exclude: Option<Vec<String>>,
     },
     // Add more guest programs here as needed
 }
@@ -120,6 +84,9 @@ impl GuestProgramCommand {
 /// Execution clients for the stateless validator
 #[derive(Debug, Copy, Clone, ValueEnum, serde::Serialize)]
 pub enum Client {
+    /// Reth execution client
     Reth,
+    /// EthRex execution client
+    Ethrex,
     //Add more execution clients here as needed
 }

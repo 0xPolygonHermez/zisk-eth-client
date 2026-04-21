@@ -5,6 +5,8 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+guest-common.workspace = true
+
 anyhow.workspace = true
 bincode.workspace = true
 serde.workspace = true
@@ -25,7 +27,7 @@ reth-ethereum-primitives.workspace = true
 reth-primitives-traits.workspace = true
 reth-evm-ethereum.workspace = true
 
-zeth-mpt-state.workspace = true
+stateless-reth-tries.workspace = true
 
 stateless-reth.workspace = true
 

@@ -6,16 +6,17 @@ use zisk_sdk::VerboseMode;
 
 mod benchmark;
 mod cli;
+mod elfs;
 mod zisk;
 
 use benchmark::BenchmarkRunner;
-use cli::{Cli, GuestProgramCommand};
+use cli::{Cli, Client, GuestProgramCommand};
+use elfs::{ELF_ETHREX, ELF_RETH};
 
 fn main() -> Result<()> {
     zisk_sdk::setup_logger(VerboseMode::Info);
 
     let cli = Cli::parse();
-    cli.validate().map_err(|e| anyhow::anyhow!(e))?;
 
     // Write metadata to a separate file
     if cli.output_folder.is_some() {
@@ -24,22 +25,45 @@ fn main() -> Result<()> {
 
     info!("ZisK Host");
     info!(" Action: {:?}", cli.action);
-    info!(" ELF: {}", cli.elf.display());
     info!(" Guest Program: {}", cli.guest_program.display_name());
-
     match &cli.guest_program {
         GuestProgramCommand::StatelessValidator {
             input_folder,
             client,
-            gas_millions,
+            include,
+            exclude,
         } => {
             info!(" Client: {:?}", client);
+
+            let elf = match client {
+                Client::Reth => ELF_RETH,
+                Client::Ethrex => ELF_ETHREX,
+            };
+
+            info!(
+                " ELF Path: {}",
+                elf.path().unwrap_or_else(|| "N/A".to_string())
+            );
             info!(" Input Folder: {}", input_folder.display());
-            if let Some(gas) = gas_millions {
-                info!(" Gas Filter: {}M", gas);
+            if let Some(include) = include {
+                info!(" Include Patterns: {:?}", include);
             }
-            let runner = BenchmarkRunner::new(&cli);
-            runner.run(input_folder, *gas_millions)?;
+            if let Some(exclude) = exclude {
+                info!(" Exclude Patterns: {:?}", exclude);
+            }
+
+            // Create benchmark runner and execute benchmarks
+            let runner = BenchmarkRunner::new(
+                elf,
+                cli.action,
+                cli.output_folder.clone(),
+                cli.force_rerun,
+                cli.proving_key.clone(),
+                cli.emulator,
+                cli.port,
+                cli.unlock_mapped_memory,
+            )?;
+            runner.run(input_folder, include.as_deref(), exclude.as_deref())?;
         }
     }
 
@@ -60,7 +84,6 @@ fn write_metadata(cli: &Cli) -> Result<()> {
     writeln!(file, "ZisK Host")?;
     writeln!(file, "=========================")?;
     writeln!(file, "Action: {:?}", cli.action)?;
-    writeln!(file, "ELF: {}", cli.elf.display())?;
     writeln!(file, "Guest Program: {}", cli.guest_program.display_name())?;
 
     // Add per-guest metadata
@@ -68,12 +91,16 @@ fn write_metadata(cli: &Cli) -> Result<()> {
         GuestProgramCommand::StatelessValidator {
             input_folder,
             client,
-            gas_millions,
+            include,
+            exclude,
         } => {
             writeln!(file, "Client: {:?}", client)?;
             writeln!(file, "Input Folder: {}", input_folder.display())?;
-            if let Some(gas) = gas_millions {
-                writeln!(file, "Gas Filter: {}M", gas)?;
+            if let Some(include) = include {
+                writeln!(file, "Include Patterns: {:?}", include)?;
+            }
+            if let Some(exclude) = exclude {
+                writeln!(file, "Exclude Patterns: {:?}", exclude)?;
             }
         }
     }

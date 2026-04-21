@@ -1,0 +1,25 @@
+[package]
+name = "guest-ethrex"
+description = ""
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+guest-common.workspace = true
+
+anyhow.workspace = true
+bincode.workspace = true
+rkyv.workspace = true
+serde.workspace = true
+
+primitive-types.workspace = true
+ethereum-types.workspace = true
+tiny-keccak.workspace = true
+
+stateless-ethrex.workspace = true
+
+ethrex-common.workspace = true
+ethrex-crypto.workspace = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_vendor, values("zisk"))', 'cfg(zisk_hints)', 'cfg(zisk_hints_debug)'] }

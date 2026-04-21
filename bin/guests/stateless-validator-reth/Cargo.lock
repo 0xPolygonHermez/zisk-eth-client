@@ -31,9 +31,9 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "alloy-chains"
-version = "0.2.31"
+version = "0.2.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d9d22005bf31b018f31ef9ecadb5d2c39cf4f6acc8db0456f72c815f3d7f757"
+checksum = "9247f0a399ef71aeb68f497b2b8fb348014f742b50d3b83b1e00dfe1b7d64b3d"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -164,28 +164,7 @@ dependencies = [
 [[package]]
 name = "alloy-evm"
 version = "0.27.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b991c370ce44e70a3a9e474087e3d65e42e66f967644ad729dc4cec09a21fd09"
-dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-hardforks",
- "alloy-primitives",
- "alloy-rpc-types-engine",
- "alloy-rpc-types-eth",
- "alloy-sol-types",
- "auto_impl",
- "derive_more",
- "op-alloy",
- "op-revm",
- "revm",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "alloy-evm"
-version = "0.27.3"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git?branch=zisk-hints%2Fv0.27.3#f61d14215cb4d727d13a6b75d2f3f91595c0bf3e"
+source = "git+https://github.com/eth-act/zisk-patch-alloy-evm.git?branch=feature%2Fswitchable-u256-backend#a9062881a99d72cce69905421e4867df38eac4e5"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -545,7 +524,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6df77fea9d6a2a75c0ef8d2acbdfd92286cc599983d3175ccdc170d3433d249"
 dependencies = [
  "serde",
- "winnow",
+ "winnow 0.7.15",
 ]
 
 [[package]]
@@ -1066,9 +1045,9 @@ checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 
 [[package]]
 name = "aws-lc-rs"
-version = "1.16.1"
+version = "1.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94bffc006df10ac2a68c83692d734a465f8ee6c5b384d8545a636f81d858f4bf"
+checksum = "a054912289d18629dc78375ba2c3726a3afe3ff71b4edba9dedfca0e3446d1fc"
 dependencies = [
  "aws-lc-sys",
  "zeroize",
@@ -1076,9 +1055,9 @@ dependencies = [
 
 [[package]]
 name = "aws-lc-sys"
-version = "0.38.0"
+version = "0.39.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4321e568ed89bb5a7d291a7f37997c2c0df89809d7b6d12062c81ddb54aa782e"
+checksum = "1fa7e52a4c5c547c741610a2c6f123f3881e409b714cd27e6798ef020c514f0a"
 dependencies = [
  "cc",
  "cmake",
@@ -1129,6 +1108,26 @@ dependencies = [
  "quote",
  "regex",
  "rustc-hash 1.1.0",
+ "shlex",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "bindgen"
+version = "0.72.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "993776b509cfb49c750f11b8f07a46fa23e0a1386ffc01fb1e7d343efc387895"
+dependencies = [
+ "bitflags",
+ "cexpr",
+ "clang-sys",
+ "itertools 0.12.1",
+ "log",
+ "prettyplease",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "rustc-hash 2.1.1",
  "shlex",
  "syn 2.0.117",
 ]
@@ -1223,19 +1222,20 @@ dependencies = [
 
 [[package]]
 name = "borsh"
-version = "1.6.0"
+version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d1da5ab77c1437701eeff7c88d968729e7766172279eab0676857b3d63af7a6f"
+checksum = "cfd1e3f8955a5d7de9fab72fc8373fade9fb8a703968cb200ae3dc6cf08e185a"
 dependencies = [
  "borsh-derive",
+ "bytes",
  "cfg_aliases",
 ]
 
 [[package]]
 name = "borsh-derive"
-version = "1.6.0"
+version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0686c856aa6aac0c4498f936d7d6a02df690f614c03e4d906d1018062b5c5e2c"
+checksum = "bfcfdc083699101d5a7965e49925975f2f55060f94f9a05e7187be95d530ca59"
 dependencies = [
  "once_cell",
  "proc-macro-crate",
@@ -1304,9 +1304,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.2.56"
+version = "1.2.57"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aebf35691d1bfb0ac386a69bac2fde4dd276fb618cf8bf4f5318fe285e821bb2"
+checksum = "7a0dd1ca384932ff3641c8718a02769f1698e7563dc6974ffd03346116310423"
 dependencies = [
  "find-msvc-tools",
  "jobserver",
@@ -1357,8 +1357,8 @@ dependencies = [
 
 [[package]]
 name = "circuit"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 
 [[package]]
 name = "clang-sys"
@@ -1386,7 +1386,7 @@ version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -1611,10 +1611,10 @@ dependencies = [
 
 [[package]]
 name = "curves"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
+ "fields",
  "num-bigint",
  "num-traits",
 ]
@@ -1643,6 +1643,16 @@ checksum = "9cdf337090841a411e2a7f3deb9187445851f91b309c0c0a29e05f74a00a48c0"
 dependencies = [
  "darling_core 0.21.3",
  "darling_macro 0.21.3",
+]
+
+[[package]]
+name = "darling"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25ae13da2f202d56bd7f91c25fba009e7717a1e4a1cc98a76d844b65ae912e9d"
+dependencies = [
+ "darling_core 0.23.0",
+ "darling_macro 0.23.0",
 ]
 
 [[package]]
@@ -1675,6 +1685,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "darling_core"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9865a50f7c335f53564bb694ef660825eb8610e0a53d3e11bf1b0d3df31e03b0"
+dependencies = [
+ "ident_case",
+ "proc-macro2",
+ "quote",
+ "strsim",
+ "syn 2.0.117",
+]
+
+[[package]]
 name = "darling_macro"
 version = "0.20.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1692,6 +1715,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d38308df82d1080de0afee5d069fa14b0326a88c14f15c5ccda35b4a6c414c81"
 dependencies = [
  "darling_core 0.21.3",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "darling_macro"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac3984ec7bd6cfa798e62b4a642426a5be0e68f9401cfc2a01e3fa9ea2fcdb8d"
+dependencies = [
+ "darling_core 0.23.0",
  "quote",
  "syn 2.0.117",
 ]
@@ -1764,9 +1798,9 @@ dependencies = [
 
 [[package]]
 name = "derive-where"
-version = "1.6.0"
+version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef941ded77d15ca19b40374869ac6000af1c9f2a4c0f3d4c70926287e6364a8f"
+checksum = "d08b3a0bcc0d079199cd476b2cae8435016ec11d1c0986c6901c5ac223041534"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1944,7 +1978,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -2039,19 +2073,8 @@ dependencies = [
 
 [[package]]
 name = "fields"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
-dependencies = [
- "cfg-if",
- "num-bigint",
- "paste",
- "serde",
-]
-
-[[package]]
-name = "fields"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0#620e7c89f39ee2b608bd0f5d43765dc89728ff67"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
  "cfg-if",
  "num-bigint",
@@ -2300,8 +2323,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "guest-common"
+version = "0.7.0"
+dependencies = [
+ "zkvm-interface",
+]
+
+[[package]]
 name = "guest-reth"
-version = "0.5.0"
+version = "0.7.0"
 dependencies = [
  "alloy-consensus",
  "alloy-genesis",
@@ -2309,18 +2339,19 @@ dependencies = [
  "alloy-rpc-types-debug",
  "anyhow",
  "bincode",
+ "guest-common",
  "k256",
  "rayon",
  "reth-chainspec",
  "reth-ethereum-primitives",
  "reth-evm-ethereum",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
  "revm",
  "serde",
  "serde_with",
  "stateless",
  "tiny-keccak",
- "zeth-mpt-state",
+ "tries",
 ]
 
 [[package]]
@@ -2416,7 +2447,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.62.2",
+ "windows-core",
 ]
 
 [[package]]
@@ -2623,9 +2654,9 @@ dependencies = [
 
 [[package]]
 name = "itoa"
-version = "1.0.17"
+version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92ecc6618181def0457392ccd0ee51198e065e016d1d527a7ac1b6dc7c1f09d2"
+checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
 name = "jni"
@@ -2723,13 +2754,13 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 
 [[package]]
 name = "lib-c"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 
 [[package]]
 name = "lib-float"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 
 [[package]]
 name = "libc"
@@ -2899,7 +2930,7 @@ version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f655543f54b263cbc3d2456bf714bd807d66a33eff8f70136687f0776d34f76"
 dependencies = [
- "bindgen",
+ "bindgen 0.69.5",
  "build-probe-mpi",
  "cc",
 ]
@@ -3024,9 +3055,9 @@ dependencies = [
 
 [[package]]
 name = "num_enum"
-version = "0.7.5"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1207a7e20ad57b847bbddc6776b968420d38292bbfe2089accff5e19e82454c"
+checksum = "5d0bca838442ec211fa11de3a8b0e0e8f3a4522575b5c4c06ed722e005036f26"
 dependencies = [
  "num_enum_derive",
  "rustversion",
@@ -3034,9 +3065,9 @@ dependencies = [
 
 [[package]]
 name = "num_enum_derive"
-version = "0.7.5"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff32365de1b6743cb203b710788263c44a03de03802daf96092f2da4fe6ba4d7"
+checksum = "680998035259dcfcafe653688bf2aa6d3e2dc05e98be6ab46afb089dc84f1df8"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -3376,11 +3407,11 @@ dependencies = [
 
 [[package]]
 name = "pil-std-lib"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
  "colored",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
+ "fields",
  "num-bigint",
  "num-traits",
  "proofman-common",
@@ -3474,8 +3505,8 @@ dependencies = [
 
 [[package]]
 name = "precompiles-helpers"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -3485,6 +3516,7 @@ dependencies = [
  "ark-std 0.5.0",
  "cfg-if",
  "circuit",
+ "crunchy",
  "lib-c",
  "num-bigint",
  "num-traits",
@@ -3562,8 +3594,8 @@ dependencies = [
 
 [[package]]
 name = "proofman"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
  "bincode",
  "blake3",
@@ -3574,7 +3606,7 @@ dependencies = [
  "crossbeam-channel",
  "csv",
  "curves",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
+ "fields",
  "libloading",
  "mpi",
  "num-bigint",
@@ -3597,8 +3629,8 @@ dependencies = [
 
 [[package]]
 name = "proofman-common"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
  "bincode",
  "borsh",
@@ -3608,8 +3640,9 @@ dependencies = [
  "crossbeam-queue",
  "csv",
  "env",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
+ "fields",
  "lazy_static",
+ "libc",
  "libloading",
  "mpi",
  "num_cpus",
@@ -3622,16 +3655,16 @@ dependencies = [
  "sysinfo",
  "thiserror 2.0.18",
  "tracing",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
  "yansi",
 ]
 
 [[package]]
 name = "proofman-hints"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
+ "fields",
  "itoa",
  "proofman-common",
  "proofman-starks-lib-c",
@@ -3641,8 +3674,8 @@ dependencies = [
 
 [[package]]
 name = "proofman-macros"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3651,8 +3684,8 @@ dependencies = [
 
 [[package]]
 name = "proofman-starks-lib-c"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
  "crossbeam-channel",
  "tracing",
@@ -3660,8 +3693,8 @@ dependencies = [
 
 [[package]]
 name = "proofman-util"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
  "bincode",
  "bytemuck",
@@ -3672,11 +3705,11 @@ dependencies = [
 
 [[package]]
 name = "proofman-verifier"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
  "bytemuck",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
+ "fields",
  "proofman-util",
  "rayon",
  "tracing",
@@ -3761,7 +3794,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3966,12 +3999,12 @@ checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
 [[package]]
 name = "reth-chainspec"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-chains",
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm 0.27.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "alloy-evm",
  "alloy-genesis",
  "alloy-primitives",
  "alloy-trie 0.9.5",
@@ -3979,14 +4012,14 @@ dependencies = [
  "derive_more",
  "reth-ethereum-forks",
  "reth-network-peers",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
  "serde_json",
 ]
 
 [[package]]
 name = "reth-codecs"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4004,7 +4037,7 @@ dependencies = [
 [[package]]
 name = "reth-codecs-derive"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4020,7 +4053,7 @@ dependencies = [
  "alloy-primitives",
  "auto_impl",
  "reth-execution-types",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
  "thiserror 2.0.18",
 ]
 
@@ -4033,18 +4066,18 @@ dependencies = [
  "alloy-eips",
  "reth-chainspec",
  "reth-consensus",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
 ]
 
 [[package]]
 name = "reth-db-models"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
  "bytes",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
  "serde",
 ]
 
@@ -4060,14 +4093,14 @@ dependencies = [
  "reth-consensus",
  "reth-consensus-common",
  "reth-execution-types",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
  "tracing",
 ]
 
 [[package]]
 name = "reth-ethereum-forks"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-eip2124",
  "alloy-hardforks",
@@ -4080,7 +4113,7 @@ dependencies = [
 [[package]]
 name = "reth-ethereum-primitives"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4089,7 +4122,7 @@ dependencies = [
  "alloy-rpc-types-eth",
  "alloy-serde",
  "reth-codecs",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
  "reth-zstd-compressors",
  "serde",
  "serde_with",
@@ -4098,21 +4131,21 @@ dependencies = [
 [[package]]
 name = "reth-evm"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm 0.27.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "alloy-evm",
  "alloy-primitives",
  "auto_impl",
  "derive_more",
  "futures-util",
  "rayon",
- "reth-execution-errors",
+ "reth-execution-errors 1.11.0 (git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend)",
  "reth-execution-types",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
  "reth-storage-api",
- "reth-storage-errors",
+ "reth-storage-errors 1.11.0 (git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend)",
  "reth-trie-common",
  "revm",
 ]
@@ -4120,11 +4153,11 @@ dependencies = [
 [[package]]
 name = "reth-evm-ethereum"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm 0.27.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "alloy-evm",
  "alloy-primitives",
  "alloy-rpc-types-engine",
  "derive_more",
@@ -4133,8 +4166,8 @@ dependencies = [
  "reth-ethereum-primitives",
  "reth-evm",
  "reth-execution-types",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
- "reth-storage-errors",
+ "reth-primitives-traits",
+ "reth-storage-errors 1.11.0 (git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend)",
  "revm",
 ]
 
@@ -4143,26 +4176,39 @@ name = "reth-execution-errors"
 version = "1.11.0"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
- "alloy-evm 0.27.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "alloy-evm",
  "alloy-primitives",
  "alloy-rlp",
  "nybbles 0.4.8",
- "reth-storage-errors",
+ "reth-storage-errors 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "reth-execution-errors"
+version = "1.11.0"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
+dependencies = [
+ "alloy-evm",
+ "alloy-primitives",
+ "alloy-rlp",
+ "nybbles 0.4.8",
+ "reth-storage-errors 1.11.0 (git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend)",
  "thiserror 2.0.18",
 ]
 
 [[package]]
 name = "reth-execution-types"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
- "alloy-evm 0.27.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "alloy-evm",
  "alloy-primitives",
  "derive_more",
  "reth-ethereum-primitives",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
  "reth-trie-common",
  "revm",
  "serde",
@@ -4172,7 +4218,7 @@ dependencies = [
 [[package]]
 name = "reth-network-peers"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -4185,7 +4231,7 @@ dependencies = [
 [[package]]
 name = "reth-primitives-traits"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4211,35 +4257,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "reth-primitives-traits"
+name = "reth-prune-types"
 version = "1.11.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.11.0#a068d98d78af4424847fa7fc2bb9d36bec101c0b"
+source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
- "alloy-consensus",
- "alloy-eips",
- "alloy-genesis",
  "alloy-primitives",
- "alloy-rlp",
- "alloy-rpc-types-eth",
- "alloy-trie 0.9.5",
- "auto_impl",
- "bytes",
  "derive_more",
- "once_cell",
- "op-alloy-consensus",
- "revm-bytecode",
- "revm-primitives",
- "revm-state",
- "secp256k1 0.30.0",
- "serde",
- "serde_with",
+ "strum",
  "thiserror 2.0.18",
+ "tracing",
 ]
 
 [[package]]
 name = "reth-prune-types"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-primitives",
  "derive_more",
@@ -4255,6 +4287,15 @@ version = "1.11.0"
 source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
 dependencies = [
  "alloy-primitives",
+ "reth-trie-common",
+]
+
+[[package]]
+name = "reth-stages-types"
+version = "1.11.0"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
+dependencies = [
+ "alloy-primitives",
  "bytes",
  "reth-trie-common",
  "serde",
@@ -4268,7 +4309,20 @@ dependencies = [
  "alloy-primitives",
  "derive_more",
  "fixed-map",
- "reth-stages-types",
+ "reth-stages-types 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "serde",
+ "strum",
+]
+
+[[package]]
+name = "reth-static-file-types"
+version = "1.11.0"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
+dependencies = [
+ "alloy-primitives",
+ "derive_more",
+ "fixed-map",
+ "reth-stages-types 1.11.0 (git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend)",
  "serde",
  "strum",
  "tracing",
@@ -4277,7 +4331,7 @@ dependencies = [
 [[package]]
 name = "reth-storage-api"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -4288,10 +4342,10 @@ dependencies = [
  "reth-db-models",
  "reth-ethereum-primitives",
  "reth-execution-types",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
- "reth-prune-types",
- "reth-stages-types",
- "reth-storage-errors",
+ "reth-primitives-traits",
+ "reth-prune-types 1.11.0 (git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend)",
+ "reth-stages-types 1.11.0 (git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend)",
+ "reth-storage-errors 1.11.0 (git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend)",
  "reth-trie-common",
  "revm-database",
  "serde_json",
@@ -4306,9 +4360,26 @@ dependencies = [
  "alloy-primitives",
  "alloy-rlp",
  "derive_more",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
- "reth-prune-types",
- "reth-static-file-types",
+ "reth-primitives-traits",
+ "reth-prune-types 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-static-file-types 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "revm-database-interface",
+ "revm-state",
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "reth-storage-errors"
+version = "1.11.0"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
+dependencies = [
+ "alloy-eips",
+ "alloy-primitives",
+ "alloy-rlp",
+ "derive_more",
+ "reth-primitives-traits",
+ "reth-prune-types 1.11.0 (git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend)",
+ "reth-static-file-types 1.11.0 (git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend)",
  "revm-database-interface",
  "revm-state",
  "thiserror 2.0.18",
@@ -4317,7 +4388,7 @@ dependencies = [
 [[package]]
 name = "reth-trie-common"
 version = "1.11.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.11.0#a068d98d78af4424847fa7fc2bb9d36bec101c0b"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
@@ -4330,7 +4401,7 @@ dependencies = [
  "derive_more",
  "itertools 0.14.0",
  "nybbles 0.4.8",
- "reth-primitives-traits 1.11.0 (git+https://github.com/0xPolygonHermez/zisk-patch-reth.git?branch=zisk-hints%2Fv1.11.0)",
+ "reth-primitives-traits",
  "revm-database",
  "serde",
  "serde_with",
@@ -4345,8 +4416,8 @@ dependencies = [
  "alloy-rlp",
  "alloy-trie 0.9.5",
  "auto_impl",
- "reth-execution-errors",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-execution-errors 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
  "reth-trie-common",
  "smallvec",
  "tracing",
@@ -4355,7 +4426,7 @@ dependencies = [
 [[package]]
 name = "reth-zstd-compressors"
 version = "1.11.0"
-source = "git+https://github.com/paradigmxyz/reth?tag=v1.11.0#564ffa586845fa4a8bb066f0c7b015ff36b26c08"
+source = "git+https://github.com/eth-act/zisk-patch-reth.git?branch=feature%2Fswitchable-u256-backend#953b99e402f38ac595095fba4b7f2602b48578f0"
 dependencies = [
  "zstd",
 ]
@@ -4363,8 +4434,7 @@ dependencies = [
 [[package]]
 name = "revm"
 version = "34.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2aabdebaa535b3575231a88d72b642897ae8106cf6b0d12eafc6bfdf50abfc7"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "revm-bytecode",
  "revm-context",
@@ -4382,8 +4452,7 @@ dependencies = [
 [[package]]
 name = "revm-bytecode"
 version = "8.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74d1e5c1eaa44d39d537f668bc5c3409dc01e5c8be954da6c83370bbdf006457"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "bitvec",
  "phf",
@@ -4394,8 +4463,7 @@ dependencies = [
 [[package]]
 name = "revm-context"
 version = "13.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "892ff3e6a566cf8d72ffb627fdced3becebbd9ba64089c25975b9b028af326a5"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "bitvec",
  "cfg-if",
@@ -4411,8 +4479,7 @@ dependencies = [
 [[package]]
 name = "revm-context-interface"
 version = "14.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57f61cc6d23678c4840af895b19f8acfbbd546142ec8028b6526c53cc1c16c98"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "alloy-eip2930",
  "alloy-eip7702",
@@ -4427,8 +4494,7 @@ dependencies = [
 [[package]]
 name = "revm-database"
 version = "10.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "529528d0b05fe646be86223032c3e77aa8b05caa2a35447d538c55965956a511"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "alloy-eips",
  "revm-bytecode",
@@ -4441,8 +4507,7 @@ dependencies = [
 [[package]]
 name = "revm-database-interface"
 version = "9.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7bf93ac5b91347c057610c0d96e923db8c62807e03f036762d03e981feddc1d"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "auto_impl",
  "either",
@@ -4455,8 +4520,7 @@ dependencies = [
 [[package]]
 name = "revm-handler"
 version = "15.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cd0e43e815a85eded249df886c4badec869195e70cdd808a13cfca2794622d2"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "auto_impl",
  "derive-where",
@@ -4474,8 +4538,7 @@ dependencies = [
 [[package]]
 name = "revm-inspector"
 version = "15.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f3ccad59db91ef93696536a0dbaf2f6f17cfe20d4d8843ae118edb7e97947ef"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "auto_impl",
  "either",
@@ -4492,8 +4555,7 @@ dependencies = [
 [[package]]
 name = "revm-interpreter"
 version = "32.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11406408597bc249392d39295831c4b641b3a6f5c471a7c41104a7a1e3564c07"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "revm-bytecode",
  "revm-context-interface",
@@ -4504,9 +4566,8 @@ dependencies = [
 
 [[package]]
 name = "revm-precompile"
-version = "32.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2ec11f45deec71e4945e1809736bb20d454285f9167ab53c5159dae1deb603f"
+version = "32.0.0"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -4527,21 +4588,20 @@ dependencies = [
 
 [[package]]
 name = "revm-primitives"
-version = "22.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4bcfb5ce6cf18b118932bcdb7da05cd9c250f2cb9f64131396b55f3fe3537c35"
+version = "22.0.0"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "alloy-primitives",
  "num_enum",
  "once_cell",
+ "ruint",
  "serde",
 ]
 
 [[package]]
 name = "revm-state"
 version = "9.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "311720d4f0f239b041375e7ddafdbd20032a33b7bae718562ea188e188ed9fd3"
+source = "git+https://github.com/eth-act/revm.git?branch=feature%2Fswitchable-u256-backend-by-conditional-compilation-v34.0.0#7d88f084399dd31d6def4681d1e14cfb1bf55bee"
 dependencies = [
  "alloy-eip7928",
  "bitflags",
@@ -4585,8 +4645,8 @@ dependencies = [
 
 [[package]]
 name = "riscv"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 
 [[package]]
 name = "rlp"
@@ -4687,7 +4747,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4746,7 +4806,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4988,9 +5048,9 @@ dependencies = [
 
 [[package]]
 name = "serde_with"
-version = "3.17.0"
+version = "3.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "381b283ce7bc6b476d903296fb59d0d36633652b633b27f64db4fb46dcbfc3b9"
+checksum = "dd5414fad8e6907dbdd5bc441a50ae8d6e26151a03b1de04d89a5576de61d01f"
 dependencies = [
  "base64",
  "chrono",
@@ -5007,11 +5067,11 @@ dependencies = [
 
 [[package]]
 name = "serde_with_macros"
-version = "3.17.0"
+version = "3.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6d4e30573c8cb306ed6ab1dca8423eec9a463ea0e155f45399455e0368b27e0"
+checksum = "d3db8978e608f1fe7357e211969fd9abdcae80bac1ba7a3369bb7eb6b404eb65"
 dependencies = [
- "darling 0.21.3",
+ "darling 0.23.0",
  "proc-macro2",
  "quote",
  "syn 2.0.117",
@@ -5155,29 +5215,27 @@ checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 [[package]]
 name = "stateless"
 version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-stateless.git?branch=zisk%2F68cd8e73#0663f63729085bd4aa061be6e97f23d1109c371e"
+source = "git+https://github.com/eth-act/zisk-patch-stateless.git?branch=feature%2Fswitchable-u256-backend#c26f35ec24d319f1cdc9697ede2366d88ab76390"
 dependencies = [
  "alloy-consensus",
  "alloy-genesis",
  "alloy-primitives",
  "alloy-rlp",
  "alloy-rpc-types-debug",
- "alloy-trie 0.9.5",
- "itertools 0.14.0",
  "reth-chainspec",
  "reth-consensus",
  "reth-ethereum-consensus",
  "reth-ethereum-primitives",
  "reth-evm",
- "reth-primitives-traits 1.11.0 (git+https://github.com/paradigmxyz/reth?tag=v1.11.0)",
+ "reth-primitives-traits",
  "reth-trie-common",
- "reth-trie-sparse",
  "revm-bytecode",
  "revm-database-interface",
  "revm-state",
  "serde",
  "serde_with",
  "thiserror 2.0.18",
+ "tries",
 ]
 
 [[package]]
@@ -5300,7 +5358,7 @@ dependencies = [
  "getrandom 0.4.2",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -5413,9 +5471,9 @@ dependencies = [
 
 [[package]]
 name = "tinyvec"
-version = "1.10.0"
+version = "1.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfa5fdc3bce6191a1dbc8c02d5c8bffcf557bafa17c124c5264a458f1b0613fa"
+checksum = "3e61e67053d25a4e82c844e8424039d9745781b3fc4f32b8d55ed50f5f667ef3"
 dependencies = [
  "tinyvec_macros",
 ]
@@ -5481,32 +5539,32 @@ dependencies = [
 
 [[package]]
 name = "toml_datetime"
-version = "1.0.0+spec-1.1.0"
+version = "1.0.1+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32c2555c699578a4f59f0cc68e5116c8d7cabbd45e1409b989d4be085b53f13e"
+checksum = "9b320e741db58cac564e26c607d3cc1fdc4a88fd36c879568c07856ed83ff3e9"
 dependencies = [
  "serde_core",
 ]
 
 [[package]]
 name = "toml_edit"
-version = "0.25.4+spec-1.1.0"
+version = "0.25.5+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7193cbd0ce53dc966037f54351dbbcf0d5a642c7f0038c382ef9e677ce8c13f2"
+checksum = "8ca1a40644a28bce036923f6a431df0b34236949d111cc07cb6dca830c9ef2e1"
 dependencies = [
  "indexmap 2.13.0",
  "toml_datetime",
  "toml_parser",
- "winnow",
+ "winnow 1.0.0",
 ]
 
 [[package]]
 name = "toml_parser"
-version = "1.0.9+spec-1.1.0"
+version = "1.0.10+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "702d4415e08923e7e1ef96cd5727c0dfed80b4d2fa25db9647fe5eb6f7c5a4c4"
+checksum = "7df25b4befd31c4816df190124375d5a20c6b6921e2cad937316de3fccd63420"
 dependencies = [
- "winnow",
+ "winnow 1.0.0",
 ]
 
 [[package]]
@@ -5600,9 +5658,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-subscriber"
-version = "0.3.22"
+version = "0.3.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f30143827ddab0d256fd843b7a66d164e9f271cfa0dde49142c5ca0ca291f1e"
+checksum = "cb7f578e5945fb242538965c2d0b04418d38ec25c79d160cd279bf0731c8d319"
 dependencies = [
  "matchers",
  "nu-ansi-term",
@@ -5617,6 +5675,24 @@ dependencies = [
  "tracing-core",
  "tracing-log",
  "tracing-serde",
+]
+
+[[package]]
+name = "tries"
+version = "0.1.0"
+source = "git+https://github.com/eth-act/zisk-patch-stateless.git?branch=feature%2Fswitchable-u256-backend#c26f35ec24d319f1cdc9697ede2366d88ab76390"
+dependencies = [
+ "alloy-primitives",
+ "alloy-rlp",
+ "alloy-rpc-types-debug",
+ "alloy-trie 0.9.5",
+ "itertools 0.14.0",
+ "reth-trie-common",
+ "reth-trie-sparse",
+ "revm-bytecode",
+ "revm-database-interface",
+ "thiserror 2.0.18",
+ "zeth-mpt",
 ]
 
 [[package]]
@@ -5880,7 +5956,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -5896,7 +5972,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9babd3a767a4c1aef6900409f85f5d53ce2544ccdfaa86dad48c91782c6d6893"
 dependencies = [
  "windows-collections",
- "windows-core 0.61.2",
+ "windows-core",
  "windows-future",
  "windows-link 0.1.3",
  "windows-numerics",
@@ -5908,7 +5984,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3beeceb5e5cfd9eb1d76b381630e82c4241ccd0d27f1a39ed41b2760b255c5e8"
 dependencies = [
- "windows-core 0.61.2",
+ "windows-core",
 ]
 
 [[package]]
@@ -5920,21 +5996,8 @@ dependencies = [
  "windows-implement",
  "windows-interface",
  "windows-link 0.1.3",
- "windows-result 0.3.4",
- "windows-strings 0.4.2",
-]
-
-[[package]]
-name = "windows-core"
-version = "0.62.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8e83a14d34d0623b51dce9581199302a221863196a1dde71a7663a4c2be9deb"
-dependencies = [
- "windows-implement",
- "windows-interface",
- "windows-link 0.2.1",
- "windows-result 0.4.1",
- "windows-strings 0.5.1",
+ "windows-result",
+ "windows-strings",
 ]
 
 [[package]]
@@ -5943,7 +6006,7 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc6a41e98427b19fe4b73c550f060b59fa592d7d686537eebf9385621bfbad8e"
 dependencies = [
- "windows-core 0.61.2",
+ "windows-core",
  "windows-link 0.1.3",
  "windows-threading",
 ]
@@ -5988,7 +6051,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9150af68066c4c5c07ddc0ce30421554771e528bde427614c61038bc2c92c2b1"
 dependencies = [
- "windows-core 0.61.2",
+ "windows-core",
  "windows-link 0.1.3",
 ]
 
@@ -6002,30 +6065,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "windows-result"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7781fa89eaf60850ac3d2da7af8e5242a5ea78d1a11c49bf2910bb5a73853eb5"
-dependencies = [
- "windows-link 0.2.1",
-]
-
-[[package]]
 name = "windows-strings"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56e6c93f3a0c3b36176cb1327a4958a0353d5d166c2a35cb268ace15e91d3b57"
 dependencies = [
  "windows-link 0.1.3",
-]
-
-[[package]]
-name = "windows-strings"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7837d08f69c77cf6b07689544538e017c1bfcf57e34b4c0ff58e6c2cd3b37091"
-dependencies = [
- "windows-link 0.2.1",
 ]
 
 [[package]]
@@ -6044,15 +6089,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "282be5f36a8ce781fad8c8ae18fa3f9beff57ec1b52cb3de0789201425d9a33d"
 dependencies = [
  "windows-targets 0.52.6",
-]
-
-[[package]]
-name = "windows-sys"
-version = "0.60.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2f500e4d28234f72040990ec9d39e3a6b950f9f22d3dba18416c35882612bcb"
-dependencies = [
- "windows-targets 0.53.5",
 ]
 
 [[package]]
@@ -6088,28 +6124,11 @@ dependencies = [
  "windows_aarch64_gnullvm 0.52.6",
  "windows_aarch64_msvc 0.52.6",
  "windows_i686_gnu 0.52.6",
- "windows_i686_gnullvm 0.52.6",
+ "windows_i686_gnullvm",
  "windows_i686_msvc 0.52.6",
  "windows_x86_64_gnu 0.52.6",
  "windows_x86_64_gnullvm 0.52.6",
  "windows_x86_64_msvc 0.52.6",
-]
-
-[[package]]
-name = "windows-targets"
-version = "0.53.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4945f9f551b88e0d65f3db0bc25c33b8acea4d9e41163edf90dcd0b19f9069f3"
-dependencies = [
- "windows-link 0.2.1",
- "windows_aarch64_gnullvm 0.53.1",
- "windows_aarch64_msvc 0.53.1",
- "windows_i686_gnu 0.53.1",
- "windows_i686_gnullvm 0.53.1",
- "windows_i686_msvc 0.53.1",
- "windows_x86_64_gnu 0.53.1",
- "windows_x86_64_gnullvm 0.53.1",
- "windows_x86_64_msvc 0.53.1",
 ]
 
 [[package]]
@@ -6134,12 +6153,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32a4622180e7a0ec044bb555404c800bc9fd9ec262ec147edd5989ccd0c02cd3"
 
 [[package]]
-name = "windows_aarch64_gnullvm"
-version = "0.53.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9d8416fa8b42f5c947f8482c43e7d89e73a173cead56d044f6a56104a6d1b53"
-
-[[package]]
 name = "windows_aarch64_msvc"
 version = "0.42.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6150,12 +6163,6 @@ name = "windows_aarch64_msvc"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09ec2a7bb152e2252b53fa7803150007879548bc709c039df7627cabbd05d469"
-
-[[package]]
-name = "windows_aarch64_msvc"
-version = "0.53.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9d782e804c2f632e395708e99a94275910eb9100b2114651e04744e9b125006"
 
 [[package]]
 name = "windows_i686_gnu"
@@ -6170,22 +6177,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8e9b5ad5ab802e97eb8e295ac6720e509ee4c243f69d781394014ebfe8bbfa0b"
 
 [[package]]
-name = "windows_i686_gnu"
-version = "0.53.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "960e6da069d81e09becb0ca57a65220ddff016ff2d6af6a223cf372a506593a3"
-
-[[package]]
 name = "windows_i686_gnullvm"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0eee52d38c090b3caa76c563b86c3a4bd71ef1a819287c19d586d7334ae8ed66"
-
-[[package]]
-name = "windows_i686_gnullvm"
-version = "0.53.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa7359d10048f68ab8b09fa71c3daccfb0e9b559aed648a8f95469c27057180c"
 
 [[package]]
 name = "windows_i686_msvc"
@@ -6200,12 +6195,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66"
 
 [[package]]
-name = "windows_i686_msvc"
-version = "0.53.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e7ac75179f18232fe9c285163565a57ef8d3c89254a30685b57d83a38d326c2"
-
-[[package]]
 name = "windows_x86_64_gnu"
 version = "0.42.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6216,12 +6205,6 @@ name = "windows_x86_64_gnu"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "147a5c80aabfbf0c7d901cb5895d1de30ef2907eb21fbbab29ca94c5b08b1a78"
-
-[[package]]
-name = "windows_x86_64_gnu"
-version = "0.53.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c3842cdd74a865a8066ab39c8a7a473c0778a3f29370b5fd6b4b9aa7df4a499"
 
 [[package]]
 name = "windows_x86_64_gnullvm"
@@ -6236,12 +6219,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "24d5b23dc417412679681396f2b49f3de8c1473deb516bd34410872eff51ed0d"
 
 [[package]]
-name = "windows_x86_64_gnullvm"
-version = "0.53.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ffa179e2d07eee8ad8f57493436566c7cc30ac536a3379fdf008f47f6bb7ae1"
-
-[[package]]
 name = "windows_x86_64_msvc"
 version = "0.42.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6254,16 +6231,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
-name = "windows_x86_64_msvc"
-version = "0.53.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6bbff5f0aada427a1e5a6da5f1f98158182f26556f345ac9e04d36d0ebed650"
-
-[[package]]
 name = "winnow"
 version = "0.7.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df79d97927682d2fd8adb29682d1140b343be4ac0f08fd68b7765d9c059d3945"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
+name = "winnow"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a90e88e4667264a994d34e6d1ab2d26d398dcdca8b7f52bec8668957517fc7d8"
 dependencies = [
  "memchr",
 ]
@@ -6358,11 +6338,11 @@ dependencies = [
 
 [[package]]
 name = "witness"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0#d61d40bee66b3c7f02bd4ab8661f9f29ad6730a4"
+version = "0.16.1"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#971209423e8fa53fa32dc747744d68c65aafa6c7"
 dependencies = [
  "colored",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
+ "fields",
  "libloading",
  "proofman-common",
  "proofman-util",
@@ -6446,27 +6426,28 @@ name = "zec-reth"
 version = "0.1.0"
 dependencies = [
  "alloy-consensus",
- "alloy-evm 0.27.3 (git+https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git?branch=zisk-hints%2Fv0.27.3)",
+ "alloy-evm",
  "alloy-primitives",
  "guest-reth",
  "revm",
+ "revm-primitives",
  "ziskos",
 ]
 
 [[package]]
 name = "zerocopy"
-version = "0.8.42"
+version = "0.8.47"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2578b716f8a7a858b7f02d5bd870c14bf4ddbbcf3a4c05414ba6503640505e3"
+checksum = "efbb2a062be311f2ba113ce66f697a4dc589f85e78a4aea276200804cea0ed87"
 dependencies = [
  "zerocopy-derive",
 ]
 
 [[package]]
 name = "zerocopy-derive"
-version = "0.8.42"
+version = "0.8.47"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e6cc098ea4d3bd6246687de65af3f920c430e236bee1e3bf2e441463f08a02f"
+checksum = "0e8bc7269b54418e7aeeef514aa68f8690b8c0489a06b0136e5f57c4c5ccab89"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -6550,7 +6531,7 @@ dependencies = [
 [[package]]
 name = "zeth-mpt"
 version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git?branch=zisk-hints%2Fv0.5.0#a1e3d24cb5b402b2b4ec03aa0101f631d98d19ba"
+source = "git+https://github.com/eth-act/zisk-patch-stateless.git?branch=feature%2Fswitchable-u256-backend#c26f35ec24d319f1cdc9697ede2366d88ab76390"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -6559,28 +6540,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "zeth-mpt-state"
-version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk-patch-zkvm-ethereum-mpt.git?branch=zisk-hints%2Fv0.5.0#a1e3d24cb5b402b2b4ec03aa0101f631d98d19ba"
-dependencies = [
- "alloy-primitives",
- "alloy-rlp",
- "alloy-trie 0.9.5",
- "itertools 0.14.0",
- "reth-trie-common",
- "revm-bytecode",
- "stateless",
- "zeth-mpt",
-]
-
-[[package]]
 name = "zisk-common"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 dependencies = [
  "anyhow",
  "bincode",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
+ "fields",
  "libc",
  "mpi",
  "proofman",
@@ -6594,17 +6560,17 @@ dependencies = [
  "thiserror 2.0.18",
  "tokio",
  "tracing",
- "tracing-subscriber 0.3.22",
+ "tracing-subscriber 0.3.23",
  "zisk-core",
 ]
 
 [[package]]
 name = "zisk-core"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 dependencies = [
  "elf",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
+ "fields",
  "lib-c",
  "lib-float",
  "paste",
@@ -6620,28 +6586,28 @@ dependencies = [
 
 [[package]]
 name = "zisk-definitions"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 
 [[package]]
 name = "zisk-verifier"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 dependencies = [
  "proofman-verifier",
 ]
 
 [[package]]
 name = "ziskos"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 dependencies = [
  "anyhow",
  "bincode",
  "bytes",
  "cfg-if",
  "ctor",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.16.0)",
+ "fields",
  "getrandom 0.2.17",
  "lazy_static",
  "lib-c",
@@ -6652,6 +6618,7 @@ dependencies = [
  "paste",
  "precompiles-helpers",
  "rand 0.8.5",
+ "ripemd",
  "serde",
  "sha2",
  "tiny-keccak",
@@ -6659,17 +6626,18 @@ dependencies = [
  "zisk-common",
  "zisk-definitions",
  "zisk-verifier",
+ "zkvm-interface",
 ]
 
 [[package]]
 name = "ziskos-hints"
-version = "0.16.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.16.0#aacf0a733cbad4be3beb674727804d17cb79f69d"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#7d501bc89f366003137969a29167c8c452182852"
 dependencies = [
  "anyhow",
  "bincode",
  "cfg-if",
- "fields 0.16.0 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.16.0)",
+ "fields",
  "getrandom 0.2.17",
  "lazy_static",
  "lib-c",
@@ -6679,10 +6647,20 @@ dependencies = [
  "paste",
  "precompiles-helpers",
  "rand 0.8.5",
+ "ripemd",
  "serde",
  "sha2",
  "tiny-keccak",
  "zisk-verifier",
+ "zkvm-interface",
+]
+
+[[package]]
+name = "zkvm-interface"
+version = "0.17.0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=ziskos-enlarge#f8027d7aee97d83b4d98b740a62cccb2b8101763"
+dependencies = [
+ "bindgen 0.72.1",
 ]
 
 [[package]]
