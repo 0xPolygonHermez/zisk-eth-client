@@ -7,9 +7,8 @@ use guest_ethrex::{EthrexInput, ZiskCrypto, extract_block_info, get_chain_name, 
 
 fn main() {
     // Read the input
-    let input: Vec<u8> = ziskos::io::read_vec();
     let input: EthrexInput =
-        EthrexInput::deserialize(&input).expect("Failed to deserialize EthrexInput");
+        EthrexInput::deserialize(&ziskos::io::read_input_slice()).expect("Failed to deserialize EthrexInput");
 
     // Get chain config
     let chain_config = input.witness().chain_config;

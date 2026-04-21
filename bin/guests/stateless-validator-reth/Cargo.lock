@@ -1378,7 +1378,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 
 [[package]]
 name = "clang-sys"
@@ -1460,9 +1460,9 @@ dependencies = [
 
 [[package]]
 name = "constant_time_eq"
-version = "0.4.3"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7dab3fe76c1571ecd5cfe878b61bce3fedf4adbde5d8a8653b2a7956ffd14628"
+checksum = "3d52eff69cd5e647efe296129160853a42795992097e8af39800e1060caeea9b"
 
 [[package]]
 name = "conv"
@@ -1642,7 +1642,7 @@ dependencies = [
 [[package]]
 name = "curves"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "fields 0.16.1 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features)",
  "num-bigint",
@@ -2069,7 +2069,7 @@ dependencies = [
 [[package]]
 name = "fields"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "cfg-if",
  "num-bigint",
@@ -2805,12 +2805,12 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 [[package]]
 name = "lib-c"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 
 [[package]]
 name = "lib-float"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 
 [[package]]
 name = "libc"
@@ -3458,7 +3458,7 @@ dependencies = [
 [[package]]
 name = "pil-std-lib"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "colored",
  "fields 0.16.1 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features)",
@@ -3556,7 +3556,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -3645,7 +3645,7 @@ dependencies = [
 [[package]]
 name = "proofman"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "bincode",
  "blake3",
@@ -3680,7 +3680,7 @@ dependencies = [
 [[package]]
 name = "proofman-common"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "bincode",
  "borsh",
@@ -3712,7 +3712,7 @@ dependencies = [
 [[package]]
 name = "proofman-hints"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "fields 0.16.1 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features)",
  "itoa",
@@ -3725,7 +3725,7 @@ dependencies = [
 [[package]]
 name = "proofman-macros"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3735,7 +3735,7 @@ dependencies = [
 [[package]]
 name = "proofman-starks-lib-c"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "crossbeam-channel",
  "tracing",
@@ -3744,7 +3744,7 @@ dependencies = [
 [[package]]
 name = "proofman-util"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "bincode",
  "bytemuck",
@@ -3756,7 +3756,7 @@ dependencies = [
 [[package]]
 name = "proofman-verifier"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "bytemuck",
  "fields 0.16.1 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features)",
@@ -4669,7 +4669,7 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 
 [[package]]
 name = "rlp"
@@ -6473,7 +6473,7 @@ dependencies = [
 [[package]]
 name = "witness"
 version = "0.16.1"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#e41045755975a684df3f7808ad1d64c309323f57"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features#4ec018c630c09888664b68c6365a3d1fb1a39b95"
 dependencies = [
  "colored",
  "fields 0.16.1 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features)",
@@ -6675,7 +6675,7 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 dependencies = [
  "alloy-sol-types",
  "anyhow",
@@ -6702,7 +6702,7 @@ dependencies = [
 [[package]]
 name = "zisk-core"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 dependencies = [
  "elf",
  "fields 0.16.1 (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features)",
@@ -6722,12 +6722,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 
 [[package]]
 name = "zisk-verifier"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 dependencies = [
  "proofman-verifier",
 ]
@@ -6735,7 +6735,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 dependencies = [
  "anyhow",
  "bincode",
@@ -6767,7 +6767,7 @@ dependencies = [
 [[package]]
 name = "ziskos-hints"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 dependencies = [
  "anyhow",
  "bincode",
@@ -6793,7 +6793,7 @@ dependencies = [
 [[package]]
 name = "zkvm-interface"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#08cea4285d633ec78d630aa0d50be646d07e48c8"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#04c86a7240830c559cbd9f41a407ef32dcf3cba1"
 dependencies = [
  "bindgen 0.72.1",
 ]
