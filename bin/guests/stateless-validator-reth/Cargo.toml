@@ -25,6 +25,7 @@ alloy-primitives = { version = "1.5.6", features = ["native-keccak"] } # Needed 
 
 # revm
 revm = { version = "34.0.0", default-features = false }
+revm-primitives = { git = "https://github.com/eth-act/revm.git", branch = "feature/switchable-u256-backend-by-conditional-compilation-v34.0.0", features = ["uint-acceleration"] }
 
 # Needed for deterministic Hashmap sort + U256 type compatibility with revm fork
 alloy-evm = { git = "https://github.com/eth-act/zisk-patch-alloy-evm.git", branch = "feature/switchable-u256-backend" }
