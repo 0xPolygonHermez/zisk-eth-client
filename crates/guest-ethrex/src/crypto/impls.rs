@@ -8,7 +8,12 @@ use super::ZiskCrypto;
 
 // mulmod256_c is exported by ziskos but not declared in zkvm_accelerators.h.
 extern "C" {
-    fn mulmod256_c(a: *const u8, b: *const u8, m: *const u8, result: *mut u8);
+    fn mul_mod_bytes256_c(
+        a_ptr: *const u8,
+        b_ptr: *const u8,
+        m_ptr: *const u8,
+        result_ptr: *mut u8,
+    );
 }
 
 impl Crypto for ZiskCrypto {
@@ -165,7 +170,7 @@ impl Crypto for ZiskCrypto {
 
     fn mulmod256(&self, a: &[u8; 32], b: &[u8; 32], m: &[u8; 32]) -> [u8; 32] {
         let mut result = [0u8; 32];
-        unsafe { mulmod256_c(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr()) };
+        unsafe { mul_mod_bytes256_c(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr()) };
         result
     }
 
