@@ -6547,6 +6547,7 @@ dependencies = [
  "alloy-primitives",
  "guest-reth",
  "revm",
+ "revm-primitives 22.0.0",
  "ziskos",
 ]
 
