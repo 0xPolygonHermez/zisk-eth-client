@@ -10,3 +10,9 @@ extern "C" {
 
     pub fn resume_hints();
 }
+
+extern "C" {
+    pub fn zkvm_init();
+
+    pub fn zkvm_deinit(block_number: u64);
+}
