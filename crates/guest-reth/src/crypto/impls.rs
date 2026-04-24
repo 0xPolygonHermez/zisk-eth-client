@@ -14,16 +14,6 @@ use super::CustomEvmCrypto;
 
 impl Crypto for CustomEvmCrypto {
     #[inline]
-    fn ripemd160(&self, input: &[u8]) -> [u8; 32] {
-        let mut output = zkvm_ripemd160_hash { data: [0u8; 32] };
-        unsafe {
-            zkvm_ripemd160(input.as_ptr(), input.len(), &mut output);
-        }
-        return output.data;
-    }
-
-    /// Compute SHA-256 hash
-    #[inline]
     fn sha256(&self, input: &[u8]) -> [u8; 32] {
         let mut output = zkvm_sha256_hash { data: [0u8; 32] };
         unsafe {
@@ -32,65 +22,45 @@ impl Crypto for CustomEvmCrypto {
         return output.data;
     }
 
-    /// BN254 elliptic curve addition.
     #[inline]
-    fn bn254_g1_add(&self, p1: &[u8], p2: &[u8]) -> Result<[u8; 64], PrecompileError> {
-        let mut result = zkvm_bn254_g1_point { data: [0u8; 64] };
-        let ret = unsafe {
-            zkvm_bn254_g1_add(
-                p1.as_ptr() as *const zkvm_bn254_g1_point,
-                p2.as_ptr() as *const zkvm_bn254_g1_point,
-                &mut result,
-            )
-        };
-        match ret {
-            0 => Ok(result.data),
-            _ => Err(PrecompileError::other("bn254_g1_add failed")),
+    fn blake2_compress(&self, rounds: u32, h: &mut [u64; 8], m: [u64; 16], t: [u64; 2], f: bool) {
+        unsafe {
+            zkvm_blake2f(
+                rounds,
+                h.as_mut_ptr() as *mut zkvm_blake2f_state,
+                m.as_ptr() as *const zkvm_blake2f_message,
+                t.as_ptr() as *const zkvm_blake2f_offset,
+                f as u8,
+            );
         }
     }
 
-    /// BN254 elliptic curve scalar multiplication.
     #[inline]
-    fn bn254_g1_mul(&self, point: &[u8], scalar: &[u8]) -> Result<[u8; 64], PrecompileError> {
-        let mut result = zkvm_bn254_g1_point { data: [0u8; 64] };
-        let ret = unsafe {
-            zkvm_bn254_g1_mul(
-                point.as_ptr() as *const zkvm_bn254_g1_point,
-                scalar.as_ptr() as *const zkvm_bn254_scalar,
-                &mut result,
-            )
-        };
-        match ret {
-            0 => Ok(result.data),
-            _ => Err(PrecompileError::other("bn254_g1_mul failed")),
+    fn ripemd160(&self, input: &[u8]) -> [u8; 32] {
+        let mut output = zkvm_ripemd160_hash { data: [0u8; 32] };
+        unsafe {
+            zkvm_ripemd160(input.as_ptr(), input.len(), &mut output);
         }
+        return output.data;
     }
 
-    /// BN254 pairing check.
     #[inline]
-    fn bn254_pairing_check(&self, pairs: &[(&[u8], &[u8])]) -> Result<bool, PrecompileError> {
-        // Each pair is G1 (64 bytes) + G2 (128 bytes) = 192 bytes laid out contiguously.
-        let mut pairs_bytes: Vec<u8> = Vec::with_capacity(pairs.len() * 192);
-        for (g1, g2) in pairs {
-            pairs_bytes.extend_from_slice(g1);
-            pairs_bytes.extend_from_slice(g2);
+    fn modexp(&self, base: &[u8], exp: &[u8], modulus: &[u8]) -> Result<Vec<u8>, PrecompileError> {
+        let mut result = vec![0u8; modulus.len()];
+        unsafe {
+            zkvm_modexp(
+                base.as_ptr(),
+                base.len(),
+                exp.as_ptr(),
+                exp.len(),
+                modulus.as_ptr(),
+                modulus.len(),
+                result.as_mut_ptr(),
+            );
         }
-        let mut verified = false;
-        let ret = unsafe {
-            zkvm_bn254_pairing(
-                pairs_bytes.as_ptr() as *const zkvm_bn254_pairing_pair,
-                pairs.len(),
-                &mut verified,
-            )
-        };
-        match ret {
-            0 => Ok(verified),
-            _ => Err(PrecompileError::other("bn254_pairing_check failed")),
-        }
+        Ok(result)
     }
 
-    /// secp256k1 ECDSA signature recovery.
-    /// Returns keccak256(pubkey) — the caller takes the last 20 bytes as the address.
     #[inline]
     fn secp256k1_ecrecover(
         &self,
@@ -122,38 +92,6 @@ impl Crypto for CustomEvmCrypto {
         }
     }
 
-    /// Modular exponentiation.
-    #[inline]
-    fn modexp(&self, base: &[u8], exp: &[u8], modulus: &[u8]) -> Result<Vec<u8>, PrecompileError> {
-        let mut result = vec![0u8; modulus.len()];
-        unsafe {
-            zkvm_modexp(
-                base.as_ptr(),
-                base.len(),
-                exp.as_ptr(),
-                exp.len(),
-                modulus.as_ptr(),
-                modulus.len(),
-                result.as_mut_ptr(),
-            );
-        }
-        Ok(result)
-    }
-
-    /// Blake2 compression function.
-    #[inline]
-    fn blake2_compress(&self, rounds: u32, h: &mut [u64; 8], m: [u64; 16], t: [u64; 2], f: bool) {
-        unsafe {
-            zkvm_blake2f(
-                rounds,
-                h.as_mut_ptr() as *mut zkvm_blake2f_state,
-                m.as_ptr() as *const zkvm_blake2f_message,
-                t.as_ptr() as *const zkvm_blake2f_offset,
-                f as u8,
-            );
-        }
-    }
-
     /// secp256r1 (P-256) signature verification.
     #[inline]
     fn secp256r1_verify_signature(&self, msg: &[u8; 32], sig: &[u8; 64], pk: &[u8; 64]) -> bool {
@@ -169,29 +107,57 @@ impl Crypto for CustomEvmCrypto {
         verified
     }
 
-    /// KZG point evaluation.
     #[inline]
-    fn verify_kzg_proof(
-        &self,
-        z: &[u8; 32],
-        y: &[u8; 32],
-        commitment: &[u8; 48],
-        proof: &[u8; 48],
-    ) -> Result<(), PrecompileError> {
-        let mut verified = false;
-        unsafe {
-            zkvm_kzg_point_eval(
-                commitment.as_ptr() as *const zkvm_kzg_commitment,
-                z.as_ptr() as *const zkvm_kzg_field_element,
-                y.as_ptr() as *const zkvm_kzg_field_element,
-                proof.as_ptr() as *const zkvm_kzg_proof,
-                &mut verified,
-            );
+    fn bn254_g1_add(&self, p1: &[u8], p2: &[u8]) -> Result<[u8; 64], PrecompileError> {
+        let mut result = zkvm_bn254_g1_point { data: [0u8; 64] };
+        let ret = unsafe {
+            zkvm_bn254_g1_add(
+                p1.as_ptr() as *const zkvm_bn254_g1_point,
+                p2.as_ptr() as *const zkvm_bn254_g1_point,
+                &mut result,
+            )
+        };
+        match ret {
+            0 => Ok(result.data),
+            _ => Err(PrecompileError::other("bn254_g1_add failed")),
         }
-        if verified {
-            Ok(())
-        } else {
-            Err(PrecompileError::BlobVerifyKzgProofFailed)
+    }
+
+    #[inline]
+    fn bn254_g1_mul(&self, point: &[u8], scalar: &[u8]) -> Result<[u8; 64], PrecompileError> {
+        let mut result = zkvm_bn254_g1_point { data: [0u8; 64] };
+        let ret = unsafe {
+            zkvm_bn254_g1_mul(
+                point.as_ptr() as *const zkvm_bn254_g1_point,
+                scalar.as_ptr() as *const zkvm_bn254_scalar,
+                &mut result,
+            )
+        };
+        match ret {
+            0 => Ok(result.data),
+            _ => Err(PrecompileError::other("bn254_g1_mul failed")),
+        }
+    }
+
+    #[inline]
+    fn bn254_pairing_check(&self, pairs: &[(&[u8], &[u8])]) -> Result<bool, PrecompileError> {
+        // Each pair is G1 (64 bytes) + G2 (128 bytes) = 192 bytes laid out contiguously.
+        let mut pairs_bytes: Vec<u8> = Vec::with_capacity(pairs.len() * 192);
+        for (g1, g2) in pairs {
+            pairs_bytes.extend_from_slice(g1);
+            pairs_bytes.extend_from_slice(g2);
+        }
+        let mut verified = false;
+        let ret = unsafe {
+            zkvm_bn254_pairing(
+                pairs_bytes.as_ptr() as *const zkvm_bn254_pairing_pair,
+                pairs.len(),
+                &mut verified,
+            )
+        };
+        match ret {
+            0 => Ok(verified),
+            _ => Err(PrecompileError::other("bn254_pairing_check failed")),
         }
     }
 
@@ -359,6 +325,32 @@ impl Crypto for CustomEvmCrypto {
         match ret {
             0 => Ok(result.data),
             _ => Err(PrecompileError::other("bls12_381_fp2_to_g2 failed")),
+        }
+    }
+
+    /// KZG point evaluation.
+    #[inline]
+    fn verify_kzg_proof(
+        &self,
+        z: &[u8; 32],
+        y: &[u8; 32],
+        commitment: &[u8; 48],
+        proof: &[u8; 48],
+    ) -> Result<(), PrecompileError> {
+        let mut verified = false;
+        unsafe {
+            zkvm_kzg_point_eval(
+                commitment.as_ptr() as *const zkvm_kzg_commitment,
+                z.as_ptr() as *const zkvm_kzg_field_element,
+                y.as_ptr() as *const zkvm_kzg_field_element,
+                proof.as_ptr() as *const zkvm_kzg_proof,
+                &mut verified,
+            );
+        }
+        if verified {
+            Ok(())
+        } else {
+            Err(PrecompileError::BlobVerifyKzgProofFailed)
         }
     }
 }
