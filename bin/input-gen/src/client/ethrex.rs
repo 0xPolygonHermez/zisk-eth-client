@@ -1,8 +1,8 @@
 use super::ExecutionClient;
 use crate::provider::ProviderKind;
 
-impl ExecutionClient for input::RethClient {
+impl ExecutionClient for input::EthrexClient {
     fn supported_providers(&self) -> &'static [ProviderKind] {
-        &[ProviderKind::Eest, ProviderKind::Rpc]
+        &[ProviderKind::Rpc]
     }
 }

@@ -12,8 +12,16 @@ use stateless_reth::StatelessInput;
 
 use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
 
+mod client;
+mod ethrex_client;
+mod reth_client;
+
+pub use client::{create_client, Client, ExecutionClient};
+pub use ethrex_client::EthrexClient;
+pub use reth_client::RethClient;
+
 #[async_trait::async_trait]
-pub trait FromRpc: Sized {
+pub(crate) trait FromRpc: Sized {
     /// Fetch from RPC using URL
     async fn from_rpc(rpc_url: &str, block_number: u64) -> Result<Self> {
         let provider = connect_provider(rpc_url).await?;

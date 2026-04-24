@@ -1,30 +1,18 @@
-use clap::ValueEnum;
 use std::path::Path;
 
+use anyhow::Result;
 use witness_generator::StatelessValidationFixture;
 
 use crate::provider::ProviderKind;
 
+mod ethrex;
 mod reth;
 
-/// Available clients for CLI selection
-#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
-pub enum Client {
-    /// Reth execution client
-    Reth,
-    // Add more clients here as needed
-}
+pub use input::Client;
 
-/// Trait for execution clients that generate zkVM inputs
-pub trait ExecutionClient: Send + Sync {
-    /// Human-readable name for this client
-    fn name(&self) -> &'static str;
-
-    /// Display name for this client (used in logs and messages)
-    fn display_name(&self) -> &'static str {
-        self.name()
-    }
-
+/// Extends the core ExecutionClient with input-gen-specific capabilities:
+/// provider compatibility and fixture processing.
+pub trait ExecutionClient: input::ExecutionClient {
     /// Which provider types this client supports
     fn supported_providers(&self) -> &'static [ProviderKind];
 
@@ -38,12 +26,22 @@ pub trait ExecutionClient: Send + Sync {
         &self,
         fixture: &StatelessValidationFixture,
         output_dir: &Path,
-    ) -> Result<(), anyhow::Error>;
+    ) -> Result<()> {
+        let stdin = self.from_stateless_input(&fixture.stateless_input)?;
+        let filename = sanitize_filename(&fixture.name);
+        let output_path = output_dir.join(format!("{}.bin", filename));
+        stdin.save(&output_path)?;
+        Ok(())
+    }
 }
 
-/// Factory function to create an execution client
-pub fn create_client(client: &Client) -> Box<dyn ExecutionClient> {
+pub fn create_client(client: Client) -> Box<dyn ExecutionClient> {
     match client {
-        Client::Reth => Box::new(reth::RethClient::new()),
+        Client::Reth => Box::new(input::RethClient::default()),
+        Client::Ethrex => Box::new(input::EthrexClient::default()),
     }
+}
+
+fn sanitize_filename(name: &str) -> String {
+    name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_")
 }

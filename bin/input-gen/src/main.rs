@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     // Create execution client
-    let client = create_client(&cli.client);
+    let client = create_client(cli.client);
 
     // Define output directory
     let output = cli

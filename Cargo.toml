@@ -1,5 +1,5 @@
 [workspace]
-members = ["bin/host", "bin/input-gen", "bin/input-gen-ethrex", "crates/*"]
+members = ["bin/host", "bin/hints-gen", "bin/input-gen", "bin/input-gen-ethrex", "crates/*"]
 exclude = []
 resolver = "2"
 
@@ -13,11 +13,13 @@ guest-ethrex = { path = "crates/guest-ethrex" }
 guest-reth = { path = "crates/guest-reth" }
 input = { path = "crates/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.0" }
-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.0" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/ziskos-hints" }
+zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/ziskos-hints" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/ziskos-hints" }
 # local dev
 # zisk-sdk = { path = "../zisk/sdk" }
 # zkvm-interface = { path = "../zisk/zkvm-interface" }
+# ziskos = { path = "../zisk/ziskos/entrypoint" }
 
 revm = { version = "34.0.0", default-features = false }
 

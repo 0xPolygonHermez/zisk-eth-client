@@ -1,0 +1,18 @@
+[package]
+name = "hints-gen"
+description = "ZisK Ethereum Client - Native hints generator"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+input = { workspace = true, features = ["cli"] }
+ziskos.workspace = true
+zisk-sdk.workspace = true
+
+clap.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

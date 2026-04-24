@@ -10,10 +10,12 @@ use reth_ethereum_primitives::{Block, TransactionSigned};
 use stateless_reth::{StatelessInput, UncompressedPublicKey};
 
 mod crypto;
+mod run;
 mod utils;
 mod validation;
 
 pub use crypto::*;
+pub use run::*;
 pub use utils::*;
 pub use validation::*;
 
