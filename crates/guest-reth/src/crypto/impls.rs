@@ -19,7 +19,7 @@ impl Crypto for CustomEvmCrypto {
         unsafe {
             zkvm_sha256(input.as_ptr(), input.len(), &mut output);
         }
-        return output.data;
+        output.data
     }
 
     #[inline]
@@ -41,7 +41,7 @@ impl Crypto for CustomEvmCrypto {
         unsafe {
             zkvm_ripemd160(input.as_ptr(), input.len(), &mut output);
         }
-        return output.data;
+        output.data
     }
 
     #[inline]
