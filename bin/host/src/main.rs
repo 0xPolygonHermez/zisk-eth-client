@@ -13,7 +13,8 @@ use benchmark::BenchmarkRunner;
 use cli::{Cli, Client, GuestProgramCommand};
 use elfs::{ELF_ETHREX, ELF_RETH};
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     zisk_sdk::setup_logger(VerboseMode::Info);
 
     let cli = Cli::parse();
@@ -40,10 +41,7 @@ fn main() -> Result<()> {
                 Client::Ethrex => ELF_ETHREX,
             };
 
-            info!(
-                " ELF Path: {}",
-                elf.path().unwrap_or_else(|| "N/A".to_string())
-            );
+            info!(" ELF Name: {}", elf.name());
             info!(" Input Folder: {}", input_folder.display());
             if let Some(include) = include {
                 info!(" Include Patterns: {:?}", include);
@@ -60,10 +58,11 @@ fn main() -> Result<()> {
                 cli.force_rerun,
                 cli.proving_key.clone(),
                 cli.emulator,
-                cli.port,
                 cli.unlock_mapped_memory,
             )?;
-            runner.run(input_folder, include.as_deref(), exclude.as_deref())?;
+            runner
+                .run(input_folder, include.as_deref(), exclude.as_deref())
+                .await?;
         }
     }
 

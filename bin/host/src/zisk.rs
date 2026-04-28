@@ -1,22 +1,19 @@
-use anyhow::{Context, Ok, Result};
+use anyhow::{Context, Result};
 use std::{
     path::{Path, PathBuf},
     time::Duration,
 };
 
-use zisk_sdk::{Asm, ElfBinary, Emu, ProverClient, ZiskProgramPK, ZiskProver, ZiskStdin};
+use zisk_sdk::{
+    AsmOptions, EmbeddedClient, ExecutorKind, GuestProgram, ProverClient,
+    VerifyConstraintsExtension, ZiskStdin,
+};
 
 /// ZisK client
 pub struct ZiskClient {
-    pub elf: ElfBinary,
-    pub backend: Option<ZiskBackend>,
-    pub pk: Option<ZiskProgramPK>,
-}
-
-/// ZisK backend wrapper
-pub enum ZiskBackend {
-    Emu(ZiskProver<Emu>),
-    Asm(ZiskProver<Asm>),
+    pub program: GuestProgram,
+    pub backend: Option<EmbeddedClient>,
+    pub executor: ExecutorKind,
 }
 
 /// Output metrics from ZisK execution
@@ -31,11 +28,11 @@ pub struct ZiskExecutionMetrics {
 }
 
 impl ZiskClient {
-    pub fn new(elf: ElfBinary) -> Self {
+    pub fn new(program: GuestProgram) -> Self {
         Self {
-            elf,
+            program,
             backend: None,
-            pk: None,
+            executor: ExecutorKind::Emulator,
         }
     }
 
@@ -43,89 +40,85 @@ impl ZiskClient {
         mut self,
         proving_key: Option<PathBuf>,
         use_emulator: bool,
-        port: Option<u16>,
         unlock_mapped_memory: bool,
     ) -> Result<Self> {
-        let client = if use_emulator {
-            let prover = ProverClient::builder()
-                .emu()
-                .verify_constraints()
-                .proving_key_path_opt(proving_key)
-                .build()
-                .context("Failed to build ProverClient builder")?;
+        let mut builder = ProverClient::embedded();
 
-            let (pk, _) = prover.setup(&self.elf).context("Failed to setup program")?;
-            self.pk = Some(pk);
-            ZiskBackend::Emu(prover)
-        } else {
-            let prover = ProverClient::builder()
-                .asm()
-                .verify_constraints()
-                .proving_key_path_opt(proving_key)
-                .base_port_opt(port)
-                .unlock_mapped_memory(unlock_mapped_memory)
-                .build()
-                .context("Failed to build ProverClient builder")?;
+        if !use_emulator {
+            let asm_opts = if unlock_mapped_memory {
+                AsmOptions::default().unlock_mapped_memory()
+            } else {
+                AsmOptions::default()
+            };
+            builder = builder.assembly().asm_options(asm_opts);
+            self.executor = ExecutorKind::Assembly;
+        }
 
-            let (pk, _) = prover.setup(&self.elf).context("Failed to setup program")?;
-            self.pk = Some(pk);
-            ZiskBackend::Asm(prover)
-        };
+        if let Some(pk) = proving_key {
+            builder = builder.proving_key(pk);
+        }
 
-        self.backend = Some(client);
+        #[cfg(feature = "gpu")]
+        {
+            builder = builder.gpu();
+        }
+
+        self.backend = Some(builder.build().context("Failed to build EmbeddedClient")?);
 
         Ok(self)
     }
 
-    /// Execute the program with the given input and return execution metrics
-    pub fn execute(&self, input_file: &Path) -> Result<ZiskExecutionMetrics> {
-        let stdin = ZiskStdin::from_file(input_file).context("Failed to load input file")?;
-
-        let pk = self
-            .pk
+    /// Run ROM setup (call once before executing any inputs)
+    pub async fn setup(&self) -> Result<()> {
+        let client = self
+            .backend
             .as_ref()
-            .ok_or_else(|| anyhow::anyhow!("Proving key is not set up"))?;
+            .ok_or_else(|| anyhow::anyhow!("Client is not set up"))?;
+
+        client.setup(&self.program).run()?.await?;
+        Ok(())
+    }
+
+    /// Execute the program with the given input and return execution metrics
+    pub async fn execute(&self, input_file: &Path) -> Result<ZiskExecutionMetrics> {
+        let stdin = ZiskStdin::from_file(input_file).context("Failed to load input file")?;
 
         let client = self
             .backend
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("Client is not set up"))?;
 
-        let result = match client {
-            ZiskBackend::Emu(prover) => prover.execute(pk, stdin)?,
-            ZiskBackend::Asm(prover) => prover.execute(pk, stdin)?,
-        };
+        let result = client
+            .execute(&self.program, stdin)
+            .executor(self.executor)
+            .run()?
+            .await?;
 
         Ok(ZiskExecutionMetrics {
-            duration: result.get_duration(),
+            duration: Duration::from_millis(result.get_execution_time()),
             steps: result.get_execution_steps(),
-            cost: result.get_execution_total_cost(),
+            cost: result.get_execution_cost(),
             tx_count: None,
             gas_used: None,
         })
     }
 
-    /// Verify constraints for the given input file
-    pub fn verify_constraints(&self, input_file: &Path) -> Result<ZiskExecutionMetrics> {
+    /// Verify constraints for the program with the given input
+    pub async fn verify_constraints(&self, input_file: &Path) -> Result<ZiskExecutionMetrics> {
         let stdin = ZiskStdin::from_file(input_file).context("Failed to load input file")?;
-
-        let pk = self
-            .pk
-            .as_ref()
-            .ok_or_else(|| anyhow::anyhow!("Proving key is not set up"))?;
 
         let client = self
             .backend
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("Client is not set up"))?;
 
-        let result = match client {
-            ZiskBackend::Emu(prover) => prover.verify_constraints(pk, stdin)?,
-            ZiskBackend::Asm(prover) => prover.verify_constraints(pk, stdin)?,
-        };
+        let result = client
+            .verify_constraints(&self.program, stdin)
+            .run()?
+            .await?;
 
         Ok(ZiskExecutionMetrics {
-            duration: result.get_duration(),
+            duration: Duration::from_millis(result.get_duration()),
             steps: result.get_execution_steps(),
             cost: result.get_execution_total_cost(),
             tx_count: None,
@@ -166,7 +159,7 @@ fn parse_metrics(output: &str) -> Result<ZiskExecutionMetrics> {
     }
 
     Ok(ZiskExecutionMetrics {
-        duration: Duration::default(), // Placeholder, should be set based on actual execution time
+        duration: Duration::default(),
         steps,
         cost,
         tx_count,

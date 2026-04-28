@@ -12,10 +12,11 @@ serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
-
-[build-dependencies]
-zisk-sdk.workspace = true
+tokio.workspace = true
 
 [features]
 default = []
-gpu = [ "zisk-sdk/gpu"]
+gpu = []
+
+[build-dependencies]
+zisk-sdk.workspace = true
