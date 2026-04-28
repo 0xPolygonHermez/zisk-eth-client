@@ -41,6 +41,7 @@ impl ZiskClient {
         proving_key: Option<PathBuf>,
         use_emulator: bool,
         unlock_mapped_memory: bool,
+        gpu: bool,
     ) -> Result<Self> {
         let mut builder = ProverClient::embedded();
 
@@ -58,8 +59,7 @@ impl ZiskClient {
             builder = builder.proving_key(pk);
         }
 
-        #[cfg(feature = "gpu")]
-        {
+        if gpu {
             builder = builder.gpu();
         }
 

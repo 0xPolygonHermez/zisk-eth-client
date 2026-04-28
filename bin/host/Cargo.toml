@@ -14,9 +14,6 @@ anyhow.workspace = true
 tracing.workspace = true
 tokio.workspace = true
 
-[features]
-default = []
-gpu = []
 
 [build-dependencies]
 zisk-sdk.workspace = true

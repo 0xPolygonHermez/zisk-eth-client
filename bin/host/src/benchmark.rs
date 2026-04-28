@@ -27,6 +27,7 @@ struct BenchmarkResult {
 }
 
 impl BenchmarkRunner {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         elf: GuestProgram,
         action: Action,
@@ -35,9 +36,14 @@ impl BenchmarkRunner {
         proving_key: Option<PathBuf>,
         emulator: bool,
         unlock_mapped_memory: bool,
+        gpu: bool,
     ) -> Result<Self> {
-        let zisk_client =
-            ZiskClient::new(elf).with_proving_key(proving_key, emulator, unlock_mapped_memory)?;
+        let zisk_client = ZiskClient::new(elf).with_proving_key(
+            proving_key,
+            emulator,
+            unlock_mapped_memory,
+            gpu,
+        )?;
 
         Ok(Self {
             action,
@@ -105,7 +111,7 @@ impl BenchmarkRunner {
             .and_then(|s| s.to_str())
             .unwrap_or("unknown");
 
-        match self.action {
+        match &self.action {
             Action::Execute => {
                 if let Some(ref output_folder) = self.output_folder {
                     let filename = input_file.file_name().unwrap_or_default();

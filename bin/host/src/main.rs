@@ -50,7 +50,6 @@ async fn main() -> Result<()> {
                 info!(" Exclude Patterns: {:?}", exclude);
             }
 
-            // Create benchmark runner and execute benchmarks
             let runner = BenchmarkRunner::new(
                 elf,
                 cli.action,
@@ -59,6 +58,7 @@ async fn main() -> Result<()> {
                 cli.proving_key.clone(),
                 cli.emulator,
                 cli.unlock_mapped_memory,
+                cli.gpu,
             )?;
             runner
                 .run(input_folder, include.as_deref(), exclude.as_deref())
