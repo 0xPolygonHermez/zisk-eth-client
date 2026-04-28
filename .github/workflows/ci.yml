@@ -13,6 +13,8 @@ concurrency:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
+  PROVING_KEY_VERSION: "0.17.0"
+  PROVING_KEY_DIR: /tmp/proving-key
 
 jobs:
   # Format check
@@ -70,16 +72,9 @@ jobs:
   #     - name: Run Clippy
   #       run: cargo clippy --workspace --all-targets -- -D warnings
 
-  #     - name: Upload host binary
-  #       uses: actions/upload-artifact@v4.6.2
-  #       with:
-  #         name: host-binary
-  #         path: target/release/host
-  #         retention-days: 1
-
-  # Build host binary
-  build:
-    name: Build
+  # Test Reth client
+  test-reth:
+    name: Test Reth
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -108,69 +103,99 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-target-
 
+      - name: Cache proving key
+        id: cache-proving-key
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PROVING_KEY_DIR }}
+          key: proving-key-${{ env.PROVING_KEY_VERSION }}
+
+      - name: Download proving key
+        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p $PROVING_KEY_DIR
+          curl -sSfL "https://storage.googleapis.com/zisk-setup/proving-key-${{ env.PROVING_KEY_VERSION }}.tar.gz" \
+            | tar -xz -C $PROVING_KEY_DIR
+
       - name: Build host
         run: cargo build --release -p host
 
-      - name: Upload host binary
-        uses: actions/upload-artifact@v4.6.2
-        with:
-          name: host-binary
-          path: target/release/host
-          if-no-files-found: error
-          retention-days: 1
-
-  # Test reth client
-  test-reth:
-    name: Test Reth
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download host binary
-        uses: actions/download-artifact@v4.3.0
-        with:
-          name: host-binary
-          path: ./bin
-
-      - name: Make binary executable
-        run: chmod +x ./bin/host
-
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
-
-      - name: Execute Reth tests (emulator)
+      - name: Execute Reth Stateless Validation tests (emulator)
         run: |
-          ./bin/host --action execute --emulator stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+          ./target/release/host --action execute --emulator --proving-key $PROVING_KEY_DIR stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
 
-      - name: Execute Reth tests (assembly)
+      - name: Execute Reth Stateless Validation tests (assembly)
         run: |
-          ./bin/host --action execute --port 25000 stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+          ./target/release/host --action execute --port 25000 --proving-key $PROVING_KEY_DIR stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
 
-  # Test ethrex client
+      - name: Verify Reth Stateless Validation constraints (emulator)
+        run: |
+          ./target/release/host --action verify-constraints --emulator --proving-key $PROVING_KEY_DIR stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+
+      - name: Verify Reth Stateless Validation constraints (assembly)
+        run: |
+          ./target/release/host --action verify-constraints --port 25000 --proving-key $PROVING_KEY_DIR stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+
+  # Test Ethrex client
   test-ethrex:
     name: Test Ethrex
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download host binary
-        uses: actions/download-artifact@v4.3.0
-        with:
-          name: host-binary
-          path: ./bin
-
-      - name: Make binary executable
-        run: chmod +x ./bin/host
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Setup dependencies
         uses: ./.github/actions/setup-deps
 
-      - name: Execute Ethrex tests (emulator)
-        run: |
-          ./bin/host --action execute --emulator stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
 
-      - name: Execute Ethrex tests (assembly)
+      - name: Cache target directory
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-target-
+
+      - name: Cache proving key
+        id: cache-proving-key
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PROVING_KEY_DIR }}
+          key: proving-key-${{ env.PROVING_KEY_VERSION }}
+
+      - name: Download proving key
+        if: steps.cache-proving-key.outputs.cache-hit != 'true'
         run: |
-          ./bin/host --action execute --port 25000 stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+          mkdir -p $PROVING_KEY_DIR
+          curl -sSfL "https://storage.googleapis.com/zisk-setup/proving-key-${{ env.PROVING_KEY_VERSION }}.tar.gz" \
+            | tar -xz -C $PROVING_KEY_DIR
+
+      - name: Build host
+        run: cargo build --release -p host
+
+      - name: Execute Ethrex Stateless Validation tests (emulator)
+        run: |
+          ./target/release/host --action execute --emulator --proving-key $PROVING_KEY_DIR stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+
+      - name: Execute Ethrex Stateless Validation tests (assembly)
+        run: |
+          ./target/release/host --action execute --port 25000 --proving-key $PROVING_KEY_DIR stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+
+      - name: Verify Ethrex Stateless Validation constraints (emulator)
+        run: |
+          ./target/release/host --action verify-constraints --emulator --proving-key $PROVING_KEY_DIR stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+
+      - name: Verify Ethrex Stateless Validation constraints (assembly)
+        run: |
+          ./target/release/host --action verify-constraints --port 25000 --proving-key $PROVING_KEY_DIR stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
