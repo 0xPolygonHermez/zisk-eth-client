@@ -44,11 +44,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
-
       - name: Setup dependencies
         uses: ./.github/actions/setup-deps
 
@@ -79,8 +74,14 @@ jobs:
   # Test Reth client
   test-reth:
     name: Test Reth
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 45
+    container:
+      image: ubuntu:22.04
+      options: --shm-size=48g
+    defaults:
+      run:
+        shell: bash
     env:
       RETH_TEST_BLOCKS: "24642968 24647140 24697070" # Add as many as needed
       RETH_INPUT_FOLDER: bin/guests/stateless-validator-reth/inputs
@@ -93,9 +94,6 @@ jobs:
             count=$(ls ${RETH_INPUT_FOLDER}/mainnet_${block}_*.bin 2>/dev/null | wc -l)
             [ "$count" -gt 0 ] || { echo "ERROR: no input file for block $block in $RETH_INPUT_FOLDER"; exit 1; }
           done
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
 
       - name: Setup dependencies
         uses: ./.github/actions/setup-deps
@@ -140,28 +138,32 @@ jobs:
           include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
           ./target/release/host --emulator --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
 
-      # TODO: We need a runner with more memory
-      # - name: Execute Reth Stateless Validation tests (assembly)
-      #   run: |
-      #     include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
-      #     ./target/release/host --unlock-mapped-memory --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
+      - name: Execute Reth Stateless Validation tests (assembly)
+        run: |
+          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
+          ./target/release/host --unlock-mapped-memory --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
 
       - name: Verify Reth Stateless Validation constraints (emulator)
         run: |
           include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
           ./target/release/host --emulator --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
 
-      # TODO: We need a runner with more memory
-      # - name: Verify Reth Stateless Validation constraints (assembly)
-      #   run: |
-      #     include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
-      #     ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
+      - name: Verify Reth Stateless Validation constraints (assembly)
+        run: |
+          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
+          ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
 
   # Test Ethrex client
   test-ethrex:
     name: Test Ethrex
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 45
+    container:
+      image: ubuntu:22.04
+      options: --shm-size=48g
+    defaults:
+      run:
+        shell: bash
     env:
       ETHREX_TEST_BLOCKS: "24697056 24697070 24697073" # Add as many as needed
       ETHREX_INPUT_FOLDER: bin/guests/stateless-validator-ethrex/inputs
@@ -174,9 +176,6 @@ jobs:
             count=$(ls ${ETHREX_INPUT_FOLDER}/mainnet_${block}_*.bin 2>/dev/null | wc -l)
             [ "$count" -gt 0 ] || { echo "ERROR: no input file for block $block in $ETHREX_INPUT_FOLDER"; exit 1; }
           done
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
 
       - name: Setup dependencies
         uses: ./.github/actions/setup-deps

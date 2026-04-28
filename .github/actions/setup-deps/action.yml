@@ -6,12 +6,31 @@ runs:
   steps:
     - name: Install system dependencies
       shell: bash
+      env:
+        DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo apt-get update
-        sudo apt-get install -y curl git xz-utils jq build-essential qemu-system libomp-dev libgmp-dev \
+        SUDO=$([ "$(id -u)" -ne 0 ] && echo sudo || echo "")
+        $SUDO apt-get update
+        $SUDO apt-get install -y curl git xz-utils jq build-essential qemu-system libomp-dev libgmp-dev \
           nlohmann-json3-dev protobuf-compiler uuid-dev libgrpc++-dev libsecp256k1-dev \
           libsodium-dev libpqxx-dev nasm libopenmpi-dev openmpi-bin openmpi-common \
           ca-certificates gnupg lsb-release wget libclang-dev clang gcc-riscv64-unknown-elf
+
+    - name: Install Node.js 20
+      shell: bash
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        SUDO=$([ "$(id -u)" -ne 0 ] && echo sudo || echo "")
+        curl -fsSL https://deb.nodesource.com/setup_20.x | ([ "$(id -u)" -ne 0 ] && sudo -E bash || bash)
+        $SUDO apt-get install -y nodejs
+
+    - name: Install Rust
+      shell: bash
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+          | sh -s -- -y --default-toolchain stable --component rustfmt,clippy
+        echo "${CARGO_HOME:-$HOME/.cargo}/bin" >> "$GITHUB_PATH"
 
     - name: Install ZisK toolchain
       shell: bash
