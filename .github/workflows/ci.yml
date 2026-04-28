@@ -1,5 +1,8 @@
 name: CI
 
+# TODO: Add tests with hints
+# TODO: Add gpu testing
+
 on:
   pull_request:
     branches:
@@ -8,7 +11,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
@@ -34,52 +37,62 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
-  # # Clippy lint
-  # clippy:
-  #   name: Clippy
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
+  # Clippy lint
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Install Rust
-  #       uses: dtolnay/rust-toolchain@stable
-  #       with:
-  #         components: clippy
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
 
-  #     - name: Setup dependencies
-  #       uses: ./.github/actions/setup-deps
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-deps
 
-  #     - name: Cache cargo registry
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: |
-  #           ~/.cargo/registry
-  #           ~/.cargo/git
-  #         key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-cargo-registry-
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
 
-  #     - name: Cache target directory
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: target
-  #         key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-target-
+      - name: Cache target directory
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-target-
 
-  #     - name: Build host
-  #       run: cargo build --release -p host
+      - name: Build host
+        run: cargo build --release -p host
 
-  #     - name: Run Clippy
-  #       run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Run Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
 
   # Test Reth client
   test-reth:
     name: Test Reth
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      RETH_TEST_BLOCKS: "24642968 24647140 24697070" # Add as many as needed
+      RETH_INPUT_FOLDER: bin/guests/stateless-validator-reth/inputs
     steps:
       - uses: actions/checkout@v4
+
+      - name: Verify test inputs exist
+        run: |
+          for block in $RETH_TEST_BLOCKS; do
+            count=$(ls ${RETH_INPUT_FOLDER}/mainnet_${block}_*.bin 2>/dev/null | wc -l)
+            [ "$count" -gt 0 ] || { echo "ERROR: no input file for block $block in $RETH_INPUT_FOLDER"; exit 1; }
+          done
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -124,27 +137,43 @@ jobs:
 
       - name: Execute Reth Stateless Validation tests (emulator)
         run: |
-          ./target/release/host --action execute --emulator --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
+          ./target/release/host --emulator --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
 
-      - name: Execute Reth Stateless Validation tests (assembly)
-        run: |
-          ./target/release/host --action execute --port 25000 --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+      # TODO: We need a runner with more memory
+      # - name: Execute Reth Stateless Validation tests (assembly)
+      #   run: |
+      #     include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
+      #     ./target/release/host --unlock-mapped-memory --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
 
       - name: Verify Reth Stateless Validation constraints (emulator)
         run: |
-          ./target/release/host --action verify-constraints --emulator --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
+          ./target/release/host --emulator --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
 
-      - name: Verify Reth Stateless Validation constraints (assembly)
-        run: |
-          ./target/release/host --action verify-constraints --port 25000 --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+      # TODO: We need a runner with more memory
+      # - name: Verify Reth Stateless Validation constraints (assembly)
+      #   run: |
+      #     include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
+      #     ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
 
   # Test Ethrex client
   test-ethrex:
     name: Test Ethrex
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      ETHREX_TEST_BLOCKS: "24697056 24697070 24697073" # Add as many as needed
+      ETHREX_INPUT_FOLDER: bin/guests/stateless-validator-ethrex/inputs
     steps:
       - uses: actions/checkout@v4
+
+      - name: Verify test inputs exist
+        run: |
+          for block in $ETHREX_TEST_BLOCKS; do
+            count=$(ls ${ETHREX_INPUT_FOLDER}/mainnet_${block}_*.bin 2>/dev/null | wc -l)
+            [ "$count" -gt 0 ] || { echo "ERROR: no input file for block $block in $ETHREX_INPUT_FOLDER"; exit 1; }
+          done
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -189,16 +218,22 @@ jobs:
 
       - name: Execute Ethrex Stateless Validation tests (emulator)
         run: |
-          ./target/release/host --action execute --emulator --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+          include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
+          ./target/release/host --emulator --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
 
-      - name: Execute Ethrex Stateless Validation tests (assembly)
-        run: |
-          ./target/release/host --action execute --port 25000 --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+      # TODO: We need a runner with more memory
+      # - name: Execute Ethrex Stateless Validation tests (assembly)
+      #   run: |
+      #     include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
+      #     ./target/release/host --unlock-mapped-memory --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
 
       - name: Verify Ethrex Stateless Validation constraints (emulator)
         run: |
-          ./target/release/host --action verify-constraints --emulator --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+          include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
+          ./target/release/host --emulator --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
 
-      - name: Verify Ethrex Stateless Validation constraints (assembly)
-        run: |
-          ./target/release/host --action verify-constraints --port 25000 --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+      # TODO: We need a runner with more memory
+      # - name: Verify Ethrex Stateless Validation constraints (assembly)
+      #   run: |
+      #     include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
+      #     ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
