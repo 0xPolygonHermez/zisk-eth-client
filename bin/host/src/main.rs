@@ -24,6 +24,11 @@ fn main() -> Result<()> {
     }
 
     info!("ZisK Host");
+    if let Some(proving_key) = &cli.proving_key
+        && let Some(name) = proving_key.file_name()
+    {
+        info!(" Proving Key: {}", name.to_string_lossy());
+    }
     info!(" Action: {:?}", cli.action);
     info!(" Guest Program: {}", cli.guest_program.display_name());
     match &cli.guest_program {
@@ -40,10 +45,7 @@ fn main() -> Result<()> {
                 Client::Ethrex => ELF_ETHREX,
             };
 
-            info!(
-                " ELF Path: {}",
-                elf.path().unwrap_or_else(|| "N/A".to_string())
-            );
+            info!(" ELF: {}", elf.name());
             info!(" Input Folder: {}", input_folder.display());
             if let Some(include) = include {
                 info!(" Include Patterns: {:?}", include);

@@ -13,8 +13,9 @@ concurrency:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
-  PROVING_KEY_VERSION: "0.17.0"
-  PROVING_KEY_DIR: /tmp/proving-key
+  PROVING_KEY_DOWNLOAD_VERSION: "0.17.0"
+  PROVING_KEY_DOWNLOAD_DIR: /tmp/proving-key
+  PROVING_KEY_PATH: /tmp/proving-key/provingKey
 
 jobs:
   # Format check
@@ -107,34 +108,34 @@ jobs:
         id: cache-proving-key
         uses: actions/cache@v4
         with:
-          path: ${{ env.PROVING_KEY_DIR }}
-          key: proving-key-${{ env.PROVING_KEY_VERSION }}
+          path: ${{ env.PROVING_KEY_DOWNLOAD_DIR }}
+          key: proving-key-${{ env.PROVING_KEY_DOWNLOAD_VERSION }}
 
       - name: Download proving key
         if: steps.cache-proving-key.outputs.cache-hit != 'true'
         run: |
-          mkdir -p $PROVING_KEY_DIR
-          curl -sSfL "https://storage.googleapis.com/zisk-setup/proving-key-${{ env.PROVING_KEY_VERSION }}.tar.gz" \
-            | tar -xz -C $PROVING_KEY_DIR
+          mkdir -p $PROVING_KEY_DOWNLOAD_DIR
+          curl -sSfL "https://storage.googleapis.com/zisk-setup/proving-key-${{ env.PROVING_KEY_DOWNLOAD_VERSION }}.tar.gz" \
+            | tar -xz -C $PROVING_KEY_DOWNLOAD_DIR
 
       - name: Build host
         run: cargo build --release -p host
 
       - name: Execute Reth Stateless Validation tests (emulator)
         run: |
-          ./target/release/host --action execute --emulator --proving-key $PROVING_KEY_DIR stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+          ./target/release/host --action execute --emulator --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
 
       - name: Execute Reth Stateless Validation tests (assembly)
         run: |
-          ./target/release/host --action execute --port 25000 --proving-key $PROVING_KEY_DIR stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+          ./target/release/host --action execute --port 25000 --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
 
       - name: Verify Reth Stateless Validation constraints (emulator)
         run: |
-          ./target/release/host --action verify-constraints --emulator --proving-key $PROVING_KEY_DIR stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+          ./target/release/host --action verify-constraints --emulator --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
 
       - name: Verify Reth Stateless Validation constraints (assembly)
         run: |
-          ./target/release/host --action verify-constraints --port 25000 --proving-key $PROVING_KEY_DIR stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
+          ./target/release/host --action verify-constraints --port 25000 --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
 
   # Test Ethrex client
   test-ethrex:
@@ -171,31 +172,31 @@ jobs:
         id: cache-proving-key
         uses: actions/cache@v4
         with:
-          path: ${{ env.PROVING_KEY_DIR }}
-          key: proving-key-${{ env.PROVING_KEY_VERSION }}
+          path: ${{ env.PROVING_KEY_DOWNLOAD_DIR }}
+          key: proving-key-${{ env.PROVING_KEY_DOWNLOAD_VERSION }}
 
       - name: Download proving key
         if: steps.cache-proving-key.outputs.cache-hit != 'true'
         run: |
-          mkdir -p $PROVING_KEY_DIR
-          curl -sSfL "https://storage.googleapis.com/zisk-setup/proving-key-${{ env.PROVING_KEY_VERSION }}.tar.gz" \
-            | tar -xz -C $PROVING_KEY_DIR
+          mkdir -p $PROVING_KEY_DOWNLOAD_DIR
+          curl -sSfL "https://storage.googleapis.com/zisk-setup/proving-key-${{ env.PROVING_KEY_DOWNLOAD_VERSION }}.tar.gz" \
+            | tar -xz -C $PROVING_KEY_DOWNLOAD_DIR
 
       - name: Build host
         run: cargo build --release -p host
 
       - name: Execute Ethrex Stateless Validation tests (emulator)
         run: |
-          ./target/release/host --action execute --emulator --proving-key $PROVING_KEY_DIR stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+          ./target/release/host --action execute --emulator --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
 
       - name: Execute Ethrex Stateless Validation tests (assembly)
         run: |
-          ./target/release/host --action execute --port 25000 --proving-key $PROVING_KEY_DIR stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+          ./target/release/host --action execute --port 25000 --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
 
       - name: Verify Ethrex Stateless Validation constraints (emulator)
         run: |
-          ./target/release/host --action verify-constraints --emulator --proving-key $PROVING_KEY_DIR stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+          ./target/release/host --action verify-constraints --emulator --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
 
       - name: Verify Ethrex Stateless Validation constraints (assembly)
         run: |
-          ./target/release/host --action verify-constraints --port 25000 --proving-key $PROVING_KEY_DIR stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
+          ./target/release/host --action verify-constraints --port 25000 --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
