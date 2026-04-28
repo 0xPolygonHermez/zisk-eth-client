@@ -43,20 +43,8 @@ jobs:
   #       with:
   #         components: clippy
 
-  #     - name: Install system dependencies
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get install -y curl git xz-utils jq build-essential qemu-system libomp-dev libgmp-dev \
-  #           nlohmann-json3-dev protobuf-compiler uuid-dev libgrpc++-dev libsecp256k1-dev \
-  #           libsodium-dev libpqxx-dev nasm libopenmpi-dev openmpi-bin openmpi-common \
-  #           ca-certificates gnupg lsb-release wget libclang-dev clang gcc-riscv64-unknown-elf
-
-  #     - name: Install ZisK toolchain
-  #       run: |
-  #         curl -sSfL https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup -o /tmp/ziskup
-  #         chmod +x /tmp/ziskup
-  #         /tmp/ziskup --nokey
-  #         echo "$HOME/.zisk/bin" >> $GITHUB_PATH
+  #     - name: Setup dependencies
+  #       uses: ./.github/actions/setup-deps
 
   #     - name: Cache cargo registry
   #       uses: actions/cache@v4
@@ -76,14 +64,14 @@ jobs:
   #         restore-keys: |
   #           ${{ runner.os }}-target-
 
-  #     - name: Build host (includes guests via build.rs)
+  #     - name: Build host
   #       run: cargo build --release -p host
 
   #     - name: Run Clippy
   #       run: cargo clippy --workspace --all-targets -- -D warnings
 
   #     - name: Upload host binary
-  #       uses: actions/upload-artifact@v4
+  #       uses: actions/upload-artifact@v4.6.2
   #       with:
   #         name: host-binary
   #         path: target/release/host
@@ -99,20 +87,8 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y curl git xz-utils jq build-essential qemu-system libomp-dev libgmp-dev \
-            nlohmann-json3-dev protobuf-compiler uuid-dev libgrpc++-dev libsecp256k1-dev \
-            libsodium-dev libpqxx-dev nasm libopenmpi-dev openmpi-bin openmpi-common \
-            ca-certificates gnupg lsb-release wget libclang-dev clang gcc-riscv64-unknown-elf
-
-      - name: Install ZisK toolchain
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup -o /tmp/ziskup
-          chmod +x /tmp/ziskup
-          /tmp/ziskup --nokey
-          echo "$HOME/.zisk/bin" >> $GITHUB_PATH
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-deps
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -132,14 +108,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-target-
 
-      - name: Build host (includes guests via build.rs)
+      - name: Build host
         run: cargo build --release -p host
 
       - name: Upload host binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: host-binary
           path: target/release/host
+          if-no-files-found: error
           retention-days: 1
 
   # Test reth client
@@ -151,7 +128,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download host binary
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.3.0
         with:
           name: host-binary
           path: ./bin
@@ -159,26 +136,14 @@ jobs:
       - name: Make binary executable
         run: chmod +x ./bin/host
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y curl git xz-utils jq build-essential qemu-system libomp-dev libgmp-dev \
-            nlohmann-json3-dev protobuf-compiler uuid-dev libgrpc++-dev libsecp256k1-dev \
-            libsodium-dev libpqxx-dev nasm libopenmpi-dev openmpi-bin openmpi-common \
-            ca-certificates gnupg lsb-release wget libclang-dev clang gcc-riscv64-unknown-elf
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-deps
 
-      - name: Install ZisK toolchain (for emulator)
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup -o /tmp/ziskup
-          chmod +x /tmp/ziskup
-          /tmp/ziskup --nokey
-          echo "$HOME/.zisk/bin" >> $GITHUB_PATH
-
-      - name: Execute reth tests (emulator)
+      - name: Execute Reth tests (emulator)
         run: |
           ./bin/host --action execute --emulator stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
 
-      - name: Execute reth tests (assembly)
+      - name: Execute Reth tests (assembly)
         run: |
           ./bin/host --action execute --port 25000 stateless-validator --client reth --input-folder bin/guests/stateless-validator-reth/inputs
 
@@ -191,7 +156,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download host binary
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.3.0
         with:
           name: host-binary
           path: ./bin
@@ -199,25 +164,13 @@ jobs:
       - name: Make binary executable
         run: chmod +x ./bin/host
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y curl git xz-utils jq build-essential qemu-system libomp-dev libgmp-dev \
-            nlohmann-json3-dev protobuf-compiler uuid-dev libgrpc++-dev libsecp256k1-dev \
-            libsodium-dev libpqxx-dev nasm libopenmpi-dev openmpi-bin openmpi-common \
-            ca-certificates gnupg lsb-release wget libclang-dev clang gcc-riscv64-unknown-elf
-
-      - name: Install ZisK toolchain (for emulator)
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/0xPolygonHermez/zisk/main/ziskup/ziskup -o /tmp/ziskup
-          chmod +x /tmp/ziskup
-          /tmp/ziskup --nokey
-          echo "$HOME/.zisk/bin" >> $GITHUB_PATH
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-deps
 
       - name: Execute Ethrex tests (emulator)
         run: |
           ./bin/host --action execute --emulator stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
 
-      - name: Execute reth tests (assembly)
+      - name: Execute Ethrex tests (assembly)
         run: |
           ./bin/host --action execute --port 25000 stateless-validator --client ethrex --input-folder bin/guests/stateless-validator-ethrex/inputs
