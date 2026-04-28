@@ -24,4 +24,4 @@ runs:
         echo "$ZISKUP_SHA256  /tmp/ziskup" | sha256sum -c
         chmod +x /tmp/ziskup
         /tmp/ziskup --nokey
-        echo "$HOME/.zisk/bin" >> $GITHUB_PATH
+        echo "$HOME/.zisk/bin" >> "$GITHUB_PATH"
