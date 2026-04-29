@@ -11,6 +11,7 @@ anyhow.workspace = true
 bincode.workspace = true
 rkyv.workspace = true
 serde.workspace = true
+hex-literal.workspace = true
 
 primitive-types.workspace = true
 ethereum-types.workspace = true

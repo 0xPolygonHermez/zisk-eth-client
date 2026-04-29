@@ -82,9 +82,6 @@ impl RethInputWitness {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RethInputPublic {
     /// The block being executed in the stateless validation function
-    #[serde_as(
-        as = "reth_primitives_traits::serde_bincode_compat::Block<reth_ethereum_primitives::TransactionSigned, alloy_consensus::Header>"
-    )]
     pub block: Block,
     /// Chain configuration for the stateless validation function
     #[serde_as(as = "alloy_genesis::serde_bincode_compat::ChainConfig<'_>")]

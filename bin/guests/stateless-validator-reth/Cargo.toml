@@ -20,27 +20,21 @@ ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "refact
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 # alloy
-alloy-consensus = { version = "1.7.3", default-features = false }
+alloy-consensus = { version = "2.0.0", default-features = false }
 alloy-primitives = { version = "1.5.6", features = ["native-keccak"] } # Needed for ZisK-accelerated keccak
 
 # revm
-revm = { version = "34.0.0", default-features = false }
+revm = { version = "38.0.0", default-features = false }
 
+[patch.crates-io]
 # Needed for deterministic Hashmap sort
-alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.27.3" }
+alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.33.3" }
 # alloy-evm = { path = "../../../zisk-patch-alloy-evm/crates/evm" }
 
 [patch."https://github.com/paradigmxyz/reth.git"]
 # Needed for deterministic Hashmap sort
-reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v1.11.0" }
+reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v2.1.0" }
 # reth-trie-common = { path = "../../../zisk-patch-reth/crates/trie/common" }
-
-[patch."https://github.com/paradigmxyz/stateless.git"]
-# Needed for function visibility and deterministic Hashmap sort
-stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
-tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
-# stateless = { path = "../zisk-patch-stateless/crates/stateless" }
-# tries = { path = "../zisk-patch-stateless/crates/tries" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

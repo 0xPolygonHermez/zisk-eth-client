@@ -19,43 +19,43 @@ zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch =
 # zisk-sdk = { path = "../zisk/sdk" }
 # zkvm-interface = { path = "../zisk/zkvm-interface" }
 
-revm = { version = "34.0.0", default-features = false }
+revm = { version = "38.0.0", default-features = false }
 
 # types (for reth)
 alloy-primitives = "1.5.6"
-alloy = "1.7.3"
-alloy-consensus = { version = "1.7.3", default-features = false }
-alloy-json-rpc = "1.7.3"
-alloy-provider = "1.7.3"
-alloy-rpc-client = "1.7.3"
-alloy-transport = "1.7.3"
-alloy-genesis = "1.7.3"
-alloy-eips = "1.7.3"
-alloy-rpc-types-eth = "1.7.3"
-alloy-rpc-types-debug = "1.7.3"
+alloy = "2.0.0"
+alloy-consensus = { version = "2.0.0", default-features = false }
+alloy-json-rpc = "2.0.0"
+alloy-provider = "2.0.0"
+alloy-rpc-client = "2.0.0"
+alloy-transport = "2.0.0"
+alloy-genesis = "2.0.0"
+alloy-eips = "2.0.0"
+alloy-rpc-types-eth = "2.0.0"
+alloy-rpc-types-debug = "2.0.0"
 
 # reth
-reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
-reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
-reth-primitives-traits = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
-reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
-reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
-stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "ed189a51931e8589102f3139d48fdbb3bbe4c1f7", package = "stateless" }
-stateless-reth-tries = { git = "https://github.com/paradigmxyz/stateless", rev = "ed189a51931e8589102f3139d48fdbb3bbe4c1f7", package = "tries" }
+reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v2.1.0", default-features = false }
+reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v2.1.0", default-features = false }
+reth-primitives-traits = { version = "0.3.0", default-features = false }
+reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v2.1.0", default-features = false }
+reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v2.1.0", default-features = false }
+stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "e5480e71a8031641ff471cad9dc482a7a14b32d5", package = "stateless" }
+stateless-reth-tries = { git = "https://github.com/paradigmxyz/stateless", rev = "e5480e71a8031641ff471cad9dc482a7a14b32d5", package = "tries" }
 
 # types (for ethrex)
 primitive-types = "0.13.1"
 ethereum-types = "0.15.1"
 
 # ethrex
-ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969" }
-ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969", default-features = false }
-ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969" }
-ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969", default-features = false }
-stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969", default-features = false, package = "ethrex-guest-program" }
+ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v10.0.0" }
+ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v10.0.0", default-features = false }
+ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v10.0.0" }
+ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v10.0.0", default-features = false }
+stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v10.0.0", default-features = false, package = "ethrex-guest-program" }
 
 # eth-act
-witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "63da9dde9b284dc4845cf7128c3f0d7c53d21654" }
+witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "1a6ae1414f45e7a64e274469c95b9b2b3b251df2" }
 
 # common dependencies
 anyhow = "1.0"
@@ -83,9 +83,4 @@ jsonrpsee = { version = "0.26", features = ["http-client"] }
 http = "1.4.0"
 tempfile = "3"
 rkyv = { version = "0.8.10", features = ["std", "unaligned"] }
-
-[patch."https://github.com/paradigmxyz/stateless.git"]
-stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
-tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
-# stateless = { path = "../zisk-patch-stateless/crates/stateless" }
-# tries = { path = "../zisk-patch-stateless/crates/tries" }
+hex-literal = "0.4.1"

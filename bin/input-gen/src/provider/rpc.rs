@@ -367,9 +367,11 @@ impl RpcProvider {
         .context("Failed to fetch block")?
         .with_context(|| format!("Block {} not found", block_num))?;
 
-        let witness = DebugApiClient::<()>::debug_execution_witness(rpc_client, block_num.into())
-            .await
-            .context("Failed to fetch execution witness")?;
+        // TODO: Check if new mode can be better than legacy
+        let witness =
+            DebugApiClient::<()>::debug_execution_witness(rpc_client, block_num.into(), None)
+                .await
+                .context("Failed to fetch execution witness")?;
 
         Ok((block, witness))
     }

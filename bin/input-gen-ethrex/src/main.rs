@@ -9,7 +9,6 @@ use url::Url;
 use ethrex_common::types::block_execution_witness::RpcExecutionWitness;
 use ethrex_common::types::{Block, ChainConfig};
 use ethrex_config::networks::Network;
-use ethrex_rpc::debug::execution_witness::execution_witness_from_rpc_chain_config;
 use ethrex_rpc::types::{block::RpcBlock, block_identifier::BlockIdentifier};
 use ethrex_rpc::EthClient;
 
@@ -144,7 +143,7 @@ async fn main() -> Result<()> {
 /// Fetch the latest block number
 async fn fetch_latest_block_number(client: &EthClient) -> Result<u64> {
     let block_number = client.get_block_number().await?;
-    Ok(block_number.as_u64())
+    Ok(block_number)
 }
 
 /// Fetch block and execution witness for a given block number
@@ -219,8 +218,8 @@ async fn process_single_block(
         .try_into()
         .map_err(|e: String| anyhow::anyhow!("{}", e))?;
 
-    let witness = execution_witness_from_rpc_chain_config(rpc_witness, *chain_config, block_num)
-        .context("Failed to convert execution witness")?;
+    // Convert RPC witness to execution witness
+    let witness = rpc_witness.into_execution_witness(*chain_config, block_num)?;
 
     // Create EthrexInput
     let input = EthrexInput::new(block.clone(), witness);
