@@ -1,5 +1,6 @@
-use zisk_sdk::{ElfBinary, include_elf};
+use zisk_sdk::{GuestProgram, load_program};
 
-pub(crate) const ELF_RETH: ElfBinary = include_elf!("zec-reth");
-
-pub(crate) const ELF_ETHREX: ElfBinary = include_elf!("zec-ethrex");
+// ELF binaries for the host to load into the zkVM
+pub(crate) const ELF_RETH: GuestProgram = load_program!("zec-reth");
+pub(crate) const ELF_ETHREX: GuestProgram = load_program!("zec-ethrex");
+// Add more ELF binaries here as needed

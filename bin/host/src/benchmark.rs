@@ -5,7 +5,7 @@ use std::{
 };
 use tracing::{error, info};
 
-use zisk_sdk::ElfBinary;
+use zisk_sdk::GuestProgram;
 
 use crate::{
     cli::Action,
@@ -29,20 +29,20 @@ struct BenchmarkResult {
 impl BenchmarkRunner {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        elf: ElfBinary,
+        elf: GuestProgram,
         action: Action,
         output_folder: Option<PathBuf>,
         force_rerun: bool,
         proving_key: Option<PathBuf>,
         emulator: bool,
-        port: Option<u16>,
         unlock_mapped_memory: bool,
+        gpu: bool,
     ) -> Result<Self> {
         let zisk_client = ZiskClient::new(elf).with_proving_key(
             proving_key,
             emulator,
-            port,
             unlock_mapped_memory,
+            gpu,
         )?;
 
         Ok(Self {
@@ -53,12 +53,14 @@ impl BenchmarkRunner {
         })
     }
 
-    pub fn run(
+    pub async fn run(
         &self,
         input_folder: &Path,
         include: Option<&[String]>,
         exclude: Option<&[String]>,
     ) -> Result<()> {
+        self.zisk_client.setup().await?;
+
         let mut input_files = collect_input_files(input_folder)?;
 
         if let Some(patterns) = include {
@@ -84,7 +86,7 @@ impl BenchmarkRunner {
         let mut failed = 0;
         let mut skipped = 0;
         for (index, file) in input_files.iter().enumerate() {
-            match self.run_single(file, index + 1, total) {
+            match self.run_single(file, index + 1, total).await {
                 Ok(true) => passed += 1,
                 Ok(false) => skipped += 1,
                 Err(e) => {
@@ -94,7 +96,6 @@ impl BenchmarkRunner {
             }
         }
 
-        // Print summary
         info!("");
         info!(
             "Summary: {} passed, {} failed, {} skipped",
@@ -104,15 +105,14 @@ impl BenchmarkRunner {
         Ok(())
     }
 
-    fn run_single(&self, input_file: &Path, current: usize, total: usize) -> Result<bool> {
+    async fn run_single(&self, input_file: &Path, current: usize, total: usize) -> Result<bool> {
         let test_name = input_file
             .file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or("unknown");
 
-        match self.action {
+        match &self.action {
             Action::Execute => {
-                // Check if output file exists and skip if it does
                 if let Some(ref output_folder) = self.output_folder {
                     let filename = input_file.file_name().unwrap_or_default();
                     let output_file = output_folder.join(filename).with_extension("json");
@@ -125,14 +125,12 @@ impl BenchmarkRunner {
 
                 info!("[{}/{}] Running: {}", current, total, test_name);
 
-                let metrics = self.zisk_client.execute(input_file)?;
+                let metrics = self.zisk_client.execute(input_file).await?;
                 let elapsed = metrics.duration.as_secs_f64();
 
                 info!("Execution metrics: {:?}", metrics);
-
                 info!("[{}/{}] Completed in {:.2}s", current, total, elapsed);
 
-                // Write metrics to output file
                 if let Some(ref output_folder) = self.output_folder {
                     let filename = input_file.file_name().unwrap_or_default();
                     let output_file = output_folder.join(filename).with_extension("json");
@@ -158,7 +156,7 @@ impl BenchmarkRunner {
                     current, total, test_name
                 );
 
-                let metrics = self.zisk_client.verify_constraints(input_file)?;
+                let metrics = self.zisk_client.verify_constraints(input_file).await?;
                 let elapsed = metrics.duration.as_secs_f64();
 
                 info!("[{}/{}] PASSED in {:.2}s", current, total, elapsed);

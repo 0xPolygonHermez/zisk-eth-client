@@ -31,11 +31,12 @@ pub struct Cli {
     #[arg(short = 'l', long, default_value_t = false)]
     pub emulator: bool,
 
-    #[arg(long, conflicts_with = "emulator")]
-    pub port: Option<u16>,
-
     #[arg(long, conflicts_with = "emulator", default_value_t = false)]
     pub unlock_mapped_memory: bool,
+
+    /// Use GPU acceleration (verify-constraints / prove only)
+    #[arg(long, default_value_t = false)]
+    pub gpu: bool,
 }
 
 /// Actions to perform
