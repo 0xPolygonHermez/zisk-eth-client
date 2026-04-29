@@ -10,7 +10,7 @@ use ziskos::io::read_input_slice;
 fn main() {
     // Read the input
     let input: EthrexInput =
-        EthrexInput::deserialize(read_input_slice()).expect("Failed to deserialize EthrexInput");
+        EthrexInput::deserialize(&read_input_slice()).expect("Failed to deserialize EthrexInput");
 
     // Get chain config
     let chain_config = input.witness().chain_config;
