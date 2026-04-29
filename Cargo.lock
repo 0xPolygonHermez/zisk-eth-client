@@ -1255,7 +1255,7 @@ dependencies = [
 [[package]]
 name = "asm-runner"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "libc",
@@ -1859,7 +1859,7 @@ dependencies = [
 [[package]]
 name = "cargo-zisk"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "asm-runner",
@@ -1977,7 +1977,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 
 [[package]]
 name = "clang-sys"
@@ -2504,7 +2504,7 @@ dependencies = [
 [[package]]
 name = "curves"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "fields",
  "num-bigint 0.4.6",
@@ -2606,7 +2606,7 @@ dependencies = [
 [[package]]
 name = "data-bus"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "zisk-common",
  "zisk-core",
@@ -3598,7 +3598,7 @@ dependencies = [
 [[package]]
 name = "executor"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "asm-runner",
@@ -3747,7 +3747,7 @@ checksum = "28dea519a9695b9977216879a3ebfddf92f1c08c05d984f8996aecd6ecdc811d"
 [[package]]
 name = "fields"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "cfg-if 1.0.4",
  "num-bigint 0.4.6",
@@ -5491,12 +5491,12 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 [[package]]
 name = "lib-c"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 
 [[package]]
 name = "lib-float"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 
 [[package]]
 name = "libc"
@@ -5778,7 +5778,7 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 [[package]]
 name = "mem-common"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "clap",
  "fields",
@@ -5798,7 +5798,7 @@ dependencies = [
 [[package]]
 name = "mem-planner-cpp"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "mem-common",
  "proofman-common",
@@ -7063,7 +7063,7 @@ dependencies = [
 [[package]]
 name = "pil-std-lib"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "colored",
  "fields",
@@ -7188,7 +7188,7 @@ dependencies = [
 [[package]]
 name = "precomp-arith-eq"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
@@ -7225,7 +7225,7 @@ dependencies = [
 [[package]]
 name = "precomp-arith-eq-384"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -7262,7 +7262,7 @@ dependencies = [
 [[package]]
 name = "precomp-big-int"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "generic-array",
@@ -7284,7 +7284,7 @@ dependencies = [
 [[package]]
 name = "precomp-blake2"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "mem-common",
@@ -7304,7 +7304,7 @@ dependencies = [
 [[package]]
 name = "precomp-dma"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "generic-array",
@@ -7328,7 +7328,7 @@ dependencies = [
 [[package]]
 name = "precomp-keccakf"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "circuit",
  "fields",
@@ -7350,7 +7350,7 @@ dependencies = [
 [[package]]
 name = "precomp-poseidon2"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "mem-common",
@@ -7371,7 +7371,7 @@ dependencies = [
 [[package]]
 name = "precomp-sha256f"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "mem-common",
@@ -7391,7 +7391,7 @@ dependencies = [
 [[package]]
 name = "precompiles-common"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "mem-common",
@@ -7403,7 +7403,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -7422,7 +7422,7 @@ dependencies = [
 [[package]]
 name = "precompiles-hints"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "borsh",
@@ -7561,7 +7561,7 @@ dependencies = [
 [[package]]
 name = "proofman"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "bincode",
  "blake3",
@@ -7596,7 +7596,7 @@ dependencies = [
 [[package]]
 name = "proofman-common"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "bincode",
  "borsh",
@@ -7628,7 +7628,7 @@ dependencies = [
 [[package]]
 name = "proofman-hints"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "fields",
  "itoa",
@@ -7641,7 +7641,7 @@ dependencies = [
 [[package]]
 name = "proofman-macros"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7651,7 +7651,7 @@ dependencies = [
 [[package]]
 name = "proofman-starks-lib-c"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "crossbeam-channel 0.5.15",
  "tracing",
@@ -7660,7 +7660,7 @@ dependencies = [
 [[package]]
 name = "proofman-util"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "bincode",
  "bytemuck",
@@ -7672,7 +7672,7 @@ dependencies = [
 [[package]]
 name = "proofman-verifier"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "bytemuck",
  "fields",
@@ -10054,7 +10054,7 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 
 [[package]]
 name = "rkyv"
@@ -10128,7 +10128,7 @@ dependencies = [
 [[package]]
 name = "rom-setup"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "blake3",
@@ -11059,7 +11059,7 @@ dependencies = [
 [[package]]
 name = "sm-arith"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "num-bigint 0.4.6",
@@ -11080,7 +11080,7 @@ dependencies = [
 [[package]]
 name = "sm-binary"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "num-bigint 0.4.6",
@@ -11100,7 +11100,7 @@ dependencies = [
 [[package]]
 name = "sm-frequent-ops"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "clap",
  "fields",
@@ -11116,7 +11116,7 @@ dependencies = [
 [[package]]
 name = "sm-main"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "mem-common",
@@ -11136,7 +11136,7 @@ dependencies = [
 [[package]]
 name = "sm-mem"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "mem-common",
@@ -11157,7 +11157,7 @@ dependencies = [
 [[package]]
 name = "sm-rom"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "asm-runner",
@@ -13275,7 +13275,7 @@ dependencies = [
 [[package]]
 name = "witness"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fremove-packed-gpu-features-0.17.0#dd20ad9171d1eb954c118c81317bb3a0c3503d91"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-0.17.0#fc11ef4438a71d892085da089a8f4525b7244c99"
 dependencies = [
  "colored",
  "fields",
@@ -13516,7 +13516,7 @@ dependencies = [
 [[package]]
 name = "zisk-build"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "blake3",
@@ -13530,7 +13530,7 @@ dependencies = [
 [[package]]
 name = "zisk-cluster-api"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "chrono",
@@ -13549,7 +13549,7 @@ dependencies = [
 [[package]]
 name = "zisk-cluster-common"
 version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "borsh",
@@ -13570,7 +13570,7 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "alloy-sol-types",
  "anyhow",
@@ -13597,7 +13597,7 @@ dependencies = [
 [[package]]
 name = "zisk-coordinator"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "async-stream",
@@ -13634,7 +13634,7 @@ dependencies = [
 [[package]]
 name = "zisk-coordinator-api"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "chrono",
@@ -13651,7 +13651,7 @@ dependencies = [
 [[package]]
 name = "zisk-coordinator-client"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "bytes",
@@ -13660,13 +13660,14 @@ dependencies = [
  "tokio-stream",
  "tonic",
  "uuid",
+ "zisk-common",
  "zisk-coordinator-api",
 ]
 
 [[package]]
 name = "zisk-coordinator-server"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "async-stream",
@@ -13698,6 +13699,7 @@ dependencies = [
  "uuid",
  "zisk-cluster-api",
  "zisk-cluster-common",
+ "zisk-common",
  "zisk-coordinator",
  "zisk-coordinator-api",
 ]
@@ -13705,7 +13707,7 @@ dependencies = [
 [[package]]
 name = "zisk-core"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "elf",
  "fields",
@@ -13725,12 +13727,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 
 [[package]]
 name = "zisk-pil"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "fields",
  "proofman-common",
@@ -13743,7 +13745,7 @@ dependencies = [
 [[package]]
 name = "zisk-prover-backend"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "alloy-sol-types",
  "anyhow",
@@ -13772,7 +13774,7 @@ dependencies = [
 [[package]]
 name = "zisk-sdk"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "alloy-sol-types",
  "anyhow",
@@ -13800,7 +13802,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "proofman-verifier",
 ]
@@ -13808,7 +13810,7 @@ dependencies = [
 [[package]]
 name = "ziskemu"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "clap",
  "data-bus",
@@ -13838,7 +13840,7 @@ dependencies = [
 [[package]]
 name = "ziskos-hints"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "anyhow",
  "bincode",
@@ -13891,7 +13893,7 @@ dependencies = [
 [[package]]
 name = "zkvm-interface"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=refactor-sdk-0.17.0#8d3d5159025dddecb27bb2c828d7347dc3433035"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.0#1994f3392198e9c90ed8926f13af5f4240d7a99b"
 dependencies = [
  "bindgen 0.72.1",
 ]
