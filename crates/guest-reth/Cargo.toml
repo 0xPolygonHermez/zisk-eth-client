@@ -18,6 +18,7 @@ tiny-keccak.workspace = true
 alloy-consensus = { workspace = true, default-features = false, features = ["crypto-backend", "k256"] }
 alloy-genesis.workspace = true
 alloy-primitives.workspace = true
+alloy-rlp.workspace = true
 alloy-rpc-types-debug.workspace = true
 
 revm.workspace = true

@@ -13,8 +13,8 @@ guest-ethrex = { path = "crates/guest-ethrex" }
 guest-reth = { path = "crates/guest-reth" }
 input = { path = "crates/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "refactor-sdk-0.17.0" }
-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "refactor-sdk-0.17.0" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.0" }
+zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.0" }
 # local dev
 # zisk-sdk = { path = "../zisk/sdk" }
 # zkvm-interface = { path = "../zisk/zkvm-interface" }
@@ -22,6 +22,7 @@ zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch =
 revm = { version = "38.0.0", default-features = false }
 
 # types (for reth)
+alloy-rlp = "0.3"
 alloy-primitives = "1.5.6"
 alloy = "2.0.0"
 alloy-consensus = { version = "2.0.0", default-features = false }

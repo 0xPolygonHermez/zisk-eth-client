@@ -1,7 +1,8 @@
+use alloy_rlp::{Decodable, Encodable};
 use anyhow::{anyhow, Context, Result};
 use rayon::prelude::*;
-use serde::{Deserialize, Serialize};
-use serde_with::serde_as;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde_with::{serde_as, DeserializeAs, SerializeAs};
 
 use alloy_genesis::ChainConfig;
 use alloy_rpc_types_debug::ExecutionWitness;
@@ -77,11 +78,33 @@ impl RethInputWitness {
     }
 }
 
+/// RLP-based serde adapter for `Block`. Replaces the
+/// `reth_primitives_traits::serde_bincode_compat::Block` helper that was
+/// removed in reth v2.1.0; `Header` carries `Option<_>` fields with
+/// `skip_serializing_if`, which bincode 1.x cannot round-trip without help.
+struct BlockRlp;
+
+impl SerializeAs<Block> for BlockRlp {
+    fn serialize_as<S: Serializer>(source: &Block, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut buf = Vec::with_capacity(source.length());
+        source.encode(&mut buf);
+        buf.serialize(serializer)
+    }
+}
+
+impl<'de> DeserializeAs<'de, Block> for BlockRlp {
+    fn deserialize_as<D: Deserializer<'de>>(deserializer: D) -> Result<Block, D::Error> {
+        let buf = Vec::<u8>::deserialize(deserializer)?;
+        Block::decode(&mut buf.as_slice()).map_err(serde::de::Error::custom)
+    }
+}
+
 /// The public input part of the input
 #[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RethInputPublic {
     /// The block being executed in the stateless validation function
+    #[serde_as(as = "BlockRlp")]
     pub block: Block,
     /// Chain configuration for the stateless validation function
     #[serde_as(as = "alloy_genesis::serde_bincode_compat::ChainConfig<'_>")]
@@ -119,12 +142,12 @@ impl RethInputPublic {
 
     /// Serialize to bytes
     pub fn serialize(&self) -> Result<Vec<u8>> {
-        bincode::serialize(self).context("Failed to serialize public keys")
+        bincode::serialize(self).context("Failed to serialize public input")
     }
 
     /// Deserialize from bytes
     pub fn deserialize(bytes: &[u8]) -> Result<Self> {
-        bincode::deserialize(bytes).context("Failed to deserialize public keys")
+        bincode::deserialize(bytes).context("Failed to deserialize public input")
     }
 }
 
