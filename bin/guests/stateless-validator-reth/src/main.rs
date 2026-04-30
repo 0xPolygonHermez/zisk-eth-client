@@ -12,21 +12,6 @@ use guest_reth::{
 };
 
 fn main() {
-    #[cfg(zisk_hints)]
-    {
-        // Create ./hints directory if it doesn't exist
-        let hints_dir = std::path::PathBuf::from("./hints");
-        if !hints_dir.exists() {
-            std::fs::create_dir_all(&hints_dir).expect("Failed to create hints directory");
-        }
-
-        // Initialize hints file
-        let hints_file = std::path::PathBuf::from("./hints/block_hints.bin");
-        if let Err(e) = ziskos::hints::init_hints_file(hints_file, None) {
-            panic!("Failed to init hints, error: {}", e);
-        }
-    }
-
     // Install custom EVM crypto
     install_crypto(CustomEvmCrypto::default());
     install_default_provider(Arc::new(CustomEvmCrypto::default())).unwrap();
@@ -69,23 +54,4 @@ fn main() {
         "Execution summary:\n  - Chain: {} (ID: {})\n  - Block Number: {}\n  - Block Hash: {}\n  - Transaction Count: {}\n  - Gas Consumed: {}",
         chain, chain_id, block_number, block_hash, tx_count, gas_used
     );
-
-    #[cfg(zisk_hints)]
-    {
-        // Close hints generation
-        if let Err(e) = ziskos::hints::close_hints() {
-            panic!("Failed to close hints, error: {}", e);
-        }
-
-        // Rename hint file
-        let hints_file = std::path::PathBuf::from("./hints/block_hints.bin");
-        let new_hints_file =
-            std::path::PathBuf::from(format!("./hints/{}_hints.bin", block_number));
-        std::fs::rename(&hints_file, &new_hints_file).unwrap();
-
-        println!(
-            "Hints generated successfully in file {}",
-            &new_hints_file.display()
-        );
-    }
 }
