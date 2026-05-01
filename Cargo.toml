@@ -1,5 +1,5 @@
 [workspace]
-members = ["bin/host", "bin/input-gen", "crates/*"]
+members = ["bin/host", "bin/input-gen", "bin/input-gen-ethrex", "crates/*"]
 exclude = []
 resolver = "2"
 
@@ -8,16 +8,20 @@ version = "0.7.0"
 edition = "2021"
 
 [workspace.dependencies]
+guest-common = { path = "crates/guest-common" }
+guest-ethrex = { path = "crates/guest-ethrex" }
 guest-reth = { path = "crates/guest-reth" }
 input = { path = "crates/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.16.0" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.0" }
+zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.0" }
 # local dev
 # zisk-sdk = { path = "../zisk/sdk" }
+# zkvm-interface = { path = "../zisk/zkvm-interface" }
 
 revm = { version = "34.0.0", default-features = false }
 
-# alloy
+# types (for reth)
 alloy-primitives = "1.5.6"
 alloy = "1.7.3"
 alloy-consensus = { version = "1.7.3", default-features = false }
@@ -36,14 +40,22 @@ reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = 
 reth-primitives-traits = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
+stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "ed189a51931e8589102f3139d48fdbb3bbe4c1f7", package = "stateless" }
+stateless-reth-tries = { git = "https://github.com/paradigmxyz/stateless", rev = "ed189a51931e8589102f3139d48fdbb3bbe4c1f7", package = "tries" }
 
-# stateless
-stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "68cd8e73682d21fed69670fc7eabe25e55c5cdbe", package = "stateless" }
+# types (for ethrex)
+primitive-types = "0.13.1"
+ethereum-types = "0.15.1"
 
-zeth-mpt-state = { git = "https://github.com/eth-act/zkvm-ethereum-mpt.git", tag = "v0.5.0" }
+# ethrex
+ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969" }
+ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969", default-features = false }
+ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969" }
+ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969", default-features = false }
+stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969", default-features = false, package = "ethrex-guest-program" }
 
 # eth-act
-witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "a1f5dc47df7735500c1d8dfe055e966ee9f8070e" }
+witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "63da9dde9b284dc4845cf7128c3f0d7c53d21654" }
 
 # common dependencies
 anyhow = "1.0"
@@ -70,7 +82,10 @@ walkdir = "2"
 jsonrpsee = { version = "0.26", features = ["http-client"] }
 http = "1.4.0"
 tempfile = "3"
+rkyv = { version = "0.8.10", features = ["std", "unaligned"] }
 
 [patch."https://github.com/paradigmxyz/stateless.git"]
-stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/68cd8e73" }
+stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
+tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
 # stateless = { path = "../zisk-patch-stateless/crates/stateless" }
+# tries = { path = "../zisk-patch-stateless/crates/tries" }

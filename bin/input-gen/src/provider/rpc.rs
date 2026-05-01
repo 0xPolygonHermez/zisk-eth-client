@@ -17,11 +17,11 @@ use stateless_reth::{ExecutionWitness, StatelessInput};
 
 use witness_generator::StatelessValidationFixture;
 
-use super::{InputSource, SourceKind};
+use super::{InputProvider, ProviderKind};
 use crate::{client::ExecutionClient, processor::ProcessingTracker};
 
 #[derive(Debug, Clone, Args)]
-pub struct RpcSource {
+pub struct RpcProvider {
     /// RPC URL to use
     #[arg(short = 'u', long)]
     rpc_url: String,
@@ -48,9 +48,9 @@ pub struct RpcSource {
 }
 
 #[async_trait::async_trait]
-impl InputSource for RpcSource {
-    fn kind(&self) -> SourceKind {
-        SourceKind::Rpc
+impl InputProvider for RpcProvider {
+    fn kind(&self) -> ProviderKind {
+        ProviderKind::Rpc
     }
 
     async fn generate_inputs(
@@ -58,8 +58,8 @@ impl InputSource for RpcSource {
         client: &dyn ExecutionClient,
         output: &Path,
     ) -> anyhow::Result<()> {
-        if !client.supports_source(self.kind()) {
-            anyhow::bail!("{} doesn't support RPC source", client.display_name());
+        if !client.supports_provider(self.kind()) {
+            anyhow::bail!("{} doesn't support RPC provider", client.display_name());
         }
 
         // Initialize the RPC client
@@ -91,7 +91,7 @@ impl InputSource for RpcSource {
     }
 }
 
-impl RpcSource {
+impl RpcProvider {
     /// Process a batch of blocks
     async fn process_batch(
         &self,
@@ -219,7 +219,7 @@ impl RpcSource {
     }
 }
 
-impl RpcSource {
+impl RpcProvider {
     /// Continuously follow and process new blocks
     pub async fn follow_new_blocks(
         &self,
@@ -290,7 +290,7 @@ impl RpcSource {
     }
 }
 
-impl RpcSource {
+impl RpcProvider {
     /// Initialize the RPC client and fetch chain configuration
     async fn init_rpc_client(
         rpc_url: &str,

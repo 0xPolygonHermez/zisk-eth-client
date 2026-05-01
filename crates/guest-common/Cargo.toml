@@ -1,0 +1,11 @@
+[package]
+name = "guest-common"
+description = ""
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+zkvm-interface.workspace = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_vendor, values("zisk"))', 'cfg(zisk_hints)', 'cfg(zisk_hints_debug)'] }

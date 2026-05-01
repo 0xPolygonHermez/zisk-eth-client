@@ -1,9 +1,9 @@
 mod impls;
 
 #[derive(Debug)]
-pub struct CustomEvmCrypto;
+pub struct ZiskCrypto;
 
-impl Default for CustomEvmCrypto {
+impl Default for ZiskCrypto {
     fn default() -> Self {
         Self
     }

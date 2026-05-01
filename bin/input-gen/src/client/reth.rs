@@ -6,7 +6,7 @@ use witness_generator::StatelessValidationFixture;
 use zisk_sdk::ZiskStdin;
 
 use super::ExecutionClient;
-use crate::source::SourceKind;
+use crate::provider::ProviderKind;
 
 pub struct RethClient;
 
@@ -25,8 +25,8 @@ impl ExecutionClient for RethClient {
         "Reth"
     }
 
-    fn supported_sources(&self) -> &'static [SourceKind] {
-        &[SourceKind::Eest, SourceKind::Rpc]
+    fn supported_providers(&self) -> &'static [ProviderKind] {
+        &[ProviderKind::Eest, ProviderKind::Rpc]
     }
 
     fn process_fixture(
