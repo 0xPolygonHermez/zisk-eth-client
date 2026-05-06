@@ -955,7 +955,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 
 [[package]]
 name = "clang-sys"
@@ -2707,12 +2707,12 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 [[package]]
 name = "lib-c"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 
 [[package]]
 name = "lib-float"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 
 [[package]]
 name = "libc"
@@ -3493,7 +3493,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -4069,7 +4069,7 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 
 [[package]]
 name = "rkyv"
@@ -6161,7 +6161,7 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 dependencies = [
  "alloy-sol-types",
  "anyhow",
@@ -6188,7 +6188,7 @@ dependencies = [
 [[package]]
 name = "zisk-core"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 dependencies = [
  "elf",
  "fields",
@@ -6208,12 +6208,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 
 [[package]]
 name = "zisk-verifier"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 dependencies = [
  "proofman-verifier",
 ]
@@ -6221,7 +6221,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 dependencies = [
  "anyhow",
  "ark-bn254",
@@ -6260,7 +6260,7 @@ dependencies = [
 [[package]]
 name = "ziskos-hints"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 dependencies = [
  "anyhow",
  "bincode",
@@ -6313,7 +6313,7 @@ dependencies = [
 [[package]]
 name = "zkvm-interface"
 version = "0.17.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?tag=v0.17.0#b63274507a040bf9e09d22214df43066e8f80cb7"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 dependencies = [
  "bindgen 0.72.1",
 ]
