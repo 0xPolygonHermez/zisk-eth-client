@@ -15,7 +15,8 @@ panic = "abort"
 [dependencies]
 guest-ethrex = { path = "../../../crates/guest-ethrex" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.1" }
+# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.17.1" }
+ziskos = { git = "https://github.com/eth-act/zisk.git", branch = "feature/no-std-compatibility" }
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 [lints.rust]
