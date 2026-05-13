@@ -634,6 +634,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "bincode"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36eaf5d7b090263e8150820482d5d93cd964a81e4019913c972f4edcc6edb740"
+dependencies = [
+ "serde",
+ "unty",
+]
+
+[[package]]
 name = "bindgen"
 version = "0.69.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1773,7 +1783,7 @@ name = "ethrex-vm"
 version = "9.0.0"
 source = "git+https://github.com/lambdaclass/ethrex.git?rev=283ae1a561f46daacac99e281126901e5208b969#283ae1a561f46daacac99e281126901e5208b969"
 dependencies = [
- "bincode",
+ "bincode 1.3.3",
  "bytes",
  "derive_more 1.0.0",
  "dyn-clone",
@@ -2136,7 +2146,7 @@ name = "guest-ethrex"
 version = "0.7.0"
 dependencies = [
  "anyhow",
- "bincode",
+ "bincode 2.0.1",
  "ethereum-types",
  "ethrex-common",
  "ethrex-crypto",
@@ -3597,7 +3607,7 @@ name = "proofman"
 version = "0.17.0"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.17.0#ff0e33a9b40f2467b35ef26aa2aabb4a624dfed3"
 dependencies = [
- "bincode",
+ "bincode 1.3.3",
  "blake3",
  "borsh",
  "bytemuck",
@@ -3632,7 +3642,7 @@ name = "proofman-common"
 version = "0.17.0"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.17.0#ff0e33a9b40f2467b35ef26aa2aabb4a624dfed3"
 dependencies = [
- "bincode",
+ "bincode 1.3.3",
  "borsh",
  "bytemuck",
  "colored",
@@ -3696,7 +3706,7 @@ name = "proofman-util"
 version = "0.17.0"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.17.0#ff0e33a9b40f2467b35ef26aa2aabb4a624dfed3"
 dependencies = [
- "bincode",
+ "bincode 1.3.3",
  "bytemuck",
  "colored",
  "serde",
@@ -4736,7 +4746,7 @@ version = "6.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b96392c1b1c197beaa6b0806099a8d73643a09d5ac0874e26c9c5153a7fcb4c"
 dependencies = [
- "bincode",
+ "bincode 1.3.3",
  "serde",
  "sp1-primitives",
 ]
@@ -4747,7 +4757,7 @@ version = "6.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6b77098dae9d62e080be3af253188c08e7e96e666423306654eede0110bf363"
 dependencies = [
- "bincode",
+ "bincode 1.3.3",
  "blake3",
  "elf",
  "hex",
@@ -5253,6 +5263,12 @@ name = "untrusted"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
+
+[[package]]
+name = "unty"
+version = "0.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d49784317cd0d1ee7ec5c716dd598ec5b4483ea832a2dced265471cc0f690ae"
 
 [[package]]
 name = "url"
@@ -6165,7 +6181,7 @@ source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.1
 dependencies = [
  "alloy-sol-types",
  "anyhow",
- "bincode",
+ "bincode 1.3.3",
  "fields",
  "libc",
  "proofman",
@@ -6229,7 +6245,7 @@ dependencies = [
  "ark-ff 0.5.0",
  "ark-serialize 0.5.0",
  "aurora-engine-modexp",
- "bincode",
+ "bincode 1.3.3",
  "blst",
  "bytes",
  "cfg-if",
@@ -6263,7 +6279,7 @@ version = "0.17.0"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-0.17.1#b5fd4b29981af160156793cf551428f3131daa81"
 dependencies = [
  "anyhow",
- "bincode",
+ "bincode 1.3.3",
  "cfg-if",
  "fields",
  "getrandom 0.2.17",
