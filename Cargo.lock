@@ -4140,14 +4140,14 @@ dependencies = [
 
 [[package]]
 name = "guest-common"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "zkvm-interface",
 ]
 
 [[package]]
 name = "guest-ethrex"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "bincode 2.0.1",
@@ -4164,7 +4164,7 @@ dependencies = [
 
 [[package]]
 name = "guest-reth"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "alloy-consensus",
  "alloy-genesis",
@@ -4893,7 +4893,7 @@ dependencies = [
 
 [[package]]
 name = "input"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "alloy-genesis",
  "alloy-provider",
@@ -4913,7 +4913,7 @@ dependencies = [
 
 [[package]]
 name = "input-gen"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "alloy-eips",
  "alloy-genesis",
@@ -4943,7 +4943,7 @@ dependencies = [
 
 [[package]]
 name = "input-gen-ethrex"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "clap",
