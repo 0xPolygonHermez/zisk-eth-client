@@ -1,0 +1,16 @@
+[package]
+name = "secp256k1"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+hex.workspace = true
+
+ziskos.workspace = true
+guest-reth.workspace = true
+common.workspace = true
+
+revm.workspace = true
+
+alloy-primitives = { workspace = true, features = ["native-keccak"] }
+alloy-consensus = { workspace = true, features = ["crypto-backend"] }

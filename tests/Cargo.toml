@@ -1,0 +1,12 @@
+[package]
+name = "tests"
+description = "Tests for the ZisK Ethereum client."
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+zisk-sdk.workspace = true
+
+[build-dependencies]
+zisk-sdk.workspace = true
