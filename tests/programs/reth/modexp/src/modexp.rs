@@ -19,18 +19,26 @@ fn be_bytes_to_usize(bytes: &[u8]) -> usize {
     val
 }
 
-fn parse_modexp_test(test: &PrecompileTestCase) -> Option<ModexpTestCase> {
+fn parse_modexp_test(test: &PrecompileTestCase) -> Result<ModexpTestCase, String> {
     if test.input.len() < 96 {
-        return None;
+        return Err(format!(
+            "input shorter than 96-byte header: got {} bytes",
+            test.input.len()
+        ));
     }
     let base_len = be_bytes_to_usize(&test.input[0..32]);
     let exp_len = be_bytes_to_usize(&test.input[32..64]);
     let mod_len = be_bytes_to_usize(&test.input[64..96]);
     let data = &test.input[96..];
-    if data.len() < base_len + exp_len + mod_len {
-        return None;
+    let need = base_len + exp_len + mod_len;
+    if data.len() < need {
+        return Err(format!(
+            "payload too short: have {} bytes, need {} (base={base_len}, exp={exp_len}, mod={mod_len})",
+            data.len(),
+            need
+        ));
     }
-    Some(ModexpTestCase {
+    Ok(ModexpTestCase {
         name: test.name.clone(),
         base: data[..base_len].to_vec(),
         exp: data[base_len..base_len + exp_len].to_vec(),
@@ -58,7 +66,9 @@ fn modexp_json_tests(crypto: &CustomEvmCrypto) {
     for (file_name, json_content) in json_files {
         let tests = parse_precompile_json(json_content);
         for test in &tests {
-            let Some(parsed) = parse_modexp_test(test) else { continue };
+            let parsed = parse_modexp_test(test).unwrap_or_else(|err| {
+                panic!("failed to parse modexp test {} ({}): {}", test.name, file_name, err)
+            });
             let result = crypto.modexp(&parsed.base, &parsed.exp, &parsed.modulus);
             assert!(result.is_ok(), "Modexp {} ({}) should succeed", parsed.name, file_name);
             let result = result.unwrap();

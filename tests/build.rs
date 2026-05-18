@@ -11,8 +11,6 @@ fn main() -> Result<()> {
         .collect::<PathBuf>()
         .canonicalize()?;
 
-    println!("programs path: {programs_path:?}");
-
     build_program(
         programs_path
             .to_str()
