@@ -35,12 +35,12 @@ pub fn validate_block_stateless(
     let evm_config = EthEvmConfig::new(chain_spec.clone());
 
     // Perform stateless validation
-    let (hash, _) = stateless_validation_recovered_with_trie::<SparseState, _, _>(
+    let out = stateless_validation_recovered_with_trie::<SparseState, _, _>(
         recovered_block,
         witness,
         chain_spec,
         evm_config,
     )?;
 
-    Ok(hash)
+    Ok(out.block_hash)
 }

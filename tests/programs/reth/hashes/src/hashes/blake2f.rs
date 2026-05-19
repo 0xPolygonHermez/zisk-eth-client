@@ -73,7 +73,7 @@ pub fn blake2f_tests(crypto: &CustomEvmCrypto) {
         match parse_blake2f_test(test) {
             Ok(parsed) => {
                 let mut h = parsed.h;
-                crypto.blake2_compress(parsed.rounds, &mut h, parsed.m, parsed.t, parsed.f);
+                crypto.blake2_compress(parsed.rounds, &mut h, &parsed.m, &parsed.t, parsed.f);
                 match parsed.expected {
                     Some(expected_h) => {
                         assert_eq!(

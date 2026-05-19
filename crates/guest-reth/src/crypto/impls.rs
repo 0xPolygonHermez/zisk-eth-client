@@ -5,7 +5,7 @@ use alloy_primitives::Address;
 
 use revm::precompile::{
     bls12_381::{G1Point, G1PointScalar, G2Point, G2PointScalar},
-    Crypto, PrecompileError,
+    Crypto, PrecompileHalt,
 };
 
 use guest_common::ffi::*;
@@ -23,7 +23,7 @@ impl Crypto for CustomEvmCrypto {
     }
 
     #[inline]
-    fn blake2_compress(&self, rounds: u32, h: &mut [u64; 8], m: [u64; 16], t: [u64; 2], f: bool) {
+    fn blake2_compress(&self, rounds: u32, h: &mut [u64; 8], m: &[u64; 16], t: &[u64; 2], f: bool) {
         unsafe {
             zkvm_blake2f(
                 rounds,
@@ -45,7 +45,7 @@ impl Crypto for CustomEvmCrypto {
     }
 
     #[inline]
-    fn modexp(&self, base: &[u8], exp: &[u8], modulus: &[u8]) -> Result<Vec<u8>, PrecompileError> {
+    fn modexp(&self, base: &[u8], exp: &[u8], modulus: &[u8]) -> Result<Vec<u8>, PrecompileHalt> {
         let mut result = vec![0u8; modulus.len()];
         unsafe {
             zkvm_modexp(
@@ -67,7 +67,7 @@ impl Crypto for CustomEvmCrypto {
         sig: &[u8; 64],
         recid: u8,
         msg: &[u8; 32],
-    ) -> Result<[u8; 32], PrecompileError> {
+    ) -> Result<[u8; 32], PrecompileHalt> {
         let mut pubkey_out = zkvm_secp256k1_pubkey { data: [0u8; 64] };
         let ret = unsafe {
             zkvm_secp256k1_ecrecover(
@@ -88,7 +88,7 @@ impl Crypto for CustomEvmCrypto {
                 hash[..12].fill(0);
                 Ok(hash)
             }
-            _ => Err(PrecompileError::Secp256k1RecoverFailed),
+            _ => Err(PrecompileHalt::Secp256k1RecoverFailed),
         }
     }
 
@@ -108,7 +108,7 @@ impl Crypto for CustomEvmCrypto {
     }
 
     #[inline]
-    fn bn254_g1_add(&self, p1: &[u8], p2: &[u8]) -> Result<[u8; 64], PrecompileError> {
+    fn bn254_g1_add(&self, p1: &[u8], p2: &[u8]) -> Result<[u8; 64], PrecompileHalt> {
         let mut result = zkvm_bn254_g1_point { data: [0u8; 64] };
         let ret = unsafe {
             zkvm_bn254_g1_add(
@@ -119,12 +119,12 @@ impl Crypto for CustomEvmCrypto {
         };
         match ret {
             0 => Ok(result.data),
-            _ => Err(PrecompileError::other("bn254_g1_add failed")),
+            _ => Err(PrecompileHalt::other("bn254_g1_add failed")),
         }
     }
 
     #[inline]
-    fn bn254_g1_mul(&self, point: &[u8], scalar: &[u8]) -> Result<[u8; 64], PrecompileError> {
+    fn bn254_g1_mul(&self, point: &[u8], scalar: &[u8]) -> Result<[u8; 64], PrecompileHalt> {
         let mut result = zkvm_bn254_g1_point { data: [0u8; 64] };
         let ret = unsafe {
             zkvm_bn254_g1_mul(
@@ -135,12 +135,12 @@ impl Crypto for CustomEvmCrypto {
         };
         match ret {
             0 => Ok(result.data),
-            _ => Err(PrecompileError::other("bn254_g1_mul failed")),
+            _ => Err(PrecompileHalt::other("bn254_g1_mul failed")),
         }
     }
 
     #[inline]
-    fn bn254_pairing_check(&self, pairs: &[(&[u8], &[u8])]) -> Result<bool, PrecompileError> {
+    fn bn254_pairing_check(&self, pairs: &[(&[u8], &[u8])]) -> Result<bool, PrecompileHalt> {
         // Each pair is G1 (64 bytes) + G2 (128 bytes) = 192 bytes laid out contiguously.
         let mut pairs_bytes: Vec<u8> = Vec::with_capacity(pairs.len() * 192);
         for (g1, g2) in pairs {
@@ -157,12 +157,12 @@ impl Crypto for CustomEvmCrypto {
         };
         match ret {
             0 => Ok(verified),
-            _ => Err(PrecompileError::other("bn254_pairing_check failed")),
+            _ => Err(PrecompileHalt::other("bn254_pairing_check failed")),
         }
     }
 
     /// BLS12-381 G1 addition (returns 96-byte unpadded G1 point)
-    fn bls12_381_g1_add(&self, a: G1Point, b: G1Point) -> Result<[u8; 96], PrecompileError> {
+    fn bls12_381_g1_add(&self, a: G1Point, b: G1Point) -> Result<[u8; 96], PrecompileHalt> {
         // G1Point is ([u8; 48], [u8; 48])
         let mut a_bytes = [0u8; 96];
         a_bytes[..48].copy_from_slice(&a.0);
@@ -180,15 +180,15 @@ impl Crypto for CustomEvmCrypto {
         };
         match ret {
             0 => Ok(result.data),
-            _ => Err(PrecompileError::Bls12381G1NotOnCurve),
+            _ => Err(PrecompileHalt::Bls12381G1NotOnCurve),
         }
     }
 
     /// BLS12-381 G1 multi-scalar multiplication (returns 96-byte unpadded G1 point)
     fn bls12_381_g1_msm(
         &self,
-        pairs: &mut dyn Iterator<Item = Result<G1PointScalar, PrecompileError>>,
-    ) -> Result<[u8; 96], PrecompileError> {
+        pairs: &mut dyn Iterator<Item = Result<G1PointScalar, PrecompileHalt>>,
+    ) -> Result<[u8; 96], PrecompileHalt> {
         // G1PointScalar is (G1Point, [u8; 32]) = (([u8; 48], [u8; 48]), [u8; 32])
         // Each pair is laid out as: point (96 bytes) || scalar (32 bytes) = 128 bytes.
         let mut pairs_bytes: Vec<u8> = Vec::new();
@@ -210,12 +210,12 @@ impl Crypto for CustomEvmCrypto {
         };
         match ret {
             0 => Ok(result.data),
-            _ => Err(PrecompileError::Bls12381G1NotOnCurve),
+            _ => Err(PrecompileHalt::Bls12381G1NotOnCurve),
         }
     }
 
     /// BLS12-381 G2 addition (returns 192-byte unpadded G2 point)
-    fn bls12_381_g2_add(&self, a: G2Point, b: G2Point) -> Result<[u8; 192], PrecompileError> {
+    fn bls12_381_g2_add(&self, a: G2Point, b: G2Point) -> Result<[u8; 192], PrecompileHalt> {
         // G2Point is ([u8; 48], [u8; 48], [u8; 48], [u8; 48])
         let mut a_bytes = [0u8; 192];
         a_bytes[..48].copy_from_slice(&a.0);
@@ -237,15 +237,15 @@ impl Crypto for CustomEvmCrypto {
         };
         match ret {
             0 => Ok(result.data),
-            _ => Err(PrecompileError::Bls12381G2NotOnCurve),
+            _ => Err(PrecompileHalt::Bls12381G2NotOnCurve),
         }
     }
 
     /// BLS12-381 G2 multi-scalar multiplication (returns 192-byte unpadded G2 point)
     fn bls12_381_g2_msm(
         &self,
-        pairs: &mut dyn Iterator<Item = Result<G2PointScalar, PrecompileError>>,
-    ) -> Result<[u8; 192], PrecompileError> {
+        pairs: &mut dyn Iterator<Item = Result<G2PointScalar, PrecompileHalt>>,
+    ) -> Result<[u8; 192], PrecompileHalt> {
         // G2PointScalar is (G2Point, [u8; 32]) = (([u8; 48]*4), [u8; 32])
         // Each pair is laid out as: point (192 bytes) || scalar (32 bytes) = 224 bytes.
         let mut pairs_bytes: Vec<u8> = Vec::new();
@@ -269,7 +269,7 @@ impl Crypto for CustomEvmCrypto {
         };
         match ret {
             0 => Ok(result.data),
-            _ => Err(PrecompileError::Bls12381G2NotOnCurve),
+            _ => Err(PrecompileHalt::Bls12381G2NotOnCurve),
         }
     }
 
@@ -277,7 +277,7 @@ impl Crypto for CustomEvmCrypto {
     fn bls12_381_pairing_check(
         &self,
         pairs: &[(G1Point, G2Point)],
-    ) -> Result<bool, PrecompileError> {
+    ) -> Result<bool, PrecompileHalt> {
         // Each pair is G1 (96 bytes) || G2 (192 bytes) = 288 bytes laid out contiguously.
         let mut pairs_bytes: Vec<u8> = Vec::with_capacity(pairs.len() * 288);
         for (g1, g2) in pairs {
@@ -298,24 +298,24 @@ impl Crypto for CustomEvmCrypto {
         };
         match ret {
             0 => Ok(verified),
-            _ => Err(PrecompileError::Bls12381G1NotOnCurve),
+            _ => Err(PrecompileHalt::Bls12381G1NotOnCurve),
         }
     }
 
     /// BLS12-381 map field element to G1.
-    fn bls12_381_fp_to_g1(&self, fp: &[u8; 48]) -> Result<[u8; 96], PrecompileError> {
+    fn bls12_381_fp_to_g1(&self, fp: &[u8; 48]) -> Result<[u8; 96], PrecompileHalt> {
         let mut result = zkvm_bls12_381_g1_point { data: [0u8; 96] };
         let ret = unsafe {
             zkvm_bls12_map_fp_to_g1(fp.as_ptr() as *const zkvm_bls12_381_fp, &mut result)
         };
         match ret {
             0 => Ok(result.data),
-            _ => Err(PrecompileError::other("bls12_381_fp_to_g1 failed")),
+            _ => Err(PrecompileHalt::other("bls12_381_fp_to_g1 failed")),
         }
     }
 
     /// BLS12-381 map field element to G2.
-    fn bls12_381_fp2_to_g2(&self, fp2: ([u8; 48], [u8; 48])) -> Result<[u8; 192], PrecompileError> {
+    fn bls12_381_fp2_to_g2(&self, fp2: ([u8; 48], [u8; 48])) -> Result<[u8; 192], PrecompileHalt> {
         let mut fp2_bytes = [0u8; 96];
         fp2_bytes[..48].copy_from_slice(&fp2.0);
         fp2_bytes[48..].copy_from_slice(&fp2.1);
@@ -324,7 +324,7 @@ impl Crypto for CustomEvmCrypto {
         let ret = unsafe { zkvm_bls12_map_fp2_to_g2(&fp2_struct, &mut result) };
         match ret {
             0 => Ok(result.data),
-            _ => Err(PrecompileError::other("bls12_381_fp2_to_g2 failed")),
+            _ => Err(PrecompileHalt::other("bls12_381_fp2_to_g2 failed")),
         }
     }
 
@@ -336,7 +336,7 @@ impl Crypto for CustomEvmCrypto {
         y: &[u8; 32],
         commitment: &[u8; 48],
         proof: &[u8; 48],
-    ) -> Result<(), PrecompileError> {
+    ) -> Result<(), PrecompileHalt> {
         let mut verified = false;
         unsafe {
             zkvm_kzg_point_eval(
@@ -350,7 +350,7 @@ impl Crypto for CustomEvmCrypto {
         if verified {
             Ok(())
         } else {
-            Err(PrecompileError::BlobVerifyKzgProofFailed)
+            Err(PrecompileHalt::BlobVerifyKzgProofFailed)
         }
     }
 }
