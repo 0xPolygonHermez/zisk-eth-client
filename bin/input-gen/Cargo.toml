@@ -15,7 +15,7 @@ alloy-rpc-types-eth.workspace = true
 
 reth-chainspec.workspace = true
 reth-ethereum-primitives.workspace = true
-reth-rpc-api = { workspace = true, features = ["client"]}
+reth-rpc-api = { workspace = true, features = ["client"] }
 
 stateless-reth.workspace = true
 

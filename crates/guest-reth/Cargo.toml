@@ -15,7 +15,10 @@ rayon.workspace = true
 k256.workspace = true
 tiny-keccak.workspace = true
 
-alloy-consensus = { workspace = true, default-features = false, features = ["crypto-backend", "k256"] }
+alloy-consensus = { workspace = true, default-features = false, features = [
+  "crypto-backend",
+  "k256",
+] }
 alloy-genesis.workspace = true
 alloy-primitives.workspace = true
 alloy-rlp.workspace = true
@@ -33,4 +36,8 @@ stateless-reth-tries.workspace = true
 stateless-reth.workspace = true
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_vendor, values("zisk"))', 'cfg(zisk_hints)', 'cfg(zisk_hints_debug)'] }
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(target_vendor, values("zisk"))',
+  'cfg(zisk_hints)',
+  'cfg(zisk_hints_debug)',
+] }
