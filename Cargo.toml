@@ -6,6 +6,7 @@ members = [
   "crates/*",
   "tests",
 ]
+exclude = ["tools/migrate-inputs"]
 resolver = "2"
 
 [workspace.package]
