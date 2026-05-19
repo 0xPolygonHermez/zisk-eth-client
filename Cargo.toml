@@ -1,5 +1,5 @@
 [workspace]
-members = ["bin/host", "bin/input-gen", "bin/input-gen-ethrex", "crates/*"]
+members = ["bin/host", "bin/input-gen", "bin/input-gen-ethrex", "crates/*", "tests"]
 exclude = []
 resolver = "2"
 
