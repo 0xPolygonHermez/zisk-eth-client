@@ -93,4 +93,3 @@ jsonrpsee = { version = "0.26", features = ["http-client"] }
 http = "1.4.0"
 tempfile = "3"
 rkyv = { version = "0.8.10", features = ["std", "unaligned"] }
-hex-literal = "0.4.1"
