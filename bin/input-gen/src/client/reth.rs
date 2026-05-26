@@ -3,10 +3,10 @@ use std::path::Path;
 use anyhow::Result;
 use witness_generator::StatelessValidationFixture;
 
-use super::{sanitize_filename, ExecutionClient};
+use super::{sanitize_filename, InputGenClient};
 use crate::provider::ProviderKind;
 
-impl ExecutionClient for input::RethClient {
+impl InputGenClient for input::RethClient {
     fn supported_providers(&self) -> &'static [ProviderKind] {
         &[ProviderKind::Eest, ProviderKind::Rpc]
     }

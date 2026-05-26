@@ -7,7 +7,7 @@ use tracing::info;
 use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
 
 use super::{InputProvider, ProviderKind};
-use crate::{client::ExecutionClient, common::fixtures_from_path, processor::ProcessingTracker};
+use crate::{client::InputGenClient, common::fixtures_from_path, processor::ProcessingTracker};
 
 #[derive(Debug, Clone, Args)]
 pub struct EestProvider {
@@ -40,7 +40,7 @@ impl InputProvider for EestProvider {
 
     async fn generate_inputs(
         &self,
-        client: &dyn ExecutionClient,
+        client: &dyn InputGenClient,
         output: &Path,
     ) -> anyhow::Result<()> {
         if !client.supports_provider(self.kind()) {

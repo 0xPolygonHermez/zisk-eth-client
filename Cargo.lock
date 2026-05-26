@@ -4663,6 +4663,7 @@ dependencies = [
  "ethrex-common",
  "ethrex-config",
  "ethrex-rpc",
+ "guest-common",
  "guest-ethrex",
  "guest-reth",
  "reth-chainspec",

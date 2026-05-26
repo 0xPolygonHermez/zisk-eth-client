@@ -13,9 +13,10 @@ use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SE
 use stateless_reth::StatelessInput;
 use zisk_sdk::ZiskStdin;
 
+use guest_common::chain::chain_name;
 use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
 
-use super::client::{chain_name, BlockStats, ExecutionClient};
+use super::client::{BlockStats, ExecutionClient};
 
 #[derive(Default)]
 pub struct RethClient;

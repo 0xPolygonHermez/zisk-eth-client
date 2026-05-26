@@ -22,14 +22,17 @@ pub struct BlockStats {
     pub gas_used: u64,
 }
 
-/// Map a chain ID to a display name. Returns `"Unknown"` for unsupported chains.
-pub fn chain_name(chain_id: u64) -> &'static str {
-    match chain_id {
-        1 => "Mainnet",
-        11155111 => "Sepolia",
-        17000 => "Holesky",
-        560048 => "Hoodi",
-        _ => "Unknown",
+impl BlockStats {
+    /// Canonical output filename: `<chain>_<block>_<txs>_<mgas>_zec_<client>.bin`.
+    pub fn output_filename(&self, client_name: &str) -> String {
+        format!(
+            "{}_{}_{}_{}_zec_{}.bin",
+            self.chain_name.to_lowercase(),
+            self.block_number,
+            self.tx_count,
+            self.gas_used / 1_000_000,
+            client_name,
+        )
     }
 }
 
@@ -42,11 +45,11 @@ pub fn create_client(client: Client) -> Box<dyn ExecutionClient> {
 
 #[async_trait]
 pub trait ExecutionClient: Send + Sync {
+    /// Short identifier used for filenames and CLI flags (e.g. `"reth"`).
     fn name(&self) -> &'static str;
 
-    fn display_name(&self) -> &'static str {
-        self.name()
-    }
+    /// Human-readable name used in logs (e.g. `"Reth"`).
+    fn display_name(&self) -> &'static str;
 
     /// Generate `ZiskStdin` from a live RPC endpoint, alongside block metadata.
     async fn from_rpc(&self, rpc_url: &str, block_number: u64) -> Result<(ZiskStdin, BlockStats)>;

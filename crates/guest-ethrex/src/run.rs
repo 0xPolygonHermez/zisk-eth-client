@@ -1,6 +1,9 @@
-use super::{extract_block_info, get_chain_name, validate_block, EthrexInput, ZiskCrypto};
 use std::sync::Arc;
+
+use guest_common::chain::chain_name;
 use ziskos::io::read_input_slice;
+
+use super::{extract_block_info, validate_block, EthrexInput, ZiskCrypto};
 
 pub fn run() {
     // Read the input
@@ -14,7 +17,7 @@ pub fn run() {
     let block = input.block();
     let (block_number, gas_used, tx_count) = extract_block_info(block);
     let chain_id = chain_config.chain_id;
-    let chain = get_chain_name(chain_id);
+    let chain = chain_name(chain_id);
     println!(
         "Executing block validation for {} Block #{} ({} txs)",
         chain, block_number, tx_count

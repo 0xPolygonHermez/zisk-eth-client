@@ -16,7 +16,7 @@ pub use input::Client;
 /// Clients that don't support fixture-based providers (e.g. EEST) get the
 /// default-bail `process_fixture` impl. The `supports_provider` check is the
 /// real guard — callers should consult it before invoking `process_fixture`.
-pub trait ExecutionClient: input::ExecutionClient {
+pub trait InputGenClient: input::ExecutionClient {
     /// Which provider types this client supports.
     fn supported_providers(&self) -> &'static [ProviderKind];
 
@@ -42,10 +42,10 @@ pub trait ExecutionClient: input::ExecutionClient {
     }
 }
 
-pub fn create_client(client: Client) -> Box<dyn ExecutionClient> {
+pub fn create_client(client: Client) -> Box<dyn InputGenClient> {
     match client {
-        Client::Reth => Box::<input::RethClient>::default(),
-        Client::Ethrex => Box::<input::EthrexClient>::default(),
+        Client::Reth => Box::new(input::RethClient),
+        Client::Ethrex => Box::new(input::EthrexClient),
     }
 }
 

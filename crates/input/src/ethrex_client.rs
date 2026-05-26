@@ -9,9 +9,10 @@ use ethrex_config::networks::Network;
 use ethrex_rpc::types::{block::RpcBlock, block_identifier::BlockIdentifier};
 use ethrex_rpc::EthClient;
 
+use guest_common::chain::chain_name;
 use guest_ethrex::EthrexInput;
 
-use super::client::{chain_name, BlockStats, ExecutionClient};
+use super::client::{BlockStats, ExecutionClient};
 
 #[derive(Default)]
 pub struct EthrexClient;

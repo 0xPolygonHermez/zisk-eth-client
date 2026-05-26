@@ -1,4 +1,4 @@
-[workspace.package]
+[workspace]
 
 [package]
 name = "zec-reth"

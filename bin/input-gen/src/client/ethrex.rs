@@ -1,7 +1,7 @@
-use super::ExecutionClient;
+use super::InputGenClient;
 use crate::provider::ProviderKind;
 
-impl ExecutionClient for input::EthrexClient {
+impl InputGenClient for input::EthrexClient {
     fn supported_providers(&self) -> &'static [ProviderKind] {
         &[ProviderKind::Rpc]
     }

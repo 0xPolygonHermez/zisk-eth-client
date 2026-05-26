@@ -3,9 +3,11 @@ use std::sync::Arc;
 use alloy_consensus::crypto::install_default_provider;
 use revm::install_crypto;
 
+use guest_common::chain::chain_name;
+
 use super::{
-    extract_block_info, get_chain_name, get_chain_spec, validate_block_stateless,
-    verify_signatures, CustomEvmCrypto, RethInputPublic, RethInputWitness,
+    extract_block_info, get_chain_spec, validate_block_stateless, verify_signatures,
+    CustomEvmCrypto, RethInputPublic, RethInputWitness,
 };
 
 /// Run the full block validation: read inputs, validate, commit output.
@@ -24,7 +26,7 @@ pub fn run() {
     let block = public.block().clone();
     let (block_number, gas_used, tx_count) = extract_block_info(&block);
     let chain_id = chain_config.chain_id;
-    let chain = get_chain_name(chain_id);
+    let chain = chain_name(chain_id);
     println!(
         "Executing block validation for {} Block #{} ({} txs)",
         chain, block_number, tx_count

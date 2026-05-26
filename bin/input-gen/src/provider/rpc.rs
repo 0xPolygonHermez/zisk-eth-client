@@ -8,7 +8,7 @@ use tracing::info;
 use alloy_provider::{Provider, ProviderBuilder};
 
 use super::{InputProvider, ProviderKind};
-use crate::{client::ExecutionClient, processor::ProcessingTracker};
+use crate::{client::InputGenClient, processor::ProcessingTracker};
 
 #[derive(Debug, Clone, Args)]
 pub struct RpcProvider {
@@ -39,7 +39,7 @@ impl InputProvider for RpcProvider {
         ProviderKind::Rpc
     }
 
-    async fn generate_inputs(&self, client: &dyn ExecutionClient, output: &Path) -> Result<()> {
+    async fn generate_inputs(&self, client: &dyn InputGenClient, output: &Path) -> Result<()> {
         if !client.supports_provider(self.kind()) {
             anyhow::bail!("{} doesn't support RPC provider", client.display_name());
         }
@@ -58,7 +58,7 @@ impl InputProvider for RpcProvider {
 }
 
 impl RpcProvider {
-    async fn process_batch(&self, output: &Path, client: &dyn ExecutionClient) -> Result<()> {
+    async fn process_batch(&self, output: &Path, client: &dyn InputGenClient) -> Result<()> {
         let block_numbers: Vec<u64> = if let Some(block_num) = self.block {
             vec![block_num]
         } else if let Some(range) = &self.range_of_blocks {
@@ -102,7 +102,7 @@ impl RpcProvider {
         Ok(())
     }
 
-    async fn follow_new_blocks(&self, output: &Path, client: &dyn ExecutionClient) -> Result<()> {
+    async fn follow_new_blocks(&self, output: &Path, client: &dyn InputGenClient) -> Result<()> {
         info!("Following new blocks (press Ctrl+C to stop)...");
 
         let stop = CancellationToken::new();
@@ -153,18 +153,10 @@ impl RpcProvider {
         &self,
         block_num: u64,
         output: &Path,
-        client: &dyn ExecutionClient,
+        client: &dyn InputGenClient,
     ) -> Result<()> {
         let (stdin, stats) = client.from_rpc(&self.rpc_url, block_num).await?;
-        let filename = format!(
-            "{}_{}_{}_{}_zec_{}.bin",
-            stats.chain_name.to_lowercase(),
-            stats.block_number,
-            stats.tx_count,
-            stats.gas_used / 1_000_000,
-            client.name(),
-        );
-        stdin.save(&output.join(filename))?;
+        stdin.save(&output.join(stats.output_filename(client.name())))?;
         Ok(())
     }
 

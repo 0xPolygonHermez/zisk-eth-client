@@ -1,7 +1,7 @@
 pub mod eest;
 pub mod rpc;
 
-use crate::client::ExecutionClient;
+use crate::client::InputGenClient;
 use std::path::Path;
 
 /// Provider type identifier
@@ -20,7 +20,7 @@ pub trait InputProvider: Send + Sync {
     /// Generate ZisK inputs for the given client
     async fn generate_inputs(
         &self,
-        client: &dyn ExecutionClient,
+        client: &dyn InputGenClient,
         output: &Path,
     ) -> anyhow::Result<()>;
 }
