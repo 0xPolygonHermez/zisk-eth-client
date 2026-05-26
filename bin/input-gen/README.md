@@ -18,7 +18,7 @@ input-gen [OPTIONS] <COMMAND>
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-c, --client <CLIENT>` | Execution client: `reth` | `reth` |
+| `-c, --client <CLIENT>` | Execution client: `reth`, `ethrex` | `reth` |
 | `-o, --output <PATH>` | Output folder | `<client>-inputs` |
 
 ### Commands
@@ -33,8 +33,7 @@ input-gen rpc -u <RPC_URL> [OPTIONS]
 
 | Option | Description |
 |--------|-------------|
-| `-u, --rpc-url <URL>` | RPC endpoint URL (required) |
-| `-H, --rpc-headers <K:V>` | Custom headers (repeatable) |
+| `-u, --rpc-url <URL>` | RPC endpoint URL (required; auth credentials must be embedded in the URL) |
 | `-l, --last-n-blocks <N>` | Last N blocks |
 | `-b, --block <N>` | Specific block number |
 | `-r, --range-of-blocks <START> <END>` | Block range (inclusive) |
@@ -55,9 +54,16 @@ input-gen rpc -u <RPC_URL> -l 5
 # Follow new blocks (Ctrl+C to stop)
 input-gen rpc -u <RPC_URL> -f
 
-# With custom headers
-input-gen rpc -u <RPC_URL> -H "Authorization:Bearer TOKEN" -b 22767493
+# Ethrex client
+input-gen -c ethrex rpc -u <RPC_URL> -b 22767493
 ```
+
+#### Client support matrix
+
+| Client | `rpc` | `eest` |
+|---|---|---|
+| `reth` | ✅ | ✅ |
+| `ethrex` | ✅ | ❌ |
 
 #### `eest` — Generate from EEST fixtures
 

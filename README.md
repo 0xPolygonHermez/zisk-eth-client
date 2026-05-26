@@ -9,13 +9,16 @@ This project enables **stateless block validation** to run, verifying Ethereum b
 ```
 zisk-eth-client/
 ├── bin/
-│   ├── guests/                  # zkVM guest programs
-│   │   └── stateless-validator-reth/  # Reth-based stateless validator
-│   ├── host/                    # Benchmark runner for guest programs
-│   └── input-gen/               # Input file generator
+│   ├── guests/                          # zkVM guest programs
+│   │   ├── stateless-validator-reth/    # Reth-based stateless validator
+│   │   └── stateless-validator-ethrex/  # Ethrex-based stateless validator
+│   ├── host/                            # Benchmark runner for guest programs
+│   ├── input-gen/                       # Input file generator (reth + ethrex)
+│   └── hints-gen/                       # Native runner that captures prover hints
 └── crates/
-    ├── guest-reth/              # Core validation library for reth
-    └── input/                   # RPC data fetching utilities
+    ├── guest-reth/                      # Core validation library for reth
+    ├── guest-ethrex/                    # Core validation library for ethrex
+    └── input/                           # RPC fetching + `ExecutionClient` abstraction
 ```
 
 ## Quick Start
@@ -65,6 +68,17 @@ This command will fetch the latest block from the specified RPC endpoint and cre
 
 You can specify options to target specific blocks or ranges as needed. Refer to the [input-gen README](bin/input-gen/README.md) for detailed usage instructions.
 
+### Generate Prover Hints
+
+Run the guest natively against existing input files to capture hints for the ZisK prover:
+
+```bash
+RUSTFLAGS="--cfg zisk_hints" cargo build --release -p hints-gen
+./target/release/hints-gen -f reth-inputs/
+```
+
+For each `foo.bin` input, a sibling `foo.hints` file is written. See the [hints-gen README](bin/hints-gen/README.md) for full options.
+
 ## Using a Local ZisK Build
 
 The standard `cargo-zisk` installation fetches the latest published version. If you need to test unreleased features or patches, build ZisK locally from source:
@@ -89,11 +103,14 @@ Then use the local binaries instead of the installed ones:
 
 | Component | Description |
 |-----------|-------------|
-| [**stateless-validator-reth**](bin/guests/stateless-validator-reth/) | zkVM guest program that validates Ethereum blocks statelessly |
+| [**stateless-validator-reth**](bin/guests/stateless-validator-reth/) | zkVM guest program that validates Ethereum blocks statelessly via reth |
+| [**stateless-validator-ethrex**](bin/guests/stateless-validator-ethrex/) | zkVM guest program that validates Ethereum blocks statelessly via ethrex |
 | [**host**](bin/host/) | Benchmark runner for executing/proving guest programs |
-| [**input-gen**](bin/input-gen/) | Generate inputs from RPC endpoints or EEST test fixtures |
-| [**guest-reth**](crates/guest-reth/) | Core library: crypto, validation logic, input types |
-| [**input**](crates/input/) | RPC data fetching with `FromRpc` trait |
+| [**input-gen**](bin/input-gen/) | Generate inputs from RPC endpoints or EEST test fixtures (reth + ethrex) |
+| [**hints-gen**](bin/hints-gen/) | Run guests natively against `.bin` inputs to capture prover hints |
+| [**guest-reth**](crates/guest-reth/) | Core reth validation library: crypto, validation logic, input types |
+| [**guest-ethrex**](crates/guest-ethrex/) | Core ethrex validation library: crypto, validation logic, input types |
+| [**input**](crates/input/) | RPC data fetching and the shared `ExecutionClient` abstraction (reth, ethrex) |
 
 ## Supported Chains
 

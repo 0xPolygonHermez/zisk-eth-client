@@ -109,6 +109,9 @@ impl InputProvider for EestProvider {
 
         tracker.log_summary();
 
+        if tracker.error_count() > 0 {
+            anyhow::bail!("{} fixture(s) failed", tracker.error_count());
+        }
         Ok(())
     }
 }
