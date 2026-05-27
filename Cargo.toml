@@ -1,5 +1,5 @@
 [workspace]
-members = ["bin/host", "bin/input-gen", "bin/input-gen-ethrex", "crates/*", "tests"]
+members = ["bin/host", "bin/hints-gen", "bin/input-gen", "crates/*", "tests"]
 exclude = []
 resolver = "2"
 
@@ -15,9 +15,11 @@ input = { path = "crates/input" }
 
 zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
 zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
-# local dev
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
+# Local dev:
 # zisk-sdk = { path = "../zisk/sdk" }
 # zkvm-interface = { path = "../zisk/zkvm-interface" }
+# ziskos = { path = "../zisk/ziskos/entrypoint" }
 
 revm = { version = "34.0.0", default-features = false }
 
@@ -29,6 +31,7 @@ alloy-json-rpc = "1.7.3"
 alloy-provider = "1.7.3"
 alloy-rpc-client = "1.7.3"
 alloy-transport = "1.7.3"
+alloy-transport-http = { version = "1.7.3", features = ["reqwest"] }
 alloy-genesis = "1.7.3"
 alloy-eips = "1.7.3"
 alloy-rpc-types-eth = "1.7.3"

@@ -78,7 +78,7 @@ impl Crypto for ZiskCrypto {
     }
 
     fn recover_signer(&self, sig: &[u8; 65], msg: &[u8; 32]) -> Result<Address, CryptoError> {
-       // EIP-2: reject high-s signatures (s > secp256k1n/2)
+        // EIP-2: reject high-s signatures (s > secp256k1n/2)
         const SECP256K1_N_HALF: [u8; 32] =
             hex_literal::hex!("7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0");
         if sig[32..64] > SECP256K1_N_HALF[..] {

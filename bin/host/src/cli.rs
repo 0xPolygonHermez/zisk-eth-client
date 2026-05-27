@@ -37,6 +37,10 @@ pub struct Cli {
     /// Use GPU acceleration (verify-constraints / prove only)
     #[arg(long, default_value_t = false)]
     pub gpu: bool,
+
+    /// Increase log verbosity (`-v` = debug, `-vv` = trace)
+    #[arg(short, long, action = clap::ArgAction::Count)]
+    pub verbose: u8,
 }
 
 /// Actions to perform
