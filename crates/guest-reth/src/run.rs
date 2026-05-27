@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, Once};
 
 use alloy_consensus::crypto::install_default_provider;
 use revm::install_crypto;
@@ -12,10 +12,12 @@ use super::{
 
 /// Run the full block validation: read inputs, validate, commit output.
 pub fn run() {
-    // Install custom EVM crypto
-    install_crypto(CustomEvmCrypto::default());
-    install_default_provider(Arc::new(CustomEvmCrypto::default()))
-        .expect("Failed to install default crypto provider");
+    static INSTALL_CRYPTO: Once = Once::new();
+    INSTALL_CRYPTO.call_once(|| {
+        install_crypto(CustomEvmCrypto::default());
+        install_default_provider(Arc::new(CustomEvmCrypto::default()))
+            .expect("Failed to install default crypto provider");
+    });
 
     // Read the public input
     let public: RethInputPublic = ziskos::io::read();

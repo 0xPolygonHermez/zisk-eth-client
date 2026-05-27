@@ -112,6 +112,9 @@ fn generate_hints_inner(
 ) -> Result<(Duration, Duration)> {
     use ziskos::hints::{close_hints, init_hints_file};
 
+    ziskos::read_input_reset();
+    ziskos::io::write_output_reset();
+
     ziskos::set_native_input(stdin.read_data());
     init_hints_file(output_path.clone(), None).context("Failed to init hints")?;
 
