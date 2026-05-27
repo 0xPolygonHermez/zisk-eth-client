@@ -4,10 +4,12 @@ use rayon::ThreadPoolBuilder;
 use std::path::{Path, PathBuf};
 use tracing::info;
 
-use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
+use witness_generator::{FixtureGenerator, eest_generator::EESTFixtureGeneratorBuilder};
 
 use super::{InputProvider, ProviderKind};
-use crate::{client::InputGenClient, common::fixtures_from_path, processor::ProcessingTracker};
+use crate::input_gen::{
+    client::InputGenClient, common::fixtures_from_path, processor::ProcessingTracker,
+};
 
 #[derive(Debug, Clone, Args)]
 pub struct EestProvider {

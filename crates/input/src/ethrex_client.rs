@@ -1,3 +1,5 @@
+use std::sync::atomic::{AtomicBool, Ordering};
+
 use anyhow::{Context, Result};
 use async_trait::async_trait;
 use url::Url;
@@ -12,7 +14,7 @@ use ethrex_rpc::EthClient;
 use guest_common::chain::chain_name;
 use guest_ethrex::EthrexInput;
 
-use super::client::{BlockStats, ExecutionClient};
+use super::client::{BlockStats, ExecutionClient, RpcConfig};
 
 #[derive(Default)]
 pub struct EthrexClient;
@@ -38,8 +40,22 @@ impl ExecutionClient for EthrexClient {
         "Ethrex"
     }
 
-    async fn from_rpc(&self, rpc_url: &str, block_number: u64) -> Result<(ZiskStdin, BlockStats)> {
-        let url = Url::parse(rpc_url).context("Invalid RPC URL")?;
+    async fn from_rpc(
+        &self,
+        config: &RpcConfig,
+        block_number: u64,
+    ) -> Result<(ZiskStdin, BlockStats)> {
+        if !config.headers.is_empty() {
+            static WARNED: AtomicBool = AtomicBool::new(false);
+            if !WARNED.swap(true, Ordering::Relaxed) {
+                tracing::warn!(
+                    "--rpc-headers is not honored by the ethrex client (EthClient has no header support); ignoring {} header(s)",
+                    config.headers.len()
+                );
+            }
+        }
+
+        let url = Url::parse(&config.url).context("Invalid RPC URL")?;
         let rpc_client = EthClient::new(url).context("Failed to create EthClient")?;
 
         let chain_id = rpc_client.get_chain_id().await?.as_u64();

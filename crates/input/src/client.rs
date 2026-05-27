@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use zisk_sdk::ZiskStdin;
 
@@ -11,9 +11,36 @@ pub enum Client {
     Ethrex,
 }
 
-/// Per-block metadata returned alongside the generated [`ZiskStdin`] by
-/// [`ExecutionClient::from_rpc`]. Callers use it to derive output filenames
-/// and log lines.
+/// Headers are honored only by clients that support custom HTTP headers
+/// (currently `reth`). Others warn once and ignore them.
+#[derive(Debug, Clone, Default)]
+pub struct RpcConfig {
+    pub url: String,
+    pub headers: Vec<(String, String)>,
+}
+
+impl RpcConfig {
+    pub fn new(url: impl Into<String>) -> Self {
+        Self {
+            url: url.into(),
+            headers: Vec::new(),
+        }
+    }
+
+    pub fn with_headers(mut self, headers: Vec<(String, String)>) -> Self {
+        self.headers = headers;
+        self
+    }
+}
+
+/// Parse a `Key:Value` header pair (used by clap as a `value_parser`).
+pub fn parse_header(s: &str) -> Result<(String, String)> {
+    let (k, v) = s
+        .split_once(':')
+        .with_context(|| format!("Invalid header (expected `Key:Value`): {s}"))?;
+    Ok((k.trim().to_string(), v.trim().to_string()))
+}
+
 #[derive(Debug, Clone)]
 pub struct BlockStats {
     pub chain_name: &'static str,
@@ -23,7 +50,7 @@ pub struct BlockStats {
 }
 
 impl BlockStats {
-    /// Canonical output filename: `<chain>_<block>_<txs>_<mgas>_zec_<client>.bin`.
+    /// `<chain>_<block>_<txs>_<mgas>_zec_<client>.bin`
     pub fn output_filename(&self, client_name: &str) -> String {
         format!(
             "{}_{}_{}_{}_zec_{}.bin",
@@ -38,22 +65,24 @@ impl BlockStats {
 
 pub fn create_client(client: Client) -> Box<dyn ExecutionClient> {
     match client {
-        Client::Reth => Box::new(RethClient),
-        Client::Ethrex => Box::new(EthrexClient),
+        Client::Reth => Box::new(RethClient::default()),
+        Client::Ethrex => Box::new(EthrexClient::default()),
     }
 }
 
 #[async_trait]
 pub trait ExecutionClient: Send + Sync {
-    /// Short identifier used for filenames and CLI flags (e.g. `"reth"`).
+    /// Slug used for filenames and CLI flags (e.g. `"reth"`).
     fn name(&self) -> &'static str;
 
-    /// Human-readable name used in logs (e.g. `"Reth"`).
+    /// Display name used in logs (e.g. `"Reth"`).
     fn display_name(&self) -> &'static str;
 
-    /// Generate `ZiskStdin` from a live RPC endpoint, alongside block metadata.
-    async fn from_rpc(&self, rpc_url: &str, block_number: u64) -> Result<(ZiskStdin, BlockStats)>;
+    async fn from_rpc(
+        &self,
+        config: &RpcConfig,
+        block_number: u64,
+    ) -> Result<(ZiskStdin, BlockStats)>;
 
-    /// Run native guest execution (used for hints generation).
     fn run(&self);
 }

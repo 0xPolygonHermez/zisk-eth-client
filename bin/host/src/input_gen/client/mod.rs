@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use witness_generator::StatelessValidationFixture;
 
-use crate::provider::ProviderKind;
+use crate::input_gen::provider::ProviderKind;
 
 mod ethrex;
 mod reth;
@@ -44,8 +44,8 @@ pub trait InputGenClient: input::ExecutionClient {
 
 pub fn create_client(client: Client) -> Box<dyn InputGenClient> {
     match client {
-        Client::Reth => Box::new(input::RethClient),
-        Client::Ethrex => Box::new(input::EthrexClient),
+        Client::Reth => Box::new(input::RethClient::default()),
+        Client::Ethrex => Box::new(input::EthrexClient::default()),
     }
 }
 

@@ -1,13 +1,23 @@
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
 
 use anyhow::{Context, Result};
 use async_trait::async_trait;
 use tracing::debug;
+use url::Url;
 
 use alloy_genesis::ChainConfig;
 use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
+use alloy_rpc_client::RpcClient;
 use alloy_rpc_types_debug::ExecutionWitness;
 use alloy_rpc_types_eth::Block as RpcBlock;
+use alloy_transport_http::{
+    reqwest::{
+        header::{HeaderMap, HeaderName, HeaderValue},
+        Client as ReqwestClient,
+    },
+    Http,
+};
 
 use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
 use stateless_reth::StatelessInput;
@@ -16,17 +26,14 @@ use zisk_sdk::ZiskStdin;
 use guest_common::chain::chain_name;
 use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
 
-use super::client::{BlockStats, ExecutionClient};
+use super::client::{BlockStats, ExecutionClient, RpcConfig};
 
 #[derive(Default)]
 pub struct RethClient;
 
 impl RethClient {
-    /// Build ZiskStdin from a pre-fetched `StatelessInput`.
-    ///
-    /// Inherent rather than trait-level: only reth-flavored clients can consume
-    /// `stateless_reth::StatelessInput`, so this is not part of the core
-    /// [`ExecutionClient`] abstraction.
+    /// Inherent (not trait-level): only reth can consume a `StatelessInput`,
+    /// so this lives outside the [`ExecutionClient`] abstraction.
     pub fn from_stateless_input(&self, stateless_input: &StatelessInput) -> Result<ZiskStdin> {
         let input = RethInput::new(stateless_input)
             .context("Failed to create RethInput from StatelessInput")?;
@@ -64,11 +71,15 @@ impl ExecutionClient for RethClient {
         "Reth"
     }
 
-    async fn from_rpc(&self, rpc_url: &str, block_number: u64) -> Result<(ZiskStdin, BlockStats)> {
-        let provider = connect_provider(rpc_url).await?;
+    async fn from_rpc(
+        &self,
+        config: &RpcConfig,
+        block_number: u64,
+    ) -> Result<(ZiskStdin, BlockStats)> {
+        let provider = connect_provider(config).await?;
+        let chain_config = fetch_chain_config(&provider).await?;
         let block = fetch_block(&provider, block_number).await?;
         let witness = fetch_witness(&provider, block_number).await?;
-        let chain_config = fetch_chain_config(&provider).await?;
 
         let stats = BlockStats {
             chain_name: chain_name(chain_config.chain_id),
@@ -93,12 +104,27 @@ impl ExecutionClient for RethClient {
     }
 }
 
-async fn connect_provider(rpc_url: &str) -> Result<impl Provider + DebugApi> {
+async fn connect_provider(config: &RpcConfig) -> Result<impl Provider + DebugApi> {
+    let url: Url = config.url.parse().context("Invalid RPC URL")?;
+
+    let mut header_map = HeaderMap::new();
+    for (k, v) in &config.headers {
+        let name = HeaderName::from_bytes(k.as_bytes())
+            .with_context(|| format!("Invalid header name: {k}"))?;
+        let value =
+            HeaderValue::from_str(v).with_context(|| format!("Invalid header value for {k}"))?;
+        header_map.insert(name, value);
+    }
+
+    let http_client = ReqwestClient::builder()
+        .default_headers(header_map)
+        .build()
+        .context("Failed to build HTTP client")?;
+
     let start = Instant::now();
-    let provider = ProviderBuilder::new()
-        .connect(rpc_url)
-        .await
-        .context("Failed to connect to RPC provider")?;
+    let http = Http::with_client(http_client, url);
+    let rpc_client = RpcClient::new(http, false);
+    let provider = ProviderBuilder::new().connect_client(rpc_client);
     debug!("RPC connect time: {:?}", start.elapsed());
     Ok(provider)
 }
@@ -145,6 +171,13 @@ async fn fetch_chain_config<P: Provider>(provider: &P) -> Result<ChainConfig> {
         Some(NamedChain::Holesky) => HOLESKY.genesis.config.clone(),
         _ => anyhow::bail!("Unsupported chain ID: {}", chain_id),
     };
+
+    if chain_name(chain_id) == "Unknown" {
+        static WARNED: AtomicBool = AtomicBool::new(false);
+        if !WARNED.swap(true, Ordering::Relaxed) {
+            tracing::warn!("Unrecognized chain ID {chain_id}; output filenames will use 'unknown'");
+        }
+    }
 
     debug!("Chain config fetch time: {:?}", start.elapsed());
     Ok(chain_config)

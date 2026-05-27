@@ -2,6 +2,8 @@
 
 Generates serialized input files for the ZisK Ethereum Client stateless validator guest programs.
 
+`input-gen` is a thin binary wrapper around `host::input_gen` — the orchestration logic lives in the `host` library crate so it can also be invoked programmatically.
+
 ## Building
 
 ```bash
@@ -33,7 +35,8 @@ input-gen rpc -u <RPC_URL> [OPTIONS]
 
 | Option | Description |
 |--------|-------------|
-| `-u, --rpc-url <URL>` | RPC endpoint URL (required; auth credentials must be embedded in the URL) |
+| `-u, --rpc-url <URL>` | RPC endpoint URL (required; auth credentials may also be embedded in the URL) |
+| `-H, --rpc-headers <KEY:VALUE>` | Custom HTTP header (repeatable). Only honored by `reth`; `ethrex` warns and ignores |
 | `-l, --last-n-blocks <N>` | Last N blocks |
 | `-b, --block <N>` | Specific block number |
 | `-r, --range-of-blocks <START> <END>` | Block range (inclusive) |
@@ -53,6 +56,9 @@ input-gen rpc -u <RPC_URL> -l 5
 
 # Follow new blocks (Ctrl+C to stop)
 input-gen rpc -u <RPC_URL> -f
+
+# Authenticated endpoint via custom header
+input-gen rpc -u <RPC_URL> -H "Authorization: Bearer <TOKEN>" -b 22767493
 
 # Ethrex client
 input-gen -c ethrex rpc -u <RPC_URL> -b 22767493
@@ -75,11 +81,11 @@ input-gen eest [OPTIONS]
 
 | Option | Description |
 |--------|-------------|
-| `-t, --tag <TAG>` | EEST release tag |
-| `-p, --eest-fixtures-path <PATH>` | Path to fixtures |
+| `-t, --tag <TAG>` | EEST release tag (default: latest) |
+| `-p, --eest-fixtures-path <PATH>` | Local fixtures path (mutually exclusive with `--tag`) |
 | `-i, --include <PATTERN>` | Filter tests by name (repeatable) |
 | `-e, --exclude <PATTERN>` | Exclude tests by name (repeatable) |
-| `-t, --threads <N>` | Number of threads for processing |
+| `--threads <N>` | Number of threads for parallel processing |
 
 **Examples:**
 
@@ -104,7 +110,7 @@ Generated inputs are saved as `.bin` files with the naming convention:
 
 Example: `mainnet_22767493_156_12_zec_reth.bin`
 
-- **chain**: Network name (mainnet, sepolia, holesky, hoodi)
+- **chain**: Network name (`mainnet`, `sepolia`, `holesky`, `hoodi`; `unknown` for unrecognized chain IDs)
 - **block**: Block number
 - **txs**: Number of transactions
 - **mgas**: Gas used in megagas (MGas)

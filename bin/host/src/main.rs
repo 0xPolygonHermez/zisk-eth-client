@@ -4,20 +4,14 @@ use std::{fs::File, io::Write};
 use tracing::info;
 use zisk_sdk::VerboseMode;
 
-mod benchmark;
-mod cli;
-mod elfs;
-mod zisk;
-
-use benchmark::BenchmarkRunner;
-use cli::{Cli, Client, GuestProgramCommand};
-use elfs::{ELF_ETHREX, ELF_RETH};
+use host::benchmark::BenchmarkRunner;
+use host::cli::{Cli, Client, GuestProgramCommand};
+use host::elfs::{ELF_ETHREX, ELF_RETH};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    zisk_sdk::setup_logger(VerboseMode::Info);
-
     let cli = Cli::parse();
+    init_tracing(cli.verbose);
 
     // Write metadata to a separate file
     if cli.output_folder.is_some() {
@@ -27,6 +21,7 @@ async fn main() -> Result<()> {
     info!("ZisK Host");
     info!(" Action: {:?}", cli.action);
     info!(" Guest Program: {}", cli.guest_program.display_name());
+
     match &cli.guest_program {
         GuestProgramCommand::StatelessValidator {
             input_folder,
@@ -52,7 +47,7 @@ async fn main() -> Result<()> {
 
             let runner = BenchmarkRunner::new(
                 elf,
-                cli.action,
+                cli.action.clone(),
                 cli.output_folder.clone(),
                 cli.force_rerun,
                 cli.proving_key.clone(),
@@ -67,6 +62,15 @@ async fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+fn init_tracing(verbose: u8) {
+    let mode = match verbose {
+        0 => VerboseMode::Info,
+        1 => VerboseMode::Debug,
+        _ => VerboseMode::Trace,
+    };
+    zisk_sdk::setup_logger(mode);
 }
 
 fn write_metadata(cli: &Cli) -> Result<()> {

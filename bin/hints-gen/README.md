@@ -4,6 +4,8 @@ Runs ZisK Ethereum Client stateless validator guests **natively** (outside the z
 
 Hints are produced once per block input and reused by the prover, so they only need to be regenerated when the guest logic or input changes.
 
+`hints-gen` is a thin binary wrapper around `host::hints_gen` — the orchestration logic lives in the `host` library crate so it can also be invoked programmatically.
+
 ## Building
 
 `hints-gen` must be compiled with the `zisk_hints` cfg flag — without it, the binary builds but refuses to run.

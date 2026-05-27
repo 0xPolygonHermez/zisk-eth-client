@@ -1,7 +1,7 @@
 pub mod eest;
 pub mod rpc;
 
-use crate::client::InputGenClient;
+use crate::input_gen::client::InputGenClient;
 use std::path::Path;
 
 /// Provider type identifier

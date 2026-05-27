@@ -23,8 +23,10 @@ tracing.workspace = true
 
 alloy-genesis.workspace = true
 alloy-provider = { workspace = true, features = ["debug-api"] }
+alloy-rpc-client.workspace = true
 alloy-rpc-types-eth.workspace = true
 alloy-rpc-types-debug.workspace = true
+alloy-transport-http.workspace = true
 
 reth-chainspec.workspace = true
 

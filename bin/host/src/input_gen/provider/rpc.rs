@@ -7,14 +7,21 @@ use tracing::info;
 
 use alloy_provider::{Provider, ProviderBuilder};
 
+use input::{RpcConfig, parse_header};
+
 use super::{InputProvider, ProviderKind};
-use crate::{client::InputGenClient, processor::ProcessingTracker};
+use crate::input_gen::{client::InputGenClient, processor::ProcessingTracker};
 
 #[derive(Debug, Clone, Args)]
 pub struct RpcProvider {
     /// RPC URL to use
     #[arg(short = 'u', long)]
     rpc_url: String,
+
+    /// Optional RPC headers (format: "Key:Value", repeatable). Only honored by
+    /// clients that support custom HTTP headers (reth).
+    #[arg(short = 'H', long, value_parser = parse_header)]
+    rpc_headers: Vec<(String, String)>,
 
     /// Number of last blocks to fetch (default: 1 if no other block selection method is used)
     #[arg(short = 'l', long, group = "block_selection")]
@@ -49,15 +56,25 @@ impl InputProvider for RpcProvider {
             client.display_name()
         );
 
+        // The RPC generator has two modes:
+        //  1. Follow mode: Continuously listen for new blocks and generate inputs as they arrive.
+        //  2. Batch mode: Process a specific block, a range of blocks, or the last N blocks, then exit.
+
+        // If follow is enabled, continuously listen for new blocks.
         if self.follow {
-            self.follow_new_blocks(output, client).await
-        } else {
-            self.process_batch(output, client).await
+            return self.follow_new_blocks(output, client).await;
         }
+
+        // Otherwise, process specified blocks.
+        self.process_batch(output, client).await
     }
 }
 
 impl RpcProvider {
+    fn rpc_config(&self) -> RpcConfig {
+        RpcConfig::new(self.rpc_url.clone()).with_headers(self.rpc_headers.clone())
+    }
+
     async fn process_batch(&self, output: &Path, client: &dyn InputGenClient) -> Result<()> {
         let block_numbers: Vec<u64> = if let Some(block_num) = self.block {
             vec![block_num]
@@ -88,10 +105,11 @@ impl RpcProvider {
             block_numbers
         );
 
+        let config = self.rpc_config();
         let mut tracker = ProcessingTracker::new(client.display_name());
         for block_num in block_numbers {
             let name = format!("Block #{}", block_num);
-            match self.process_block(block_num, output, client).await {
+            match self.process_block(&config, block_num, output, client).await {
                 Ok(_) => tracker.record_success(&name),
                 Err(e) => tracker.record_error(&name, &e),
             }
@@ -116,6 +134,7 @@ impl RpcProvider {
             stop_clone.cancel();
         });
 
+        let config = self.rpc_config();
         let provider = self.connect_provider().await?;
         let mut tracker = ProcessingTracker::new(client.display_name());
         let mut next_block_num = fetch_latest_block_number(&provider).await?;
@@ -131,7 +150,7 @@ impl RpcProvider {
                     break;
                 }
                 let name = format!("Block #{}", block_num);
-                match self.process_block(block_num, output, client).await {
+                match self.process_block(&config, block_num, output, client).await {
                     Ok(_) => tracker.record_success(&name),
                     Err(e) => tracker.record_error(&name, &e),
                 }
@@ -149,19 +168,20 @@ impl RpcProvider {
         Ok(())
     }
 
-    /// Delegate to the client's own RPC path, then save the resulting stdin
-    /// using a filename derived from the returned [`BlockStats`].
     async fn process_block(
         &self,
+        config: &RpcConfig,
         block_num: u64,
         output: &Path,
         client: &dyn InputGenClient,
     ) -> Result<()> {
-        let (stdin, stats) = client.from_rpc(&self.rpc_url, block_num).await?;
+        let (stdin, stats) = client.from_rpc(config, block_num).await?;
         stdin.save(&output.join(stats.output_filename(client.name())))?;
         Ok(())
     }
 
+    /// Used only for `eth_blockNumber` polling — headers are intentionally
+    /// not threaded through; the per-block work goes through `from_rpc`.
     async fn connect_provider(&self) -> Result<impl Provider> {
         ProviderBuilder::new()
             .connect(&self.rpc_url)

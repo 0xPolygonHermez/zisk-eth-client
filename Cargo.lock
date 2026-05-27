@@ -768,10 +768,13 @@ dependencies = [
  "alloy-json-rpc",
  "alloy-transport",
  "itertools 0.14.0",
+ "opentelemetry",
+ "opentelemetry-http",
  "reqwest 0.13.4",
  "serde_json",
  "tower",
  "tracing",
+ "tracing-opentelemetry",
  "url",
 ]
 
@@ -4163,11 +4166,8 @@ version = "0.9.0"
 dependencies = [
  "anyhow",
  "clap",
- "input",
- "tracing",
+ "host",
  "tracing-subscriber 0.3.23",
- "zisk-sdk",
- "ziskos",
 ]
 
 [[package]]
@@ -4201,13 +4201,22 @@ dependencies = [
 name = "host"
 version = "0.1.0"
 dependencies = [
+ "alloy-provider",
  "anyhow",
+ "async-trait",
  "clap",
+ "input",
+ "rayon",
  "serde",
  "serde_json",
+ "tempfile",
  "tokio",
+ "tokio-util",
  "tracing",
+ "walkdir",
+ "witness-generator",
  "zisk-sdk",
+ "ziskos",
 ]
 
 [[package]]
@@ -4655,8 +4664,10 @@ version = "0.9.0"
 dependencies = [
  "alloy-genesis",
  "alloy-provider",
+ "alloy-rpc-client",
  "alloy-rpc-types-debug",
  "alloy-rpc-types-eth",
+ "alloy-transport-http",
  "anyhow",
  "async-trait",
  "clap",
@@ -4677,20 +4688,11 @@ dependencies = [
 name = "input-gen"
 version = "0.9.0"
 dependencies = [
- "alloy-provider",
  "anyhow",
- "async-trait",
  "clap",
- "input",
- "rayon",
- "serde_json",
- "tempfile",
+ "host",
  "tokio",
- "tokio-util",
- "tracing",
  "tracing-subscriber 0.3.23",
- "walkdir",
- "witness-generator",
 ]
 
 [[package]]
