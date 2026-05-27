@@ -14,7 +14,8 @@ use super::{
 pub fn run() {
     // Install custom EVM crypto
     install_crypto(CustomEvmCrypto::default());
-    let _ = install_default_provider(Arc::new(CustomEvmCrypto::default()));
+    install_default_provider(Arc::new(CustomEvmCrypto::default()))
+        .expect("Failed to install default crypto provider");
 
     // Read the public input
     let public: RethInputPublic = ziskos::io::read();

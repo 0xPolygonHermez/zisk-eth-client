@@ -76,7 +76,8 @@ impl RpcProvider {
                 info!("No blocks to process (last_n_blocks = 0)");
                 return Ok(());
             }
-            let latest = self.fetch_latest_block_number().await?;
+            let provider = self.connect_provider().await?;
+            let latest = fetch_latest_block_number(&provider).await?;
             let start = latest.saturating_sub(n as u64 - 1);
             (start..=latest).collect()
         };
@@ -115,15 +116,16 @@ impl RpcProvider {
             stop_clone.cancel();
         });
 
+        let provider = self.connect_provider().await?;
         let mut tracker = ProcessingTracker::new(client.display_name());
-        let mut next_block_num = self.fetch_latest_block_number().await?;
+        let mut next_block_num = fetch_latest_block_number(&provider).await?;
 
         loop {
             if stop.is_cancelled() {
                 break;
             }
 
-            let latest = self.fetch_latest_block_number().await?;
+            let latest = fetch_latest_block_number(&provider).await?;
             for block_num in next_block_num..=latest {
                 if stop.is_cancelled() {
                     break;
@@ -160,16 +162,17 @@ impl RpcProvider {
         Ok(())
     }
 
-    /// Lightweight infrastructure call: fetch the latest block number via a
-    /// fresh alloy provider. Used for `--last N` and `--follow` block selection.
-    async fn fetch_latest_block_number(&self) -> Result<u64> {
-        let provider = ProviderBuilder::new()
+    async fn connect_provider(&self) -> Result<impl Provider> {
+        ProviderBuilder::new()
             .connect(&self.rpc_url)
             .await
-            .context("Failed to connect to RPC provider")?;
-        provider
-            .get_block_number()
-            .await
-            .context("Failed to fetch latest block number")
+            .context("Failed to connect to RPC provider")
     }
+}
+
+async fn fetch_latest_block_number<P: Provider>(provider: &P) -> Result<u64> {
+    provider
+        .get_block_number()
+        .await
+        .context("Failed to fetch latest block number")
 }

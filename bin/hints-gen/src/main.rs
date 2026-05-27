@@ -102,9 +102,12 @@ fn generate_hints_for_file(
 ) -> Result<(Duration, Duration)> {
     let stdin = ZiskStdin::from_file(input).context("Failed to load input file")?;
     let output_path = match output_dir {
-        Some(dir) => dir
-            .join(input.file_stem().unwrap_or_default())
-            .with_extension("hints"),
+        Some(dir) => {
+            let stem = input
+                .file_stem()
+                .with_context(|| format!("Input path has no file stem: {}", input.display()))?;
+            dir.join(stem).with_extension("hints")
+        }
         None => input.with_extension("hints"),
     };
     info!(
