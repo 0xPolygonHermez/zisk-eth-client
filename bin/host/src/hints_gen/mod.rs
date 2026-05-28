@@ -110,19 +110,15 @@ fn generate_hints_inner(
     output_path: PathBuf,
     client: &dyn ExecutionClient,
 ) -> Result<(Duration, Duration)> {
-    use ziskos::hints::{close_hints, init_hints_file};
-
-    ziskos::read_input_reset();
-    ziskos::io::write_output_reset();
-
     ziskos::set_native_input(stdin.read_data());
-    init_hints_file(output_path.clone(), None).context("Failed to init hints")?;
+    unsafe { std::env::set_var("ZISK_HINTS_OUTPUT", &output_path) };
+    ziskos::zkvm_init();
 
     let t0 = std::time::Instant::now();
     let run_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| client.run()));
     let execution = t0.elapsed();
 
-    let _ = close_hints();
+    ziskos::zkvm_deinit();
 
     match run_result {
         Ok(()) => {
