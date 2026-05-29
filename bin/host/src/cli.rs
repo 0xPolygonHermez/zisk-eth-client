@@ -65,7 +65,7 @@ pub enum GuestProgramCommand {
 
         /// Client
         #[arg(short, long, default_value = "reth")]
-        client: Client,
+        client: input::Client,
 
         /// Include only files containing the provided strings.
         #[arg(long)]
@@ -84,14 +84,4 @@ impl GuestProgramCommand {
             Self::StatelessValidator { .. } => "Stateless Validator".to_string(),
         }
     }
-}
-
-/// Execution clients for the stateless validator
-#[derive(Debug, Copy, Clone, ValueEnum, serde::Serialize)]
-pub enum Client {
-    /// Reth execution client
-    Reth,
-    /// EthRex execution client
-    Ethrex,
-    //Add more execution clients here as needed
 }

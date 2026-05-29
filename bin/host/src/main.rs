@@ -5,8 +5,9 @@ use tracing::info;
 use zisk_sdk::VerboseMode;
 
 use host::benchmark::BenchmarkRunner;
-use host::cli::{Cli, Client, GuestProgramCommand};
+use host::cli::{Cli, GuestProgramCommand};
 use host::elfs::{ELF_ETHREX, ELF_RETH};
+use input::Client;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -31,6 +32,7 @@ async fn main() -> Result<()> {
         } => {
             info!(" Client: {:?}", client);
 
+            // To add a client, see docs/adding-a-client.md.
             let elf = match client {
                 Client::Reth => ELF_RETH,
                 Client::Ethrex => ELF_ETHREX,
