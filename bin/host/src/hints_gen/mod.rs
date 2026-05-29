@@ -5,7 +5,7 @@ use std::time::Duration;
 use tracing::{error, info, warn};
 use zisk_sdk::ZiskStdin;
 
-use input::{create_client, generate_hints_to_file, Client, ExecutionClient};
+use input::{Client, ExecutionClient, create_client, generate_hints_to_file};
 
 #[derive(Args, Debug, Clone)]
 pub struct HintsGenArgs {
