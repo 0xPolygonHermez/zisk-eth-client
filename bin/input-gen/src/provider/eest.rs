@@ -47,6 +47,10 @@ impl InputProvider for EestProvider {
             anyhow::bail!("{} doesn't support EEST provider", client.display_name());
         }
 
+        // The `ef-tests` crate selects its trie implementation from the `EF_TEST_TRIE`
+        // env var and errors if it is unset. Hardcode it here to `zeth`.
+        std::env::set_var("EF_TEST_TRIE", "zeth");
+
         if let Some(threads) = self.threads {
             ThreadPoolBuilder::new()
                 .num_threads(threads)
@@ -80,9 +84,7 @@ impl InputProvider for EestProvider {
             .await
             .context("Failed to build EEST generator")?;
 
-        info!("Generating EEST fixtures...");
-
-        // Generate fixtures to a temp directory, then convert to ZisK inputs
+        // Generate EEST fixtures to a temp directory, then convert to ZisK inputs
         let temp_dir = tempfile::tempdir().context("Failed to create temp directory")?;
 
         let count = generator

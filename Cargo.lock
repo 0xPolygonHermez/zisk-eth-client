@@ -12873,7 +12873,7 @@ dependencies = [
 [[package]]
 name = "witness-generator"
 version = "0.1.0"
-source = "git+https://github.com/eth-act/zkevm-benchmark-workload.git?rev=073561e92735994e27e5b87ee4e6941d0c83ff76#073561e92735994e27e5b87ee4e6941d0c83ff76"
+source = "git+https://github.com/eth-act/zkevm-benchmark-workload.git?rev=6786b2b9f002151e383e88cf2a693899ca73d169#6786b2b9f002151e383e88cf2a693899ca73d169"
 dependencies = [
  "alloy-eips 2.0.5",
  "alloy-genesis",

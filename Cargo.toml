@@ -62,7 +62,7 @@ ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283a
 stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", rev = "283ae1a561f46daacac99e281126901e5208b969", default-features = false, package = "ethrex-guest-program" }
 
 # eth-act
-witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "073561e92735994e27e5b87ee4e6941d0c83ff76" }
+witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "6786b2b9f002151e383e88cf2a693899ca73d169" }
 
 # common dependencies
 anyhow = "1.0"
