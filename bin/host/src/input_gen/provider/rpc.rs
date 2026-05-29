@@ -176,7 +176,7 @@ impl RpcProvider {
         client: &dyn InputGenClient,
     ) -> Result<()> {
         let (stdin, stats) = client.from_rpc(config, block_num).await?;
-        stdin.save(&output.join(stats.output_filename(client.name())))?;
+        stdin.save(output.join(stats.output_filename(client.name())))?;
         Ok(())
     }
 

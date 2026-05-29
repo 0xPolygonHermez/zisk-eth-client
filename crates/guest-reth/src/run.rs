@@ -14,8 +14,8 @@ use super::{
 pub fn run() {
     static INSTALL_CRYPTO: Once = Once::new();
     INSTALL_CRYPTO.call_once(|| {
-        install_crypto(CustomEvmCrypto::default());
-        install_default_provider(Arc::new(CustomEvmCrypto::default()))
+        install_crypto(CustomEvmCrypto);
+        install_default_provider(Arc::new(CustomEvmCrypto))
             .expect("Failed to install default crypto provider");
     });
 
