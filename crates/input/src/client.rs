@@ -75,7 +75,9 @@ pub fn create_client(client: Client) -> Box<dyn ExecutionClient> {
 
 #[async_trait]
 pub trait ExecutionClient: Send + Sync {
-    /// Slug used for filenames and CLI flags (e.g. `"reth"`).
+    /// Slug used for output filenames and the default `<client>-inputs` output
+    /// dir (e.g. `"reth"`). Not the `--client` flag — that comes from the
+    /// `Client` enum variant via `clap::ValueEnum`.
     fn name(&self) -> &'static str;
 
     /// Display name used in logs (e.g. `"Reth"`).

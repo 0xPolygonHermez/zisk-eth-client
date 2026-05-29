@@ -36,8 +36,10 @@ Use this when the guest is written in Rust (like `reth` and `ethrex`).
 ## Guest program — Pattern B: externally-built ELF embedded via a crate
 
 Use this when the ELF is produced by a non-`cargo-zisk` build — e.g. a C++ guest
-compiled with cmake. `crates/guest-zilkworm/` is a complete worked example
-(`build.rs`, `cpp/`, `build-elf.sh`).
+compiled with cmake. There's no in-repo example yet (`reth` and `ethrex` are both
+Pattern A), so the layout below is the convention to follow: a crate whose
+`build.rs` shells out to the external build (e.g. a `build-elf.sh`) and embeds
+the resulting ELF.
 
 1. **`crates/guest-geth/`** — a crate that builds and embeds the ELF. Its
    `build.rs` runs the external build; `src/lib.rs` exposes:
@@ -71,7 +73,9 @@ Identical for both patterns.
    ```
 2. **`crates/input/src/geth_client.rs`** — define a `GethClient` struct and
    `impl ExecutionClient` for it, with these methods:
-   - `name()` → `"geth"` — used in output filenames and the `--client` flag.
+   - `name()` → `"geth"` — used in output filenames and the default
+     `<client>-inputs` output dir. (The `--client` flag value comes from the
+     `Client` enum variant via its `clap::ValueEnum` derive, not from `name()`.)
    - `display_name()` → `"Geth"` — used in logs.
    - `from_rpc(config, block_number)` → fetch the block and witness over RPC,
      build the guest input, and serialize it into a `ZiskStdin`. (Pattern B
