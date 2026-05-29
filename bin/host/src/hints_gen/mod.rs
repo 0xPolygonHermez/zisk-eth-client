@@ -51,7 +51,7 @@ pub fn run(args: HintsGenArgs) -> Result<()> {
     let mut failed: Vec<(&Path, anyhow::Error)> = Vec::new();
     let mut timings: Vec<(Duration, Duration)> = Vec::new();
     for input in &inputs {
-        match generate_hints_for_file(input, args.output_dir.as_deref(), client.as_ref()) {
+        match process_input_file(input, args.output_dir.as_deref(), client.as_ref()) {
             Ok(t) => timings.push(t),
             Err(e) => {
                 error!("Failed {}: {:#}", input.display(), e);
@@ -81,7 +81,7 @@ pub fn run(args: HintsGenArgs) -> Result<()> {
     Ok(())
 }
 
-fn generate_hints_for_file(
+fn process_input_file(
     input: &Path,
     output_dir: Option<&Path>,
     client: &dyn ExecutionClient,
@@ -101,54 +101,102 @@ fn generate_hints_for_file(
         input.display(),
         output_path.display()
     );
-    generate_hints_inner(stdin, output_path, client)
+    generate_hints_to_file(&stdin, output_path, client)
 }
 
 #[cfg(zisk_hints)]
-fn generate_hints_inner(
-    stdin: ZiskStdin,
-    output_path: PathBuf,
+fn run_with_hints(
+    stdin: &ZiskStdin,
     client: &dyn ExecutionClient,
+    init: impl FnOnce() -> Result<()>,
+    deinit: impl FnOnce() -> Result<()>,
 ) -> Result<(Duration, Duration)> {
     ziskos::set_native_input(stdin.read_data());
-    unsafe { std::env::set_var("ZISK_HINTS_OUTPUT", &output_path) };
-    ziskos::zkvm_init();
+    init()?;
 
     let t0 = std::time::Instant::now();
     let run_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| client.run()));
     let execution = t0.elapsed();
 
-    ziskos::zkvm_deinit();
-
-    match run_result {
-        Ok(()) => {
-            let total = t0.elapsed();
-            info!(
-                "Written hints to {} (execution: {:.2?}, total: {:.2?})",
-                output_path.display(),
-                execution,
-                total,
-            );
-            Ok((execution, total))
-        }
-        Err(e) => {
-            let msg = e
-                .downcast_ref::<String>()
-                .map(|s| s.as_str())
-                .or_else(|| e.downcast_ref::<&str>().copied())
-                .unwrap_or("unknown panic");
-            Err(anyhow::anyhow!("Block execution failed: {}", msg))
-        }
+    let deinit_result = deinit();
+    if let Err(e) = run_result {
+        let msg = e
+            .downcast_ref::<String>()
+            .map(|s| s.as_str())
+            .or_else(|| e.downcast_ref::<&str>().copied())
+            .unwrap_or("unknown panic");
+        return Err(anyhow::anyhow!("Block execution failed: {}", msg));
     }
+    deinit_result?;
+
+    Ok((execution, t0.elapsed()))
+}
+
+#[cfg(zisk_hints)]
+pub fn generate_hints_to_file(
+    stdin: &ZiskStdin,
+    output_path: PathBuf,
+    client: &dyn ExecutionClient,
+) -> Result<(Duration, Duration)> {
+    let (execution, total) = run_with_hints(
+        stdin,
+        client,
+        || {
+            unsafe { std::env::set_var("ZISK_HINTS_OUTPUT", &output_path) };
+            ziskos::zkvm_init();
+            Ok(())
+        },
+        || {
+            ziskos::zkvm_deinit();
+            Ok(())
+        },
+    )?;
+    info!(
+        "Written hints to {} (execution: {:.2?}, total: {:.2?})",
+        output_path.display(),
+        execution,
+        total,
+    );
+    Ok((execution, total))
+}
+
+#[cfg(zisk_hints)]
+pub fn generate_hints_to_socket(
+    stdin: &ZiskStdin,
+    socket_path: PathBuf,
+    debug_file: Option<PathBuf>,
+    write_flush_threshold: Option<usize>,
+    ready: Option<tokio::sync::oneshot::Sender<()>>,
+    client: &dyn ExecutionClient,
+) -> Result<(Duration, Duration)> {
+    run_with_hints(
+        stdin,
+        client,
+        move || ziskos::zkvm_init_socket(socket_path, debug_file, write_flush_threshold, ready),
+        || ziskos::hints::close_hints(),
+    )
 }
 
 #[cfg(not(zisk_hints))]
-fn generate_hints_inner(
-    _stdin: ZiskStdin,
+const NO_HINTS_MSG: &str = "Compiled without hints support. Rebuild with:\n  RUSTFLAGS=\"--cfg zisk_hints\" cargo build -p host";
+
+#[cfg(not(zisk_hints))]
+pub fn generate_hints_to_file(
+    _stdin: &ZiskStdin,
     _output_path: PathBuf,
     _client: &dyn ExecutionClient,
 ) -> Result<(Duration, Duration)> {
-    anyhow::bail!(
-        "Compiled without hints support. Rebuild with:\n  RUSTFLAGS=\"--cfg zisk_hints\" cargo build -p host"
-    )
+    anyhow::bail!(NO_HINTS_MSG)
+}
+
+#[cfg(not(zisk_hints))]
+pub fn generate_hints_to_socket(
+    _stdin: &ZiskStdin,
+    _socket_path: PathBuf,
+    _debug_file: Option<PathBuf>,
+    _write_flush_threshold: Option<usize>,
+    _ready: Option<tokio::sync::oneshot::Sender<()>>,
+    _client: &dyn ExecutionClient,
+) -> Result<(Duration, Duration)> {
+    anyhow::bail!(NO_HINTS_MSG)
 }
