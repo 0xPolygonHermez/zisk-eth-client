@@ -4,6 +4,9 @@ use zisk_sdk::ZiskStdin;
 
 use crate::{EthrexClient, RethClient};
 
+/// Execution clients. To add one, see `docs/adding-a-client.md` — adding a
+/// variant here makes `create_client` (and the host's ELF/input-gen matches)
+/// fail to compile until you wire up the new client.
 #[cfg_attr(feature = "cli", derive(clap::ValueEnum))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Client {
