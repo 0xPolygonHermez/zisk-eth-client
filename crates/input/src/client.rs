@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use async_trait::async_trait;
 use zisk_sdk::ZiskStdin;
 
-use crate::{EthrexClient, RethClient};
+use crate::{EthrexClient, RethClient, ZilkwormClient};
 
 /// Execution clients. To add one, see `docs/adding-a-client.md` — adding a
 /// variant here makes `create_client` (and the host's ELF/input-gen matches)
@@ -14,6 +14,7 @@ use crate::{EthrexClient, RethClient};
 pub enum Client {
     Reth,
     Ethrex,
+    Zilkworm,
 }
 
 /// Headers are honored only by clients that support custom HTTP headers
@@ -72,6 +73,7 @@ pub fn create_client(client: Client) -> Box<dyn ExecutionClient> {
     match client {
         Client::Reth => Box::new(RethClient),
         Client::Ethrex => Box::new(EthrexClient),
+        Client::Zilkworm => Box::new(ZilkwormClient),
     }
 }
 

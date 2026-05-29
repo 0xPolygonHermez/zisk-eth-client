@@ -6,7 +6,7 @@ use zisk_sdk::VerboseMode;
 
 use host::benchmark::BenchmarkRunner;
 use host::cli::{Cli, GuestProgramCommand};
-use host::elfs::{ELF_ETHREX, ELF_RETH};
+use host::elfs::{ELF_ETHREX, ELF_RETH, ELF_ZILKWORM};
 use input::Client;
 
 #[tokio::main]
@@ -36,6 +36,7 @@ async fn main() -> Result<()> {
             let elf = match client {
                 Client::Reth => ELF_RETH,
                 Client::Ethrex => ELF_ETHREX,
+                Client::Zilkworm => ELF_ZILKWORM,
             };
 
             info!(" ELF Name: {}", elf.name());

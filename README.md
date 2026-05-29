@@ -14,7 +14,7 @@ zisk-eth-client/
 │   │   └── stateless-validator-ethrex/  # Ethrex-based stateless validator
 │   ├── host/                            # Benchmark runner for guest programs
 │   │                                    # (also hosts the shared input/hints libraries)
-│   ├── input-gen/                       # Thin wrapper around `host::input_gen`
+│   ├── input-gen/                       # Thin wrapper around `host::input_gen` (reth + ethrex + zilkworm)
 │   └── hints-gen/                       # Thin wrapper around `host::hints_gen`
 └── crates/
     ├── guest-reth/                      # Core validation library for reth
@@ -26,6 +26,12 @@ The `input-gen` and `hints-gen` binaries are thin wrappers over library
 modules in `bin/host` (`host::input_gen`, `host::hints_gen`), so the same
 logic can also be invoked programmatically from `host` itself.
 
+> **Zilkworm** is a third execution client — a C++ ZKEVM, compiled to a ZisK
+> RISC-V ELF, tracked as a submodule at `third_party/zilkworm`. All host-side
+> integration lives in [`crates/guest-zilkworm`](crates/guest-zilkworm/) — see
+> its [README](crates/guest-zilkworm/README.md) for build prerequisites and
+> the end-to-end workflow.
+
 ## Quick Start
 
 ### Prerequisites
@@ -33,6 +39,50 @@ logic can also be invoked programmatically from `host` itself.
 - [Rust](https://www.rust-lang.org/tools/install) (latest stable)
 - [zisk](https://0xpolygonhermez.github.io/zisk/getting_started/installation.html)
 - Ethereum RPC endpoint (Infura, Alchemy, or your own node) for input generation
+- **C++ toolchain for the zilkworm guest** — see below
+
+### Installing the zilkworm toolchain
+
+The zilkworm guest is a C++ program cross-compiled to a ZisK RISC-V ELF (the
+reth and ethrex guests are Rust and are built by `cargo-zisk` automatically).
+You need two things in `$PATH` / known locations:
+
+| Tool | Purpose | One-time install |
+|---|---|---|
+| **xPack `riscv-none-elf-gcc` 15.2+** | C++ → RISC-V cross-compile | tarball, extract to `~/opt/xpack/` |
+| **CMake ≥ 3.28** | drives the build (with make) | `apt install cmake` (or [cmake.org](https://cmake.org/download/) for older distros) |
+
+**xPack RISC-V GCC** (no compile, just extract a tarball):
+
+```bash
+mkdir -p ~/opt/xpack
+curl -L https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v15.2.0-1/xpack-riscv-none-elf-gcc-15.2.0-1-linux-x64.tar.gz \
+    | tar -xz -C ~/opt/xpack
+```
+
+That installs to `~/opt/xpack/xpack-riscv-none-elf-gcc-15.2.0-1/bin/`, which
+is where `crates/guest-zilkworm/build.rs` looks by default. Override the
+location by exporting `ZISK_TOOLCHAIN_PREFIX` if you install somewhere else.
+
+**CMake:**
+
+```bash
+sudo apt install -y cmake
+# Verify cmake version is ≥ 3.28:
+cmake --version
+# If older, grab a current build from https://cmake.org/download/
+```
+
+**Verify:**
+
+```bash
+~/opt/xpack/xpack-riscv-none-elf-gcc-15.2.0-1/bin/riscv-none-elf-gcc --version
+cmake --version
+```
+
+With the two tools in place, `cargo build -p host` will produce the
+zilkworm guest ELF automatically (`crates/guest-zilkworm/build-elf.sh` is driven
+by `guest-zilkworm/build.rs`; make is incremental, so re-runs are cheap).
 
 ### Build the Guest Program
 
@@ -160,7 +210,7 @@ Then use the local binaries instead of the installed ones:
 | [**hints-gen**](bin/hints-gen/) | Run guests natively against `.bin` inputs to capture prover hints |
 | [**guest-reth**](crates/guest-reth/) | Core reth validation library: crypto, validation logic, input types |
 | [**guest-ethrex**](crates/guest-ethrex/) | Core ethrex validation library: crypto, validation logic, input types |
-| [**input**](crates/input/) | RPC data fetching and the shared `ExecutionClient` abstraction (reth, ethrex) |
+| [**input**](crates/input/) | RPC data fetching and the shared `ExecutionClient` abstraction (reth, ethrex, zilkworm) |
 
 ## Supported Chains
 

@@ -20,7 +20,7 @@ input-gen [OPTIONS] <COMMAND>
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-c, --client <CLIENT>` | Execution client: `reth`, `ethrex` | `reth` |
+| `-c, --client <CLIENT>` | Execution client: `reth`, `ethrex`, `zilkworm` | `reth` |
 | `-o, --output <PATH>` | Output folder | `<client>-inputs` |
 
 ### Commands
@@ -62,6 +62,9 @@ input-gen rpc -u <RPC_URL> -H "Authorization: Bearer <TOKEN>" -b 22767493
 
 # Ethrex client
 input-gen -c ethrex rpc -u <RPC_URL> -b 22767493
+
+# Zilkworm client (C++ ZKEVM — input generation only, no EEST support)
+input-gen -c zilkworm rpc -u <RPC_URL> -b 22767493
 ```
 
 #### Client support matrix
@@ -70,6 +73,7 @@ input-gen -c ethrex rpc -u <RPC_URL> -b 22767493
 |---|---|---|
 | `reth` | ✅ | ✅ |
 | `ethrex` | ✅ | ❌ |
+| `zilkworm` | ✅ | ❌ |
 
 #### `eest` — Generate from EEST fixtures
 

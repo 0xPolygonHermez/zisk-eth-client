@@ -1,0 +1,4 @@
+[submodule "third_party/zilkworm"]
+	path = third_party/zilkworm
+	url = https://github.com/RogerTaule/zilkworm.git
+	branch = feat/crypto-provider

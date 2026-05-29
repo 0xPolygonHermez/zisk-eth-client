@@ -36,10 +36,10 @@ Use this when the guest is written in Rust (like `reth` and `ethrex`).
 ## Guest program — Pattern B: externally-built ELF embedded via a crate
 
 Use this when the ELF is produced by a non-`cargo-zisk` build — e.g. a C++ guest
-compiled with cmake. There's no in-repo example yet (`reth` and `ethrex` are both
-Pattern A), so the layout below is the convention to follow: a crate whose
-`build.rs` shells out to the external build (e.g. a `build-elf.sh`) and embeds
-the resulting ELF.
+compiled with cmake. `crates/guest-zilkworm/` is a complete worked example: its
+`build.rs` drives the external build (`build-elf.sh` produces the prebuilt guest
+ELF, plus a cmake host-side FFI lib), and `src/lib.rs` embeds the ELF and exposes
+`run()` for native hint generation. Its `README.md` documents the full layout.
 
 1. **`crates/guest-geth/`** — a crate that builds and embeds the ELF. Its
    `build.rs` runs the external build; `src/lib.rs` exposes:

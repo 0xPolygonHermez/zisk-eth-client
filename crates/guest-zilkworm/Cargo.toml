@@ -1,0 +1,18 @@
+[package]
+name = "guest-zilkworm"
+description = "Zilkworm C++ ZKEVM integration: native FFI run, input building, and guest ELF embedding"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+ziskos.workspace = true
+zisk-sdk.workspace = true
+z6m_common.workspace = true
+
+[build-dependencies]
+cmake = "0.1"
+blake3 = "1.5"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_skip_guest_build)'] }

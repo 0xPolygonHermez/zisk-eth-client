@@ -8,6 +8,7 @@ edition.workspace = true
 guest-common.workspace = true
 guest-reth.workspace = true
 guest-ethrex.workspace = true
+guest-zilkworm.workspace = true
 zisk-sdk.workspace = true
 ziskos.workspace = true
 # `sync` for the oneshot::Sender ready-signal in generate_hints_to_socket.
@@ -22,6 +23,7 @@ url = { workspace = true }
 
 async-trait.workspace = true
 anyhow.workspace = true
+tempfile.workspace = true
 tracing.workspace = true
 rayon.workspace = true
 

@@ -11,6 +11,7 @@ edition = "2021"
 guest-common = { path = "crates/guest-common" }
 guest-ethrex = { path = "crates/guest-ethrex" }
 guest-reth = { path = "crates/guest-reth" }
+guest-zilkworm = { path = "crates/guest-zilkworm" }
 input = { path = "crates/input" }
 
 zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
@@ -56,6 +57,9 @@ ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.
 ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0" }
 ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0", default-features = false }
 stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0", default-features = false, package = "ethrex-guest-program" }
+
+# zilkworm (submodule at third_party/zilkworm — C++ ZKEVM)
+z6m_common = { path = "third_party/zilkworm/prover/common" }
 
 # eth-act
 witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "63da9dde9b284dc4845cf7128c3f0d7c53d21654" }
