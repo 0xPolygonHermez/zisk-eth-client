@@ -4679,9 +4679,11 @@ dependencies = [
  "guest-reth",
  "reth-chainspec",
  "stateless",
+ "tokio",
  "tracing",
  "url",
  "zisk-sdk",
+ "ziskos",
 ]
 
 [[package]]

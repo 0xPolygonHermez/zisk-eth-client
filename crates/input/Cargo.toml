@@ -9,6 +9,9 @@ guest-common.workspace = true
 guest-reth.workspace = true
 guest-ethrex.workspace = true
 zisk-sdk.workspace = true
+ziskos.workspace = true
+# `sync` for the oneshot::Sender ready-signal in generate_hints_to_socket.
+tokio = { workspace = true, features = ["sync"] }
 
 ethrex-config.workspace = true
 ethrex-common.workspace = true
@@ -34,3 +37,6 @@ stateless-reth.workspace = true
 
 [features]
 cli = ["dep:clap"]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }
