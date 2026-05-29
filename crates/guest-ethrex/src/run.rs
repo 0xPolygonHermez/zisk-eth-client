@@ -24,7 +24,7 @@ pub fn run() {
     );
 
     // Validate the block
-    let crypto = ZiskCrypto::default();
+    let crypto = ZiskCrypto;
     let block_hash = validate_block(input, Arc::new(crypto)).expect("Block validation failed");
 
     // Commit to block hash as the output

@@ -7,7 +7,6 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use anyhow::Result;
-use tracing::info;
 use zisk_sdk::ZiskStdin;
 
 use crate::ExecutionClient;
@@ -66,7 +65,7 @@ pub fn generate_hints_to_file(
             Ok(())
         },
     )?;
-    info!(
+    tracing::info!(
         "Written hints to {} (execution: {:.2?}, total: {:.2?})",
         output_path.display(),
         execution,

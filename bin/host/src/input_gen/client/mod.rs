@@ -45,8 +45,8 @@ pub trait InputGenClient: input::ExecutionClient {
 // To add a client, see docs/adding-a-client.md.
 pub fn create_client(client: Client) -> Box<dyn InputGenClient> {
     match client {
-        Client::Reth => Box::new(input::RethClient::default()),
-        Client::Ethrex => Box::new(input::EthrexClient::default()),
+        Client::Reth => Box::new(input::RethClient),
+        Client::Ethrex => Box::new(input::EthrexClient),
     }
 }
 

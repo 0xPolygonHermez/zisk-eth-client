@@ -43,8 +43,8 @@ reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = 
 reth-primitives-traits = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
 reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.0" }
-stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "ed189a51931e8589102f3139d48fdbb3bbe4c1f7", package = "stateless" }
-stateless-reth-tries = { git = "https://github.com/paradigmxyz/stateless", rev = "ed189a51931e8589102f3139d48fdbb3bbe4c1f7", package = "tries" }
+stateless-reth = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5", package = "stateless" }
+stateless-reth-tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5", package = "tries" }
 
 # types (for ethrex)
 primitive-types = "0.13.1"
@@ -91,5 +91,3 @@ hex-literal = "0.4.1"
 [patch."https://github.com/paradigmxyz/stateless.git"]
 stateless = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
 tries = { git = "https://github.com/0xPolygonHermez/zisk-patch-stateless.git", branch = "zisk/ed189a5" }
-# stateless = { path = "../zisk-patch-stateless/crates/stateless" }
-# tries = { path = "../zisk-patch-stateless/crates/tries" }

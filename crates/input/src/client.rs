@@ -1,3 +1,5 @@
+#![allow(clippy::wrong_self_convention)]
+
 use anyhow::{Context, Result};
 use async_trait::async_trait;
 use zisk_sdk::ZiskStdin;
@@ -68,8 +70,8 @@ impl BlockStats {
 
 pub fn create_client(client: Client) -> Box<dyn ExecutionClient> {
     match client {
-        Client::Reth => Box::new(RethClient::default()),
-        Client::Ethrex => Box::new(EthrexClient::default()),
+        Client::Reth => Box::new(RethClient),
+        Client::Ethrex => Box::new(EthrexClient),
     }
 }
 
