@@ -25,8 +25,14 @@ fn run_with_hints(
     ziskos::set_native_input(stdin.read_data());
     init()?;
 
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .map_err(|e| anyhow::anyhow!("failed to build deterministic hints rayon pool: {e}"))?;
+
     let t0 = std::time::Instant::now();
-    let run_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| client.run()));
+    let run_result =
+        pool.install(|| std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| client.run())));
     let execution = t0.elapsed();
 
     // Always tear down, then surface a run panic over a teardown error.
