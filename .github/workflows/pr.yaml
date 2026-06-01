@@ -48,32 +48,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
+      # # Clippy skips the guest build (build.rs detects the clippy wrapper), so it
+      # # never invokes cargo +zisk and doesn't need the ZisK toolchain.
+      # - name: Setup dependencies
+      #   uses: ./.github/actions/setup-deps
+      #   with:
+      #     install-toolchain: "false"
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-registry-
+      # - name: Cache cargo registry
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       ~/.cargo/registry
+      #       ~/.cargo/git
+      #     key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-cargo-registry-
 
-      - name: Cache target directories
-        uses: actions/cache@v4
-        with:
-          path: |
-            target
-            bin/guests/stateless-validator-reth/target
-            bin/guests/stateless-validator-ethrex/target
-          key: ${{ runner.os }}-clippy-target-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-clippy-target-
-
-      - name: Build host
-        run: cargo build --locked --release -p host
+      # - name: Cache target directory
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: target
+      #     key: ${{ runner.os }}-clippy-target-${{ hashFiles('**/Cargo.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-clippy-target-
 
       - name: Run Clippy
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
@@ -109,15 +107,10 @@ jobs:
       - name: Setup dependencies
         if: steps.cache-proving-key.outputs.cache-hit != 'true'
         uses: ./.github/actions/setup-deps
-
-      - name: Install setup build dependencies
-        if: steps.cache-proving-key.outputs.cache-hit != 'true'
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          SUDO=$([ "$(id -u)" -ne 0 ] && echo sudo || echo "")
-          $SUDO apt-get update
-          $SUDO apt-get install -y cmake libbenchmark-dev
+        with:
+          # This job builds cargo-zisk itself (below) for the fixed-gen binaries
+          # and check-setup, and cross-compiles no guests — so skip the toolchain.
+          install-toolchain: "false"
 
       - name: Clone ZisK and PIL2 sources
         if: steps.cache-proving-key.outputs.cache-hit != 'true'
@@ -195,6 +188,8 @@ jobs:
 
       - name: Setup dependencies
         uses: ./.github/actions/setup-deps
+        with:
+          zisk-ref: ${{ env.ZISK_REF }}
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -275,6 +270,8 @@ jobs:
 
       - name: Setup dependencies
         uses: ./.github/actions/setup-deps
+        with:
+          zisk-ref: ${{ env.ZISK_REF }}
 
       - name: Cache cargo registry
         uses: actions/cache@v4
