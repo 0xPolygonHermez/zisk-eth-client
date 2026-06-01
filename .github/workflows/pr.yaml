@@ -48,30 +48,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # # Clippy skips the guest build (build.rs detects the clippy wrapper), so it
-      # # never invokes cargo +zisk and doesn't need the ZisK toolchain.
-      # - name: Setup dependencies
-      #   uses: ./.github/actions/setup-deps
-      #   with:
-      #     install-toolchain: "false"
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-deps
 
-      # - name: Cache cargo registry
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: |
-      #       ~/.cargo/registry
-      #       ~/.cargo/git
-      #     key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-cargo-registry-
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
 
-      # - name: Cache target directory
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: target
-      #     key: ${{ runner.os }}-clippy-target-${{ hashFiles('**/Cargo.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-clippy-target-
+      - name: Cache target directory
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-clippy-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-clippy-target-
 
       - name: Run Clippy
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
