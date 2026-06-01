@@ -63,7 +63,10 @@ witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload
 # common dependencies
 anyhow = "1.0"
 async-trait = "0.1"
-bincode = { version = "2.0", default-features = false, features = ["serde", "std"] }
+bincode = { version = "2.0", default-features = false, features = [
+  "serde",
+  "std",
+] }
 clap = { version = "4.5.7", features = ["derive", "env"] }
 dotenv = "0.15.0"
 eyre = "0.6.12"
@@ -74,8 +77,8 @@ serde = "1.0"
 serde_with = "3.14"
 serde_json = "1.0"
 tokio = { version = "1.21", default-features = false, features = [
-    "rt",
-    "rt-multi-thread",
+  "rt",
+  "rt-multi-thread",
 ] }
 tokio-util = { version = "0.7", features = ["rt"] }
 url = "2.3"

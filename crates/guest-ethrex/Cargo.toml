@@ -24,4 +24,8 @@ ethrex-common.workspace = true
 ethrex-crypto.workspace = true
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_vendor, values("zisk"))', 'cfg(zisk_hints)', 'cfg(zisk_hints_debug)'] }
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(target_vendor, values("zisk"))',
+  'cfg(zisk_hints)',
+  'cfg(zisk_hints_debug)',
+] }

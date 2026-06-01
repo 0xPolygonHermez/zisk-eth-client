@@ -3,9 +3,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = [
-    "reth/*",
-]
+members = ["reth/*"]
 resolver = "2"
 
 [profile.release]

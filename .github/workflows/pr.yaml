@@ -1,0 +1,334 @@
+name: Test Ethereum Client
+
+# TODO: Add tests with hints
+# TODO: Add gpu testing
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "develop-[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  ZISK_REF: pre-develop-1.0.0-beta
+  PIL2_COMPILER_REF: v0.9.0
+  PIL2_PROOFMAN_REF: v0.18.0
+  PIL2_PROOFMAN_JS_REF: v0.17.0
+  PROVING_KEY_DIR: /tmp/zisk-provingkey
+  PROVING_KEY_PATH: /tmp/zisk-provingkey/provingKey
+
+jobs:
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-deps
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache target directories
+        uses: actions/cache@v4
+        with:
+          path: |
+            target
+            bin/guests/stateless-validator-reth/target
+            bin/guests/stateless-validator-ethrex/target
+          key: ${{ runner.os }}-clippy-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-clippy-target-
+
+      - name: Build host
+        run: cargo build --locked --release -p host
+
+      - name: Run Clippy
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
+
+  proving-key:
+    name: Generate proving key
+    runs-on: self-hosted
+    timeout-minutes: 120
+    container:
+      image: ubuntu:22.04
+      options: --shm-size=48g
+    defaults:
+      run:
+        shell: bash
+    env:
+      WS: ${{ github.workspace }}/.zk-setup
+    outputs:
+      cache-key: ${{ steps.key.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute proving-key cache key
+        id: key
+        run: echo "value=provingkey-${ZISK_REF}-${PIL2_PROOFMAN_REF}-${PIL2_PROOFMAN_JS_REF}-${PIL2_COMPILER_REF}-v1" >> "$GITHUB_OUTPUT"
+
+      - name: Cache proving key
+        id: cache-proving-key
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PROVING_KEY_DIR }}
+          key: ${{ steps.key.outputs.value }}
+
+      - name: Setup dependencies
+        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+        uses: ./.github/actions/setup-deps
+
+      - name: Install setup build dependencies
+        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          SUDO=$([ "$(id -u)" -ne 0 ] && echo sudo || echo "")
+          $SUDO apt-get update
+          $SUDO apt-get install -y cmake libbenchmark-dev
+
+      - name: Clone ZisK and PIL2 sources
+        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+        run: |
+          rm -rf "$WS"
+          mkdir -p "$WS"
+          cd "$WS"
+          git clone --depth 1 --branch "$ZISK_REF"             https://github.com/0xPolygonHermez/zisk.git
+          git clone --depth 1 --branch "$PIL2_COMPILER_REF"    https://github.com/0xPolygonHermez/pil2-compiler.git
+          git clone --depth 1 --branch "$PIL2_PROOFMAN_REF"    https://github.com/0xPolygonHermez/pil2-proofman.git
+          git clone --depth 1 --branch "$PIL2_PROOFMAN_JS_REF" https://github.com/0xPolygonHermez/pil2-proofman-js.git
+          ( cd pil2-compiler && npm i )
+          ( cd pil2-proofman-js && npm i )
+
+      - name: Build cargo-zisk and fixed-data generators
+        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+        working-directory: ${{ env.WS }}/zisk
+        run: |
+          cargo build --release -p cargo-zisk --bin cargo-zisk
+          cargo run --release --bin arith_frops_fixed_gen
+          cargo run --release --bin binary_basic_frops_fixed_gen
+          cargo run --release --bin binary_extension_frops_fixed_gen
+
+      - name: Compile ZisK PIL
+        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+        working-directory: ${{ env.WS }}/zisk
+        run: |
+          node --max-old-space-size=16384 "$WS/pil2-compiler/src/pil.js" pil/zisk.pil \
+            -I pil,"$WS/pil2-proofman/pil2-components/lib/std/pil",state-machines,precompiles \
+            -o pil/zisk.pilout -u tmp/fixed -O fixed-to-file
+
+      - name: Generate setup (non-recursive)
+        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+        working-directory: ${{ env.WS }}/zisk
+        run: |
+          node --max-old-space-size=16384 --stack-size=8192 \
+            "$WS/pil2-proofman-js/src/main_setup.js" \
+            -a ./pil/zisk.pilout -b build -u tmp/fixed \
+            -s state-machines/starkstructs.json
+
+      - name: Install proving key and generate constant trees
+        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+        working-directory: ${{ env.WS }}/zisk
+        run: |
+          rm -rf "$PROVING_KEY_DIR"
+          mkdir -p "$PROVING_KEY_DIR"
+          cp -R build/provingKey "$PROVING_KEY_PATH"
+          # -a disables proofs aggregation (we built a non-recursive setup); CPU only.
+          ./target/release/cargo-zisk check-setup --proving-key "$PROVING_KEY_PATH" -a
+
+  test-reth:
+    name: Test Reth
+    needs: [fmt, clippy, proving-key]
+    runs-on: self-hosted
+    timeout-minutes: 45
+    container:
+      image: ubuntu:22.04
+      options: --shm-size=48g
+    defaults:
+      run:
+        shell: bash
+    env:
+      # Add as many input blocks as needed (from less MGs to more MGs)
+      RETH_TEST_BLOCKS: "24647140 24697070 24628590"
+      RETH_INPUT_FOLDER: bin/guests/stateless-validator-reth/inputs
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify test inputs exist
+        run: |
+          for block in $RETH_TEST_BLOCKS; do
+            count=$(ls ${RETH_INPUT_FOLDER}/mainnet_${block}_*.bin 2>/dev/null | wc -l)
+            [ "$count" -gt 0 ] || { echo "ERROR: no input file for block $block in $RETH_INPUT_FOLDER"; exit 1; }
+          done
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-deps
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache target directory
+        uses: actions/cache@v4
+        with:
+          path: |
+            target
+            bin/guests/stateless-validator-reth/target
+            bin/guests/stateless-validator-ethrex/target
+          key: ${{ runner.os }}-selfhosted-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-selfhosted-target-
+
+      - name: Restore proving key
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.PROVING_KEY_DIR }}
+          key: ${{ needs.proving-key.outputs.cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Build host
+        run: cargo build --locked --release -p host
+
+      - name: Execute Reth Stateless Validation tests (emulator)
+        run: |
+          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
+          ./target/release/host --emulator --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
+
+      - name: Execute Reth Stateless Validation tests (assembly)
+        run: |
+          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
+          ./target/release/host --unlock-mapped-memory --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
+
+      - name: Verify Reth Stateless Validation constraints (emulator)
+        run: |
+          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
+          ./target/release/host --emulator --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
+
+      - name: Verify Reth Stateless Validation constraints (assembly)
+        run: |
+          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
+          ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
+
+  # Test Ethrex client
+  test-ethrex:
+    name: Test Ethrex
+    needs: [fmt, clippy, proving-key]
+    runs-on: self-hosted
+    timeout-minutes: 45
+    container:
+      image: ubuntu:22.04
+      options: --shm-size=48g
+    defaults:
+      run:
+        shell: bash
+    env:
+      # Add as many input blocks as needed (from less MGs to more MGs)
+      ETHREX_TEST_BLOCKS: "25128350 24697070 24697073"
+      ETHREX_INPUT_FOLDER: bin/guests/stateless-validator-ethrex/inputs
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify test inputs exist
+        run: |
+          for block in $ETHREX_TEST_BLOCKS; do
+            count=$(ls ${ETHREX_INPUT_FOLDER}/mainnet_${block}_*.bin 2>/dev/null | wc -l)
+            [ "$count" -gt 0 ] || { echo "ERROR: no input file for block $block in $ETHREX_INPUT_FOLDER"; exit 1; }
+          done
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-deps
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache target directory
+        uses: actions/cache@v4
+        with:
+          # Guest ELFs are cross-compiled into each guest's own target dir, not
+          # the workspace target — cache them too or every run rebuilds them.
+          # Keyed separately from the hosted clippy job: self-hosted runs in an
+          # ubuntu:22.04 container, so its artifacts aren't interchangeable.
+          path: |
+            target
+            bin/guests/stateless-validator-reth/target
+            bin/guests/stateless-validator-ethrex/target
+          key: ${{ runner.os }}-selfhosted-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-selfhosted-target-
+
+      - name: Restore proving key
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.PROVING_KEY_DIR }}
+          key: ${{ needs.proving-key.outputs.cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Build host
+        run: cargo build --locked --release -p host
+
+      - name: Execute Ethrex Stateless Validation tests (emulator)
+        run: |
+          include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
+          ./target/release/host --emulator --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
+
+      # TODO: We need a runner with more memory
+      # - name: Execute Ethrex Stateless Validation tests (assembly)
+      #   run: |
+      #     include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
+      #     ./target/release/host --unlock-mapped-memory --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
+
+      - name: Verify Ethrex Stateless Validation constraints (emulator)
+        run: |
+          include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
+          ./target/release/host --emulator --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
+
+      # TODO: We need a runner with more memory
+      # - name: Verify Ethrex Stateless Validation constraints (assembly)
+      #   run: |
+      #     include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
+      #     ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
