@@ -98,12 +98,13 @@ jobs:
         id: key
         run: echo "value=provingkey-${ZISK_REF}-${PIL2_PROOFMAN_REF}-${PIL2_PROOFMAN_JS_REF}-${PIL2_COMPILER_REF}-v1" >> "$GITHUB_OUTPUT"
 
-      - name: Cache proving key
+      - name: Look up proving key cache
         id: cache-proving-key
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ${{ env.PROVING_KEY_DIR }}
           key: ${{ steps.key.outputs.value }}
+          lookup-only: true
 
       - name: Setup dependencies
         if: steps.cache-proving-key.outputs.cache-hit != 'true'
@@ -157,6 +158,13 @@ jobs:
           cp -R build/provingKey "$PROVING_KEY_PATH"
           # -a disables proofs aggregation (we built a non-recursive setup); CPU only.
           ./target/release/cargo-zisk check-setup --proving-key "$PROVING_KEY_PATH" -a
+
+      - name: Save proving key
+        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.PROVING_KEY_DIR }}
+          key: ${{ steps.key.outputs.value }}
 
   test-reth:
     name: Test Reth
