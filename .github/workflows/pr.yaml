@@ -14,8 +14,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref || github.run_id }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
+  CARGO_NET_GIT_FETCH_WITH_CLI: "true"
   RUST_BACKTRACE: 1
   ZISK_REF: pre-develop-1.0.0-beta
   PIL2_COMPILER_REF: develop-0.10.0
@@ -118,7 +122,7 @@ jobs:
           ( cd pil2-compiler && npm i )
           ( cd pil2-proofman-js && npm i )
 
-      - name: Build cargo-zisk and fixed-data generators
+      - name: Build cargo-zisk and fixed-columns generators
         if: steps.cache-proving-key.outputs.cache-hit != 'true'
         working-directory: ${{ env.WS }}/zisk
         run: |
@@ -175,15 +179,14 @@ jobs:
 
       - name: Verify test inputs exist
         run: |
+          shopt -s nullglob
           for block in $RETH_TEST_BLOCKS; do
-            count=$(ls ${RETH_INPUT_FOLDER}/mainnet_${block}_*.bin 2>/dev/null | wc -l)
-            [ "$count" -gt 0 ] || { echo "ERROR: no input file for block $block in $RETH_INPUT_FOLDER"; exit 1; }
+            matches=("${RETH_INPUT_FOLDER}"/mainnet_"${block}"_*.bin)
+            ((${#matches[@]} > 0)) || { echo "ERROR: no input file for block $block in $RETH_INPUT_FOLDER"; exit 1; }
           done
 
       - name: Setup dependencies
         uses: ./.github/actions/setup-deps
-        with:
-          zisk-ref: ${{ env.ZISK_REF }}
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -216,25 +219,37 @@ jobs:
       - name: Build host
         run: cargo build --locked --release -p host
 
-      - name: Execute Reth Stateless Validation tests (emulator)
+      - name: Execute Reth stateless validation tests (emulator)
         run: |
-          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
-          ./target/release/host --emulator --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
+          include_flags=()
+          for block in $RETH_TEST_BLOCKS; do
+            include_flags+=(--include "$block")
+          done
+          ./target/release/host --emulator --action execute --proving-key "$PROVING_KEY_PATH" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
-      - name: Execute Reth Stateless Validation tests (assembly)
+      - name: Execute Reth stateless validation tests (assembly)
         run: |
-          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
-          ./target/release/host --unlock-mapped-memory --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
+          include_flags=()
+          for block in $RETH_TEST_BLOCKS; do
+            include_flags+=(--include "$block")
+          done
+          ./target/release/host --unlock-mapped-memory --action execute --proving-key "$PROVING_KEY_PATH" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Reth Stateless Validation constraints (emulator)
         run: |
-          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
-          ./target/release/host --emulator --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
+          include_flags=()
+          for block in $RETH_TEST_BLOCKS; do
+            include_flags+=(--include "$block")
+          done
+          ./target/release/host --emulator --action verify-constraints --proving-key "$PROVING_KEY_PATH" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Reth Stateless Validation constraints (assembly)
         run: |
-          include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
-          ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
+          include_flags=()
+          for block in $RETH_TEST_BLOCKS; do
+            include_flags+=(--include "$block")
+          done
+          ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key "$PROVING_KEY_PATH" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
   test-ethrex:
     name: Test Ethrex
@@ -257,15 +272,14 @@ jobs:
 
       - name: Verify test inputs exist
         run: |
+          shopt -s nullglob
           for block in $ETHREX_TEST_BLOCKS; do
-            count=$(ls ${ETHREX_INPUT_FOLDER}/mainnet_${block}_*.bin 2>/dev/null | wc -l)
-            [ "$count" -gt 0 ] || { echo "ERROR: no input file for block $block in $ETHREX_INPUT_FOLDER"; exit 1; }
+            matches=("${ETHREX_INPUT_FOLDER}"/mainnet_"${block}"_*.bin)
+            ((${#matches[@]} > 0)) || { echo "ERROR: no input file for block $block in $ETHREX_INPUT_FOLDER"; exit 1; }
           done
 
       - name: Setup dependencies
         uses: ./.github/actions/setup-deps
-        with:
-          zisk-ref: ${{ env.ZISK_REF }}
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -280,10 +294,6 @@ jobs:
       - name: Cache target directory
         uses: actions/cache@v4
         with:
-          # Guest ELFs are cross-compiled into each guest's own target dir, not
-          # the workspace target — cache them too or every run rebuilds them.
-          # Keyed separately from the hosted clippy job: self-hosted runs in an
-          # ubuntu:22.04 container, so its artifacts aren't interchangeable.
           path: |
             target
             bin/guests/stateless-validator-reth/target
@@ -302,24 +312,36 @@ jobs:
       - name: Build host
         run: cargo build --locked --release -p host
 
-      - name: Execute Ethrex Stateless Validation tests (emulator)
+      - name: Execute Ethrex stateless validation tests (emulator)
         run: |
-          include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
-          ./target/release/host --emulator --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
+          include_flags=()
+          for block in $ETHREX_TEST_BLOCKS; do
+            include_flags+=(--include "$block")
+          done
+          ./target/release/host --emulator --action execute --proving-key "$PROVING_KEY_PATH" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
       # TODO: We need a runner with more memory
-      # - name: Execute Ethrex Stateless Validation tests (assembly)
+      # - name: Execute Ethrex stateless validation tests (assembly)
       #   run: |
-      #     include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
-      #     ./target/release/host --unlock-mapped-memory --action execute --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
+      #     include_flags=()
+      #     for block in $ETHREX_TEST_BLOCKS; do
+      #       include_flags+=(--include "$block")
+      #     done
+      #     ./target/release/host --unlock-mapped-memory --action execute --proving-key "$PROVING_KEY_PATH" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Ethrex Stateless Validation constraints (emulator)
         run: |
-          include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
-          ./target/release/host --emulator --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
+          include_flags=()
+          for block in $ETHREX_TEST_BLOCKS; do
+            include_flags+=(--include "$block")
+          done
+          ./target/release/host --emulator --action verify-constraints --proving-key "$PROVING_KEY_PATH" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
       # TODO: We need a runner with more memory
       # - name: Verify Ethrex Stateless Validation constraints (assembly)
       #   run: |
-      #     include_flags=$(printf -- "--include %s " $ETHREX_TEST_BLOCKS)
-      #     ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client ethrex --input-folder $ETHREX_INPUT_FOLDER $include_flags
+      #     include_flags=()
+      #     for block in $ETHREX_TEST_BLOCKS; do
+      #       include_flags+=(--include "$block")
+      #     done
+      #     ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key "$PROVING_KEY_PATH" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
