@@ -23,6 +23,7 @@ url = { workspace = true }
 async-trait.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
+rayon.workspace = true
 
 alloy-genesis.workspace = true
 alloy-provider = { workspace = true, features = ["debug-api"] }
