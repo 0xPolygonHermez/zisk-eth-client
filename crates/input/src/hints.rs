@@ -11,6 +11,23 @@ use zisk_sdk::ZiskStdin;
 
 use crate::ExecutionClient;
 
+#[cfg(zisk_hints)]
+fn hints_pool() -> Result<&'static rayon::ThreadPool> {
+    use std::sync::OnceLock;
+    static POOL: OnceLock<rayon::ThreadPool> = OnceLock::new();
+
+    if let Some(pool) = POOL.get() {
+        return Ok(pool);
+    }
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .map_err(|e| anyhow::anyhow!("failed to build deterministic hints rayon pool: {e}"))?;
+    // If another thread won the race, our pool is dropped and we use the winner's.
+    let _ = POOL.set(pool);
+    Ok(POOL.get().expect("pool was just set"))
+}
+
 /// Shared core: feed `stdin` as the native input, run `client.run()` under
 /// `catch_unwind` with the sink opened by `init`, then tear it down with `deinit`.
 /// `deinit` always runs — even if the client panics — so the sink flushes and
@@ -25,10 +42,7 @@ fn run_with_hints(
     ziskos::set_native_input(stdin.read_data());
     init()?;
 
-    let pool = rayon::ThreadPoolBuilder::new()
-        .num_threads(1)
-        .build()
-        .map_err(|e| anyhow::anyhow!("failed to build deterministic hints rayon pool: {e}"))?;
+    let pool = hints_pool()?;
 
     let t0 = std::time::Instant::now();
     let run_result =
