@@ -6,7 +6,8 @@
 #
 # It is run twice by the cycle-tracking workflow: once on the PR tree and once
 # on the base-branch tree. Building from the current tree each time means the
-# diff reflects changes to the emulator / cost model *and* to the guest sources.
+# diff reflects changes to the guest sources / resulting ELF (the workflow holds
+# the emulator fixed across both runs).
 #
 # Usage: zec_bench.sh <OUTDIR>
 #
@@ -22,7 +23,7 @@ mkdir -p "$OUTDIR"
 CARGO_ZISK="${CARGO_ZISK:-cargo-zisk}"
 ZISKEMU="${ZISKEMU:-ziskemu}"
 
-REPO="${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel)}"
+REPO="${BENCH_REPO_DIR:-${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel)}}"
 cd "$REPO"
 
 ZISK_TARGET="riscv64ima-zisk-zkvm-elf"

@@ -65,23 +65,29 @@ def delta(b, p):
     return f"{dot} {d / b * 100:+.2f}%"
 
 
+def split_prog(prog):
+    """Split a report stem into (guest, input): 'reth_24647140' -> ('reth', '24647140')."""
+    client, _, block = prog.partition("_")
+    return client, block
+
+
 def summary(rows):
-    """Headline table: Steps + Total Cost (PR value and delta) per guest+block."""
+    """Headline table: Steps + Total Cost (PR value and delta) per guest + input."""
     out = [
-        "| Guest | Steps | Δ Steps | Total Cost | Δ Total Cost |",
-        "| --- | --- | --- | --- | --- |",
+        "| Guest | Input | Steps | Δ Steps | Total Cost | Δ Total Cost |",
+        "| --- | --- | --- | --- | --- | --- |",
     ]
-    for prog, base, pr in rows:
+    for client, block, base, pr in rows:
         out.append(
-            f"| {prog} "
+            f"| {client} | {block} "
             f"| {fmt(pr.get('STEPS'))} | {delta(base.get('STEPS'), pr.get('STEPS'))} "
             f"| {fmt(pr.get('TOTAL'))} | {delta(base.get('TOTAL'), pr.get('TOTAL'))} |"
         )
     return "\n".join(out)
 
 
-def breakdown(program, base, pr):
-    """Full per-row table for one guest+block, wrapped in a collapsible section."""
+def breakdown(client, block, base, pr):
+    """Full per-row table for one guest + input, wrapped in a collapsible section."""
     lines = [
         "| Metric | Base Branch | Current PR | Diff | Diff (%) |",
         "| --- | --- | --- | --- | --- |",
@@ -100,7 +106,7 @@ def breakdown(program, base, pr):
         lines.append(f"| {name} | {fmt(b)} | {fmt(p)} | {diff} | {pct} |")
     table = "\n".join(lines)
     return (
-        f"<details>\n<summary><b>{program}</b></summary>\n\n"
+        f"<details>\n<summary><b>{client} ({block})</b></summary>\n\n"
         f"{table}\n\n"
         "</details>"
     )
@@ -117,7 +123,7 @@ def main():
 
     rows = [
         (
-            prog,
+            *split_prog(prog),
             parse_report(os.path.join(base_dir, f"{prog}.txt")),
             parse_report(os.path.join(pr_dir, f"{prog}.txt")),
         )
@@ -142,8 +148,8 @@ def main():
     out.append("")
     out.append("### Per-Guest Breakdown")
     out.append("")
-    for prog, base, pr in rows:
-        out.append(breakdown(prog, base, pr))
+    for client, block, base, pr in rows:
+        out.append(breakdown(client, block, base, pr))
         out.append("")
 
     out.append("---")

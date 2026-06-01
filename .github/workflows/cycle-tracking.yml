@@ -56,11 +56,6 @@ jobs:
       - name: "Setup dependencies"
         uses: ./.github/actions/setup-deps
 
-      # cargo-zisk and ziskemu are built and run from a local clone of the ZisK
-      # repo (kept in $HOME/zisk, outside the workspace so it survives the
-      # base-branch checkout/clean). The clone always tracks the tip of ZISK_REF,
-      # so the cycle-tracker reflects the latest ZisK; the build is cached by the
-      # resolved commit SHA, so it only rebuilds when that tip actually moves.
       - name: "Clone ZisK"
         id: zisk
         run: |
@@ -92,31 +87,24 @@ jobs:
           "$CARGO_ZISK" toolchain install
           rustup toolchain list | grep -q zisk || { echo "ERROR: ZisK toolchain not found after install."; exit 1; }
 
-      # Copy the bench scripts out of the tree so they survive the base checkout
-      # (the base branch may not contain them).
-      - name: "Stash benchmark scripts"
-        run: |
-          cp .github/scripts/zec_bench.sh .github/scripts/zec_cycle_diff.py "$RUNNER_TEMP/"
-          chmod +x "$RUNNER_TEMP/zec_bench.sh"
-
       - name: "Benchmark PR branch"
-        run: bash "$RUNNER_TEMP/zec_bench.sh" "$RUNNER_TEMP/pr"
+        run: bash .github/scripts/zec_bench.sh "$RUNNER_TEMP/pr"
 
-      - name: "Switch to base branch"
-        env:
-          BASE_REF: ${{ github.event.pull_request.base.ref || inputs.base_ref }}
-        run: |
-          git fetch origin "$BASE_REF"
-          git checkout --detach "origin/$BASE_REF"
-          git clean -fdx -e target
+      - name: "Checkout base branch"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref || inputs.base_ref }}
+          path: base-tree
 
       - name: "Benchmark base branch"
-        run: bash "$RUNNER_TEMP/zec_bench.sh" "$RUNNER_TEMP/base"
+        env:
+          BENCH_REPO_DIR: ${{ github.workspace }}/base-tree
+        run: bash .github/scripts/zec_bench.sh "$RUNNER_TEMP/base"
 
       - name: "Build execution report"
         id: report
         run: |
-          python3 "$RUNNER_TEMP/zec_cycle_diff.py" "$RUNNER_TEMP/base" "$RUNNER_TEMP/pr" > "$RUNNER_TEMP/report.md"
+          python3 .github/scripts/zec_cycle_diff.py "$RUNNER_TEMP/base" "$RUNNER_TEMP/pr" > "$RUNNER_TEMP/report.md"
           cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
           {
             echo 'EXECUTION_REPORT<<__ZEC_EOF__'
