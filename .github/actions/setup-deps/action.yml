@@ -4,16 +4,12 @@ description: Install system dependencies and ZisK toolchain
 runs:
   using: composite
   steps:
-    - name: Detect sudo
-      shell: bash
-      run: |
-        if [ "$(id -u)" -eq 0 ]; then echo "SUDO=" >> "$GITHUB_ENV"; else echo "SUDO=sudo" >> "$GITHUB_ENV"; fi
-
     - name: Install system dependencies
       shell: bash
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
+        SUDO=$([ "$(id -u)" -ne 0 ] && echo sudo || echo "")
         $SUDO apt-get update
         $SUDO apt-get install -y apt-utils dialog libterm-readline-perl-perl
         $SUDO apt-get install -y curl git xz-utils jq build-essential qemu-system libomp-dev libgmp-dev \

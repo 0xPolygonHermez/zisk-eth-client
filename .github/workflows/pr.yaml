@@ -18,9 +18,9 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   ZISK_REF: pre-develop-1.0.0-beta
-  PIL2_COMPILER_REF: v0.9.0
-  PIL2_PROOFMAN_REF: v0.18.0
-  PIL2_PROOFMAN_JS_REF: v0.17.0
+  PIL2_COMPILER_REF: develop-0.10.0
+  PIL2_PROOFMAN_REF: pre-develop-1.0.0-beta
+  PIL2_PROOFMAN_JS_REF: pre-develop-0.19.0
   PROVING_KEY_DIR: /tmp/zisk-provingkey
   PROVING_KEY_PATH: /tmp/zisk-provingkey/provingKey
 
@@ -74,6 +74,7 @@ jobs:
 
   proving-key:
     name: Generate proving key
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
     runs-on: self-hosted
     timeout-minutes: 120
     container:
@@ -103,10 +104,6 @@ jobs:
       - name: Setup dependencies
         if: steps.cache-proving-key.outputs.cache-hit != 'true'
         uses: ./.github/actions/setup-deps
-        with:
-          # This job builds cargo-zisk itself (below) for the fixed-gen binaries
-          # and check-setup, and cross-compiles no guests — so skip the toolchain.
-          install-toolchain: "false"
 
       - name: Clone ZisK and PIL2 sources
         if: steps.cache-proving-key.outputs.cache-hit != 'true'
@@ -160,6 +157,7 @@ jobs:
   test-reth:
     name: Test Reth
     needs: [fmt, clippy, proving-key]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
     runs-on: self-hosted
     timeout-minutes: 45
     container:
@@ -238,10 +236,10 @@ jobs:
           include_flags=$(printf -- "--include %s " $RETH_TEST_BLOCKS)
           ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key $PROVING_KEY_PATH stateless-validator --client reth --input-folder $RETH_INPUT_FOLDER $include_flags
 
-  # Test Ethrex client
   test-ethrex:
     name: Test Ethrex
     needs: [fmt, clippy, proving-key]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
     runs-on: self-hosted
     timeout-minutes: 45
     container:
