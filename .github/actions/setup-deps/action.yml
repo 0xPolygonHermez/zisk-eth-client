@@ -22,17 +22,12 @@ runs:
           ca-certificates gnupg lsb-release wget libclang-dev clang gcc-riscv64-unknown-elf llvm
 
     - name: Install Node.js 20
-      shell: bash
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        curl -fsSL https://deb.nodesource.com/setup_20.x | ([ "$(id -u)" -ne 0 ] && sudo -E bash || bash)
-        $SUDO apt-get install -y nodejs
+      uses: actions/setup-node@v6
+      with:
+        node-version: 20
 
     - name: Install Rust
-      shell: bash
-      run: |
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-          | sh -s -- -y --default-toolchain stable --component rustfmt,clippy
-        echo "${CARGO_HOME:-$HOME/.cargo}/bin" >> "$GITHUB_PATH"
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt,clippy
 
