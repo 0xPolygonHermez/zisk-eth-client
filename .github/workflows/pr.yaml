@@ -25,8 +25,6 @@ env:
   PIL2_COMPILER_REF: develop-0.10.0
   PIL2_PROOFMAN_REF: pre-develop-1.0.0-beta
   PIL2_PROOFMAN_JS_REF: pre-develop-0.19.0
-  PROVING_KEY_DIR: /tmp/zisk-provingkey
-  PROVING_KEY_PATH: /tmp/zisk-provingkey/provingKey
 
 jobs:
   fmt:
@@ -89,8 +87,6 @@ jobs:
         shell: bash
     env:
       WS: ${{ github.workspace }}/.zk-setup
-    outputs:
-      cache-key: ${{ steps.key.outputs.value }}
     steps:
       - uses: actions/checkout@v4
 
@@ -98,73 +94,54 @@ jobs:
         id: key
         run: echo "value=provingkey-${ZISK_REF}-${PIL2_PROOFMAN_REF}-${PIL2_PROOFMAN_JS_REF}-${PIL2_COMPILER_REF}-v1" >> "$GITHUB_OUTPUT"
 
-      - name: Look up proving key cache
-        id: cache-proving-key
-        uses: actions/cache/restore@v4
-        with:
-          path: ${{ env.PROVING_KEY_DIR }}
-          key: ${{ steps.key.outputs.value }}
-          lookup-only: true
+      - name: Check for existing proving key
+        id: pk
+        run: |
+          # The proving key persists on the shared $HOME/.zisk across jobs and runs.
+          # Skip (re)generation when it's already installed for this exact version.
+          marker="$HOME/.zisk/.provingkey-version"
+          if [ -d "$HOME/.zisk/provingKey" ] && [ "$(cat "$marker" 2>/dev/null)" = "${{ steps.key.outputs.value }}" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Proving key ${{ steps.key.outputs.value }} already installed at \$HOME/.zisk/provingKey"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup dependencies
-        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+        if: steps.pk.outputs.exists != 'true'
         uses: ./.github/actions/setup-deps
 
-      - name: Clone ZisK and PIL2 sources
-        if: steps.cache-proving-key.outputs.cache-hit != 'true'
+      - name: Clone ZisK
+        if: steps.pk.outputs.exists != 'true'
         run: |
           rm -rf "$WS"
-          mkdir -p "$WS"
-          cd "$WS"
-          git clone --depth 1 --branch "$ZISK_REF"             https://github.com/0xPolygonHermez/zisk.git
-          git clone --depth 1 --branch "$PIL2_COMPILER_REF"    https://github.com/0xPolygonHermez/pil2-compiler.git
-          git clone --depth 1 --branch "$PIL2_PROOFMAN_REF"    https://github.com/0xPolygonHermez/pil2-proofman.git
-          git clone --depth 1 --branch "$PIL2_PROOFMAN_JS_REF" https://github.com/0xPolygonHermez/pil2-proofman-js.git
-          ( cd pil2-compiler && npm i )
-          ( cd pil2-proofman-js && npm i )
+          git clone --depth 1 --branch "$ZISK_REF" https://github.com/0xPolygonHermez/zisk.git "$WS"
 
-      - name: Build cargo-zisk and fixed-columns generators
-        if: steps.cache-proving-key.outputs.cache-hit != 'true'
-        working-directory: ${{ env.WS }}/zisk
+      - name: Build cargo-zisk
+        if: steps.pk.outputs.exists != 'true'
+        working-directory: ${{ env.WS }}
         run: |
           cargo build --release -p cargo-zisk --bin cargo-zisk
-          cargo run --release --bin arith_frops_fixed_gen
-          cargo run --release --bin binary_basic_frops_fixed_gen
-          cargo run --release --bin binary_extension_frops_fixed_gen
+          mkdir -p "$HOME/.zisk/bin"
+          install -m 0755 target/release/cargo-zisk "$HOME/.zisk/bin/cargo-zisk"
 
-      - name: Compile ZisK PIL
-        if: steps.cache-proving-key.outputs.cache-hit != 'true'
-        working-directory: ${{ env.WS }}/zisk
+      - name: Generate proving key (zisk build_setup.sh)
+        if: steps.pk.outputs.exists != 'true'
+        working-directory: ${{ env.WS }}/tools/test-env
+        env:
+          ZISK_GHA: "1" # skip .env loading and the interactive confirm prompt
+          DISABLE_ENV_CONFIRM: "1"
+          DISABLE_RECURSIVE_SETUP: "1" # non-recursive is enough for execute / verify-constraints
+          ONLY_CPU: "1" # no GPU on the runner -> check-setup runs without --gpu
+          ZISK_REPO_DIR: ${{ env.WS }}
+          PIL2_COMPILER_BRANCH: ${{ env.PIL2_COMPILER_REF }}
+          PIL2_PROOFMAN_BRANCH: ${{ env.PIL2_PROOFMAN_REF }}
+          PIL2_PROOFMAN_JS_BRANCH: ${{ env.PIL2_PROOFMAN_JS_REF }}
         run: |
-          node --max-old-space-size=16384 "$WS/pil2-compiler/src/pil.js" pil/zisk.pil \
-            -I pil,"$WS/pil2-proofman/pil2-components/lib/std/pil",state-machines,precompiles \
-            -o pil/zisk.pilout -u tmp/fixed -O fixed-to-file
-
-      - name: Generate setup (non-recursive)
-        if: steps.cache-proving-key.outputs.cache-hit != 'true'
-        working-directory: ${{ env.WS }}/zisk
-        run: |
-          node --max-old-space-size=16384 --stack-size=8192 \
-            "$WS/pil2-proofman-js/src/main_setup.js" \
-            -a ./pil/zisk.pilout -b build -u tmp/fixed \
-            -s state-machines/starkstructs.json
-
-      - name: Install proving key and generate constant trees
-        if: steps.cache-proving-key.outputs.cache-hit != 'true'
-        working-directory: ${{ env.WS }}/zisk
-        run: |
-          rm -rf "$PROVING_KEY_DIR"
-          mkdir -p "$PROVING_KEY_DIR"
-          cp -R build/provingKey "$PROVING_KEY_PATH"
-          # -a disables proofs aggregation (we built a non-recursive setup); CPU only.
-          ./target/release/cargo-zisk check-setup --proving-key "$PROVING_KEY_PATH" -a
-
-      - name: Save proving key
-        if: steps.cache-proving-key.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.PROVING_KEY_DIR }}
-          key: ${{ steps.key.outputs.value }}
+          ./build_setup.sh
+          # build_setup installs the key to $HOME/.zisk/provingKey (read directly by
+          # the test jobs). Record the version so later runs can skip regeneration.
+          echo "${{ steps.key.outputs.value }}" > "$HOME/.zisk/.provingkey-version"
 
   test-reth:
     name: Test Reth
@@ -179,6 +156,7 @@ jobs:
       run:
         shell: bash
     env:
+      TARGET_CACHE_SCOPE: reth
       # Add as many input blocks as needed (from less MGs to more MGs)
       RETH_TEST_BLOCKS: "24647140 24697070 24628590"
       RETH_INPUT_FOLDER: bin/guests/stateless-validator-reth/inputs
@@ -213,16 +191,13 @@ jobs:
             target
             bin/guests/stateless-validator-reth/target
             bin/guests/stateless-validator-ethrex/target
-          key: ${{ runner.os }}-selfhosted-target-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-selfhosted-target-${{ env.TARGET_CACHE_SCOPE }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-selfhosted-target-
+            ${{ runner.os }}-selfhosted-target-${{ env.TARGET_CACHE_SCOPE }}-
 
-      - name: Restore proving key
-        uses: actions/cache/restore@v4
-        with:
-          path: ${{ env.PROVING_KEY_DIR }}
-          key: ${{ needs.proving-key.outputs.cache-key }}
-          fail-on-cache-miss: true
+      - name: Verify proving key present
+        run: |
+          [ -d "$HOME/.zisk/provingKey" ] || { echo "ERROR: proving key not found at \$HOME/.zisk/provingKey (the proving-key job installs it on the shared volume)"; exit 1; }
 
       - name: Build host
         run: cargo build --locked --release -p host
@@ -233,7 +208,7 @@ jobs:
           for block in $RETH_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --emulator --action execute --proving-key "$PROVING_KEY_PATH" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --emulator --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Execute Reth stateless validation tests (assembly)
         run: |
@@ -241,7 +216,7 @@ jobs:
           for block in $RETH_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --unlock-mapped-memory --action execute --proving-key "$PROVING_KEY_PATH" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --unlock-mapped-memory --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Reth Stateless Validation constraints (emulator)
         run: |
@@ -249,7 +224,7 @@ jobs:
           for block in $RETH_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --emulator --action verify-constraints --proving-key "$PROVING_KEY_PATH" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --emulator --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Reth Stateless Validation constraints (assembly)
         run: |
@@ -257,7 +232,7 @@ jobs:
           for block in $RETH_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key "$PROVING_KEY_PATH" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
   test-ethrex:
     name: Test Ethrex
@@ -272,6 +247,7 @@ jobs:
       run:
         shell: bash
     env:
+      TARGET_CACHE_SCOPE: ethrex
       # Add as many input blocks as needed (from less MGs to more MGs)
       ETHREX_TEST_BLOCKS: "25128350 24697070 24697073"
       ETHREX_INPUT_FOLDER: bin/guests/stateless-validator-ethrex/inputs
@@ -306,16 +282,13 @@ jobs:
             target
             bin/guests/stateless-validator-reth/target
             bin/guests/stateless-validator-ethrex/target
-          key: ${{ runner.os }}-selfhosted-target-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-selfhosted-target-${{ env.TARGET_CACHE_SCOPE }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-selfhosted-target-
+            ${{ runner.os }}-selfhosted-target-${{ env.TARGET_CACHE_SCOPE }}-
 
-      - name: Restore proving key
-        uses: actions/cache/restore@v4
-        with:
-          path: ${{ env.PROVING_KEY_DIR }}
-          key: ${{ needs.proving-key.outputs.cache-key }}
-          fail-on-cache-miss: true
+      - name: Verify proving key present
+        run: |
+          [ -d "$HOME/.zisk/provingKey" ] || { echo "ERROR: proving key not found at \$HOME/.zisk/provingKey (the proving-key job installs it on the shared volume)"; exit 1; }
 
       - name: Build host
         run: cargo build --locked --release -p host
@@ -326,7 +299,7 @@ jobs:
           for block in $ETHREX_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --emulator --action execute --proving-key "$PROVING_KEY_PATH" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --emulator --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
       # TODO: We need a runner with more memory
       # - name: Execute Ethrex stateless validation tests (assembly)
@@ -335,7 +308,7 @@ jobs:
       #     for block in $ETHREX_TEST_BLOCKS; do
       #       include_flags+=(--include "$block")
       #     done
-      #     ./target/release/host --unlock-mapped-memory --action execute --proving-key "$PROVING_KEY_PATH" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
+      #     ./target/release/host --unlock-mapped-memory --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Ethrex Stateless Validation constraints (emulator)
         run: |
@@ -343,7 +316,7 @@ jobs:
           for block in $ETHREX_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --emulator --action verify-constraints --proving-key "$PROVING_KEY_PATH" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --emulator --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
       # TODO: We need a runner with more memory
       # - name: Verify Ethrex Stateless Validation constraints (assembly)
@@ -352,4 +325,4 @@ jobs:
       #     for block in $ETHREX_TEST_BLOCKS; do
       #       include_flags+=(--include "$block")
       #     done
-      #     ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key "$PROVING_KEY_PATH" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
+      #     ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
