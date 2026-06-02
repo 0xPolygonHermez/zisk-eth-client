@@ -1,0 +1,54 @@
+[workspace.package]
+
+[package]
+name = "zec-reth"
+description = "ZisK Ethereum Client Stateless Validator Reth (static linking)"
+version = "0.1.0"
+edition = "2024"
+build = false
+
+[[bin]]
+name = "zec-reth"
+path = "src/main.rs"
+
+[lib]
+name = "zec_reth"
+crate-type = ["staticlib"]
+path = "src/lib.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[dependencies]
+guest-reth = { path = "../../../crates/guest-reth", default-features = false }
+bincode = { version = "2.0", default-features = false, features = ["serde", "alloc"] }
+getrandom = { version = "0.2", default-features = false, features = ["custom"] }
+
+# alloy
+alloy-consensus = { version = "2.0.0", default-features = false }
+alloy-primitives = { version = "1.5.6", default-features = false, features = ["native-keccak"] } # Needed for ZisK-accelerated keccak
+
+# revm
+revm = { version = "38.0.0", default-features = false }
+
+[target.'cfg(not(all(target_arch = "riscv64", target_os = "none")))'.dependencies]
+# Needed for deterministic Hashmap sort.
+alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git", branch = "zisk-hints/v0.33.3", default-features = false }
+# alloy-evm = { path = "../../../zisk-patch-alloy-evm/crates/evm" }
+
+[target.'cfg(not(any(all(target_arch = "riscv64", target_os = "none"), all(target_os = "zkvm", target_vendor = "zisk"))))'.dependencies]
+# reth's workspace compiles once_cell with features=["critical-section"], which requires an
+# implementation of _critical_section_1_0_acquire/release. On guest targets (bare-metal
+# riscv64im and ZisK zkVM) bump_alloc.rs provides a no-op; on the host use the std mutex.
+critical-section = { version = "1", features = ["std"] }
+
+[patch."https://github.com/paradigmxyz/reth.git"]
+# Needed for deterministic Hashmap sort
+reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v2.1.0" }
+# reth-trie-common = { path = "../../../zisk-patch-reth/crates/trie/common" }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_guest)', 'cfg(zisk_hints)', 'cfg(target_vendor, values("zisk"))', 'cfg(target_os, values("zkvm"))'] }

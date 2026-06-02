@@ -13,11 +13,11 @@ alloy-provider.workspace = true
 
 witness-generator.workspace = true
 
-anyhow.workspace = true
+anyhow = { workspace = true, features = ["std"] }
 async-trait.workspace = true
 clap.workspace = true
 rayon.workspace = true
-serde = { workspace = true, features = ["derive"] }
+serde = { workspace = true, features = ["std", "derive"] }
 serde_json.workspace = true
 tempfile.workspace = true
 tokio.workspace = true

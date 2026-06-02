@@ -1,6 +1,10 @@
+#[cfg(not(feature = "std"))]
+use alloc::sync::Arc;
+#[cfg(feature = "std")]
 use std::sync::Arc;
 
 use alloy_genesis::{ChainConfig, Genesis};
+use guest_common::chain::chain_name;
 use reth_chainspec::ChainSpec;
 use reth_ethereum_primitives::Block;
 
@@ -12,6 +16,11 @@ pub fn get_chain_spec(chain_config: &ChainConfig) -> Arc<ChainSpec> {
     };
 
     Arc::new(ChainSpec::from_genesis(genesis))
+}
+
+/// Map a chain ID to a display name.
+pub fn get_chain_name(chain_id: u64) -> &'static str {
+    chain_name(chain_id)
 }
 
 /// Extract common execution payload information across forks.

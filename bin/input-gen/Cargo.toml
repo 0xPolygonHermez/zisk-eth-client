@@ -7,7 +7,7 @@ edition.workspace = true
 [dependencies]
 host = { path = "../host" }
 
-anyhow.workspace = true
+anyhow = { workspace = true, features = ["std"] }
 clap.workspace = true
 tokio.workspace = true
 tracing-subscriber.workspace = true

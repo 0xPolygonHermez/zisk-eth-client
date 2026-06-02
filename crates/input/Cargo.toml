@@ -21,18 +21,21 @@ clap = { workspace = true, optional = true }
 url = { workspace = true }
 
 async-trait.workspace = true
-anyhow.workspace = true
-tracing.workspace = true
+anyhow = { workspace = true, features = ["std"] }
+bincode.workspace = true
 rayon.workspace = true
+tracing.workspace = true
+serde = { workspace = true, features = ["std", "derive"] }
+serde_with = { workspace = true, features = ["std", "macros"] }
 
-alloy-genesis.workspace = true
+alloy-genesis = { workspace = true, features = ["std"] }
 alloy-provider = { workspace = true, features = ["debug-api"] }
 alloy-rpc-client.workspace = true
 alloy-rpc-types-eth.workspace = true
 alloy-rpc-types-debug.workspace = true
 alloy-transport-http.workspace = true
 
-reth-chainspec.workspace = true
+reth-chainspec = { workspace = true, features = ["std"] }
 
 stateless-reth.workspace = true
 
