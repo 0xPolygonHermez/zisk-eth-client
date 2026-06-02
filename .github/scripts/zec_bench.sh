@@ -14,7 +14,7 @@
 # Requirements (provided by the workflow before calling this):
 #   - CARGO_ZISK / ZISKEMU env vars pointing at the binaries built from the local
 #     ZisK clone, and the ZisK rust toolchain installed
-#   - RETH_BLOCKS / ETHREX_BLOCKS env vars (space-separated block numbers)
+#   - RETH_TEST_BLOCKS / ETHREX_TEST_BLOCKS env vars (space-separated block numbers)
 set -euo pipefail
 
 OUTDIR="${1:?usage: zec_bench.sh <OUTDIR>}"
