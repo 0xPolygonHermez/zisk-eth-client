@@ -6,16 +6,6 @@ use guest_common::ffi::*;
 
 use super::ZiskCrypto;
 
-// mulmod256_c is exported by ziskos but not declared in zkvm_accelerators.h.
-extern "C" {
-    fn mul_mod_bytes256_c(
-        a_ptr: *const u8,
-        b_ptr: *const u8,
-        m_ptr: *const u8,
-        result_ptr: *mut u8,
-    );
-}
-
 impl Crypto for ZiskCrypto {
     fn ripemd160(&self, input: &[u8]) -> [u8; 32] {
         let mut output = zkvm_ripemd160_hash { data: [0u8; 32] };
@@ -177,7 +167,7 @@ impl Crypto for ZiskCrypto {
 
     fn mulmod256(&self, a: &[u8; 32], b: &[u8; 32], m: &[u8; 32]) -> [u8; 32] {
         let mut result = [0u8; 32];
-        unsafe { mul_mod_bytes256_c(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr()) };
+        unsafe { zkvm_mulmod256(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr()) };
         result
     }
 
