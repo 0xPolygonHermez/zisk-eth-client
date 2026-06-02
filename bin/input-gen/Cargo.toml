@@ -10,11 +10,11 @@ guest-reth.workspace = true
 zisk-sdk.workspace = true
 
 alloy-eips.workspace = true
-alloy-genesis.workspace = true
+alloy-genesis = { workspace = true, features = ["std"] }
 alloy-rpc-types-eth.workspace = true
 
-reth-chainspec.workspace = true
-reth-ethereum-primitives.workspace = true
+reth-chainspec = { workspace = true, features = ["std"] }
+reth-ethereum-primitives = { workspace = true, features = ["std"] }
 reth-rpc-api = { workspace = true, features = ["client"] }
 
 stateless-reth.workspace = true
@@ -22,7 +22,7 @@ stateless-reth.workspace = true
 witness-generator.workspace = true
 
 # Common dependencies
-anyhow.workspace = true
+anyhow = { workspace = true, features = ["std"] }
 async-trait.workspace = true
 bincode.workspace = true
 clap.workspace = true

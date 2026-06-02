@@ -14,7 +14,7 @@ ethrex-common.workspace = true
 ethrex-rpc.workspace = true
 
 # Common dependencies
-anyhow.workspace = true
+anyhow = { workspace = true, features = ["std"] }
 clap.workspace = true
 tokio.workspace = true
 tokio-util = { workspace = true, features = ["rt"] }

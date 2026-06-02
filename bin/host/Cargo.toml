@@ -8,9 +8,9 @@ edition = "2024"
 zisk-sdk.workspace = true
 
 clap.workspace = true
-serde = { workspace = true, features = ["derive"] }
+serde = { workspace = true, features = ["std", "derive"] }
 serde_json.workspace = true
-anyhow.workspace = true
+anyhow = { workspace = true, features = ["std"] }
 tracing.workspace = true
 tokio.workspace = true
 

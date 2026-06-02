@@ -4,16 +4,34 @@ description = ""
 version.workspace = true
 edition.workspace = true
 
+[features]
+default = ["std"]
+std = [
+    "dep:rayon",
+    "revm/std",
+    "anyhow/std",
+    "bincode/std",
+    "serde/std",
+    "serde_with/std",
+    "k256/std",
+    "alloy-consensus/std",
+    "alloy-genesis/std",
+    "alloy-primitives/std",
+    "alloy-rlp/std",
+]
+
 [dependencies]
 guest-common.workspace = true
 
-anyhow.workspace = true
-bincode.workspace = true
-serde.workspace = true
-serde_with.workspace = true
-rayon.workspace = true
-k256.workspace = true
-tiny-keccak.workspace = true
+# Use direct dep for bincode to avoid workspace's "std" feature being force-merged.
+bincode = { version = "2.0", default-features = false, features = ["serde", "alloc"] }
+anyhow = { workspace = true, default-features = false }
+serde = { workspace = true, default-features = false, features = ["derive", "alloc"] }
+serde_with = { workspace = true, default-features = false, features = ["macros", "alloc"] }
+rayon = { workspace = true, optional = true }
+revm = { workspace = true }
+k256 = { workspace = true, default-features = false, features = ["alloc", "ecdsa"] }
+tiny-keccak = { workspace = true }
 
 alloy-consensus = { workspace = true, default-features = false, features = [
   "crypto-backend",
@@ -24,16 +42,13 @@ alloy-primitives.workspace = true
 alloy-rlp.workspace = true
 alloy-rpc-types-debug.workspace = true
 
-revm.workspace = true
+reth-chainspec = { workspace = true, default-features = false }
+reth-ethereum-primitives = { workspace = true, default-features = false }
+reth-primitives-traits = { workspace = true, default-features = false }
+reth-evm-ethereum = { workspace = true, default-features = false }
 
-reth-chainspec.workspace = true
-reth-ethereum-primitives.workspace = true
-reth-primitives-traits.workspace = true
-reth-evm-ethereum.workspace = true
-
-stateless-reth-tries.workspace = true
-
-stateless-reth.workspace = true
+stateless-reth = { workspace = true, default-features = false }
+stateless-reth-tries = { workspace = true, default-features = false }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = [

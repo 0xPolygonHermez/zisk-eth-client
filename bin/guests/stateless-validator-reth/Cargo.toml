@@ -37,5 +37,6 @@ alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git
 reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v2.1.0" }
 # reth-trie-common = { path = "../../../zisk-patch-reth/crates/trie/common" }
 
+
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

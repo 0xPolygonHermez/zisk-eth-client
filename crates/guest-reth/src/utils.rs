@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::sync::Arc;
+#[cfg(feature = "std")]
 use std::sync::Arc;
 
 use alloy_genesis::{ChainConfig, Genesis};
