@@ -5,7 +5,8 @@ use std::{
 };
 
 use zisk_sdk::{
-    AsmOptions, EmbeddedClient, ExecutorKind, GuestProgram, ProverClient, VerifyConstraintsExtension, WitnessBuilderExt, ZiskStdin
+    AsmOptions, EmbeddedClient, ExecutorKind, GuestProgram, ProverClient,
+    VerifyConstraintsExtension, WitnessBuilderExt, ZiskStdin,
 };
 
 /// ZisK client
