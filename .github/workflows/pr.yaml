@@ -21,7 +21,7 @@ env:
   CARGO_TERM_COLOR: always
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
   RUST_BACKTRACE: 1
-  ZISK_REF: pre-develop-1.0.0-beta
+  ZISK_REF: fix-ci
   PIL2_COMPILER_REF: develop-0.10.0
   PIL2_PROOFMAN_REF: pre-develop-1.0.0-beta
   PIL2_PROOFMAN_JS_REF: pre-develop-0.19.0
@@ -301,14 +301,13 @@ jobs:
           done
           ./target/release/host --emulator --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
-      # TODO: We need a runner with more memory
-      # - name: Execute Ethrex stateless validation tests (assembly)
-      #   run: |
-      #     include_flags=()
-      #     for block in $ETHREX_TEST_BLOCKS; do
-      #       include_flags+=(--include "$block")
-      #     done
-      #     ./target/release/host --unlock-mapped-memory --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
+      - name: Execute Ethrex stateless validation tests (assembly)
+        run: |
+          include_flags=()
+          for block in $ETHREX_TEST_BLOCKS; do
+            include_flags+=(--include "$block")
+          done
+          ./target/release/host --unlock-mapped-memory --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Ethrex Stateless Validation constraints (emulator)
         run: |
@@ -318,11 +317,10 @@ jobs:
           done
           ./target/release/host --emulator --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
-      # TODO: We need a runner with more memory
-      # - name: Verify Ethrex Stateless Validation constraints (assembly)
-      #   run: |
-      #     include_flags=()
-      #     for block in $ETHREX_TEST_BLOCKS; do
-      #       include_flags+=(--include "$block")
-      #     done
-      #     ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
+      - name: Verify Ethrex Stateless Validation constraints (assembly)
+        run: |
+          include_flags=()
+          for block in $ETHREX_TEST_BLOCKS; do
+            include_flags+=(--include "$block")
+          done
+          ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
