@@ -107,7 +107,12 @@ jobs:
 
       - name: Install ZisK dependencies
         working-directory: ${{ env.WS }}/tools/test-env
-        run: bash install_deps.sh --cuda
+        run: |
+          bash install_deps.sh --cuda
+          # install_deps.sh installs Rust via rustup but only updates PATH in its
+          # own shell; expose cargo (and CUDA's nvcc) to the later build steps.
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          echo "/usr/local/cuda/bin" >> "$GITHUB_PATH"
 
       - name: Build cargo-zisk
         working-directory: ${{ env.WS }}
@@ -196,7 +201,12 @@ jobs:
 
       - name: Install ZisK dependencies
         working-directory: ${{ env.WS }}/tools/test-env
-        run: bash install_deps.sh --cuda
+        run: |
+          bash install_deps.sh --cuda
+          # install_deps.sh installs Rust via rustup but only updates PATH in its
+          # own shell; expose cargo (and CUDA's nvcc) to the later build steps.
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          echo "/usr/local/cuda/bin" >> "$GITHUB_PATH"
 
       - name: Build ZisK (cargo-zisk + toolchain + emulator-asm)
         working-directory: ${{ env.WS }}/tools/test-env
@@ -309,7 +319,12 @@ jobs:
 
       - name: Install ZisK dependencies
         working-directory: ${{ env.WS }}/tools/test-env
-        run: bash install_deps.sh --cuda
+        run: |
+          bash install_deps.sh --cuda
+          # install_deps.sh installs Rust via rustup but only updates PATH in its
+          # own shell; expose cargo (and CUDA's nvcc) to the later build steps.
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          echo "/usr/local/cuda/bin" >> "$GITHUB_PATH"
 
       - name: Build ZisK (cargo-zisk + toolchain + emulator-asm)
         working-directory: ${{ env.WS }}/tools/test-env
