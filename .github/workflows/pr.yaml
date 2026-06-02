@@ -191,11 +191,6 @@ jobs:
             target
             bin/guests/stateless-validator-reth/target
             bin/guests/stateless-validator-ethrex/target
-          # The CUDA/CPU split in proofman's starks-lib-c is decided by a build-time
-          # filesystem probe that is NOT part of cargo's fingerprint, so a CPU-built
-          # target/ (e.g. from a pre-CUDA or non-GPU run) would be reused as-is and
-          # leave the host CPU-only. Namespace the cache to GPU so it can only ever
-          # hold GPU-compiled artifacts (these jobs always build with nvcc present).
           key: ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-
@@ -324,11 +319,6 @@ jobs:
             target
             bin/guests/stateless-validator-reth/target
             bin/guests/stateless-validator-ethrex/target
-          # The CUDA/CPU split in proofman's starks-lib-c is decided by a build-time
-          # filesystem probe that is NOT part of cargo's fingerprint, so a CPU-built
-          # target/ (e.g. from a pre-CUDA or non-GPU run) would be reused as-is and
-          # leave the host CPU-only. Namespace the cache to GPU so it can only ever
-          # hold GPU-compiled artifacts (these jobs always build with nvcc present).
           key: ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-
