@@ -104,7 +104,7 @@ impl ZiskClient {
             steps: result.get_execution_steps(),
             cost: result
                 .get_execution_cost()
-                .expect("Failed to get execution cost"),
+                .ok_or_else(|| anyhow::anyhow!("Execution cost not available"))?,
             tx_count: None,
             gas_used: None,
         })

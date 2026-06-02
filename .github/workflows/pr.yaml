@@ -95,16 +95,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
-
       - name: Resolve ZisK ref
         uses: ./.github/actions/zisk-ref
 
       - name: Clone ZisK
-        run: |
-          rm -rf "$WS"
-          git clone --depth 1 --branch "$ZISK_REF" https://github.com/0xPolygonHermez/zisk.git "$WS"
+        uses: actions/checkout@v4
+        with:
+          repository: 0xPolygonHermez/zisk
+          ref: ${{ env.ZISK_REF }}
+          path: .zk-setup
+
+      - name: Install ZisK dependencies
+        working-directory: ${{ env.WS }}/tools/test-env
+        run: bash install_deps.sh --cuda
 
       - name: Build cargo-zisk
         working-directory: ${{ env.WS }}
@@ -156,9 +159,6 @@ jobs:
             ((${#matches[@]} > 0)) || { echo "ERROR: no input file for block $block in $RETH_INPUT_FOLDER"; exit 1; }
           done
 
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
-
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
@@ -188,9 +188,15 @@ jobs:
         uses: ./.github/actions/zisk-ref
 
       - name: Clone ZisK
-        run: |
-          rm -rf "$WS"
-          git clone --depth 1 --branch "$ZISK_REF" https://github.com/0xPolygonHermez/zisk.git "$WS"
+        uses: actions/checkout@v4
+        with:
+          repository: 0xPolygonHermez/zisk
+          ref: ${{ env.ZISK_REF }}
+          path: .zk-setup
+
+      - name: Install ZisK dependencies
+        working-directory: ${{ env.WS }}/tools/test-env
+        run: bash install_deps.sh --cuda
 
       - name: Build ZisK (cargo-zisk + toolchain + emulator-asm)
         working-directory: ${{ env.WS }}/tools/test-env
@@ -266,9 +272,6 @@ jobs:
             ((${#matches[@]} > 0)) || { echo "ERROR: no input file for block $block in $ETHREX_INPUT_FOLDER"; exit 1; }
           done
 
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
-
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
@@ -298,9 +301,15 @@ jobs:
         uses: ./.github/actions/zisk-ref
 
       - name: Clone ZisK
-        run: |
-          rm -rf "$WS"
-          git clone --depth 1 --branch "$ZISK_REF" https://github.com/0xPolygonHermez/zisk.git "$WS"
+        uses: actions/checkout@v4
+        with:
+          repository: 0xPolygonHermez/zisk
+          ref: ${{ env.ZISK_REF }}
+          path: .zk-setup
+
+      - name: Install ZisK dependencies
+        working-directory: ${{ env.WS }}/tools/test-env
+        run: bash install_deps.sh --cuda
 
       - name: Build ZisK (cargo-zisk + toolchain + emulator-asm)
         working-directory: ${{ env.WS }}/tools/test-env
