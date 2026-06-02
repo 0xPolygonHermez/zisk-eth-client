@@ -25,6 +25,10 @@ env:
   PIL2_COMPILER_REF: develop-0.10.0
   PIL2_PROOFMAN_REF: pre-develop-1.0.0-beta
   PIL2_PROOFMAN_JS_REF: pre-develop-0.19.0
+  # Block inputs to test per client (from less MGs to more MGs).
+  # It is good to have shared blocks between clients for easier comparison.
+  RETH_TEST_BLOCKS: "25229957 25229955 25229951"
+  ETHREX_TEST_BLOCKS: "25229957 25229955 25229951"
 
 jobs:
   fmt:
@@ -135,8 +139,6 @@ jobs:
     env:
       TARGET_CACHE_SCOPE: reth
       WS: ${{ github.workspace }}/.zk-setup
-      # Add as many input blocks as needed (from less MGs to more MGs)
-      RETH_TEST_BLOCKS: "24647140 24697070 24628590"
       RETH_INPUT_FOLDER: bin/guests/stateless-validator-reth/inputs
     steps:
       - uses: actions/checkout@v4
@@ -243,8 +245,6 @@ jobs:
     env:
       TARGET_CACHE_SCOPE: ethrex
       WS: ${{ github.workspace }}/.zk-setup
-      # Add as many input blocks as needed (from less MGs to more MGs)
-      ETHREX_TEST_BLOCKS: "25128350 24697070 24697073"
       ETHREX_INPUT_FOLDER: bin/guests/stateless-validator-ethrex/inputs
     steps:
       - uses: actions/checkout@v4
