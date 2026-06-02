@@ -102,7 +102,9 @@ impl ZiskClient {
         Ok(ZiskExecutionMetrics {
             duration: Duration::from_millis(result.get_execution_time()),
             steps: result.get_execution_steps(),
-            cost: result.get_execution_cost(),
+            cost: result
+                .get_execution_cost()
+                .expect("Failed to get execution cost"),
             tx_count: None,
             gas_used: None,
         })
