@@ -1,7 +1,6 @@
 name: "Test Ethereum Client"
 
 # TODO: Add tests with hints
-# TODO: Add gpu testing
 
 on:
   pull_request:
@@ -81,11 +80,13 @@ jobs:
   proving-key:
     name: Generate proving key
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-    runs-on: self-hosted
+    runs-on: gpu-hosted
     timeout-minutes: 120
     container:
-      image: ubuntu:22.04
-      options: --shm-size=48g
+      # CUDA-capable image so cargo-zisk builds with GPU support and check-setup
+      # can run with --gpu; --gpus all exposes the runner's GPU to the container.
+      image: ziskvm/zisk-runner-gpu:latest
+      options: --gpus all --shm-size=48g
     defaults:
       run:
         shell: bash
@@ -118,7 +119,6 @@ jobs:
           ZISK_GHA: "1" # skip .env loading and the interactive confirm prompt
           DISABLE_ENV_CONFIRM: "1"
           DISABLE_RECURSIVE_SETUP: "1"
-          ONLY_CPU: "1" # no GPU on the runner -> check-setup runs without --gpu
           USE_CACHE_SETUP: "1" # reuse a previously generated setup (keyed by PIL content hash, under $HOME/output)
           ZISK_REPO_DIR: ${{ env.WS }}
           PIL2_COMPILER_BRANCH: ${{ env.PIL2_COMPILER_REF }}
@@ -131,11 +131,13 @@ jobs:
     name: Test Reth
     needs: [fmt, clippy, proving-key]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-    runs-on: self-hosted
+    runs-on: gpu-hosted
     timeout-minutes: 45
     container:
-      image: ubuntu:22.04
-      options: --shm-size=48g
+      # CUDA-capable image + --gpus all so the host builds with GPU support and
+      # runs with --gpu.
+      image: ziskvm/zisk-runner-gpu:latest
+      options: --gpus all --shm-size=48g
     defaults:
       run:
         shell: bash
@@ -195,7 +197,6 @@ jobs:
         env:
           ZISK_GHA: "1" # skip .env loading and the interactive confirm prompt
           DISABLE_ENV_CONFIRM: "1"
-          ONLY_CPU: "1" # CPU-only build (no CUDA)
           ZISK_REPO_DIR: ${{ env.WS }}
         run: |
           ./build_zisk.sh
@@ -210,7 +211,7 @@ jobs:
           for block in $RETH_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --emulator --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --emulator --action execute --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Execute Reth stateless validation tests (assembly)
         run: |
@@ -218,7 +219,7 @@ jobs:
           for block in $RETH_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --unlock-mapped-memory --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --unlock-mapped-memory --action execute --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Reth stateless validation constraints (emulator)
         run: |
@@ -226,7 +227,7 @@ jobs:
           for block in $RETH_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --emulator --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --emulator --action verify-constraints --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Reth stateless validation constraints (assembly)
         run: |
@@ -234,17 +235,19 @@ jobs:
           for block in $RETH_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --unlock-mapped-memory --action verify-constraints --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
   test-ethrex:
     name: Test Ethrex
     needs: [fmt, clippy, proving-key]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-    runs-on: self-hosted
+    runs-on: gpu-hosted
     timeout-minutes: 45
     container:
-      image: ubuntu:22.04
-      options: --shm-size=48g
+      # CUDA-capable image + --gpus all so the host builds with GPU support and
+      # runs with --gpu.
+      image: ziskvm/zisk-runner-gpu:latest
+      options: --gpus all --shm-size=48g
     defaults:
       run:
         shell: bash
@@ -304,7 +307,6 @@ jobs:
         env:
           ZISK_GHA: "1" # skip .env loading and the interactive confirm prompt
           DISABLE_ENV_CONFIRM: "1"
-          ONLY_CPU: "1" # CPU-only build (no CUDA)
           ZISK_REPO_DIR: ${{ env.WS }}
         run: |
           ./build_zisk.sh
@@ -319,7 +321,7 @@ jobs:
           for block in $ETHREX_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --emulator --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --emulator --action execute --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Execute Ethrex stateless validation tests (assembly)
         run: |
@@ -327,7 +329,7 @@ jobs:
           for block in $ETHREX_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --unlock-mapped-memory --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --unlock-mapped-memory --action execute --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Ethrex stateless validation constraints (emulator)
         run: |
@@ -335,7 +337,7 @@ jobs:
           for block in $ETHREX_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --emulator --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --emulator --action verify-constraints --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
       - name: Verify Ethrex stateless validation constraints (assembly)
         run: |
@@ -343,4 +345,4 @@ jobs:
           for block in $ETHREX_TEST_BLOCKS; do
             include_flags+=(--include "$block")
           done
-          ./target/release/host --unlock-mapped-memory --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
+          ./target/release/host --unlock-mapped-memory --action verify-constraints --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
