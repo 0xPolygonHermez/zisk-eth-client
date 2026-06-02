@@ -30,8 +30,8 @@ ZISK_TARGET="riscv64ima-zisk-zkvm-elf"
 
 # client -> space-separated block numbers to emulate.
 declare -A CLIENT_BLOCKS=(
-  [reth]="${RETH_BLOCKS:-25229957}"
-  [ethrex]="${ETHREX_BLOCKS:-25229957}"
+  [reth]="${RETH_TEST_BLOCKS:-25229957}"
+  [ethrex]="${ETHREX_TEST_BLOCKS:-25229957}"
 )
 
 for client in reth ethrex; do
