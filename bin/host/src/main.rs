@@ -20,10 +20,8 @@ async fn main() -> Result<()> {
     }
 
     info!("ZisK Host");
-    if let Some(proving_key) = &cli.proving_key
-        && let Some(name) = proving_key.file_name()
-    {
-        info!(" Proving Key: {}", name.to_string_lossy());
+    if let Some(proving_key) = &cli.proving_key {
+        info!(" Proving Key: {}", proving_key.display());
     }
     info!(" Action: {:?}", cli.action);
     info!(" Guest Program: {}", cli.guest_program.display_name());

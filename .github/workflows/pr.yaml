@@ -21,7 +21,7 @@ env:
   CARGO_TERM_COLOR: always
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
   RUST_BACKTRACE: 1
-  ZISK_REF: fix-ci
+  ZISK_REF: feature/witness-embedded
   PIL2_COMPILER_REF: develop-0.10.0
   PIL2_PROOFMAN_REF: pre-develop-1.0.0-beta
   PIL2_PROOFMAN_JS_REF: pre-develop-0.19.0

@@ -38,11 +38,14 @@ impl BenchmarkRunner {
         unlock_mapped_memory: bool,
         gpu: bool,
     ) -> Result<Self> {
+        // Execute and verify-constraints don't aggregate proofs.
+        let no_aggregation = matches!(action, Action::Execute | Action::VerifyConstraints);
         let zisk_client = ZiskClient::new(elf).with_proving_key(
             proving_key,
             emulator,
             unlock_mapped_memory,
             gpu,
+            no_aggregation,
         )?;
 
         Ok(Self {
