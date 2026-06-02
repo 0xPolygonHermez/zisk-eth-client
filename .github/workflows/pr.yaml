@@ -1,4 +1,4 @@
-name: Test Ethereum Client
+name: "Test Ethereum Client"
 
 # TODO: Add tests with hints
 # TODO: Add gpu testing
@@ -90,35 +90,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Compute proving-key cache key
-        id: key
-        run: echo "value=provingkey-${ZISK_REF}-${PIL2_PROOFMAN_REF}-${PIL2_PROOFMAN_JS_REF}-${PIL2_COMPILER_REF}-v1" >> "$GITHUB_OUTPUT"
-
-      - name: Check for existing proving key
-        id: pk
-        run: |
-          # The proving key persists on the shared $HOME/.zisk across jobs and runs.
-          # Skip (re)generation when it's already installed for this exact version.
-          marker="$HOME/.zisk/.provingkey-version"
-          if [ -d "$HOME/.zisk/provingKey" ] && [ "$(cat "$marker" 2>/dev/null)" = "${{ steps.key.outputs.value }}" ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "Proving key ${{ steps.key.outputs.value }} already installed at \$HOME/.zisk/provingKey"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Setup dependencies
-        if: steps.pk.outputs.exists != 'true'
         uses: ./.github/actions/setup-deps
 
       - name: Clone ZisK
-        if: steps.pk.outputs.exists != 'true'
         run: |
           rm -rf "$WS"
           git clone --depth 1 --branch "$ZISK_REF" https://github.com/0xPolygonHermez/zisk.git "$WS"
 
       - name: Build cargo-zisk
-        if: steps.pk.outputs.exists != 'true'
         working-directory: ${{ env.WS }}
         run: |
           cargo build --release -p cargo-zisk --bin cargo-zisk
@@ -126,22 +106,19 @@ jobs:
           install -m 0755 target/release/cargo-zisk "$HOME/.zisk/bin/cargo-zisk"
 
       - name: Generate proving key (zisk build_setup.sh)
-        if: steps.pk.outputs.exists != 'true'
         working-directory: ${{ env.WS }}/tools/test-env
         env:
           ZISK_GHA: "1" # skip .env loading and the interactive confirm prompt
           DISABLE_ENV_CONFIRM: "1"
-          DISABLE_RECURSIVE_SETUP: "1" # non-recursive is enough for execute / verify-constraints
+          DISABLE_RECURSIVE_SETUP: "1"
           ONLY_CPU: "1" # no GPU on the runner -> check-setup runs without --gpu
+          USE_CACHE_SETUP: "1" # reuse a previously generated setup (keyed by PIL content hash, under $HOME/output)
           ZISK_REPO_DIR: ${{ env.WS }}
           PIL2_COMPILER_BRANCH: ${{ env.PIL2_COMPILER_REF }}
           PIL2_PROOFMAN_BRANCH: ${{ env.PIL2_PROOFMAN_REF }}
           PIL2_PROOFMAN_JS_BRANCH: ${{ env.PIL2_PROOFMAN_JS_REF }}
-        run: |
-          ./build_setup.sh
-          # build_setup installs the key to $HOME/.zisk/provingKey (read directly by
-          # the test jobs). Record the version so later runs can skip regeneration.
-          echo "${{ steps.key.outputs.value }}" > "$HOME/.zisk/.provingkey-version"
+        # build_setup installs the key to $HOME/.zisk/provingKey.
+        run: ./build_setup.sh
 
   test-reth:
     name: Test Reth
@@ -157,6 +134,7 @@ jobs:
         shell: bash
     env:
       TARGET_CACHE_SCOPE: reth
+      WS: ${{ github.workspace }}/.zk-setup
       # Add as many input blocks as needed (from less MGs to more MGs)
       RETH_TEST_BLOCKS: "24647140 24697070 24628590"
       RETH_INPUT_FOLDER: bin/guests/stateless-validator-reth/inputs
@@ -199,6 +177,22 @@ jobs:
         run: |
           [ -d "$HOME/.zisk/provingKey" ] || { echo "ERROR: proving key not found at \$HOME/.zisk/provingKey (the proving-key job installs it on the shared volume)"; exit 1; }
 
+      - name: Clone ZisK
+        run: |
+          rm -rf "$WS"
+          git clone --depth 1 --branch "$ZISK_REF" https://github.com/0xPolygonHermez/zisk.git "$WS"
+
+      - name: Build ZisK (cargo-zisk + toolchain + emulator-asm)
+        working-directory: ${{ env.WS }}/tools/test-env
+        env:
+          ZISK_GHA: "1" # skip .env loading and the interactive confirm prompt
+          DISABLE_ENV_CONFIRM: "1"
+          ONLY_CPU: "1" # CPU-only build (no CUDA)
+          ZISK_REPO_DIR: ${{ env.WS }}
+        run: |
+          ./build_zisk.sh
+          echo "$HOME/.zisk/bin" >> "$GITHUB_PATH"
+
       - name: Build host
         run: cargo build --locked --release -p host
 
@@ -218,7 +212,7 @@ jobs:
           done
           ./target/release/host --unlock-mapped-memory --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
-      - name: Verify Reth Stateless Validation constraints (emulator)
+      - name: Verify Reth stateless validation constraints (emulator)
         run: |
           include_flags=()
           for block in $RETH_TEST_BLOCKS; do
@@ -226,7 +220,7 @@ jobs:
           done
           ./target/release/host --emulator --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
 
-      - name: Verify Reth Stateless Validation constraints (assembly)
+      - name: Verify Reth stateless validation constraints (assembly)
         run: |
           include_flags=()
           for block in $RETH_TEST_BLOCKS; do
@@ -248,6 +242,7 @@ jobs:
         shell: bash
     env:
       TARGET_CACHE_SCOPE: ethrex
+      WS: ${{ github.workspace }}/.zk-setup
       # Add as many input blocks as needed (from less MGs to more MGs)
       ETHREX_TEST_BLOCKS: "25128350 24697070 24697073"
       ETHREX_INPUT_FOLDER: bin/guests/stateless-validator-ethrex/inputs
@@ -290,6 +285,22 @@ jobs:
         run: |
           [ -d "$HOME/.zisk/provingKey" ] || { echo "ERROR: proving key not found at \$HOME/.zisk/provingKey (the proving-key job installs it on the shared volume)"; exit 1; }
 
+      - name: Clone ZisK
+        run: |
+          rm -rf "$WS"
+          git clone --depth 1 --branch "$ZISK_REF" https://github.com/0xPolygonHermez/zisk.git "$WS"
+
+      - name: Build ZisK (cargo-zisk + toolchain + emulator-asm)
+        working-directory: ${{ env.WS }}/tools/test-env
+        env:
+          ZISK_GHA: "1" # skip .env loading and the interactive confirm prompt
+          DISABLE_ENV_CONFIRM: "1"
+          ONLY_CPU: "1" # CPU-only build (no CUDA)
+          ZISK_REPO_DIR: ${{ env.WS }}
+        run: |
+          ./build_zisk.sh
+          echo "$HOME/.zisk/bin" >> "$GITHUB_PATH"
+
       - name: Build host
         run: cargo build --locked --release -p host
 
@@ -309,7 +320,7 @@ jobs:
           done
           ./target/release/host --unlock-mapped-memory --action execute --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
-      - name: Verify Ethrex Stateless Validation constraints (emulator)
+      - name: Verify Ethrex stateless validation constraints (emulator)
         run: |
           include_flags=()
           for block in $ETHREX_TEST_BLOCKS; do
@@ -317,7 +328,7 @@ jobs:
           done
           ./target/release/host --emulator --action verify-constraints --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
 
-      - name: Verify Ethrex Stateless Validation constraints (assembly)
+      - name: Verify Ethrex stateless validation constraints (assembly)
         run: |
           include_flags=()
           for block in $ETHREX_TEST_BLOCKS; do
