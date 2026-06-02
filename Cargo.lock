@@ -1252,7 +1252,7 @@ dependencies = [
 [[package]]
 name = "asm-runner"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "libc",
@@ -1931,7 +1931,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 
 [[package]]
 name = "clang-sys"
@@ -2465,7 +2465,7 @@ dependencies = [
 [[package]]
 name = "data-bus"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "zisk-common",
 ]
@@ -3412,7 +3412,7 @@ dependencies = [
 [[package]]
 name = "executor"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3443,6 +3443,7 @@ dependencies = [
  "sm-main",
  "sm-mem",
  "sm-rom",
+ "thiserror 2.0.18",
  "tracing",
  "witness",
  "zisk-common",
@@ -5176,12 +5177,12 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 [[package]]
 name = "lib-c"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 
 [[package]]
 name = "lib-float"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 
 [[package]]
 name = "libc"
@@ -5442,7 +5443,7 @@ checksum = "47e1ffaa40ddd1f3ed91f717a33c8c0ee23fff369e3aa8772b9605cc1d22f4c3"
 [[package]]
 name = "mem-common"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "clap",
  "fields 1.0.0-beta",
@@ -5456,7 +5457,7 @@ dependencies = [
 [[package]]
 name = "mem-planner-cpp"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "mem-common",
  "proofman-common",
@@ -6558,7 +6559,7 @@ dependencies = [
 [[package]]
 name = "precomp-arith-eq"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
@@ -6589,7 +6590,7 @@ dependencies = [
 [[package]]
 name = "precomp-arith-eq-384"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "ark-bls12-381",
  "ark-ff 0.5.0",
@@ -6615,7 +6616,7 @@ dependencies = [
 [[package]]
 name = "precomp-big-int"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "lib-c",
@@ -6633,7 +6634,7 @@ dependencies = [
 [[package]]
 name = "precomp-blake2"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "pil-std-lib",
@@ -6650,7 +6651,7 @@ dependencies = [
 [[package]]
 name = "precomp-dma"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "pil-std-lib",
@@ -6668,7 +6669,7 @@ dependencies = [
 [[package]]
 name = "precomp-keccakf"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "circuit",
  "fields 1.0.0-beta",
@@ -6689,7 +6690,7 @@ dependencies = [
 [[package]]
 name = "precomp-poseidon2"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "pil-std-lib",
@@ -6706,7 +6707,7 @@ dependencies = [
 [[package]]
 name = "precomp-sha256f"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "pil-std-lib",
@@ -6723,7 +6724,7 @@ dependencies = [
 [[package]]
 name = "precompiles-common"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "mem-common",
@@ -6735,7 +6736,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -6753,7 +6754,7 @@ dependencies = [
 [[package]]
 name = "precompiles-hints"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "borsh",
@@ -9351,7 +9352,7 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 
 [[package]]
 name = "rkyv"
@@ -9425,7 +9426,7 @@ dependencies = [
 [[package]]
 name = "rom-setup"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "blake3",
@@ -10204,7 +10205,7 @@ checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
 [[package]]
 name = "sm-arith"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "pil-std-lib",
@@ -10221,7 +10222,7 @@ dependencies = [
 [[package]]
 name = "sm-binary"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "pil-std-lib",
@@ -10238,7 +10239,7 @@ dependencies = [
 [[package]]
 name = "sm-frequent-ops"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "clap",
  "fields 1.0.0-beta",
@@ -10250,7 +10251,7 @@ dependencies = [
 [[package]]
 name = "sm-main"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "mem-common",
@@ -10268,7 +10269,7 @@ dependencies = [
 [[package]]
 name = "sm-mem"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "mem-common",
@@ -10285,7 +10286,7 @@ dependencies = [
 [[package]]
 name = "sm-rom"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "asm-runner",
  "fields 1.0.0-beta",
@@ -12562,7 +12563,7 @@ dependencies = [
 [[package]]
 name = "zisk-build"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "blake3",
@@ -12575,7 +12576,7 @@ dependencies = [
 [[package]]
 name = "zisk-cluster-common"
 version = "0.1.0"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "borsh",
@@ -12593,7 +12594,7 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "alloy-sol-types",
  "anyhow",
@@ -12622,7 +12623,7 @@ dependencies = [
 [[package]]
 name = "zisk-coordinator-api"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "chrono",
@@ -12638,7 +12639,7 @@ dependencies = [
 [[package]]
 name = "zisk-coordinator-client"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "bytes",
@@ -12654,7 +12655,7 @@ dependencies = [
 [[package]]
 name = "zisk-core"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "elf",
  "fields 1.0.0-beta",
@@ -12673,12 +12674,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 
 [[package]]
 name = "zisk-pil"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "fields 1.0.0-beta",
  "proofman-common",
@@ -12690,7 +12691,7 @@ dependencies = [
 [[package]]
 name = "zisk-prover-backend"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "alloy-sol-types",
  "anyhow",
@@ -12718,7 +12719,7 @@ dependencies = [
 [[package]]
 name = "zisk-sdk"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "bincode 2.0.1",
@@ -12737,7 +12738,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "proofman-verifier 0.18.0",
 ]
@@ -12745,7 +12746,7 @@ dependencies = [
 [[package]]
 name = "ziskemu"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "clap",
  "data-bus",
@@ -12773,7 +12774,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "ark-bn254",
@@ -12813,7 +12814,7 @@ dependencies = [
 [[package]]
 name = "ziskos-hints"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "anyhow",
  "bincode 2.0.1",
@@ -12839,7 +12840,7 @@ dependencies = [
 [[package]]
 name = "zkvm-interface"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fwitness-embedded#ba2c51c77e39258064a259e0a1a1c9d841b8fc4b"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#b2cc92ddfe9aac7c0aa9a5e2fa9794e1d7221107"
 dependencies = [
  "bindgen 0.72.1",
 ]
