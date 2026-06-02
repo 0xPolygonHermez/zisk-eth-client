@@ -105,14 +105,24 @@ jobs:
           ref: ${{ env.ZISK_REF }}
           path: .zk-setup
 
-      - name: Install ZisK dependencies
+      - name: Install ZisK dependencies (zisk install_deps.sh)
         working-directory: ${{ env.WS }}/tools/test-env
         run: |
           bash install_deps.sh --cuda
           # install_deps.sh installs Rust via rustup but only updates PATH in its
-          # own shell; expose cargo (and CUDA's nvcc) to the later build steps.
+          # own shell; expose cargo to the later build steps.
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          # proofman's starks-lib-c build script compiles GPU support only when it
+          # finds /usr/local/cuda/bin/nvcc (or nvcc on PATH). cuda-toolkit-12-9
+          # installs under /usr/local/cuda-12.9, so ensure the version-less symlink
+          # exists, then fail fast if nvcc still isn't usable — otherwise the host
+          # silently builds CPU-only and rejects --gpu at runtime.
+          if [ ! -e /usr/local/cuda ]; then
+            cuda_dir="$(ls -d /usr/local/cuda-* 2>/dev/null | sort -V | tail -n1 || true)"
+            [ -n "$cuda_dir" ] && ln -sfn "$cuda_dir" /usr/local/cuda
+          fi
           echo "/usr/local/cuda/bin" >> "$GITHUB_PATH"
+          /usr/local/cuda/bin/nvcc --version
 
       - name: Build cargo-zisk
         working-directory: ${{ env.WS }}
@@ -181,9 +191,14 @@ jobs:
             target
             bin/guests/stateless-validator-reth/target
             bin/guests/stateless-validator-ethrex/target
-          key: ${{ runner.os }}-selfhosted-target-${{ env.TARGET_CACHE_SCOPE }}-${{ hashFiles('**/Cargo.lock') }}
+          # The CUDA/CPU split in proofman's starks-lib-c is decided by a build-time
+          # filesystem probe that is NOT part of cargo's fingerprint, so a CPU-built
+          # target/ (e.g. from a pre-CUDA or non-GPU run) would be reused as-is and
+          # leave the host CPU-only. Namespace the cache to GPU so it can only ever
+          # hold GPU-compiled artifacts (these jobs always build with nvcc present).
+          key: ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-selfhosted-target-${{ env.TARGET_CACHE_SCOPE }}-
+            ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-
 
       - name: Verify proving key present
         run: |
@@ -199,16 +214,26 @@ jobs:
           ref: ${{ env.ZISK_REF }}
           path: .zk-setup
 
-      - name: Install ZisK dependencies
+      - name: Install ZisK dependencies (zisk install_deps.sh)
         working-directory: ${{ env.WS }}/tools/test-env
         run: |
           bash install_deps.sh --cuda
           # install_deps.sh installs Rust via rustup but only updates PATH in its
-          # own shell; expose cargo (and CUDA's nvcc) to the later build steps.
+          # own shell; expose cargo to the later build steps.
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          # proofman's starks-lib-c build script compiles GPU support only when it
+          # finds /usr/local/cuda/bin/nvcc (or nvcc on PATH). cuda-toolkit-12-9
+          # installs under /usr/local/cuda-12.9, so ensure the version-less symlink
+          # exists, then fail fast if nvcc still isn't usable — otherwise the host
+          # silently builds CPU-only and rejects --gpu at runtime.
+          if [ ! -e /usr/local/cuda ]; then
+            cuda_dir="$(ls -d /usr/local/cuda-* 2>/dev/null | sort -V | tail -n1 || true)"
+            [ -n "$cuda_dir" ] && ln -sfn "$cuda_dir" /usr/local/cuda
+          fi
           echo "/usr/local/cuda/bin" >> "$GITHUB_PATH"
+          /usr/local/cuda/bin/nvcc --version
 
-      - name: Build ZisK (cargo-zisk + toolchain + emulator-asm)
+      - name: Build ZisK (zisk build_zisk.sh)
         working-directory: ${{ env.WS }}/tools/test-env
         env:
           ZISK_GHA: "1" # skip .env loading and the interactive confirm prompt
@@ -299,9 +324,14 @@ jobs:
             target
             bin/guests/stateless-validator-reth/target
             bin/guests/stateless-validator-ethrex/target
-          key: ${{ runner.os }}-selfhosted-target-${{ env.TARGET_CACHE_SCOPE }}-${{ hashFiles('**/Cargo.lock') }}
+          # The CUDA/CPU split in proofman's starks-lib-c is decided by a build-time
+          # filesystem probe that is NOT part of cargo's fingerprint, so a CPU-built
+          # target/ (e.g. from a pre-CUDA or non-GPU run) would be reused as-is and
+          # leave the host CPU-only. Namespace the cache to GPU so it can only ever
+          # hold GPU-compiled artifacts (these jobs always build with nvcc present).
+          key: ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-selfhosted-target-${{ env.TARGET_CACHE_SCOPE }}-
+            ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-
 
       - name: Verify proving key present
         run: |
@@ -317,16 +347,26 @@ jobs:
           ref: ${{ env.ZISK_REF }}
           path: .zk-setup
 
-      - name: Install ZisK dependencies
+      - name: Install ZisK dependencies (zisk install_deps.sh)
         working-directory: ${{ env.WS }}/tools/test-env
         run: |
           bash install_deps.sh --cuda
           # install_deps.sh installs Rust via rustup but only updates PATH in its
-          # own shell; expose cargo (and CUDA's nvcc) to the later build steps.
+          # own shell; expose cargo to the later build steps.
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          # proofman's starks-lib-c build script compiles GPU support only when it
+          # finds /usr/local/cuda/bin/nvcc (or nvcc on PATH). cuda-toolkit-12-9
+          # installs under /usr/local/cuda-12.9, so ensure the version-less symlink
+          # exists, then fail fast if nvcc still isn't usable — otherwise the host
+          # silently builds CPU-only and rejects --gpu at runtime.
+          if [ ! -e /usr/local/cuda ]; then
+            cuda_dir="$(ls -d /usr/local/cuda-* 2>/dev/null | sort -V | tail -n1 || true)"
+            [ -n "$cuda_dir" ] && ln -sfn "$cuda_dir" /usr/local/cuda
+          fi
           echo "/usr/local/cuda/bin" >> "$GITHUB_PATH"
+          /usr/local/cuda/bin/nvcc --version
 
-      - name: Build ZisK (cargo-zisk + toolchain + emulator-asm)
+      - name: Build ZisK (zisk build_zisk.sh)
         working-directory: ${{ env.WS }}/tools/test-env
         env:
           ZISK_GHA: "1" # skip .env loading and the interactive confirm prompt
