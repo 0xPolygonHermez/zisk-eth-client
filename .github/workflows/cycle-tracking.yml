@@ -23,13 +23,11 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-  # ZisK ref to build the emulator from. Must match the zisk-sdk the guests link
-  # against (Cargo.toml). The emulator is held fixed across the PR/base passes so
-  # the diff reflects only guest changes.
-  ZISK_REF: pre-develop-1.0.0-beta
-  # Blocks to emulate per client.
-  RETH_BLOCKS: "24647140 24697070 24628590"
-  ETHREX_BLOCKS: "25128350 24697070 24697073"
+  # ZISK_REF is resolved by the ./.github/actions/zisk-ref action.
+  # Block inputs to test per client (from less MGs to more MGs).
+  # It is good to have shared blocks between clients for easier comparison.
+  RETH_TEST_BLOCKS: "25229957 25229955 25229951"
+  ETHREX_TEST_BLOCKS: "25229957 25229955 25229951"
 
 jobs:
   cycle-tracking:
@@ -55,6 +53,9 @@ jobs:
 
       - name: "Setup dependencies"
         uses: ./.github/actions/setup-deps
+
+      - name: "Resolve ZisK ref"
+        uses: ./.github/actions/zisk-ref
 
       - name: "Clone ZisK"
         id: zisk
