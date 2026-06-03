@@ -6,7 +6,7 @@ use std::{
 
 use zisk_sdk::{
     AsmOptions, EmbeddedClient, ExecutorKind, GuestProgram, ProverClient,
-    VerifyConstraintsExtension, ZiskStdin,
+    VerifyConstraintsExtension, WitnessBuilderExt, ZiskStdin,
 };
 
 /// ZisK client
@@ -42,6 +42,7 @@ impl ZiskClient {
         use_emulator: bool,
         unlock_mapped_memory: bool,
         gpu: bool,
+        no_aggregation: bool,
     ) -> Result<Self> {
         let mut builder = ProverClient::embedded();
 
@@ -61,6 +62,10 @@ impl ZiskClient {
 
         if gpu {
             builder = builder.gpu();
+        }
+
+        if no_aggregation {
+            builder = builder.no_aggregation();
         }
 
         self.backend = Some(builder.build().context("Failed to build EmbeddedClient")?);
@@ -97,7 +102,9 @@ impl ZiskClient {
         Ok(ZiskExecutionMetrics {
             duration: Duration::from_millis(result.get_execution_time()),
             steps: result.get_execution_steps(),
-            cost: result.get_execution_cost(),
+            cost: result
+                .get_execution_cost()
+                .ok_or_else(|| anyhow::anyhow!("Execution cost not available"))?,
             tx_count: None,
             gas_used: None,
         })

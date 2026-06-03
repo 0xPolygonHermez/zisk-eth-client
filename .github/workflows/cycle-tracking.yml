@@ -1,0 +1,127 @@
+name: "Cycle Tracking"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "develop-[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      base_ref:
+        description: "Base branch to compare against (manual runs only)"
+        required: false
+        default: "main"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+  # Block inputs to test per client (from less MGs to more MGs).
+  # It is good to have shared blocks between clients for easier comparison.
+  RETH_TEST_BLOCKS: "25229957 25229955 25229951"
+  ETHREX_TEST_BLOCKS: "25229957 25229955 25229951"
+
+jobs:
+  cycle-tracking:
+    name: "Compare emulator cost vs base branch"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      WS: ${{ github.workspace }}/.zk-setup
+    steps:
+      - name: "Free disk space"
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+
+      - name: "Checkout sources"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Resolve ZisK ref"
+        uses: ./.github/actions/zisk-ref
+
+      - name: "Clone ZisK"
+        uses: actions/checkout@v4
+        with:
+          repository: 0xPolygonHermez/zisk
+          ref: ${{ env.ZISK_REF }}
+          path: .zk-setup
+
+      - name: Install ZisK dependencies (zisk install_deps.sh)
+        working-directory: ${{ env.WS }}/tools/test-env
+        run: |
+          bash install_deps.sh
+          # install_deps.sh installs Rust via rustup but only updates PATH in its
+          # own shell; expose cargo to the later build steps.
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: "Resolve ZisK SHA + tool paths"
+        id: zisk
+        run: |
+          echo "sha=$(git -C "$WS" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          {
+            echo "CARGO_ZISK=$WS/target/release/cargo-zisk"
+            echo "ZISKEMU=$WS/target/release/ziskemu"
+          } >> "$GITHUB_ENV"
+
+      - name: "Cache ZisK emulator build"
+        id: cache-emulator
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.WS }}/target/release/cargo-zisk
+            ${{ env.WS }}/target/release/ziskemu
+          key: zisk-emulator-${{ runner.os }}-${{ steps.zisk.outputs.sha }}
+
+      - name: "Build emulator (cargo-zisk + ziskemu)"
+        if: steps.cache-emulator.outputs.cache-hit != 'true'
+        working-directory: ${{ env.WS }}
+        run: cargo build --release -p cargo-zisk -p ziskemu --bin cargo-zisk --bin ziskemu
+
+      - name: "Install ZisK rust toolchain"
+        run: |
+          "$CARGO_ZISK" toolchain install
+          rustup toolchain list | grep -q zisk || { echo "ERROR: ZisK toolchain not found after install."; exit 1; }
+
+      - name: "Benchmark PR branch"
+        run: bash .github/scripts/zec_bench.sh "$RUNNER_TEMP/pr"
+
+      - name: "Checkout base branch"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref || inputs.base_ref }}
+          path: base-tree
+
+      - name: "Benchmark base branch"
+        env:
+          BENCH_REPO_DIR: ${{ github.workspace }}/base-tree
+        run: bash .github/scripts/zec_bench.sh "$RUNNER_TEMP/base"
+
+      - name: "Build execution report"
+        run: |
+          python3 .github/scripts/zec_cycle_diff.py "$RUNNER_TEMP/base" "$RUNNER_TEMP/pr" > "$RUNNER_TEMP/report.md"
+          # Always show the report in this run's summary.
+          cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: "Upload report artifact"
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cycle-tracking-report
+          path: ${{ runner.temp }}/report.md
+          if-no-files-found: error
+          retention-days: 3

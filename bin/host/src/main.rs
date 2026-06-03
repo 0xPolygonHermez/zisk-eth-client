@@ -20,6 +20,9 @@ async fn main() -> Result<()> {
     }
 
     info!("ZisK Host");
+    if let Some(proving_key) = &cli.proving_key {
+        info!(" Proving Key: {}", proving_key.display());
+    }
     info!(" Action: {:?}", cli.action);
     info!(" Guest Program: {}", cli.guest_program.display_name());
 
@@ -38,7 +41,7 @@ async fn main() -> Result<()> {
                 Client::Ethrex => ELF_ETHREX,
             };
 
-            info!(" ELF Name: {}", elf.name());
+            info!(" ELF: {}", elf.name());
             info!(" Input Folder: {}", input_folder.display());
             if let Some(include) = include {
                 info!(" Include Patterns: {:?}", include);

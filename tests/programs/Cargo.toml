@@ -3,9 +3,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = [
-    "reth/*",
-]
+members = ["reth/*"]
 resolver = "2"
 
 [profile.release]
@@ -16,6 +14,7 @@ panic = "abort"
 
 [workspace.dependencies]
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
+# Local development
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 common = { path = "reth/common" }
