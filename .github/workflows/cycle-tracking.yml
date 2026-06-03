@@ -22,7 +22,6 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-  # ZISK_REF is resolved by the ./.github/actions/zisk-ref action.
   # Block inputs to test per client (from less MGs to more MGs).
   # It is good to have shared blocks between clients for easier comparison.
   RETH_TEST_BLOCKS: "25229957 25229955 25229951"
@@ -33,6 +32,8 @@ jobs:
     name: "Compare emulator cost vs base branch"
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      WS: ${{ github.workspace }}/.zk-setup
     steps:
       - name: "Free disk space"
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -50,21 +51,31 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "Setup dependencies"
-        uses: ./.github/actions/setup-deps
-
       - name: "Resolve ZisK ref"
         uses: ./.github/actions/zisk-ref
 
       - name: "Clone ZisK"
+        uses: actions/checkout@v4
+        with:
+          repository: 0xPolygonHermez/zisk
+          ref: ${{ env.ZISK_REF }}
+          path: .zk-setup
+
+      - name: Install ZisK dependencies (zisk install_deps.sh)
+        working-directory: ${{ env.WS }}/tools/test-env
+        run: |
+          bash install_deps.sh
+          # install_deps.sh installs Rust via rustup but only updates PATH in its
+          # own shell; expose cargo to the later build steps.
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: "Resolve ZisK SHA + tool paths"
         id: zisk
         run: |
-          rm -rf "$HOME/zisk"
-          git clone --depth 1 --branch "$ZISK_REF" https://github.com/0xPolygonHermez/zisk.git "$HOME/zisk"
-          echo "sha=$(git -C "$HOME/zisk" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git -C "$WS" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           {
-            echo "CARGO_ZISK=$HOME/zisk/target/release/cargo-zisk"
-            echo "ZISKEMU=$HOME/zisk/target/release/ziskemu"
+            echo "CARGO_ZISK=$WS/target/release/cargo-zisk"
+            echo "ZISKEMU=$WS/target/release/ziskemu"
           } >> "$GITHUB_ENV"
 
       - name: "Cache ZisK emulator build"
@@ -72,15 +83,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/zisk/target/release/cargo-zisk
-            ~/zisk/target/release/ziskemu
+            ${{ env.WS }}/target/release/cargo-zisk
+            ${{ env.WS }}/target/release/ziskemu
           key: zisk-emulator-${{ runner.os }}-${{ steps.zisk.outputs.sha }}
 
       - name: "Build emulator (cargo-zisk + ziskemu)"
         if: steps.cache-emulator.outputs.cache-hit != 'true'
-        run: |
-          cd "$HOME/zisk"
-          cargo build --release -p cargo-zisk -p ziskemu --bin cargo-zisk --bin ziskemu
+        working-directory: ${{ env.WS }}
+        run: cargo build --release -p cargo-zisk -p ziskemu --bin cargo-zisk --bin ziskemu
 
       - name: "Install ZisK rust toolchain"
         run: |
