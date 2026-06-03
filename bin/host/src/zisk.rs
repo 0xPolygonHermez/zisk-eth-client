@@ -146,6 +146,19 @@ impl ZiskClient {
         Ok(())
     }
 
+    fn validate_sources(&self, input_file: Option<&Path>, hints_file: Option<&Path>) -> Result<()> {
+        if input_file.is_some() && hints_file.is_some() {
+            anyhow::bail!("provide either an input file or a hints file, not both");
+        }
+        if input_file.is_none() && hints_file.is_none() {
+            anyhow::bail!("provide an input file or a hints file");
+        }
+        if hints_file.is_some() && !self.use_hints {
+            anyhow::bail!("a hints file was provided but the client was not set up with hints");
+        }
+        Ok(())
+    }
+
     /// Execute the program and return execution metrics.
     ///
     /// Exactly one source drives the run: `input_file` (normal execution) or
@@ -157,6 +170,8 @@ impl ZiskClient {
         input_file: Option<&Path>,
         hints_file: Option<&Path>,
     ) -> Result<ZiskExecutionMetrics> {
+        self.validate_sources(input_file, hints_file)?;
+
         let stdin = match input_file {
             Some(file) => ZiskStdin::from_file(file).context("Failed to load input file")?,
             None => ZiskStdin::new(),
@@ -200,6 +215,8 @@ impl ZiskClient {
         input_file: Option<&Path>,
         hints_file: Option<&Path>,
     ) -> Result<ZiskExecutionMetrics> {
+        self.validate_sources(input_file, hints_file)?;
+
         let stdin = match input_file {
             Some(file) => ZiskStdin::from_file(file).context("Failed to load input file")?,
             None => ZiskStdin::new(),
