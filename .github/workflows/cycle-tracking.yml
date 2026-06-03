@@ -50,21 +50,31 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "Setup dependencies"
-        uses: ./.github/actions/setup-deps
-
       - name: "Resolve ZisK ref"
         uses: ./.github/actions/zisk-ref
 
       - name: "Clone ZisK"
+        uses: actions/checkout@v4
+        with:
+          repository: 0xPolygonHermez/zisk
+          ref: ${{ env.ZISK_REF }}
+          path: .zk-setup
+
+      - name: Install ZisK dependencies (zisk install_deps.sh)
+        working-directory: ${{ env.WS }}/tools/test-env
+        run: |
+          bash install_deps.sh
+          # install_deps.sh installs Rust via rustup but only updates PATH in its
+          # own shell; expose cargo to the later build steps.
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: "Resolve ZisK SHA + tool paths"
         id: zisk
         run: |
-          rm -rf "$HOME/zisk"
-          git clone --depth 1 --branch "$ZISK_REF" https://github.com/0xPolygonHermez/zisk.git "$HOME/zisk"
-          echo "sha=$(git -C "$HOME/zisk" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git -C .zk-setup rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           {
-            echo "CARGO_ZISK=$HOME/zisk/target/release/cargo-zisk"
-            echo "ZISKEMU=$HOME/zisk/target/release/ziskemu"
+            echo "CARGO_ZISK=$GITHUB_WORKSPACE/.zk-setup/target/release/cargo-zisk"
+            echo "ZISKEMU=$GITHUB_WORKSPACE/.zk-setup/target/release/ziskemu"
           } >> "$GITHUB_ENV"
 
       - name: "Cache ZisK emulator build"
@@ -72,15 +82,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/zisk/target/release/cargo-zisk
-            ~/zisk/target/release/ziskemu
+            .zk-setup/target/release/cargo-zisk
+            .zk-setup/target/release/ziskemu
           key: zisk-emulator-${{ runner.os }}-${{ steps.zisk.outputs.sha }}
 
       - name: "Build emulator (cargo-zisk + ziskemu)"
         if: steps.cache-emulator.outputs.cache-hit != 'true'
-        run: |
-          cd "$HOME/zisk"
-          cargo build --release -p cargo-zisk -p ziskemu --bin cargo-zisk --bin ziskemu
+        working-directory: .zk-setup
+        run: cargo build --release -p cargo-zisk -p ziskemu --bin cargo-zisk --bin ziskemu
 
       - name: "Install ZisK rust toolchain"
         run: |
