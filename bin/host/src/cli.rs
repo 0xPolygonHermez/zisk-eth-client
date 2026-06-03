@@ -59,9 +59,23 @@ pub enum Action {
 pub enum GuestProgramCommand {
     /// Ethereum Stateless Validator
     StatelessValidator {
-        /// Input folder
-        #[arg(short, long)]
-        input_folder: PathBuf,
+        /// Input folder or file (mutually exclusive with --hints)
+        #[arg(
+            short,
+            long,
+            conflicts_with = "hints",
+            required_unless_present = "hints"
+        )]
+        input_folder: Option<PathBuf>,
+
+        #[arg(long)]
+        hints: Option<PathBuf>,
+
+        #[arg(long, requires = "input_folder", conflicts_with = "hints")]
+        gen_hints: bool,
+
+        #[arg(long, requires = "gen_hints")]
+        hints_out: Option<PathBuf>,
 
         /// Client
         #[arg(short, long, default_value = "reth")]

@@ -17,7 +17,7 @@ pub struct HintsGenArgs {
     #[arg(short = 'f', long)]
     inputs_folder: Option<PathBuf>,
 
-    /// Output directory for hints files (default: same directory as input)
+    /// Output directory for hints files (default: <client>-hints)
     #[arg(short, long)]
     output_dir: Option<PathBuf>,
 
@@ -27,11 +27,20 @@ pub struct HintsGenArgs {
 }
 
 pub fn run(args: HintsGenArgs) -> Result<()> {
-    if let Some(dir) = &args.output_dir {
-        std::fs::create_dir_all(dir).context("Failed to create output directory")?;
-    }
-
     let client = create_client(args.client);
+
+    // Default to a per-client folder (e.g. reth-hints), mirroring input-gen's
+    // <client>-inputs convention, so each client's hints stay isolated.
+    let output_dir = args
+        .output_dir
+        .clone()
+        .unwrap_or_else(|| PathBuf::from(format!("{}-hints", client.name())));
+    std::fs::create_dir_all(&output_dir).with_context(|| {
+        format!(
+            "Failed to create output directory: {}",
+            output_dir.display()
+        )
+    })?;
 
     let inputs: Vec<PathBuf> = if let Some(folder) = &args.inputs_folder {
         let mut entries: Vec<PathBuf> = std::fs::read_dir(folder)
@@ -51,7 +60,7 @@ pub fn run(args: HintsGenArgs) -> Result<()> {
     let mut failed: Vec<(&Path, anyhow::Error)> = Vec::new();
     let mut timings: Vec<(Duration, Duration)> = Vec::new();
     for input in &inputs {
-        match process_input_file(input, args.output_dir.as_deref(), client.as_ref()) {
+        match process_input_file(input, &output_dir, client.as_ref()) {
             Ok(t) => timings.push(t),
             Err(e) => {
                 error!("Failed {}: {:#}", input.display(), e);
@@ -83,19 +92,14 @@ pub fn run(args: HintsGenArgs) -> Result<()> {
 
 fn process_input_file(
     input: &Path,
-    output_dir: Option<&Path>,
+    output_dir: &Path,
     client: &dyn ExecutionClient,
 ) -> Result<(Duration, Duration)> {
     let stdin = ZiskStdin::from_file(input).context("Failed to load input file")?;
-    let output_path = match output_dir {
-        Some(dir) => {
-            let stem = input
-                .file_stem()
-                .with_context(|| format!("Input path has no file stem: {}", input.display()))?;
-            dir.join(stem).with_extension("hints")
-        }
-        None => input.with_extension("hints"),
-    };
+    let stem = input
+        .file_stem()
+        .with_context(|| format!("Input path has no file stem: {}", input.display()))?;
+    let output_path = output_dir.join(stem).with_extension("hints");
     info!(
         "Generating hints: {} -> {}",
         input.display(),
