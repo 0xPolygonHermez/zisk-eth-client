@@ -117,18 +117,11 @@ jobs:
           # Always show the report in this run's summary.
           cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: "Stage report for the comment workflow"
-        if: github.event_name == 'pull_request'
-        run: |
-          mkdir -p "$RUNNER_TEMP/report"
-          cp "$RUNNER_TEMP/report.md" "$RUNNER_TEMP/report/report.md"
-          echo "${{ github.event.pull_request.number }}" > "$RUNNER_TEMP/report/pr-number.txt"
-
       - name: "Upload report artifact"
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: cycle-tracking-report
-          path: ${{ runner.temp }}/report
+          path: ${{ runner.temp }}/report.md
           if-no-files-found: error
           retention-days: 3
