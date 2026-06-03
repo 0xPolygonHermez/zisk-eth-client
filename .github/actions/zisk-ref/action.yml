@@ -1,0 +1,18 @@
+name: Resolve ZisK ref
+description: >
+  Export ZISK_REF to $GITHUB_ENV from the zisk git dependency pinned in the
+  root Cargo.toml, so CI builds at the exact ref the host links against.
+  Run after actions/checkout, before any step that clones ZisK.
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve ZISK_REF from Cargo.toml
+      shell: bash
+      run: |
+        # Matches the active (uncommented) `zisk-sdk = { git = ..., branch|tag = "X" }`
+        # line; commented "# zisk-sdk = { path = ... }" lines don't match the ^anchor.
+        ref="$(sed -nE 's/^zisk-sdk[[:space:]]*=.*(branch|tag)[[:space:]]*=[[:space:]]*"([^"]+)".*/\2/p' Cargo.toml | head -n1)"
+        [ -n "$ref" ] || { echo "ERROR: could not parse the zisk-sdk branch/tag from Cargo.toml"; exit 1; }
+        echo "ZISK_REF=$ref" >> "$GITHUB_ENV"
+        echo "Resolved ZISK_REF=$ref from Cargo.toml"
