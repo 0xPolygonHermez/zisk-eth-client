@@ -1248,9 +1248,9 @@ dependencies = [
 
 [[package]]
 name = "bitflags"
-version = "2.11.1"
+version = "2.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4512299f36f043ab09a583e57bceb5a5aab7a73db1805848e8fef3c9e8c78b3"
+checksum = "84d7ced0ae9557296835c32bf1b1e02b44c746701f898460fb000d7eaa84f00a"
 dependencies = [
  "serde_core",
 ]
@@ -1453,7 +1453,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 
 [[package]]
 name = "clang-sys"
@@ -1772,7 +1772,7 @@ dependencies = [
 [[package]]
 name = "curves"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "fields 1.0.0-beta",
  "num-bigint",
@@ -2241,7 +2241,7 @@ dependencies = [
 [[package]]
 name = "fields"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "cfg-if",
  "num-bigint",
@@ -2988,12 +2988,12 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 [[package]]
 name = "lib-c"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 
 [[package]]
 name = "lib-float"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 
 [[package]]
 name = "libc"
@@ -3068,9 +3068,9 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.30"
+version = "0.4.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "616ec5685824bcc94416c6d4a7a446eea774a31efd7062c8480ba6fd06d7a6e5"
+checksum = "113b30b4cd05f7c06868fdb2854f66a7b9fece9a48425351cd532e810d74024f"
 
 [[package]]
 name = "lru"
@@ -3653,7 +3653,7 @@ dependencies = [
 [[package]]
 name = "pil-std-lib"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "colored",
  "fields 1.0.0-beta",
@@ -3751,7 +3751,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -3839,7 +3839,7 @@ dependencies = [
 [[package]]
 name = "proofman"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "bincode",
  "blake3",
@@ -3873,7 +3873,7 @@ dependencies = [
 [[package]]
 name = "proofman-common"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "bincode",
  "borsh",
@@ -3904,7 +3904,7 @@ dependencies = [
 [[package]]
 name = "proofman-hints"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "fields 1.0.0-beta",
  "itoa",
@@ -3917,7 +3917,7 @@ dependencies = [
 [[package]]
 name = "proofman-macros"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3927,7 +3927,7 @@ dependencies = [
 [[package]]
 name = "proofman-starks-lib-c"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "crossbeam-channel",
  "tracing",
@@ -3936,7 +3936,7 @@ dependencies = [
 [[package]]
 name = "proofman-util"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "bincode",
  "colored",
@@ -3957,7 +3957,7 @@ dependencies = [
 [[package]]
 name = "proofman-verifier"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "bincode",
  "fields 1.0.0-beta",
@@ -4882,7 +4882,7 @@ dependencies = [
 [[package]]
 name = "riscv"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 
 [[package]]
 name = "rlp"
@@ -6679,7 +6679,7 @@ dependencies = [
 [[package]]
 name = "witness"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#25b1046c71c7d0715d8fb107c094d25111b7b7e2"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.0.0-beta#4b6605172b9822d9ab5ff099ba7a9271c1655f3c"
 dependencies = [
  "colored",
  "fields 1.0.0-beta",
@@ -6882,7 +6882,7 @@ dependencies = [
 [[package]]
 name = "zisk-common"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 dependencies = [
  "alloy-sol-types",
  "anyhow",
@@ -6911,7 +6911,7 @@ dependencies = [
 [[package]]
 name = "zisk-core"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 dependencies = [
  "elf",
  "fields 1.0.0-beta",
@@ -6930,12 +6930,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 
 [[package]]
 name = "zisk-verifier"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 dependencies = [
  "proofman-verifier 0.18.0",
 ]
@@ -6943,7 +6943,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 dependencies = [
  "anyhow",
  "ark-bn254",
@@ -6983,7 +6983,7 @@ dependencies = [
 [[package]]
 name = "ziskos-hints"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 dependencies = [
  "anyhow",
  "bincode",
@@ -7009,7 +7009,7 @@ dependencies = [
 [[package]]
 name = "zkvm-interface"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#ccd797b903f644b19e10ac46e501b277727e7c19"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#35cbdfa903a6ae26bf4155be95f36fb2210ec9e2"
 dependencies = [
  "bindgen 0.72.1",
 ]

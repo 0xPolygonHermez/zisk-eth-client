@@ -58,7 +58,7 @@ impl BenchmarkRunner {
                 emulator,
                 unlock_mapped_memory,
                 gpu,
-                false,
+                true,
                 use_hints,
             )?,
             Action::Prove => ZiskClient::for_proving(
@@ -67,7 +67,7 @@ impl BenchmarkRunner {
                 emulator,
                 unlock_mapped_memory,
                 gpu,
-                true,
+                false,
                 use_hints,
             )?,
         };

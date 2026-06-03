@@ -81,7 +81,7 @@ impl ZiskClient {
         use_emulator: bool,
         unlock_mapped_memory: bool,
         gpu: bool,
-        aggregate: bool,
+        verify_constraints: bool,
         use_hints: bool,
     ) -> Result<Self> {
         let (mut builder, executor) =
@@ -92,9 +92,11 @@ impl ZiskClient {
         if gpu {
             builder = builder.gpu();
         }
-        if !aggregate {
-            builder = builder.no_aggregation();
+
+        if verify_constraints {
+            builder = builder.verify_constraints();
         }
+
         let client = builder.build().context("Failed to build EmbeddedClient")?;
         Ok(Self {
             program,
