@@ -50,11 +50,28 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      WS: ${{ github.workspace }}/.clippy
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup dependencies
-        uses: ./.github/actions/setup-deps
+      - name: Resolve ZisK ref
+        uses: ./.github/actions/zisk-ref
+
+      - name: Clone ZisK
+        uses: actions/checkout@v4
+        with:
+          repository: 0xPolygonHermez/zisk
+          ref: ${{ env.ZISK_REF }}
+          path: .clippy
+
+      - name: Install ZisK dependencies (zisk install_deps.sh)
+        working-directory: ${{ env.WS }}/tools/test-env
+        run: |
+          bash install_deps.sh
+          # install_deps.sh installs Rust via rustup but only updates PATH in its
+          # own shell; expose cargo to the later build steps.
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -134,10 +151,10 @@ jobs:
       - name: Generate proving key (zisk build_setup.sh)
         working-directory: ${{ env.WS }}/tools/test-env
         env:
-          ZISK_GHA: "1" # skip .env loading and the interactive confirm prompt
+          ZISK_GHA: "1" # skip the interactive confirm prompt
           DISABLE_ENV_CONFIRM: "1"
           DISABLE_RECURSIVE_SETUP: "1"
-          USE_CACHE_SETUP: "1" # reuse a previously generated setup (keyed by PIL content hash, under $HOME/output)
+          USE_CACHE_SETUP: "1" # reuse a previously generated setup
           ZISK_REPO_DIR: ${{ env.WS }}
           PIL2_COMPILER_BRANCH: ${{ env.PIL2_COMPILER_REF }}
           PIL2_PROOFMAN_BRANCH: ${{ env.PIL2_PROOFMAN_REF }}
