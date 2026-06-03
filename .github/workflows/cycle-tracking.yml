@@ -22,7 +22,6 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-  # ZISK_REF is resolved by the ./.github/actions/zisk-ref action.
   # Block inputs to test per client (from less MGs to more MGs).
   # It is good to have shared blocks between clients for easier comparison.
   RETH_TEST_BLOCKS: "25229957 25229955 25229951"
@@ -33,6 +32,8 @@ jobs:
     name: "Compare emulator cost vs base branch"
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      WS: ${{ github.workspace }}/.zk-setup
     steps:
       - name: "Free disk space"
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -71,10 +72,10 @@ jobs:
       - name: "Resolve ZisK SHA + tool paths"
         id: zisk
         run: |
-          echo "sha=$(git -C .zk-setup rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git -C "$WS" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           {
-            echo "CARGO_ZISK=$GITHUB_WORKSPACE/.zk-setup/target/release/cargo-zisk"
-            echo "ZISKEMU=$GITHUB_WORKSPACE/.zk-setup/target/release/ziskemu"
+            echo "CARGO_ZISK=$WS/target/release/cargo-zisk"
+            echo "ZISKEMU=$WS/target/release/ziskemu"
           } >> "$GITHUB_ENV"
 
       - name: "Cache ZisK emulator build"
@@ -82,13 +83,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            .zk-setup/target/release/cargo-zisk
-            .zk-setup/target/release/ziskemu
+            ${{ env.WS }}/target/release/cargo-zisk
+            ${{ env.WS }}/target/release/ziskemu
           key: zisk-emulator-${{ runner.os }}-${{ steps.zisk.outputs.sha }}
 
       - name: "Build emulator (cargo-zisk + ziskemu)"
         if: steps.cache-emulator.outputs.cache-hit != 'true'
-        working-directory: .zk-setup
+        working-directory: ${{ env.WS }}
         run: cargo build --release -p cargo-zisk -p ziskemu --bin cargo-zisk --bin ziskemu
 
       - name: "Install ZisK rust toolchain"
