@@ -10,9 +10,9 @@ runs:
     - name: Resolve ZISK_REF from Cargo.toml
       shell: bash
       run: |
-        # Matches the active (uncommented) `zisk-sdk = { git = ..., branch|tag = "X" }`
+        # Matches the active (uncommented) `zisk-sdk = { git = ..., branch|tag|rev = "X" }`
         # line; commented "# zisk-sdk = { path = ... }" lines don't match the ^anchor.
-        ref="$(sed -nE 's/^zisk-sdk[[:space:]]*=.*(branch|tag)[[:space:]]*=[[:space:]]*"([^"]+)".*/\2/p' Cargo.toml | head -n1)"
-        [ -n "$ref" ] || { echo "ERROR: could not parse the zisk-sdk branch/tag from Cargo.toml"; exit 1; }
+        ref="$(sed -nE 's/^zisk-sdk[[:space:]]*=.*(branch|tag|rev)[[:space:]]*=[[:space:]]*"([^"]+)".*/\2/p' Cargo.toml | head -n1)"
+        [ -n "$ref" ] || { echo "ERROR: could not parse the zisk-sdk branch/tag/rev from Cargo.toml"; exit 1; }
         echo "ZISK_REF=$ref" >> "$GITHUB_ENV"
         echo "Resolved ZISK_REF=$ref from Cargo.toml"
