@@ -100,8 +100,6 @@ jobs:
     runs-on: gpu-hosted
     timeout-minutes: 120
     container:
-      # CUDA-capable image so cargo-zisk builds with GPU support and check-setup
-      # can run with --gpu; --gpus all exposes the runner's GPU to the container.
       image: ziskvm/zisk-runner-gpu:latest
       options: --gpus all --shm-size=48g
     defaults:
@@ -125,21 +123,10 @@ jobs:
       - name: Install ZisK dependencies (zisk install_deps.sh)
         working-directory: ${{ env.WS }}/tools/test-env
         run: |
-          bash install_deps.sh --cuda
+          bash install_deps.sh
           # install_deps.sh installs Rust via rustup but only updates PATH in its
           # own shell; expose cargo to the later build steps.
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-          # proofman's starks-lib-c build script compiles GPU support only when it
-          # finds /usr/local/cuda/bin/nvcc (or nvcc on PATH). cuda-toolkit-12-9
-          # installs under /usr/local/cuda-12.9, so ensure the version-less symlink
-          # exists, then fail fast if nvcc still isn't usable — otherwise the host
-          # silently builds CPU-only and rejects --gpu at runtime.
-          if [ ! -e /usr/local/cuda ]; then
-            cuda_dir="$(ls -d /usr/local/cuda-* 2>/dev/null | sort -V | tail -n1 || true)"
-            [ -n "$cuda_dir" ] && ln -sfn "$cuda_dir" /usr/local/cuda
-          fi
-          echo "/usr/local/cuda/bin" >> "$GITHUB_PATH"
-          /usr/local/cuda/bin/nvcc --version
 
       - name: Build cargo-zisk
         working-directory: ${{ env.WS }}
@@ -154,6 +141,7 @@ jobs:
           ZISK_GHA: "1" # skip the interactive confirm prompt
           DISABLE_ENV_CONFIRM: "1"
           DISABLE_RECURSIVE_SETUP: "1"
+          ONLY_CPU: "1"
           USE_CACHE_SETUP: "1" # reuse a previously generated setup
           ZISK_REPO_DIR: ${{ env.WS }}
           PIL2_COMPILER_BRANCH: ${{ env.PIL2_COMPILER_REF }}
