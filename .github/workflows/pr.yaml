@@ -94,6 +94,67 @@ jobs:
       - name: Run Clippy
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
 
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      WS: ${{ github.workspace }}/.tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache target directory
+        uses: actions/cache@v4
+        with:
+          path: |
+            target
+            tests/programs/target
+          key: ${{ runner.os }}-tests-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-tests-target-
+
+      - name: Resolve ZisK ref
+        uses: ./.github/actions/zisk-ref
+
+      - name: Clone ZisK
+        uses: actions/checkout@v4
+        with:
+          repository: 0xPolygonHermez/zisk
+          ref: ${{ env.ZISK_REF }}
+          path: .tests
+
+      - name: Install ZisK dependencies (zisk install_deps.sh)
+        working-directory: ${{ env.WS }}/tools/test-env
+        run: |
+          bash install_deps.sh
+          # install_deps.sh installs Rust via rustup but only updates PATH in its
+          # own shell; expose cargo to the later build steps.
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Build cargo-zisk
+        working-directory: ${{ env.WS }}
+        run: |
+          cargo build --release -p cargo-zisk --bin cargo-zisk
+          mkdir -p "$HOME/.zisk/bin"
+          install -m 0755 target/release/cargo-zisk "$HOME/.zisk/bin/cargo-zisk"
+          echo "$HOME/.zisk/bin" >> "$GITHUB_PATH"
+
+      - name: Install ZisK Rust toolchain
+        run: cargo-zisk toolchain install
+
+      - name: Run cargo test
+        run: cargo test --locked -p tests
+
   proving-key:
     name: Generate proving key
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
