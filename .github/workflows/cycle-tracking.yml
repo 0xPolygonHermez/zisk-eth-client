@@ -18,9 +18,6 @@ concurrency:
 
 permissions:
   contents: read
-  issues: write
-  pull-requests: write
-
 
 env:
   CARGO_TERM_COLOR: always
@@ -105,48 +102,23 @@ jobs:
         run: bash .github/scripts/zec_bench.sh "$RUNNER_TEMP/base"
 
       - name: "Build execution report"
-        id: report
         run: |
           python3 .github/scripts/zec_cycle_diff.py "$RUNNER_TEMP/base" "$RUNNER_TEMP/pr" > "$RUNNER_TEMP/report.md"
+          # Always show the report in this run's summary.
           cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
-          {
-            echo 'EXECUTION_REPORT<<__ZEC_EOF__'
-            cat "$RUNNER_TEMP/report.md"
-            echo '__ZEC_EOF__'
-          } >> "$GITHUB_OUTPUT"
 
-      - name: "Post / update PR comment"
+      - name: "Stage report for the comment workflow"
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        env:
-          EXECUTION_REPORT: ${{ steps.report.outputs.EXECUTION_REPORT }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/report"
+          cp "$RUNNER_TEMP/report.md" "$RUNNER_TEMP/report/report.md"
+          echo "${{ github.event.pull_request.number }}" > "$RUNNER_TEMP/report/pr-number.txt"
+
+      - name: "Upload report artifact"
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            const { EXECUTION_REPORT } = process.env;
-            const marker = '<!-- zec-cycle-tracking -->';
-            const body = `${marker}\n${EXECUTION_REPORT}`;
-
-            const { data: comments } = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-            const existing = comments.find(
-              (c) => c.user.type === 'Bot' && c.body.includes(marker)
-            );
-
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body,
-              });
-            }
+          name: cycle-tracking-report
+          path: ${{ runner.temp }}/report
+          if-no-files-found: error
+          retention-days: 3
