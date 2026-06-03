@@ -29,6 +29,9 @@ async fn main() -> Result<()> {
     match &cli.guest_program {
         GuestProgramCommand::StatelessValidator {
             input_folder,
+            hints,
+            gen_hints,
+            hints_out,
             client,
             include,
             exclude,
@@ -41,8 +44,16 @@ async fn main() -> Result<()> {
                 Client::Ethrex => ELF_ETHREX,
             };
 
-            info!(" ELF: {}", elf.name());
-            info!(" Input Folder: {}", input_folder.display());
+            info!(" ELF Name: {}", elf.name());
+            if let Some(input_folder) = input_folder {
+                info!(" Input Folder: {}", input_folder.display());
+            }
+            if let Some(hints) = hints {
+                info!(" Hints: {}", hints.display());
+            }
+            if *gen_hints {
+                info!(" Generating hints before running");
+            }
             if let Some(include) = include {
                 info!(" Include Patterns: {:?}", include);
             }
@@ -59,9 +70,17 @@ async fn main() -> Result<()> {
                 cli.emulator,
                 cli.unlock_mapped_memory,
                 cli.gpu,
+                hints.clone(),
+                *gen_hints,
+                hints_out.clone(),
+                *client,
             )?;
             runner
-                .run(input_folder, include.as_deref(), exclude.as_deref())
+                .run(
+                    input_folder.as_deref(),
+                    include.as_deref(),
+                    exclude.as_deref(),
+                )
                 .await?;
         }
     }
@@ -98,12 +117,26 @@ fn write_metadata(cli: &Cli) -> Result<()> {
     match &cli.guest_program {
         GuestProgramCommand::StatelessValidator {
             input_folder,
+            hints,
+            gen_hints,
+            hints_out,
             client,
             include,
             exclude,
         } => {
             writeln!(file, "Client: {:?}", client)?;
-            writeln!(file, "Input Folder: {}", input_folder.display())?;
+            if let Some(input_folder) = input_folder {
+                writeln!(file, "Input Folder: {}", input_folder.display())?;
+            }
+            if let Some(hints) = hints {
+                writeln!(file, "Hints: {}", hints.display())?;
+            }
+            if *gen_hints {
+                writeln!(file, "Generate Hints: true")?;
+            }
+            if let Some(hints_out) = hints_out {
+                writeln!(file, "Hints Out: {}", hints_out.display())?;
+            }
             if let Some(include) = include {
                 writeln!(file, "Include Patterns: {:?}", include)?;
             }
