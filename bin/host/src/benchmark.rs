@@ -105,6 +105,11 @@ impl BenchmarkRunner {
             passed, failed, skipped
         );
 
+        // Propagate failures as a non-zero exit.
+        if failed > 0 {
+            anyhow::bail!("{failed} of {total} input(s) failed");
+        }
+
         Ok(())
     }
 
