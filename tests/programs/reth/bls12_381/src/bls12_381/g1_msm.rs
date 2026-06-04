@@ -38,15 +38,24 @@ fn parse_bls_g1_msm_test(test: &PrecompileTestCase) -> Result<BlsG1MsmTestCase, 
         }
         ExpectedOutcome::Failure(_) => None,
     };
-    Ok(BlsG1MsmTestCase { name: test.name.clone(), pairs, expected })
+    Ok(BlsG1MsmTestCase {
+        name: test.name.clone(),
+        pairs,
+        expected,
+    })
 }
 
 pub fn bls12_381_g1_msm_tests(crypto: &CustomEvmCrypto) {
-    let mut tests =
-        parse_precompile_json(include_str!("../testdata/blsG1MultiExp.json"));
+    let mut tests = parse_precompile_json(include_str!("../testdata/blsG1MultiExp.json"));
     tests.extend(parse_precompile_fail_json(include_str!(
         "../testdata/fail-blsG1MultiExp.json"
     )));
+
+    // The `jwasinger` cases scale up to 4877 pairs and dominate runtime
+    // (~80% of total G1 MSM work). Skipped by default.
+    if !cfg!(feature = "heavy-tests") {
+        tests.retain(|t| !t.name.contains("jwasinger"));
+    }
 
     for test in &tests {
         match parse_bls_g1_msm_test(test) {
