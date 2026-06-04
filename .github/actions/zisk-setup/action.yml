@@ -2,7 +2,7 @@ name: Set up ZisK build environment
 description: >
   Resolve the pinned ZisK ref, clone ZisK, install system dependencies
   (install_deps.sh) and build the ZisK toolchain + asm emulator (build_zisk.sh).
-  Shared by the build-zisk jobs.
+  Used by the jobs that build host or compile guests (tests, execute, test).
 
 runs:
   using: composite
