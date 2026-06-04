@@ -172,14 +172,20 @@ jobs:
             cargo build --locked --release -p host
           fi
 
-      - name: Execute
+      # emulator runs standard only (hints requires the assembly executor).
+      - name: Execute (emulator)
+        if: ${{ matrix.mode == 'standard' }}
         run: |
           for client in $CLIENTS; do
-            echo "::group::execute $client (${{ matrix.mode }})"
-            # standard runs the emulator too; hints requires the assembly executor.
-            if [ "${{ matrix.mode }}" = "standard" ]; then
-              bash tools/ci/run-validation.sh "$client" execute emulator
-            fi
+            echo "::group::execute $client (emulator)"
+            bash tools/ci/run-validation.sh "$client" execute emulator
+            echo "::endgroup::"
+          done
+
+      - name: Execute (assembly)
+        run: |
+          for client in $CLIENTS; do
+            echo "::group::execute $client (assembly, ${{ matrix.mode }})"
             bash tools/ci/run-validation.sh "$client" execute assembly "${{ matrix.mode }}"
             echo "::endgroup::"
           done
@@ -211,12 +217,19 @@ jobs:
       - name: Build host
         run: cargo build --locked --release -p host
 
-      - name: Verify constraints
+      - name: Verify constraints (emulator)
         run: |
           for client in $CLIENTS; do
-            echo "::group::verify-constraints $client"
+            echo "::group::verify-constraints $client (emulator)"
             EXTRA_FLAGS="--gpu --proving-key $HOME/.zisk/provingKey" \
               bash tools/ci/run-validation.sh "$client" verify-constraints emulator
+            echo "::endgroup::"
+          done
+
+      - name: Verify constraints (assembly)
+        run: |
+          for client in $CLIENTS; do
+            echo "::group::verify-constraints $client (assembly)"
             EXTRA_FLAGS="--gpu --proving-key $HOME/.zisk/provingKey" \
               bash tools/ci/run-validation.sh "$client" verify-constraints assembly
             echo "::endgroup::"
