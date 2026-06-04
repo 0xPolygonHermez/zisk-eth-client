@@ -96,8 +96,14 @@ jobs:
 
   tests:
     name: Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
+    runs-on: self-hosted
+    timeout-minutes: 60
+    container:
+      image: ubuntu:22.04
+      options: --shm-size=48g
+    defaults:
+      run:
+        shell: bash
     env:
       WS: ${{ github.workspace }}/.tests
     steps:
