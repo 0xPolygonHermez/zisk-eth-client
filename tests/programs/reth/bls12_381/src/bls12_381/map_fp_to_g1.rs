@@ -26,7 +26,11 @@ fn parse_bls_map_fp_to_g1_test(test: &PrecompileTestCase) -> Result<BlsMapFpToG1
         }
         ExpectedOutcome::Failure(_) => None,
     };
-    Ok(BlsMapFpToG1TestCase { name: test.name.clone(), fe, expected })
+    Ok(BlsMapFpToG1TestCase {
+        name: test.name.clone(),
+        fe,
+        expected,
+    })
 }
 
 pub fn bls12_381_map_fp_to_g1_tests(crypto: &CustomEvmCrypto) {
