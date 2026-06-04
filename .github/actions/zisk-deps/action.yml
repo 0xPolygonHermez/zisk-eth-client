@@ -1,0 +1,28 @@
+name: Install ZisK dependencies
+description: >
+  Resolve the pinned ZisK ref, clone ZisK into .zk-setup and run install_deps.sh.
+  This is the shared prefix used by every ZisK job. Jobs that also need the built
+  ZisK toolchain + asm emulator should use the zisk-setup action, which composes
+  this action and then runs build_zisk.sh.
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve ZisK ref
+      uses: ./.github/actions/zisk-ref
+
+    - name: Clone ZisK
+      uses: actions/checkout@v4
+      with:
+        repository: 0xPolygonHermez/zisk
+        ref: ${{ env.ZISK_REF }}
+        path: .zk-setup
+
+    - name: Install ZisK dependencies (zisk install_deps.sh)
+      shell: bash
+      working-directory: ${{ github.workspace }}/.zk-setup/tools/test-env
+      run: |
+        bash install_deps.sh
+        # install_deps.sh installs Rust via rustup but only updates PATH in its
+        # own shell; expose cargo to the later build steps.
+        echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
