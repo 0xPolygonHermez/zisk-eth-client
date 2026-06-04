@@ -30,7 +30,12 @@ fn parse_bls_map_fp2_to_g2_test(
         }
         ExpectedOutcome::Failure(_) => None,
     };
-    Ok(BlsMapFp2ToG2TestCase { name: test.name.clone(), fe0, fe1, expected })
+    Ok(BlsMapFp2ToG2TestCase {
+        name: test.name.clone(),
+        fe0,
+        fe1,
+        expected,
+    })
 }
 
 pub fn bls12_381_map_fp2_to_g2_tests(crypto: &CustomEvmCrypto) {

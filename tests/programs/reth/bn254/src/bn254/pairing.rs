@@ -27,13 +27,19 @@ fn parse_ecpairing_test(test: &PrecompileTestCase) -> EcPairingTestCase {
     let bytes = test.expected.unwrap_success();
     let expected = bytes.last().copied().unwrap_or(0) == 1;
 
-    EcPairingTestCase { name: test.name.clone(), pairs, expected }
+    EcPairingTestCase {
+        name: test.name.clone(),
+        pairs,
+        expected,
+    }
 }
 
 pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
     // 1] 0 inputs should return true (empty pairing)
     let pairs: &[(&[u8], &[u8])] = &[];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 1 should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 1 should succeed");
     assert!(result, "Test 1: empty pairing should return true");
 
     // 2] Tests with 1 pair
@@ -47,7 +53,10 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
     );
     let pairs: &[(&[u8], &[u8])] = &[(&g1, &g2)];
     let result = crypto.bn254_pairing_check(pairs);
-    assert!(result.is_err(), "Test 2.1a: G1 (0,1) not on curve should fail");
+    assert!(
+        result.is_err(),
+        "Test 2.1a: G1 (0,1) not on curve should fail"
+    );
 
     // 2.1b] Invalid G2 point (wrong y coordinate)
     let g1 = build_g1_point("0", "0");
@@ -78,14 +87,20 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
     let g2 = build_g2_point("0", "0", "0", "0");
     let pairs: &[(&[u8], &[u8])] = &[(&g1, &g2)];
     let result = crypto.bn254_pairing_check(pairs);
-    assert!(result.is_err(), "Test 2.1d: G1 (1,1) not on curve should fail");
+    assert!(
+        result.is_err(),
+        "Test 2.1d: G1 (1,1) not on curve should fail"
+    );
 
     // 2.1e] Invalid - G2 not on curve (1, 2, 3, 3)
     let g1 = build_g1_point("0", "0");
     let g2 = build_g2_point("1", "2", "3", "3");
     let pairs: &[(&[u8], &[u8])] = &[(&g1, &g2)];
     let result = crypto.bn254_pairing_check(pairs);
-    assert!(result.is_err(), "Test 2.1e: G2 (1,2,3,3) not on curve should fail");
+    assert!(
+        result.is_err(),
+        "Test 2.1e: G2 (1,2,3,3) not on curve should fail"
+    );
 
     // 2.2] Out of range tests - G1.x >= P
     let g1 = build_g1_point(
@@ -165,14 +180,18 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
         "322506915963699862059245473966830598387691259163658767351233132602858049743",
     );
     let pairs: &[(&[u8], &[u8])] = &[(&g1, &g2)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 2.3a should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 2.3a should succeed");
     assert!(result, "Test 2.3a: e(0, Q) should be 1");
 
     // e(P, 0) = 1
     let g1 = build_g1_point("1", "2");
     let g2 = build_g2_point("0", "0", "0", "0");
     let pairs: &[(&[u8], &[u8])] = &[(&g1, &g2)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 2.3b should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 2.3b should succeed");
     assert!(result, "Test 2.3b: e(P, 0) should be 1");
 
     // e(0, G2_generator) = 1
@@ -184,7 +203,9 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
         "8495653923123431417604973247489272438418190587263600148770280649306958101930",
     );
     let pairs: &[(&[u8], &[u8])] = &[(&g1, &g2)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 2.3c should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 2.3c should succeed");
     assert!(result, "Test 2.3c: e(0, G2) should be 1");
 
     // e(0, another G2 point) = 1
@@ -196,7 +217,9 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
         "16129402215257578064845163124174157135534373400489420174780024516864802406908",
     );
     let pairs: &[(&[u8], &[u8])] = &[(&g1, &g2)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 2.3d should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 2.3d should succeed");
     assert!(result, "Test 2.3d: e(0, G2) should be 1");
 
     let g1 = build_g1_point(
@@ -210,7 +233,9 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
         "18464139784518468940813808456787395271551658665172075242540518796021481349881",
     );
     let pairs: &[(&[u8], &[u8])] = &[(&g1, &g2)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 2.4d should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 2.4d should succeed");
     assert!(!result, "Test 2.4d: e(G1, G2) should not be 1");
 
     let g1 = build_g1_point(
@@ -250,7 +275,9 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
         "16129402215257578064845163124174157135534373400489420174780024516864802406908",
     );
     let pairs: &[(&[u8], &[u8])] = &[(&g1_1, &g2_1), (&g1_2, &g2_2)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 3a should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 3a should succeed");
     assert!(result, "Test 3a: Ethereum example pairing should be true");
 
     // KZG proof with one poly and one evaluation (test 1)
@@ -275,7 +302,9 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
         "8495653923123431417604973247489272438418190587263600148770280649306958101930",
     );
     let pairs: &[(&[u8], &[u8])] = &[(&g1_1, &g2_1), (&g1_2, &g2_2)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 3b should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 3b should succeed");
     assert!(result, "Test 3b: KZG proof pairing should be true");
 
     // KZG proof with one poly and one evaluation (test 2)
@@ -300,7 +329,9 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
         "8495653923123431417604973247489272438418190587263600148770280649306958101930",
     );
     let pairs: &[(&[u8], &[u8])] = &[(&g1_1, &g2_1), (&g1_2, &g2_2)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 3c should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 3c should succeed");
     assert!(result, "Test 3c: KZG proof pairing should be true");
 
     // 4] Tests with 3 pairs (18 inputs)
@@ -329,7 +360,9 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
     let g1_3 = build_g1_point("1", "2");
     let g2_3 = build_g2_point("0", "0", "0", "0");
     let pairs: &[(&[u8], &[u8])] = &[(&g1_1, &g2_1), (&g1_2, &g2_2), (&g1_3, &g2_3)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 4a should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 4a should succeed");
     assert!(result, "Test 4a: 3 pairs with (G1, 0) should be true");
 
     // Another 3-pair test
@@ -364,7 +397,9 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
         "8495653923123431417604973247489272438418190587263600148770280649306958101930",
     );
     let pairs: &[(&[u8], &[u8])] = &[(&g1_1, &g2_1), (&g1_2, &g2_2), (&g1_3, &g2_3)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 4b should succeed");
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 4b should succeed");
     assert!(result, "Test 4b: 3 pairs pairing should be true");
 
     // 5] Tests with 4 pairs (24 inputs)
@@ -408,16 +443,25 @@ pub fn ecpairing_tests(crypto: &CustomEvmCrypto) {
         "4082367875863433681332203403145435568316851327593401208105741076214120093531",
         "8495653923123431417604973247489272438418190587263600148770280649306958101930",
     );
-    let pairs: &[(&[u8], &[u8])] =
-        &[(&g1_1, &g2_1), (&g1_2, &g2_2), (&g1_3, &g2_3), (&g1_4, &g2_4)];
-    let result = crypto.bn254_pairing_check(pairs).expect("Test 5 should succeed");
+    let pairs: &[(&[u8], &[u8])] = &[
+        (&g1_1, &g2_1),
+        (&g1_2, &g2_2),
+        (&g1_3, &g2_3),
+        (&g1_4, &g2_4),
+    ];
+    let result = crypto
+        .bn254_pairing_check(pairs)
+        .expect("Test 5 should succeed");
     assert!(result, "Test 5: 4 pairs pairing should be true");
 
     // Geth test vectors
     for test in &parse_precompile_json(include_str!("../testdata/bn256Pairing.json")) {
         let t = parse_ecpairing_test(test);
-        let pairs: Vec<(&[u8], &[u8])> =
-            t.pairs.iter().map(|(g1, g2)| (g1.as_slice(), g2.as_slice())).collect();
+        let pairs: Vec<(&[u8], &[u8])> = t
+            .pairs
+            .iter()
+            .map(|(g1, g2)| (g1.as_slice(), g2.as_slice()))
+            .collect();
         let result = crypto.bn254_pairing_check(&pairs);
         assert!(result.is_ok(), "bn254Pairing {} should succeed", t.name);
         assert_eq!(

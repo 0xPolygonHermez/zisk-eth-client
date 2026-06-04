@@ -28,7 +28,13 @@ fn parse_p256_verify_test(test: &PrecompileTestCase) -> P256VerifyTestCase {
 
     let expected = matches!(test.expected, ExpectedOutcome::Success(ref b) if !b.is_empty());
 
-    P256VerifyTestCase { name: test.name.clone(), msg, sig, pk, expected }
+    P256VerifyTestCase {
+        name: test.name.clone(),
+        msg,
+        sig,
+        pk,
+        expected,
+    }
 }
 
 pub fn p256_verify_tests(crypto: &CustomEvmCrypto) {

@@ -85,7 +85,7 @@ input-gen eest [OPTIONS]
 | `-p, --eest-fixtures-path <PATH>` | Local fixtures path (mutually exclusive with `--tag`) |
 | `-i, --include <PATTERN>` | Filter tests by name (repeatable) |
 | `-e, --exclude <PATTERN>` | Exclude tests by name (repeatable) |
-| `--threads <N>` | Number of threads for parallel processing |
+| `--threads <N>` | Number of threads for parallel processing (default: `10`) |
 
 **Examples:**
 

@@ -6,7 +6,10 @@ pub type G2PointScalar = (G2Point, [u8; 32]);
 /// Parse a 64-byte padded field element to 48 bytes (strips 16-byte zero prefix)
 pub fn parse_fp_padded(input: &[u8]) -> Result<[u8; 48], String> {
     if input.len() != 64 {
-        return Err(format!("Invalid padded field element length: {}", input.len()));
+        return Err(format!(
+            "Invalid padded field element length: {}",
+            input.len()
+        ));
     }
 
     let (padding, data) = input.split_at(16);

@@ -28,7 +28,12 @@ fn parse_bls_g2_add_test(test: &PrecompileTestCase) -> Result<BlsG2AddTestCase, 
         }
         ExpectedOutcome::Failure(_) => None,
     };
-    Ok(BlsG2AddTestCase { name: test.name.clone(), p1, p2, expected })
+    Ok(BlsG2AddTestCase {
+        name: test.name.clone(),
+        p1,
+        p2,
+        expected,
+    })
 }
 
 pub fn bls12_381_g2_add_tests(crypto: &CustomEvmCrypto) {

@@ -22,6 +22,7 @@ alloy-consensus = { workspace = true, default-features = false, features = [
 ] }
 alloy-genesis.workspace = true
 alloy-primitives.workspace = true
+alloy-rlp.workspace = true
 alloy-rpc-types-debug.workspace = true
 
 revm.workspace = true

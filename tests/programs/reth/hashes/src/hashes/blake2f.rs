@@ -18,7 +18,10 @@ struct Blake2fTestCase {
 fn parse_blake2f_test(test: &PrecompileTestCase) -> Result<Blake2fTestCase, String> {
     let input = &test.input;
     if input.len() != 213 {
-        return Err(format!("invalid input length: {} (expected 213)", input.len()));
+        return Err(format!(
+            "invalid input length: {} (expected 213)",
+            input.len()
+        ));
     }
 
     let rounds = u32::from_be_bytes(input[0..4].try_into().unwrap());
@@ -61,19 +64,28 @@ fn parse_blake2f_test(test: &PrecompileTestCase) -> Result<Blake2fTestCase, Stri
         ExpectedOutcome::Failure(_) => None,
     };
 
-    Ok(Blake2fTestCase { name: test.name.clone(), rounds, h, m, t, f, expected })
+    Ok(Blake2fTestCase {
+        name: test.name.clone(),
+        rounds,
+        h,
+        m,
+        t,
+        f,
+        expected,
+    })
 }
 
 pub fn blake2f_tests(crypto: &CustomEvmCrypto) {
     let mut tests = parse_precompile_json(include_str!("../testdata/blake2F.json"));
-    tests
-        .extend(parse_precompile_fail_json(include_str!("../testdata/fail-blake2f.json")));
+    tests.extend(parse_precompile_fail_json(include_str!(
+        "../testdata/fail-blake2f.json"
+    )));
 
     for test in &tests {
         match parse_blake2f_test(test) {
             Ok(parsed) => {
                 let mut h = parsed.h;
-                crypto.blake2_compress(parsed.rounds, &mut h, parsed.m, parsed.t, parsed.f);
+                crypto.blake2_compress(parsed.rounds, &mut h, &parsed.m, &parsed.t, parsed.f);
                 match parsed.expected {
                     Some(expected_h) => {
                         assert_eq!(

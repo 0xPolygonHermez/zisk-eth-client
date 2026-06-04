@@ -24,7 +24,7 @@ pub struct Cli {
     pub output_folder: Option<PathBuf>,
 
     /// Path to the proving key file (default: installed one)
-    #[arg(short, long)]
+    #[arg(short = 'k', long)]
     pub proving_key: Option<PathBuf>,
 
     /// Use emulator backend (Emu) instead of assembly (Asm)

@@ -26,7 +26,7 @@ hints-gen [OPTIONS] [INPUTS]...
 |--------|-------------|---------|
 | `[INPUTS]...` | One or more `.bin` input files | — |
 | `-f, --inputs-folder <PATH>` | Directory of `.bin` input files (processed in sorted order) | — |
-| `-o, --output-dir <PATH>` | Output directory for `.hints` files | Same directory as each input |
+| `-o, --output-dir <PATH>` | Output directory for `.hints` files | `<client>-hints/` (e.g. `reth-hints/`) |
 | `-c, --client <CLIENT>` | Execution client: `reth`, `ethrex` | `reth` |
 
 Either `[INPUTS]...` or `--inputs-folder` must be provided (they are mutually exclusive).
@@ -42,11 +42,11 @@ hints-gen path/to/mainnet_22767493_156_12_zec_reth.bin
 # Multiple inputs
 hints-gen block1.bin block2.bin block3.bin
 
-# Whole folder, written next to each input
+# Whole folder, hints written to the default `reth-hints/`
 hints-gen -f reth-inputs/
 
-# Whole folder, hints written to a separate directory
-hints-gen -f reth-inputs/ -o reth-hints/
+# Whole folder, hints written to a custom directory
+hints-gen -f reth-inputs/ -o my-hints/
 
 # Ethrex client
 hints-gen -c ethrex -f ethrex-inputs/
@@ -61,11 +61,12 @@ RUST_LOG=debug hints-gen -f reth-inputs/
 
 ## Output
 
-For each input `foo.bin`, a sibling (or in `--output-dir`) `foo.hints` file is written.
+For each input `foo.bin`, a `foo.hints` file is written to `<client>-hints/` (override with `-o`).
 
 ```
 reth-inputs/
   mainnet_22767493_156_12_zec_reth.bin
+reth-hints/
   mainnet_22767493_156_12_zec_reth.hints   # generated
 ```
 

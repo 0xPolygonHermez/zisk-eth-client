@@ -76,7 +76,7 @@ RUSTFLAGS="--cfg zisk_hints" cargo build --release -p hints-gen
 ./target/release/hints-gen -f reth-inputs/
 ```
 
-For each `foo.bin`, a sibling `foo.hints` is written. See [hints-gen](#hints-gen) for details.
+For each `foo.bin`, a `foo.hints` file is written to `reth-hints/` (per-client default; override with `-o`). See [hints-gen](#hints-gen) for details.
 
 ## Binaries
 
@@ -92,12 +92,12 @@ host [EXECUTION_OPTIONS] stateless-validator -i <INPUT_FOLDER> [OPTIONS]
 
 | Option | Description | Default |
 |---|---|---|
-| `-a, --action <ACTION>` | `execute`, `verify-constraints`, or `prove` | `execute` |
+| `-a, --action <ACTION>` | Action to perform: `execute`, `verify-constraints`, `prove` | `execute` |
 | `-f, --force-rerun` | Re-run even if results already exist | `false` |
-| `-o, --output-folder <PATH>` | Folder for benchmark results | — |
-| `-p, --proving-key <PATH>` | Path to proving key (default: installed) | — |
-| `-l, --emulator` | Use the emulator backend instead of assembly | `false` |
-| `--unlock-mapped-memory` | (mutually exclusive with `--emulator`) | `false` |
+| `-o, --output-folder <PATH>` | Output folder for benchmark results | None |
+| `-k, --proving-key <PATH>` | Path to the proving key file | Required for `verify-constraints`/`prove`. Defaults to installed one |
+| `-l, --emulator` | Use emulator backend instead of assembly | `false` |
+| `--unlock-mapped-memory` | Use the assembly backend with mapped memory unlocked (mutually exclusive with `--emulator`) | `false` |
 | `--gpu` | Use GPU acceleration (verify-constraints / prove only) | `false` |
 | `-v, --verbose` | Increase log verbosity (`-v` = debug, `-vv` = trace) | — |
 
@@ -105,10 +105,13 @@ host [EXECUTION_OPTIONS] stateless-validator -i <INPUT_FOLDER> [OPTIONS]
 
 | Option | Description | Default |
 |---|---|---|
-| `-i, --input-folder <PATH>` | Folder containing `.bin` inputs (required) | — |
+| `-i, --input-folder <PATH>` | Folder containing `.bin` inputs (required unless `--hints` is given) | — |
 | `-c, --client <CLIENT>` | Execution client: `reth`, `ethrex` | `reth` |
 | `--include <PATTERN>` | Only process inputs whose name contains the pattern (repeatable) | — |
 | `--exclude <PATTERN>` | Skip inputs whose name contains the pattern (repeatable) | — |
+| `--hints <PATH>` | Run against a pre-generated `.hints` file/folder (mutually exclusive with `--input-folder`) | — |
+| `--gen-hints` | Generate `.hints` files inline before running (requires `RUSTFLAGS="--cfg zisk_hints"`) | `false` |
+| `--hints-out <PATH>` | Output directory for `--gen-hints` (defaults next to inputs) | — |
 
 ```bash
 # Execute (default action)

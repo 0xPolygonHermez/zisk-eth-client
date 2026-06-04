@@ -4,7 +4,13 @@ unsafe extern "C" {
 }
 pub fn keccak256(bytes: &[u8]) -> [u8; 32] {
     let mut output = [0u8; 32];
-    unsafe { native_keccak256(bytes.as_ptr(), bytes.len(), output.as_mut_ptr().cast::<u8>()) };
+    unsafe {
+        native_keccak256(
+            bytes.as_ptr(),
+            bytes.len(),
+            output.as_mut_ptr().cast::<u8>(),
+        )
+    };
     output
 }
 
