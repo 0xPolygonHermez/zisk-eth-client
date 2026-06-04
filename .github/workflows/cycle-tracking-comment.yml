@@ -57,7 +57,7 @@ jobs:
             }
 
             const report = fs.readFileSync('report/report.md', 'utf8');
-            const marker = '<!-- zisk-cycle-tracking -->';
+            const marker = '<!-- zec-cycle-tracking -->';
             const body = `${marker}\n${report}`;
 
             const { data: comments } = await github.rest.issues.listComments({
