@@ -40,6 +40,29 @@ impl RethClient {
         self.build_stdin(&input)
     }
 
+    pub async fn witness_from_rpc(
+        &self,
+        config: &RpcConfig,
+        block_number: u64,
+    ) -> Result<RethInputWitness> {
+        let provider = connect_provider(config).await?;
+        let witness = fetch_witness(&provider, block_number).await?;
+        Ok(RethInputWitness::new(witness))
+    }
+
+    pub async fn public_from_rpc(
+        &self,
+        config: &RpcConfig,
+        block_number: u64,
+    ) -> Result<RethInputPublic> {
+        let provider = connect_provider(config).await?;
+        let chain_config = fetch_chain_config(&provider).await?;
+        let block = fetch_block(&provider, block_number).await?;
+
+        RethInputPublic::new(block.into(), chain_config)
+            .with_context(|| format!("Failed to build RethInputPublic for block {block_number}"))
+    }
+
     fn build_stdin(&self, input: &RethInput) -> Result<ZiskStdin> {
         let public = RethInputPublic {
             block: input.stateless_input.block.clone(),
