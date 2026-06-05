@@ -7,3 +7,5 @@ pub use client::{create_client, parse_header, BlockStats, Client, ExecutionClien
 pub use ethrex_client::EthrexClient;
 pub use hints::{generate_hints_to_file, generate_hints_to_socket};
 pub use reth_client::RethClient;
+
+pub use guest_reth;
