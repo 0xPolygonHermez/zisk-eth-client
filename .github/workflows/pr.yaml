@@ -1,7 +1,5 @@
 name: "Test Ethereum Client"
 
-# TODO: Add tests with hints
-
 on:
   pull_request:
     branches:
@@ -24,6 +22,9 @@ env:
   PIL2_COMPILER_REF: develop-0.10.0
   PIL2_PROOFMAN_REF: pre-develop-1.0.0-beta
   PIL2_PROOFMAN_JS_REF: pre-develop-0.19.0
+  # Clients exercised by the execute / verify-constraints loops. To add a client,
+  # append it here and add its <CLIENT>_TEST_BLOCKS below.
+  CLIENTS: "reth ethrex"
   # Block inputs to test per client (from less MGs to more MGs).
   # It is good to have shared blocks between clients for easier comparison.
   RETH_TEST_BLOCKS: "25229957 25229955 25229951"
@@ -50,8 +51,6 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    env:
-      WS: ${{ github.workspace }}/.clippy
     steps:
       - uses: actions/checkout@v4
 
@@ -73,29 +72,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-clippy-target-
 
-      - name: Resolve ZisK ref
-        uses: ./.github/actions/zisk-ref
-
-      - name: Clone ZisK
-        uses: actions/checkout@v4
-        with:
-          repository: 0xPolygonHermez/zisk
-          ref: ${{ env.ZISK_REF }}
-          path: .clippy
-
-      - name: Install ZisK dependencies (zisk install_deps.sh)
-        working-directory: ${{ env.WS }}/tools/test-env
-        run: |
-          bash install_deps.sh
-          # install_deps.sh installs Rust via rustup but only updates PATH in its
-          # own shell; expose cargo to the later build steps.
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+      - name: Install ZisK dependencies
+        uses: ./.github/actions/zisk-deps
 
       - name: Run Clippy
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
 
   tests:
     name: Tests
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
     runs-on: self-hosted
     timeout-minutes: 60
     container:
@@ -104,59 +89,11 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      WS: ${{ github.workspace }}/.tests
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-registry-
-
-      - name: Cache target directory
-        uses: actions/cache@v4
-        with:
-          path: |
-            target
-            tests/programs/target
-          key: ${{ runner.os }}-tests-target-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-tests-target-
-
-      - name: Resolve ZisK ref
-        uses: ./.github/actions/zisk-ref
-
-      - name: Clone ZisK
-        uses: actions/checkout@v4
-        with:
-          repository: 0xPolygonHermez/zisk
-          ref: ${{ env.ZISK_REF }}
-          path: .tests
-
-      - name: Install ZisK dependencies (zisk install_deps.sh)
-        working-directory: ${{ env.WS }}/tools/test-env
-        run: |
-          bash install_deps.sh
-          # install_deps.sh installs Rust via rustup but only updates PATH in its
-          # own shell; expose cargo to the later build steps.
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-
-      - name: Build cargo-zisk
-        working-directory: ${{ env.WS }}
-        run: |
-          cargo build --release -p cargo-zisk --bin cargo-zisk
-          mkdir -p "$HOME/.zisk/bin"
-          install -m 0755 target/release/cargo-zisk "$HOME/.zisk/bin/cargo-zisk"
-          echo "$HOME/.zisk/bin" >> "$GITHUB_PATH"
-
-      - name: Install ZisK Rust toolchain
-        run: cargo-zisk toolchain install
+      - name: Set up ZisK build environment
+        uses: ./.github/actions/zisk-setup
 
       - name: Run cargo test
         run: cargo test --locked -p tests
@@ -177,23 +114,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Resolve ZisK ref
-        uses: ./.github/actions/zisk-ref
-
-      - name: Clone ZisK
-        uses: actions/checkout@v4
-        with:
-          repository: 0xPolygonHermez/zisk
-          ref: ${{ env.ZISK_REF }}
-          path: .zk-setup
-
-      - name: Install ZisK dependencies (zisk install_deps.sh)
-        working-directory: ${{ env.WS }}/tools/test-env
-        run: |
-          bash install_deps.sh
-          # install_deps.sh installs Rust via rustup but only updates PATH in its
-          # own shell; expose cargo to the later build steps.
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+      - name: Install ZisK dependencies
+        uses: ./.github/actions/zisk-deps
 
       - name: Build cargo-zisk
         working-directory: ${{ env.WS }}
@@ -217,8 +139,61 @@ jobs:
         # build_setup installs the key to $HOME/.zisk/provingKey.
         run: ./build_setup.sh
 
-  test-reth:
-    name: Test Reth
+  # Matrix on mode only (not client): zisk-setup (full build_zisk.sh) and the host
+  # build are mode-dependent but client-independent, so we run them once per mode
+  # and loop over the clients inside. On a single self-hosted runner the cells
+  # serialize anyway, so this just avoids repeating the toolchain build per client.
+  execute:
+    name: Execute (${{ matrix.mode }})
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
+    runs-on: self-hosted
+    timeout-minutes: 60
+    container:
+      image: ubuntu:22.04
+      options: --shm-size=48g
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [standard, hints]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up ZisK build environment
+        uses: ./.github/actions/zisk-setup
+
+      - name: Build host
+        run: |
+          if [ "${{ matrix.mode }}" = "hints" ]; then
+            RUSTFLAGS="--cfg zisk_hints" cargo build --locked --release -p host
+          else
+            cargo build --locked --release -p host
+          fi
+
+      # emulator runs standard only (hints requires the assembly executor).
+      - name: Execute (emulator)
+        if: ${{ matrix.mode == 'standard' }}
+        run: |
+          for client in $CLIENTS; do
+            echo "::group::execute $client (emulator)"
+            bash tools/ci/run-validation.sh "$client" execute emulator
+            echo "::endgroup::"
+          done
+
+      - name: Execute (assembly)
+        run: |
+          for client in $CLIENTS; do
+            echo "::group::execute $client (assembly, ${{ matrix.mode }})"
+            bash tools/ci/run-validation.sh "$client" execute assembly "${{ matrix.mode }}"
+            echo "::endgroup::"
+          done
+
+  # verify-constraints is standard-mode and client-independent for setup, so run
+  # zisk-setup + the host build once and loop over both clients inside.
+  test:
+    name: Verify constraints
     needs: [proving-key]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
     runs-on: gpu-hosted
@@ -229,220 +204,33 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      TARGET_CACHE_SCOPE: reth
-      WS: ${{ github.workspace }}/.zk-setup
-      RETH_INPUT_FOLDER: bin/guests/stateless-validator-reth/inputs
     steps:
       - uses: actions/checkout@v4
-
-      - name: Verify test inputs exist
-        run: |
-          shopt -s nullglob
-          for block in $RETH_TEST_BLOCKS; do
-            matches=("${RETH_INPUT_FOLDER}"/mainnet_"${block}"_*.bin)
-            ((${#matches[@]} > 0)) || { echo "ERROR: no input file for block $block in $RETH_INPUT_FOLDER"; exit 1; }
-          done
 
       - name: Verify proving key present
         run: |
           [ -d "$HOME/.zisk/provingKey" ] || { echo "ERROR: proving key not found at \$HOME/.zisk/provingKey (the proving-key job installs it on the shared volume)"; exit 1; }
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-registry-
-
-      - name: Cache target directory
-        uses: actions/cache@v4
-        with:
-          path: |
-            target
-            bin/guests/stateless-validator-reth/target
-            bin/guests/stateless-validator-ethrex/target
-          key: ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-
-
-      - name: Resolve ZisK ref
-        uses: ./.github/actions/zisk-ref
-
-      - name: Clone ZisK
-        uses: actions/checkout@v4
-        with:
-          repository: 0xPolygonHermez/zisk
-          ref: ${{ env.ZISK_REF }}
-          path: .zk-setup
-
-      - name: Install ZisK dependencies (zisk install_deps.sh)
-        working-directory: ${{ env.WS }}/tools/test-env
-        run: |
-          bash install_deps.sh
-          # install_deps.sh installs Rust via rustup but only updates PATH in its
-          # own shell; expose cargo to the later build steps.
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-
-      - name: Build ZisK (zisk build_zisk.sh)
-        working-directory: ${{ env.WS }}/tools/test-env
-        env:
-          ZISK_GHA: "1" # skip the interactive confirm prompt
-          DISABLE_ENV_CONFIRM: "1"
-          ZISK_REPO_DIR: ${{ env.WS }}
-        run: |
-          ./build_zisk.sh
-          echo "$HOME/.zisk/bin" >> "$GITHUB_PATH"
+      - name: Set up ZisK build environment
+        uses: ./.github/actions/zisk-setup
 
       - name: Build host
         run: cargo build --locked --release -p host
 
-      - name: Execute Reth stateless validation tests (emulator)
+      - name: Verify constraints (emulator)
         run: |
-          include_flags=()
-          for block in $RETH_TEST_BLOCKS; do
-            include_flags+=(--include "$block")
-          done
-          ./target/release/host --emulator --action execute --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
-
-      - name: Execute Reth stateless validation tests (assembly)
-        run: |
-          include_flags=()
-          for block in $RETH_TEST_BLOCKS; do
-            include_flags+=(--include "$block")
-          done
-          ./target/release/host --unlock-mapped-memory --action execute --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
-
-      - name: Verify Reth stateless validation constraints (emulator)
-        run: |
-          include_flags=()
-          for block in $RETH_TEST_BLOCKS; do
-            include_flags+=(--include "$block")
-          done
-          ./target/release/host --emulator --action verify-constraints --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
-
-      - name: Verify Reth stateless validation constraints (assembly)
-        run: |
-          include_flags=()
-          for block in $RETH_TEST_BLOCKS; do
-            include_flags+=(--include "$block")
-          done
-          ./target/release/host --unlock-mapped-memory --action verify-constraints --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client reth --input-folder "$RETH_INPUT_FOLDER" "${include_flags[@]}"
-
-  test-ethrex:
-    name: Test Ethrex
-    needs: [proving-key]
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-    runs-on: gpu-hosted
-    timeout-minutes: 45
-    container:
-      image: ziskvm/zisk-runner-gpu:latest
-      options: --gpus all --shm-size=48g
-    defaults:
-      run:
-        shell: bash
-    env:
-      TARGET_CACHE_SCOPE: ethrex
-      WS: ${{ github.workspace }}/.zk-setup
-      ETHREX_INPUT_FOLDER: bin/guests/stateless-validator-ethrex/inputs
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Verify test inputs exist
-        run: |
-          shopt -s nullglob
-          for block in $ETHREX_TEST_BLOCKS; do
-            matches=("${ETHREX_INPUT_FOLDER}"/mainnet_"${block}"_*.bin)
-            ((${#matches[@]} > 0)) || { echo "ERROR: no input file for block $block in $ETHREX_INPUT_FOLDER"; exit 1; }
+          for client in $CLIENTS; do
+            echo "::group::verify-constraints $client (emulator)"
+            EXTRA_FLAGS="--gpu --proving-key $HOME/.zisk/provingKey" \
+              bash tools/ci/run-validation.sh "$client" verify-constraints emulator
+            echo "::endgroup::"
           done
 
-      - name: Verify proving key present
+      - name: Verify constraints (assembly)
         run: |
-          [ -d "$HOME/.zisk/provingKey" ] || { echo "ERROR: proving key not found at \$HOME/.zisk/provingKey (the proving-key job installs it on the shared volume)"; exit 1; }
-
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-registry-
-
-      - name: Cache target directory
-        uses: actions/cache@v4
-        with:
-          path: |
-            target
-            bin/guests/stateless-validator-reth/target
-            bin/guests/stateless-validator-ethrex/target
-          key: ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-selfhosted-target-gpu-${{ env.TARGET_CACHE_SCOPE }}-
-
-      - name: Resolve ZisK ref
-        uses: ./.github/actions/zisk-ref
-
-      - name: Clone ZisK
-        uses: actions/checkout@v4
-        with:
-          repository: 0xPolygonHermez/zisk
-          ref: ${{ env.ZISK_REF }}
-          path: .zk-setup
-
-      - name: Install ZisK dependencies (zisk install_deps.sh)
-        working-directory: ${{ env.WS }}/tools/test-env
-        run: |
-          bash install_deps.sh
-          # install_deps.sh installs Rust via rustup but only updates PATH in its
-          # own shell; expose cargo to the later build steps.
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-
-      - name: Build ZisK (zisk build_zisk.sh)
-        working-directory: ${{ env.WS }}/tools/test-env
-        env:
-          ZISK_GHA: "1" # skip the interactive confirm prompt
-          DISABLE_ENV_CONFIRM: "1"
-          ZISK_REPO_DIR: ${{ env.WS }}
-        run: |
-          ./build_zisk.sh
-          echo "$HOME/.zisk/bin" >> "$GITHUB_PATH"
-
-      - name: Build host
-        run: cargo build --locked --release -p host
-
-      - name: Execute Ethrex stateless validation tests (emulator)
-        run: |
-          include_flags=()
-          for block in $ETHREX_TEST_BLOCKS; do
-            include_flags+=(--include "$block")
+          for client in $CLIENTS; do
+            echo "::group::verify-constraints $client (assembly)"
+            EXTRA_FLAGS="--gpu --proving-key $HOME/.zisk/provingKey" \
+              bash tools/ci/run-validation.sh "$client" verify-constraints assembly
+            echo "::endgroup::"
           done
-          ./target/release/host --emulator --action execute --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
-
-      - name: Execute Ethrex stateless validation tests (assembly)
-        run: |
-          include_flags=()
-          for block in $ETHREX_TEST_BLOCKS; do
-            include_flags+=(--include "$block")
-          done
-          ./target/release/host --unlock-mapped-memory --action execute --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
-
-      - name: Verify Ethrex stateless validation constraints (emulator)
-        run: |
-          include_flags=()
-          for block in $ETHREX_TEST_BLOCKS; do
-            include_flags+=(--include "$block")
-          done
-          ./target/release/host --emulator --action verify-constraints --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"
-
-      - name: Verify Ethrex stateless validation constraints (assembly)
-        run: |
-          include_flags=()
-          for block in $ETHREX_TEST_BLOCKS; do
-            include_flags+=(--include "$block")
-          done
-          ./target/release/host --unlock-mapped-memory --action verify-constraints --gpu --proving-key "$HOME/.zisk/provingKey" stateless-validator --client ethrex --input-folder "$ETHREX_INPUT_FOLDER" "${include_flags[@]}"

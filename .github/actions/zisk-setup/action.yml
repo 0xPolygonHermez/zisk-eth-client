@@ -1,0 +1,22 @@
+name: Set up ZisK build environment
+description: >
+  Resolve the pinned ZisK ref, clone ZisK, install system dependencies
+  (install_deps.sh) and build the ZisK toolchain + asm emulator (build_zisk.sh).
+  Used by the jobs that build host or compile guests (tests, execute, test).
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve ref, clone ZisK and install dependencies
+      uses: ./.github/actions/zisk-deps
+
+    - name: Build ZisK (zisk build_zisk.sh)
+      shell: bash
+      working-directory: ${{ github.workspace }}/.zk-setup/tools/test-env
+      env:
+        ZISK_GHA: "1" # skip the interactive confirm prompt
+        DISABLE_ENV_CONFIRM: "1"
+        ZISK_REPO_DIR: ${{ github.workspace }}/.zk-setup
+      run: |
+        ./build_zisk.sh
+        echo "$HOME/.zisk/bin" >> "$GITHUB_PATH"
