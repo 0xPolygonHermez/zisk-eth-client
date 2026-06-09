@@ -19,7 +19,10 @@ fn parse_point_evaluation_test(
     test: &PrecompileTestCase,
 ) -> Result<PointEvaluationTestCase, String> {
     if test.input.len() != 192 {
-        return Err(format!("invalid input length: {} (expected 192)", test.input.len()));
+        return Err(format!(
+            "invalid input length: {} (expected 192)",
+            test.input.len()
+        ));
     }
 
     let mut versioned_hash = [0u8; 32];
@@ -81,7 +84,11 @@ fn geth_tests(crypto: &CustomEvmCrypto) {
         // Verify versioned hash matches commitment
         let mut hash = crypto.sha256(&t.commitment);
         hash[0] = VERSIONED_HASH_VERSION_KZG;
-        assert_eq!(hash, t.versioned_hash, "pointEvaluation {} versioned hash mismatch", t.name);
+        assert_eq!(
+            hash, t.versioned_hash,
+            "pointEvaluation {} versioned hash mismatch",
+            t.name
+        );
 
         // Verify KZG proof
         let result = crypto.verify_kzg_proof(&t.z, &t.y, &t.commitment, &t.proof);
@@ -95,7 +102,11 @@ fn geth_tests(crypto: &CustomEvmCrypto) {
             0xD8, 0x08, 0x09, 0xA1, 0xD8, 0x05, 0x53, 0xBD, 0xA4, 0x02, 0xFF, 0xFE, 0x5B, 0xFE,
             0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
         ];
-        assert_eq!(t.expected, expected_output, "pointEvaluation {} output mismatch", t.name);
+        assert_eq!(
+            t.expected, expected_output,
+            "pointEvaluation {} output mismatch",
+            t.name
+        );
     }
 }
 
@@ -142,7 +153,10 @@ fn tests_basic(crypto: &CustomEvmCrypto) {
     );
 
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "Test 1: Incorrect proof should fail verification");
+    assert!(
+        result.is_err(),
+        "Test 1: Incorrect proof should fail verification"
+    );
 
     // Test 2: Commitment has invalid serialization - should fail
     let commitment = build_commitment(
@@ -159,7 +173,10 @@ fn tests_basic(crypto: &CustomEvmCrypto) {
     );
 
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "Test 2: Invalid commitment serialization should fail");
+    assert!(
+        result.is_err(),
+        "Test 2: Invalid commitment serialization should fail"
+    );
 
     // Test 3: Edge case - [y] = 0 and proof = 𝒪 (point at infinity)
     // This is trivially satisfied as long as [z]₂ is a curve element
@@ -177,7 +194,10 @@ fn tests_basic(crypto: &CustomEvmCrypto) {
     );
 
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "Test 3: Edge case with point at infinity should pass");
+    assert!(
+        result.is_ok(),
+        "Test 3: Edge case with point at infinity should pass"
+    );
 
     // Test 4: Standard test case 1
     let commitment = build_commitment(
@@ -925,7 +945,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_twos_poly_05c1f3685f3393f0 should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_twos_poly_05c1f3685f3393f0 should pass"
+    );
 
     // verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_177b58dc7a46b08f
     let commitment = build_commitment(
@@ -941,7 +964,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_twos_poly_177b58dc7a46b08f should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_twos_poly_177b58dc7a46b08f should pass"
+    );
 
     // verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_2b76dc9e3abf42f3
     let commitment = build_commitment(
@@ -957,7 +983,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_twos_poly_2b76dc9e3abf42f3 should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_twos_poly_2b76dc9e3abf42f3 should pass"
+    );
 
     // verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_395cf6d697d1a743
     let commitment = build_commitment(
@@ -973,7 +1002,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_twos_poly_395cf6d697d1a743 should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_twos_poly_395cf6d697d1a743 should pass"
+    );
 
     // verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_585454b31673dd62
     let commitment = build_commitment(
@@ -989,7 +1021,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_twos_poly_585454b31673dd62 should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_twos_poly_585454b31673dd62 should pass"
+    );
 
     // verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_a0be66af9a97ea52
     let commitment = build_commitment(
@@ -1005,7 +1040,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_twos_poly_a0be66af9a97ea52 should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_twos_poly_a0be66af9a97ea52 should pass"
+    );
 
     // =========================================================================
     // Point at infinity for zero poly tests
@@ -1025,7 +1063,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_zero_poly_02e696ada7d4631d should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_zero_poly_02e696ada7d4631d should pass"
+    );
 
     // verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_0cf79b17cb5f4ea2
     let commitment = build_commitment(
@@ -1041,7 +1082,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_zero_poly_0cf79b17cb5f4ea2 should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_zero_poly_0cf79b17cb5f4ea2 should pass"
+    );
 
     // verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_3208425794224c3f
     let commitment = build_commitment(
@@ -1057,7 +1101,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_zero_poly_3208425794224c3f should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_zero_poly_3208425794224c3f should pass"
+    );
 
     // verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_3ac8dc31e9aa6a70
     let commitment = build_commitment(
@@ -1073,7 +1120,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_zero_poly_3ac8dc31e9aa6a70 should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_zero_poly_3ac8dc31e9aa6a70 should pass"
+    );
 
     // verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_c3d4322ec17fe7cd
     let commitment = build_commitment(
@@ -1089,7 +1139,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_zero_poly_c3d4322ec17fe7cd should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_zero_poly_c3d4322ec17fe7cd should pass"
+    );
 
     // verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_ffa6e97b97146517
     let commitment = build_commitment(
@@ -1105,7 +1158,10 @@ fn tests_correct(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_ok(), "point_at_infinity_for_zero_poly_ffa6e97b97146517 should pass");
+    assert!(
+        result.is_ok(),
+        "point_at_infinity_for_zero_poly_ffa6e97b97146517 should pass"
+    );
 }
 
 // =========================================================================
@@ -1126,7 +1182,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_02e696ada7d4631d should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_02e696ada7d4631d should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_05c1f3685f3393f0
     let commitment = build_commitment(
@@ -1142,7 +1201,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_05c1f3685f3393f0 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_05c1f3685f3393f0 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_08f9e2f1cb3d39db
     let commitment = build_commitment(
@@ -1158,7 +1220,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_08f9e2f1cb3d39db should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_08f9e2f1cb3d39db should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_0cf79b17cb5f4ea2
     let commitment = build_commitment(
@@ -1174,7 +1239,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_0cf79b17cb5f4ea2 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_0cf79b17cb5f4ea2 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_177b58dc7a46b08f
     let commitment = build_commitment(
@@ -1190,7 +1258,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_177b58dc7a46b08f should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_177b58dc7a46b08f should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_1ce8e4f69d5df899
     let commitment = build_commitment(
@@ -1206,7 +1277,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x9779b8337f00de6aeac881256198bd2d",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_1ce8e4f69d5df899 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_1ce8e4f69d5df899 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_26b753dec0560daa
     let commitment = build_commitment(
@@ -1222,7 +1296,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x90f53a4837bbde6ab0838fef0c0be533",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_26b753dec0560daa should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_26b753dec0560daa should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_2b76dc9e3abf42f3
     let commitment = build_commitment(
@@ -1238,7 +1315,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_2b76dc9e3abf42f3 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_2b76dc9e3abf42f3 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_31ebd010e6098750
     let commitment = build_commitment(
@@ -1254,7 +1334,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xb9b65c2ebc89e669cf19e82fb178f0d1",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_31ebd010e6098750 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_31ebd010e6098750 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_3208425794224c3f
     let commitment = build_commitment(
@@ -1270,7 +1353,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_3208425794224c3f should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_3208425794224c3f should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_36817bfd67de97a8
     let commitment = build_commitment(
@@ -1286,7 +1372,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_36817bfd67de97a8 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_36817bfd67de97a8 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_392169c16a2e5ef6
     let commitment = build_commitment(
@@ -1302,7 +1391,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xb08a5afbb1717334e08e05576b07bff5",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_392169c16a2e5ef6 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_392169c16a2e5ef6 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_395cf6d697d1a743
     let commitment = build_commitment(
@@ -1318,7 +1410,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_395cf6d697d1a743 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_395cf6d697d1a743 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_3ac8dc31e9aa6a70
     let commitment = build_commitment(
@@ -1334,7 +1429,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_3ac8dc31e9aa6a70 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_3ac8dc31e9aa6a70 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_3c1e8b38219e3e12
     let commitment = build_commitment(
@@ -1350,7 +1448,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x90559bfd8e58f5d144588a1a959c93ab",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_3c1e8b38219e3e12 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_3c1e8b38219e3e12 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_3c87ec986c2656c2
     let commitment = build_commitment(
@@ -1366,7 +1467,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x8d72dc4eec977090f452b412a6b0a3cd",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_3c87ec986c2656c2 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_3c87ec986c2656c2 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_3cd183d0bab85fb7
     let commitment = build_commitment(
@@ -1382,7 +1486,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_3cd183d0bab85fb7 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_3cd183d0bab85fb7 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_420f2a187ce77035
     let commitment = build_commitment(
@@ -1398,7 +1505,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x99c282db3a79a9ec1553306515e6a71d",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_420f2a187ce77035 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_420f2a187ce77035 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_444b73ff54a19b44
     let commitment = build_commitment(
@@ -1414,7 +1524,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xa7de1e32bb336b85e42ff50281670421",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_444b73ff54a19b44 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_444b73ff54a19b44 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_53a9bdf4f75196da
     let commitment = build_commitment(
@@ -1430,7 +1543,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_53a9bdf4f75196da should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_53a9bdf4f75196da should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_585454b31673dd62
     let commitment = build_commitment(
@@ -1446,7 +1562,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_585454b31673dd62 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_585454b31673dd62 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_7db4f140a955dd1a
     let commitment = build_commitment(
@@ -1462,7 +1581,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xb0ac600174134691bf9d91fee448b4d5",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_7db4f140a955dd1a should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_7db4f140a955dd1a should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_83e53423a2dd93fe
     let commitment = build_commitment(
@@ -1478,7 +1600,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x8e3069b19e6e71aed9b7dc8fbba13e42",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_83e53423a2dd93fe should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_83e53423a2dd93fe should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_9b24f8997145435c
     let commitment = build_commitment(
@@ -1494,7 +1619,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xafc13cef6ed41f7abe142d32d7b5354e",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_9b24f8997145435c should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_9b24f8997145435c should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_9b754afb690c47e1
     let commitment = build_commitment(
@@ -1510,7 +1638,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_9b754afb690c47e1 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_9b754afb690c47e1 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_a0be66af9a97ea52
     let commitment = build_commitment(
@@ -1526,7 +1657,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_a0be66af9a97ea52 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_a0be66af9a97ea52 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_af669445747d2585
     let commitment = build_commitment(
@@ -1542,7 +1676,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xa88d68fe3ad0d09b07f4605b1364c8d4",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_af669445747d2585 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_af669445747d2585 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_af8b75f664ed7d43
     let commitment = build_commitment(
@@ -1558,7 +1695,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xaf08cbca9deec336f2a56ca0b2029958",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_af8b75f664ed7d43 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_af8b75f664ed7d43 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_b6cb6698327d9835
     let commitment = build_commitment(
@@ -1574,7 +1714,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x861a2aef7aa82db033bfa125b9f756af",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_b6cb6698327d9835 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_b6cb6698327d9835 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_b6ec3736f9ff2c62
     let commitment = build_commitment(
@@ -1590,7 +1733,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x82f1cd05471ab6ff21bcfd5c3369cba0",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_b6ec3736f9ff2c62 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_b6ec3736f9ff2c62 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_becf2e1641bbd4e6
     let commitment = build_commitment(
@@ -1606,7 +1752,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_becf2e1641bbd4e6 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_becf2e1641bbd4e6 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_c3d4322ec17fe7cd
     let commitment = build_commitment(
@@ -1622,7 +1771,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_c3d4322ec17fe7cd should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_c3d4322ec17fe7cd should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_c5e1490d672d026d
     let commitment = build_commitment(
@@ -1638,7 +1790,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xacd56791e0ab0d1b3802021862013418",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_c5e1490d672d026d should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_c5e1490d672d026d should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_cae5d3491190b777
     let commitment = build_commitment(
@@ -1654,7 +1809,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xa4cc8c419ade0cf043cbf30f43c8f7ee",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_cae5d3491190b777 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_cae5d3491190b777 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_d0992bc0387790a4
     let commitment = build_commitment(
@@ -1670,7 +1828,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xb8f731ba6a52e419ffc843c50d2947d3",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_d0992bc0387790a4 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_d0992bc0387790a4 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_d736268229bd87ec
     let commitment = build_commitment(
@@ -1686,7 +1847,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x84c349506215a2d55f9d06f475b8229c",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_d736268229bd87ec should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_d736268229bd87ec should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_e68d7111a2364a49
     let commitment = build_commitment(
@@ -1702,7 +1866,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x94fce36bf7e9f0ed981728fcd829013d",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_e68d7111a2364a49 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_e68d7111a2364a49 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_ed6b180ec759bcf6
     let commitment = build_commitment(
@@ -1718,7 +1885,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xb3477fc9a5bfab5fdb5523251818ee5a",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_ed6b180ec759bcf6 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_ed6b180ec759bcf6 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_f0ed3dc11cdeb130
     let commitment = build_commitment(
@@ -1734,7 +1904,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x98e15cbf800b69b90bfcaf1d907a9889",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_f0ed3dc11cdeb130 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_f0ed3dc11cdeb130 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_f47eb9fc139f6bfd
     let commitment = build_commitment(
@@ -1750,7 +1923,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x98613e9e1b1ed52fc2fdc54e945b863f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_f47eb9fc139f6bfd should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_f47eb9fc139f6bfd should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_f7f44e1e864aa967
     let commitment = build_commitment(
@@ -1766,7 +1942,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xa1d8f2a5ab22acdfc1a9492ee2e1c2cb",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_f7f44e1e864aa967 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_f7f44e1e864aa967 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_ffa6e97b97146517
     let commitment = build_commitment(
@@ -1782,7 +1961,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac0f",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_ffa6e97b97146517 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_ffa6e97b97146517 should fail"
+    );
 
     // =========================================================================
     // Incorrect proof with point at infinity tests
@@ -1802,7 +1984,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_point_at_infinity_392169c16a2e5ef6 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_point_at_infinity_392169c16a2e5ef6 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_point_at_infinity_3c1e8b38219e3e12
     let commitment = build_commitment(
@@ -1818,7 +2003,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_point_at_infinity_3c1e8b38219e3e12 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_point_at_infinity_3c1e8b38219e3e12 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_point_at_infinity_3c87ec986c2656c2
     let commitment = build_commitment(
@@ -1834,7 +2022,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_point_at_infinity_3c87ec986c2656c2 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_point_at_infinity_3c87ec986c2656c2 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_point_at_infinity_420f2a187ce77035
     let commitment = build_commitment(
@@ -1850,7 +2041,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_point_at_infinity_420f2a187ce77035 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_point_at_infinity_420f2a187ce77035 should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_point_at_infinity_83e53423a2dd93fe
     let commitment = build_commitment(
@@ -1866,7 +2060,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_point_at_infinity_83e53423a2dd93fe should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_point_at_infinity_83e53423a2dd93fe should fail"
+    );
 
     // verify_kzg_proof_case_incorrect_proof_point_at_infinity_ed6b180ec759bcf6
     let commitment = build_commitment(
@@ -1882,7 +2079,10 @@ fn tests_incorrect(crypto: &CustomEvmCrypto) {
         "0xc0000000000000000000000000000000",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "incorrect_proof_point_at_infinity_ed6b180ec759bcf6 should fail");
+    assert!(
+        result.is_err(),
+        "incorrect_proof_point_at_infinity_ed6b180ec759bcf6 should fail"
+    );
 }
 
 // =========================================================================
@@ -1961,7 +2161,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0xb0c829a8d2d3405304fecbea193e6c67",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_commitment_32afa9561a4b3b91: commit not in G1 should fail");
+    assert!(
+        result.is_err(),
+        "invalid_commitment_32afa9561a4b3b91: commit not in G1 should fail"
+    );
 
     // // verify_kzg_proof_case_invalid_proof_3e55802a5ed3c757
     // // proof >= 2³⁸⁴
@@ -1995,7 +2198,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0x97f1d3a73197d7942695638c4fa9ac",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_proof_1b44e341d56c757d: invalid serialization should fail");
+    assert!(
+        result.is_err(),
+        "invalid_proof_1b44e341d56c757d: invalid serialization should fail"
+    );
 
     // verify_kzg_proof_case_invalid_proof_e9d3e9ec16fbc15f
     // invalid serialization
@@ -2012,7 +2218,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0x8123456789abcdef0123456789abcdef",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_proof_e9d3e9ec16fbc15f: invalid serialization should fail");
+    assert!(
+        result.is_err(),
+        "invalid_proof_e9d3e9ec16fbc15f: invalid serialization should fail"
+    );
 
     // verify_kzg_proof_case_invalid_proof_32afa9561a4b3b91
     // proof is not in G1
@@ -2029,7 +2238,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0x8123456789abcdef0123456789abcdef",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_proof_32afa9561a4b3b91: proof not in G1 should fail");
+    assert!(
+        result.is_err(),
+        "invalid_proof_32afa9561a4b3b91: proof not in G1 should fail"
+    );
 
     // verify_kzg_proof_case_invalid_y_35d08d612aad2197
     // y > r (all 0xff)
@@ -2046,7 +2258,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0xb30b3d1e4faccc380557792c9a0374d5",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_y_35d08d612aad2197: y > r should fail");
+    assert!(
+        result.is_err(),
+        "invalid_y_35d08d612aad2197: y > r should fail"
+    );
 
     // verify_kzg_proof_case_invalid_y_4aa6def8c35c9097
     // y > r
@@ -2063,7 +2278,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0xb30b3d1e4faccc380557792c9a0374d5",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_y_4aa6def8c35c9097: y > r should fail");
+    assert!(
+        result.is_err(),
+        "invalid_y_4aa6def8c35c9097: y > r should fail"
+    );
 
     // verify_kzg_proof_case_invalid_y_64b9ff2b8f7dddee
     // y = r + 1
@@ -2080,7 +2298,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0xb30b3d1e4faccc380557792c9a0374d5",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_y_64b9ff2b8f7dddee: y = r + 1 should fail");
+    assert!(
+        result.is_err(),
+        "invalid_y_64b9ff2b8f7dddee: y = r + 1 should fail"
+    );
 
     // verify_kzg_proof_case_invalid_y_eb0601fec84cc5e9
     // y = r
@@ -2097,7 +2318,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0xb30b3d1e4faccc380557792c9a0374d5",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_y_eb0601fec84cc5e9: y = r should fail");
+    assert!(
+        result.is_err(),
+        "invalid_y_eb0601fec84cc5e9: y = r should fail"
+    );
 
     // verify_kzg_proof_case_invalid_z_35d08d612aad2197
     // z > r (all 0xff)
@@ -2114,7 +2338,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0xb30b3d1e4faccc380557792c9a0374d5",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_z_35d08d612aad2197: z > r should fail");
+    assert!(
+        result.is_err(),
+        "invalid_z_35d08d612aad2197: z > r should fail"
+    );
 
     // verify_kzg_proof_case_invalid_z_4aa6def8c35c9097
     // z > r
@@ -2131,7 +2358,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0xb30b3d1e4faccc380557792c9a0374d5",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_z_4aa6def8c35c9097: z > r should fail");
+    assert!(
+        result.is_err(),
+        "invalid_z_4aa6def8c35c9097: z > r should fail"
+    );
 
     // verify_kzg_proof_case_invalid_z_64b9ff2b8f7dddee
     // z = r + 1
@@ -2148,7 +2378,10 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0xb30b3d1e4faccc380557792c9a0374d5",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_z_64b9ff2b8f7dddee: z = r + 1 should fail");
+    assert!(
+        result.is_err(),
+        "invalid_z_64b9ff2b8f7dddee: z = r + 1 should fail"
+    );
 
     // verify_kzg_proof_case_invalid_z_eb0601fec84cc5e9
     // z = r
@@ -2165,5 +2398,8 @@ fn tests_invalid(crypto: &CustomEvmCrypto) {
         "0xb30b3d1e4faccc380557792c9a0374d5",
     );
     let result = crypto.verify_kzg_proof(&z, &y, &commitment, &proof);
-    assert!(result.is_err(), "invalid_z_eb0601fec84cc5e9: z = r should fail");
+    assert!(
+        result.is_err(),
+        "invalid_z_eb0601fec84cc5e9: z = r should fail"
+    );
 }

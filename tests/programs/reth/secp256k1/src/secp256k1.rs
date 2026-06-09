@@ -44,7 +44,14 @@ fn parse_ecrecover_test(test: &PrecompileTestCase) -> Result<EcRecoverTestCase, 
         ExpectedOutcome::Failure(_) => None,
     };
 
-    Ok(EcRecoverTestCase { name: test.name.clone(), hash, v, r, s, expected })
+    Ok(EcRecoverTestCase {
+        name: test.name.clone(),
+        hash,
+        v,
+        r,
+        s,
+        expected,
+    })
 }
 
 /// Helper to convert v (27 or 28) to recid (0 or 1)
@@ -460,7 +467,10 @@ pub fn ecrecover_tx_tests(crypto: &CustomEvmCrypto) {
 
     let sig = build_sig_65(r, s, v);
     let result = crypto.recover_signer_unchecked(&sig, &hash);
-    assert!(result.is_err(), "Test #32 should fail (r == N-1, recovery fails)");
+    assert!(
+        result.is_err(),
+        "Test #32 should fail (r == N-1, recovery fails)"
+    );
 
     // #33 s == 0 - should fail
     let hash = hex_to_32("456e9aea5e197a1f1af7a3e85a3212fa4049a3ba34c2289b4c860fc0b0c64ef3");

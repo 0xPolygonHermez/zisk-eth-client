@@ -33,7 +33,11 @@ fn parse_bls_pairing_test(test: &PrecompileTestCase) -> Result<BlsPairingTestCas
         ExpectedOutcome::Success(bytes) => Some(bytes.len() == 32 && bytes[31] == 1),
         ExpectedOutcome::Failure(_) => None,
     };
-    Ok(BlsPairingTestCase { name: test.name.clone(), pairs, expected })
+    Ok(BlsPairingTestCase {
+        name: test.name.clone(),
+        pairs,
+        expected,
+    })
 }
 
 pub fn bls12_381_pairing_tests(crypto: &CustomEvmCrypto) {

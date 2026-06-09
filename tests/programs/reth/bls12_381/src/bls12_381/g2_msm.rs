@@ -38,12 +38,15 @@ fn parse_bls_g2_msm_test(test: &PrecompileTestCase) -> Result<BlsG2MsmTestCase, 
         }
         ExpectedOutcome::Failure(_) => None,
     };
-    Ok(BlsG2MsmTestCase { name: test.name.clone(), pairs, expected })
+    Ok(BlsG2MsmTestCase {
+        name: test.name.clone(),
+        pairs,
+        expected,
+    })
 }
 
 pub fn bls12_381_g2_msm_tests(crypto: &CustomEvmCrypto) {
-    let mut tests =
-        parse_precompile_json(include_str!("../testdata/blsG2MultiExp.json"));
+    let mut tests = parse_precompile_json(include_str!("../testdata/blsG2MultiExp.json"));
     tests.extend(parse_precompile_fail_json(include_str!(
         "../testdata/fail-blsG2MultiExp.json"
     )));

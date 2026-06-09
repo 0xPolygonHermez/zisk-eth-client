@@ -29,7 +29,12 @@ pub fn parse_bls_g1_mul_test(test: &PrecompileTestCase) -> Result<BlsG1MulTestCa
         }
         ExpectedOutcome::Failure(_) => None,
     };
-    Ok(BlsG1MulTestCase { name: test.name.clone(), point, scalar, expected })
+    Ok(BlsG1MulTestCase {
+        name: test.name.clone(),
+        point,
+        scalar,
+        expected,
+    })
 }
 
 pub fn bls12_381_g1_mul_tests(crypto: &CustomEvmCrypto) {

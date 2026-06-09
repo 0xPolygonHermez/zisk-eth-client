@@ -59,20 +59,38 @@ pub fn modexp_tests(crypto: &CustomEvmCrypto) {
 fn modexp_json_tests(crypto: &CustomEvmCrypto) {
     let json_files: &[(&str, &str)] = &[
         ("modexp_eip198", include_str!("../testdata/modexp.json")),
-        ("modexp_eip2565", include_str!("../testdata/modexp_eip2565.json")),
-        ("modexp_eip7883", include_str!("../testdata/modexp_eip7883.json")),
+        (
+            "modexp_eip2565",
+            include_str!("../testdata/modexp_eip2565.json"),
+        ),
+        (
+            "modexp_eip7883",
+            include_str!("../testdata/modexp_eip7883.json"),
+        ),
     ];
 
     for (file_name, json_content) in json_files {
         let tests = parse_precompile_json(json_content);
         for test in &tests {
             let parsed = parse_modexp_test(test).unwrap_or_else(|err| {
-                panic!("failed to parse modexp test {} ({}): {}", test.name, file_name, err)
+                panic!(
+                    "failed to parse modexp test {} ({}): {}",
+                    test.name, file_name, err
+                )
             });
             let result = crypto.modexp(&parsed.base, &parsed.exp, &parsed.modulus);
-            assert!(result.is_ok(), "Modexp {} ({}) should succeed", parsed.name, file_name);
+            assert!(
+                result.is_ok(),
+                "Modexp {} ({}) should succeed",
+                parsed.name,
+                file_name
+            );
             let result = result.unwrap();
-            assert_eq!(result, parsed.expected, "Modexp {} ({}) mismatch", parsed.name, file_name);
+            assert_eq!(
+                result, parsed.expected,
+                "Modexp {} ({}) mismatch",
+                parsed.name, file_name
+            );
         }
     }
 }
@@ -212,7 +230,11 @@ fn modexp_512bit_tests(crypto: &CustomEvmCrypto) {
     let exp = hex_to_vec("010001"); // 65537
     let modulus = hex_to_vec("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
     let result = crypto.modexp(&base, &exp, &modulus).unwrap();
-    assert_eq!(result.len(), 64, "512-bit modulus should give 64-byte result");
+    assert_eq!(
+        result.len(),
+        64,
+        "512-bit modulus should give 64-byte result"
+    );
 }
 
 fn modexp_4096bit_tests(crypto: &CustomEvmCrypto) {
@@ -227,5 +249,9 @@ fn modexp_4096bit_tests(crypto: &CustomEvmCrypto) {
     );
     let result = crypto.modexp(&base, &exp, &modulus);
     assert!(result.is_ok(), "4096-bit modexp should succeed");
-    assert_eq!(result.unwrap().len(), modulus.len(), "result length should match modulus length");
+    assert_eq!(
+        result.unwrap().len(),
+        modulus.len(),
+        "result length should match modulus length"
+    );
 }

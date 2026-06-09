@@ -87,7 +87,8 @@ impl RethInputWitness {
 /// RLP-based serde adapter for `Block`. Replaces the
 /// `reth_primitives_traits::serde_bincode_compat::Block` helper that was
 /// removed in reth v2.1.0; `Header` carries `Option<_>` fields with
-/// `skip_serializing_if`, which bincode 1.x cannot round-trip without help.
+/// `skip_serializing_if`, which bincode's serde encoding may not round-trip
+/// without an explicit adapter.
 struct BlockRlp;
 
 impl SerializeAs<Block> for BlockRlp {

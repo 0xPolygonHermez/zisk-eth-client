@@ -2,7 +2,7 @@
 ziskos::entrypoint!(main);
 
 mod hashes;
-use hashes::{blake2f_tests, sha256_tests, keccak256_tests};
+use hashes::{blake2f_tests, keccak256_tests, sha256_tests};
 
 use guest_reth::CustomEvmCrypto;
 

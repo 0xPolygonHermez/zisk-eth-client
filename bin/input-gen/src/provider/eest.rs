@@ -49,7 +49,9 @@ impl InputProvider for EestProvider {
 
         // The `ef-tests` crate selects its trie implementation from the `EF_TEST_TRIE`
         // env var and errors if it is unset. Hardcode it here to `zeth`.
-        std::env::set_var("EF_TEST_TRIE", "zeth");
+        if std::env::var_os("EF_TEST_TRIE").is_none() {
+            std::env::set_var("EF_TEST_TRIE", "zeth");
+        }
 
         if let Some(threads) = self.threads {
             ThreadPoolBuilder::new()
