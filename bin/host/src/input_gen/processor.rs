@@ -34,4 +34,8 @@ impl ProcessingTracker {
             self.success_count, self.error_count
         );
     }
+
+    pub fn error_count(&self) -> usize {
+        self.error_count
+    }
 }

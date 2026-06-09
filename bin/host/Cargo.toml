@@ -5,15 +5,28 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+input = { workspace = true, features = ["cli"] }
 zisk-sdk.workspace = true
+ziskos.workspace = true
 
+alloy-provider.workspace = true
+
+witness-generator.workspace = true
+
+anyhow.workspace = true
+async-trait.workspace = true
 clap.workspace = true
+rayon.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
-anyhow.workspace = true
-tracing.workspace = true
+tempfile.workspace = true
 tokio.workspace = true
-
+tokio-util = { workspace = true, features = ["rt"] }
+tracing.workspace = true
+walkdir.workspace = true
 
 [build-dependencies]
 zisk-sdk.workspace = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

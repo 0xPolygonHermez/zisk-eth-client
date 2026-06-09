@@ -30,19 +30,21 @@ fn parse_modexp_test(test: &PrecompileTestCase) -> Result<ModexpTestCase, String
     let exp_len = be_bytes_to_usize(&test.input[32..64]);
     let mod_len = be_bytes_to_usize(&test.input[64..96]);
     let data = &test.input[96..];
-    let need = base_len + exp_len + mod_len;
-    if data.len() < need {
-        return Err(format!(
-            "payload too short: have {} bytes, need {} (base={base_len}, exp={exp_len}, mod={mod_len})",
-            data.len(),
-            need
-        ));
-    }
+
+    let take = |start: usize, len: usize| -> Vec<u8> {
+        let mut out = vec![0u8; len];
+        if start < data.len() {
+            let end = core::cmp::min(start + len, data.len());
+            out[..end - start].copy_from_slice(&data[start..end]);
+        }
+        out
+    };
+
     Ok(ModexpTestCase {
         name: test.name.clone(),
-        base: data[..base_len].to_vec(),
-        exp: data[base_len..base_len + exp_len].to_vec(),
-        modulus: data[base_len + exp_len..base_len + exp_len + mod_len].to_vec(),
+        base: take(0, base_len),
+        exp: take(base_len, exp_len),
+        modulus: take(base_len + exp_len, mod_len),
         expected: test.expected.unwrap_success().clone(),
     })
 }

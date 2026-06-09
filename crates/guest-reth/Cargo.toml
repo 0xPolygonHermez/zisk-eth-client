@@ -6,6 +6,7 @@ edition.workspace = true
 
 [dependencies]
 guest-common.workspace = true
+ziskos.workspace = true
 
 anyhow.workspace = true
 bincode.workspace = true

@@ -4,20 +4,15 @@ use std::{fs::File, io::Write};
 use tracing::info;
 use zisk_sdk::VerboseMode;
 
-mod benchmark;
-mod cli;
-mod elfs;
-mod zisk;
-
-use benchmark::BenchmarkRunner;
-use cli::{Cli, Client, GuestProgramCommand};
-use elfs::{ELF_ETHREX, ELF_RETH};
+use host::benchmark::BenchmarkRunner;
+use host::cli::{Cli, GuestProgramCommand};
+use host::elfs::{ELF_ETHREX, ELF_RETH};
+use input::Client;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    zisk_sdk::setup_logger(VerboseMode::Info);
-
     let cli = Cli::parse();
+    init_tracing(cli.verbose);
 
     // Write metadata to a separate file
     if cli.output_folder.is_some() {
@@ -25,24 +20,40 @@ async fn main() -> Result<()> {
     }
 
     info!("ZisK Host");
+    if let Some(proving_key) = &cli.proving_key {
+        info!(" Proving Key: {}", proving_key.display());
+    }
     info!(" Action: {:?}", cli.action);
     info!(" Guest Program: {}", cli.guest_program.display_name());
+
     match &cli.guest_program {
         GuestProgramCommand::StatelessValidator {
             input_folder,
+            hints,
+            gen_hints,
+            hints_out,
             client,
             include,
             exclude,
         } => {
             info!(" Client: {:?}", client);
 
+            // To add a client, see docs/adding-a-client.md.
             let elf = match client {
                 Client::Reth => ELF_RETH,
                 Client::Ethrex => ELF_ETHREX,
             };
 
             info!(" ELF Name: {}", elf.name());
-            info!(" Input Folder: {}", input_folder.display());
+            if let Some(input_folder) = input_folder {
+                info!(" Input Folder: {}", input_folder.display());
+            }
+            if let Some(hints) = hints {
+                info!(" Hints: {}", hints.display());
+            }
+            if *gen_hints {
+                info!(" Generating hints before running");
+            }
             if let Some(include) = include {
                 info!(" Include Patterns: {:?}", include);
             }
@@ -52,21 +63,38 @@ async fn main() -> Result<()> {
 
             let runner = BenchmarkRunner::new(
                 elf,
-                cli.action,
+                cli.action.clone(),
                 cli.output_folder.clone(),
                 cli.force_rerun,
                 cli.proving_key.clone(),
                 cli.emulator,
                 cli.unlock_mapped_memory,
                 cli.gpu,
+                hints.clone(),
+                *gen_hints,
+                hints_out.clone(),
+                *client,
             )?;
             runner
-                .run(input_folder, include.as_deref(), exclude.as_deref())
+                .run(
+                    input_folder.as_deref(),
+                    include.as_deref(),
+                    exclude.as_deref(),
+                )
                 .await?;
         }
     }
 
     Ok(())
+}
+
+fn init_tracing(verbose: u8) {
+    let mode = match verbose {
+        0 => VerboseMode::Info,
+        1 => VerboseMode::Debug,
+        _ => VerboseMode::Trace,
+    };
+    zisk_sdk::setup_logger(mode);
 }
 
 fn write_metadata(cli: &Cli) -> Result<()> {
@@ -89,12 +117,26 @@ fn write_metadata(cli: &Cli) -> Result<()> {
     match &cli.guest_program {
         GuestProgramCommand::StatelessValidator {
             input_folder,
+            hints,
+            gen_hints,
+            hints_out,
             client,
             include,
             exclude,
         } => {
             writeln!(file, "Client: {:?}", client)?;
-            writeln!(file, "Input Folder: {}", input_folder.display())?;
+            if let Some(input_folder) = input_folder {
+                writeln!(file, "Input Folder: {}", input_folder.display())?;
+            }
+            if let Some(hints) = hints {
+                writeln!(file, "Hints: {}", hints.display())?;
+            }
+            if *gen_hints {
+                writeln!(file, "Generate Hints: true")?;
+            }
+            if let Some(hints_out) = hints_out {
+                writeln!(file, "Hints Out: {}", hints_out.display())?;
+            }
             if let Some(include) = include {
                 writeln!(file, "Include Patterns: {:?}", include)?;
             }

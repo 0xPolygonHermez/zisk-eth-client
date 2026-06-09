@@ -3,6 +3,9 @@ name = "bls12_381"
 version.workspace = true
 edition.workspace = true
 
+[features]
+heavy-tests = []
+
 [dependencies]
 hex.workspace = true
 

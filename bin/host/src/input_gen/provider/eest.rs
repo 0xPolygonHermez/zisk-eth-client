@@ -4,10 +4,12 @@ use rayon::ThreadPoolBuilder;
 use std::path::{Path, PathBuf};
 use tracing::info;
 
-use witness_generator::{eest_generator::EESTFixtureGeneratorBuilder, FixtureGenerator};
+use witness_generator::{FixtureGenerator, eest_generator::EESTFixtureGeneratorBuilder};
 
 use super::{InputProvider, ProviderKind};
-use crate::{client::ExecutionClient, common::fixtures_from_path, processor::ProcessingTracker};
+use crate::input_gen::{
+    client::InputGenClient, common::fixtures_from_path, processor::ProcessingTracker,
+};
 
 #[derive(Debug, Clone, Args)]
 pub struct EestProvider {
@@ -40,7 +42,7 @@ impl InputProvider for EestProvider {
 
     async fn generate_inputs(
         &self,
-        client: &dyn ExecutionClient,
+        client: &dyn InputGenClient,
         output: &Path,
     ) -> anyhow::Result<()> {
         if !client.supports_provider(self.kind()) {
@@ -113,6 +115,9 @@ impl InputProvider for EestProvider {
 
         tracker.log_summary();
 
+        if tracker.error_count() > 0 {
+            anyhow::bail!("{} fixture(s) failed", tracker.error_count());
+        }
         Ok(())
     }
 }

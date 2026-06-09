@@ -5,21 +5,39 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+guest-common.workspace = true
 guest-reth.workspace = true
+guest-ethrex.workspace = true
+zisk-sdk.workspace = true
+ziskos.workspace = true
+# `sync` for the oneshot::Sender ready-signal in generate_hints_to_socket.
+tokio = { workspace = true, features = ["sync"] }
+
+ethrex-config.workspace = true
+ethrex-common.workspace = true
+ethrex-rpc.workspace = true
+
+clap = { workspace = true, optional = true }
+url = { workspace = true }
 
 async-trait.workspace = true
 anyhow.workspace = true
-bincode.workspace = true
-rayon.workspace = true
 tracing.workspace = true
-serde.workspace = true
-serde_with.workspace = true
+rayon.workspace = true
 
 alloy-genesis.workspace = true
 alloy-provider = { workspace = true, features = ["debug-api"] }
+alloy-rpc-client.workspace = true
 alloy-rpc-types-eth.workspace = true
 alloy-rpc-types-debug.workspace = true
+alloy-transport-http.workspace = true
 
 reth-chainspec.workspace = true
 
 stateless-reth.workspace = true
+
+[features]
+cli = ["dep:clap"]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

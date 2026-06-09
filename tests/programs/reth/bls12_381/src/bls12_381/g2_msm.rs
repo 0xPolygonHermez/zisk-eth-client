@@ -51,6 +51,12 @@ pub fn bls12_381_g2_msm_tests(crypto: &CustomEvmCrypto) {
         "../testdata/fail-blsG2MultiExp.json"
     )));
 
+    // The `jwasinger` cases scale up to 1024 pairs and dominate runtime
+    // (~94% of total G2 MSM work). Skipped by default.
+    if !cfg!(feature = "heavy-tests") {
+        tests.retain(|t| !t.name.contains("jwasinger"));
+    }
+
     for test in &tests {
         match parse_bls_g2_msm_test(test) {
             Ok(t) => {
