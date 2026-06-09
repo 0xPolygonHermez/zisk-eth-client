@@ -1,14 +1,14 @@
 use std::sync::Arc;
 
 use guest_common::chain::chain_name;
-use ziskos::io::read_input_slice;
+use ziskos::io::read_slice;
 
 use super::{extract_block_info, validate_block, EthrexInput, ZiskCrypto};
 
 pub fn run() {
     // Read the input
     let input: EthrexInput =
-        EthrexInput::deserialize(&read_input_slice()).expect("Failed to deserialize EthrexInput");
+        EthrexInput::deserialize(&read_slice()).expect("Failed to deserialize EthrexInput");
 
     // Get chain config
     let chain_config = input.witness().chain_config;

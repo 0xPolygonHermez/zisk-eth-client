@@ -32,7 +32,10 @@ alloy-json-rpc = "2.0.0"
 alloy-provider = "2.0.0"
 alloy-rpc-client = "2.0.0"
 alloy-transport = "2.0.0"
+alloy-transport-http = { version = "2.0.0", features = ["reqwest"] }
+alloy-genesis = "2.0.0"
 alloy-eips = "2.0.0"
+alloy-rpc-types-eth = "2.0.0"
 alloy-rpc-types-debug = "2.0.0"
 
 # reth
