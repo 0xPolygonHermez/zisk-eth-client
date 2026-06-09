@@ -15,15 +15,13 @@ panic = "abort"
 [dependencies]
 guest-reth = { path = "../../../crates/guest-reth" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-0.19.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
 # Local development
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 # alloy
 alloy-consensus = { version = "2.0.0", default-features = false }
-alloy-primitives = { version = "1.5.6", features = [
-  "native-keccak",
-] }
+alloy-primitives = { version = "1.5.6", features = ["native-keccak"] }
 
 # revm
 revm = { version = "38.0.0", default-features = false }

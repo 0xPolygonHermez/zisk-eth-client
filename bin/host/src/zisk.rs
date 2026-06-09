@@ -22,7 +22,7 @@ pub struct ZiskExecutionMetrics {
     #[serde(skip)]
     pub duration: Duration,
     pub steps: u64,
-    pub cost: u64,
+    pub cost: Option<u64>,
     pub tx_count: Option<u64>,
     pub gas_used: Option<u64>,
 }
@@ -120,7 +120,7 @@ impl ZiskClient {
         Ok(ZiskExecutionMetrics {
             duration: Duration::from_millis(result.get_duration()),
             steps: result.get_execution_steps(),
-            cost: result.get_execution_total_cost(),
+            cost: Some(result.get_execution_total_cost()),
             tx_count: None,
             gas_used: None,
         })
@@ -161,7 +161,7 @@ fn parse_metrics(output: &str) -> Result<ZiskExecutionMetrics> {
     Ok(ZiskExecutionMetrics {
         duration: Duration::default(),
         steps,
-        cost,
+        cost: Some(cost),
         tx_count,
         gas_used,
     })
