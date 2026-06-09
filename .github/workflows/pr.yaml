@@ -22,7 +22,7 @@ env:
   RUST_BACKTRACE: 1
   # ZISK_REF is resolved by the ./.github/actions/zisk-ref action.
   PIL2_COMPILER_REF: develop-0.10.0
-  PIL2_PROOFMAN_REF: pre-develop-0.19.0
+  PIL2_PROOFMAN_REF: pre-develop-1.0.0-beta
   PIL2_PROOFMAN_JS_REF: pre-develop-0.19.0
   # Block inputs to test per client (from less MGs to more MGs).
   # It is good to have shared blocks between clients for easier comparison.
