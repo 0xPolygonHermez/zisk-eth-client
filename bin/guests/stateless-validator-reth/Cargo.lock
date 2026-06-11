@@ -1113,7 +1113,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#28f7f729d974643625c5cb49d61612402340321d"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fadd_poseidon1#b15a2280712bc0be47763b6c4c7abea34fc8cc42"
 
 [[package]]
 name = "clang-sys"
@@ -1592,8 +1592,8 @@ dependencies = [
 
 [[package]]
 name = "fields"
-version = "0.18.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.18.0#42ad4d02da3d3b6238ac126ead82a8814f3fd426"
+version = "1.0.0-beta"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fadd_poseidon1#17aafeba7a608cf429e238975cd4c34a27df76e1"
 dependencies = [
  "cfg-if",
  "num-bigint",
@@ -2173,7 +2173,7 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 [[package]]
 name = "lib-c"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#28f7f729d974643625c5cb49d61612402340321d"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fadd_poseidon1#b15a2280712bc0be47763b6c4c7abea34fc8cc42"
 
 [[package]]
 name = "libc"
@@ -2608,7 +2608,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#28f7f729d974643625c5cb49d61612402340321d"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fadd_poseidon1#b15a2280712bc0be47763b6c4c7abea34fc8cc42"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -2695,8 +2695,8 @@ dependencies = [
 
 [[package]]
 name = "proofman-verifier"
-version = "0.18.0"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?tag=v0.18.0#42ad4d02da3d3b6238ac126ead82a8814f3fd426"
+version = "1.0.0-beta"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feature%2Fadd_poseidon1#17aafeba7a608cf429e238975cd4c34a27df76e1"
 dependencies = [
  "fields",
  "num-traits",
@@ -4749,12 +4749,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#28f7f729d974643625c5cb49d61612402340321d"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fadd_poseidon1#b15a2280712bc0be47763b6c4c7abea34fc8cc42"
 
 [[package]]
 name = "zisk-stream"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#28f7f729d974643625c5cb49d61612402340321d"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fadd_poseidon1#b15a2280712bc0be47763b6c4c7abea34fc8cc42"
 dependencies = [
  "anyhow",
  "libc",
@@ -4765,7 +4765,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#28f7f729d974643625c5cb49d61612402340321d"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fadd_poseidon1#b15a2280712bc0be47763b6c4c7abea34fc8cc42"
 dependencies = [
  "proofman-verifier",
 ]
@@ -4773,7 +4773,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#28f7f729d974643625c5cb49d61612402340321d"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fadd_poseidon1#b15a2280712bc0be47763b6c4c7abea34fc8cc42"
 dependencies = [
  "anyhow",
  "ark-bn254",
@@ -4813,7 +4813,7 @@ dependencies = [
 [[package]]
 name = "zkvm-interface"
 version = "1.0.0-beta"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#28f7f729d974643625c5cb49d61612402340321d"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feature%2Fadd_poseidon1#b15a2280712bc0be47763b6c4c7abea34fc8cc42"
 dependencies = [
  "bindgen",
 ]
