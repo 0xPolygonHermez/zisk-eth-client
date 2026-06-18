@@ -1113,6 +1113,11 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "1.0.0-beta"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa#f694a0f2b9b1dea35c85cd8ca509de05dbdc25c7"
+
+[[package]]
+name = "circuit"
+version = "1.0.0-beta"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#c6b2e77eece7b5c3ad85642dafc3deac3ef7f282"
 
 [[package]]
@@ -1763,7 +1768,7 @@ dependencies = [
 name = "guest-common"
 version = "0.9.0"
 dependencies = [
- "zkvm-interface",
+ "zkvm-interface 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa)",
 ]
 
 [[package]]
@@ -1790,7 +1795,7 @@ dependencies = [
  "stateless",
  "tiny-keccak",
  "tries",
- "ziskos",
+ "ziskos 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa)",
 ]
 
 [[package]]
@@ -2168,6 +2173,11 @@ name = "leb128fmt"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
+
+[[package]]
+name = "lib-c"
+version = "1.0.0-beta"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa#f694a0f2b9b1dea35c85cd8ca509de05dbdc25c7"
 
 [[package]]
 name = "lib-c"
@@ -2607,6 +2617,24 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "1.0.0-beta"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa#f694a0f2b9b1dea35c85cd8ca509de05dbdc25c7"
+dependencies = [
+ "ark-bls12-381",
+ "ark-bn254",
+ "ark-ff 0.5.0",
+ "ark-secp256k1",
+ "ark-secp256r1",
+ "cfg-if",
+ "circuit 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa)",
+ "crunchy",
+ "lib-c 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa)",
+ "num-bigint",
+ "num-traits",
+]
+
+[[package]]
+name = "precompiles-helpers"
+version = "1.0.0-beta"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#c6b2e77eece7b5c3ad85642dafc3deac3ef7f282"
 dependencies = [
  "ark-bls12-381",
@@ -2615,9 +2643,9 @@ dependencies = [
  "ark-secp256k1",
  "ark-secp256r1",
  "cfg-if",
- "circuit",
+ "circuit 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta)",
  "crunchy",
- "lib-c",
+ "lib-c 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta)",
  "num-bigint",
  "num-traits",
 ]
@@ -4636,7 +4664,7 @@ dependencies = [
  "alloy-primitives",
  "guest-reth",
  "revm",
- "ziskos",
+ "ziskos 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta)",
 ]
 
 [[package]]
@@ -4747,7 +4775,22 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "1.0.0-beta"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa#f694a0f2b9b1dea35c85cd8ca509de05dbdc25c7"
+
+[[package]]
+name = "zisk-definitions"
+version = "1.0.0-beta"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#c6b2e77eece7b5c3ad85642dafc3deac3ef7f282"
+
+[[package]]
+name = "zisk-stream"
+version = "1.0.0-beta"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa#f694a0f2b9b1dea35c85cd8ca509de05dbdc25c7"
+dependencies = [
+ "libc",
+ "thiserror",
+ "tracing",
+]
 
 [[package]]
 name = "zisk-stream"
@@ -4762,9 +4805,57 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "1.0.0-beta"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa#f694a0f2b9b1dea35c85cd8ca509de05dbdc25c7"
+dependencies = [
+ "proofman-verifier",
+]
+
+[[package]]
+name = "zisk-verifier"
+version = "1.0.0-beta"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta#c6b2e77eece7b5c3ad85642dafc3deac3ef7f282"
 dependencies = [
  "proofman-verifier",
+]
+
+[[package]]
+name = "ziskos"
+version = "1.0.0-beta"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa#f694a0f2b9b1dea35c85cd8ca509de05dbdc25c7"
+dependencies = [
+ "anyhow",
+ "ark-bn254",
+ "ark-ec",
+ "ark-ff 0.5.0",
+ "ark-serialize 0.5.0",
+ "aurora-engine-modexp",
+ "bincode",
+ "blst",
+ "bytes",
+ "cfg-if",
+ "ctor",
+ "fields",
+ "getrandom 0.2.17",
+ "lazy_static",
+ "lib-c 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa)",
+ "libc",
+ "num-bigint",
+ "num-integer",
+ "num-traits",
+ "once_cell",
+ "paste",
+ "precompiles-helpers 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa)",
+ "rand 0.8.6",
+ "ripemd",
+ "secp256k1 0.31.1",
+ "serde",
+ "sha2",
+ "tiny-keccak",
+ "tokio",
+ "zisk-definitions 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa)",
+ "zisk-stream 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa)",
+ "zisk-verifier 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa)",
+ "zkvm-interface 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa)",
 ]
 
 [[package]]
@@ -4786,14 +4877,14 @@ dependencies = [
  "fields",
  "getrandom 0.2.17",
  "lazy_static",
- "lib-c",
+ "lib-c 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta)",
  "libc",
  "num-bigint",
  "num-integer",
  "num-traits",
  "once_cell",
  "paste",
- "precompiles-helpers",
+ "precompiles-helpers 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta)",
  "rand 0.8.6",
  "ripemd",
  "secp256k1 0.31.1",
@@ -4801,10 +4892,18 @@ dependencies = [
  "sha2",
  "tiny-keccak",
  "tokio",
- "zisk-definitions",
- "zisk-stream",
- "zisk-verifier",
- "zkvm-interface",
+ "zisk-definitions 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta)",
+ "zisk-stream 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta)",
+ "zisk-verifier 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta)",
+ "zkvm-interface 1.0.0-beta (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-beta)",
+]
+
+[[package]]
+name = "zkvm-interface"
+version = "1.0.0-beta"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.0.0-alfa#f694a0f2b9b1dea35c85cd8ca509de05dbdc25c7"
+dependencies = [
+ "bindgen",
 ]
 
 [[package]]
