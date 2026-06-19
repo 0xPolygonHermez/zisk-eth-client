@@ -1,0 +1,17 @@
+[package]
+name = "bn254"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+hex.workspace = true
+num-bigint.workspace = true
+
+ziskos.workspace = true
+guest-reth.workspace = true
+common.workspace = true
+
+revm.workspace = true
+
+alloy-primitives = { workspace = true, features = ["native-keccak"] }
+alloy-consensus = { workspace = true, features = ["crypto-backend"] }

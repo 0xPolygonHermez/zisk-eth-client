@@ -1,4 +1,4 @@
-[workspace.package]
+[workspace]
 
 [package]
 name = "zec-ethrex"
@@ -15,7 +15,8 @@ panic = "abort"
 [dependencies]
 guest-ethrex = { path = "../../../crates/guest-ethrex" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.18.0" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag ="v1.0.0-alpha" }
+# Local development
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 [lints.rust]

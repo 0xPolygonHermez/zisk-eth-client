@@ -1,0 +1,22 @@
+mod common;
+mod g1_add;
+mod g1_msm;
+mod g1_mul;
+mod g2_add;
+mod g2_msm;
+mod g2_mul;
+mod map_fp2_to_g2;
+mod map_fp_to_g1;
+mod pairing;
+mod point_evaluation;
+
+pub use g1_add::bls12_381_g1_add_tests;
+pub use g1_msm::bls12_381_g1_msm_tests;
+pub use g1_mul::bls12_381_g1_mul_tests;
+pub use g2_add::bls12_381_g2_add_tests;
+pub use g2_msm::bls12_381_g2_msm_tests;
+pub use g2_mul::bls12_381_g2_mul_tests;
+pub use map_fp2_to_g2::bls12_381_map_fp2_to_g2_tests;
+pub use map_fp_to_g1::bls12_381_map_fp_to_g1_tests;
+pub use pairing::bls12_381_pairing_tests;
+pub use point_evaluation::bls12_381_point_evaluation_tests;

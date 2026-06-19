@@ -1,7 +1,8 @@
+use alloy_rlp::{Decodable, Encodable};
 use anyhow::{anyhow, Context, Result};
 use rayon::prelude::*;
-use serde::{Deserialize, Serialize};
-use serde_with::serde_as;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde_with::{serde_as, DeserializeAs, SerializeAs};
 
 use alloy_genesis::ChainConfig;
 use alloy_rpc_types_debug::ExecutionWitness;
@@ -10,10 +11,12 @@ use reth_ethereum_primitives::{Block, TransactionSigned};
 use stateless_reth::{StatelessInput, UncompressedPublicKey};
 
 mod crypto;
+mod run;
 mod utils;
 mod validation;
 
 pub use crypto::*;
+pub use run::*;
 pub use utils::*;
 pub use validation::*;
 
@@ -83,14 +86,34 @@ impl RethInputWitness {
     }
 }
 
+/// RLP-based serde adapter for `Block`. Replaces the
+/// `reth_primitives_traits::serde_bincode_compat::Block` helper that was
+/// removed in reth v2.1.0; `Header` carries `Option<_>` fields with
+/// `skip_serializing_if`, which bincode's serde encoding may not round-trip
+/// without an explicit adapter.
+struct BlockRlp;
+
+impl SerializeAs<Block> for BlockRlp {
+    fn serialize_as<S: Serializer>(source: &Block, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut buf = Vec::with_capacity(source.length());
+        source.encode(&mut buf);
+        buf.serialize(serializer)
+    }
+}
+
+impl<'de> DeserializeAs<'de, Block> for BlockRlp {
+    fn deserialize_as<D: Deserializer<'de>>(deserializer: D) -> Result<Block, D::Error> {
+        let buf = Vec::<u8>::deserialize(deserializer)?;
+        Block::decode(&mut buf.as_slice()).map_err(serde::de::Error::custom)
+    }
+}
+
 /// The public input part of the input
 #[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RethInputPublic {
     /// The block being executed in the stateless validation function
-    #[serde_as(
-        as = "reth_primitives_traits::serde_bincode_compat::Block<reth_ethereum_primitives::TransactionSigned, alloy_consensus::Header>"
-    )]
+    #[serde_as(as = "BlockRlp")]
     pub block: Block,
     /// Chain configuration for the stateless validation function
     #[serde_as(as = "alloy_genesis::serde_bincode_compat::ChainConfig<'_>")]

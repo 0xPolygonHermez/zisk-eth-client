@@ -6,16 +6,6 @@ use guest_common::ffi::*;
 
 use super::ZiskCrypto;
 
-// mulmod256_c is exported by ziskos but not declared in zkvm_accelerators.h.
-extern "C" {
-    fn mul_mod_bytes256_c(
-        a_ptr: *const u8,
-        b_ptr: *const u8,
-        m_ptr: *const u8,
-        result_ptr: *mut u8,
-    );
-}
-
 impl Crypto for ZiskCrypto {
     fn ripemd160(&self, input: &[u8]) -> [u8; 32] {
         let mut output = zkvm_ripemd160_hash { data: [0u8; 32] };
@@ -78,6 +68,13 @@ impl Crypto for ZiskCrypto {
     }
 
     fn recover_signer(&self, sig: &[u8; 65], msg: &[u8; 32]) -> Result<Address, CryptoError> {
+        // EIP-2: reject high-s signatures (s > secp256k1n/2)
+        const SECP256K1_N_HALF: [u8; 32] =
+            hex_literal::hex!("7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0");
+        if sig[32..64] > SECP256K1_N_HALF[..] {
+            return Err(CryptoError::InvalidSignature);
+        }
+
         let sig_bytes: [u8; 64] = sig[..64].try_into().unwrap();
         let recid = sig[64];
         let mut pubkey_out = zkvm_secp256k1_pubkey { data: [0u8; 64] };
@@ -170,7 +167,7 @@ impl Crypto for ZiskCrypto {
 
     fn mulmod256(&self, a: &[u8; 32], b: &[u8; 32], m: &[u8; 32]) -> [u8; 32] {
         let mut result = [0u8; 32];
-        unsafe { mul_mod_bytes256_c(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr()) };
+        unsafe { zkvm_mulmod256(a.as_ptr(), b.as_ptr(), m.as_ptr(), result.as_mut_ptr()) };
         result
     }
 

@@ -4,10 +4,12 @@ use serde::{Deserialize, Serialize};
 use ethrex_common::types::{block_execution_witness::ExecutionWitness, Block};
 
 mod crypto;
+mod run;
 mod utils;
 mod validation;
 
 pub use crypto::*;
+pub use run::*;
 pub use utils::*;
 pub use validation::*;
 

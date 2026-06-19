@@ -1,0 +1,8 @@
+# Rustflags for zisk
+[target.riscv64ima-zisk-zkvm-elf]
+rustflags = [
+  "-Z",
+  "share-generics=y",
+  "-C",
+  "llvm-args=--inline-threshold=2000",
+]
