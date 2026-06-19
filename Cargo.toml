@@ -4,7 +4,7 @@ exclude = ["tools/migrate-inputs"]
 resolver = "2"
 
 [workspace.package]
-version = "0.9.0"
+version = "0.10.0"
 edition = "2021"
 
 [workspace.dependencies]
@@ -13,9 +13,9 @@ guest-ethrex = { path = "crates/guest-ethrex" }
 guest-reth = { path = "crates/guest-reth" }
 input = { path = "crates/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-alpha" }
-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-alpha" }
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-alpha" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v1.0.0-alpha" }
+zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v1.0.0-alpha" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v1.0.0-alpha" }
 # Local development
 # zisk-sdk = { path = "../zisk/sdk" }
 # zkvm-interface = { path = "../zisk/zkvm-interface" }
