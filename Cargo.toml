@@ -13,9 +13,9 @@ guest-ethrex = { path = "crates/guest-ethrex" }
 guest-reth = { path = "crates/guest-reth" }
 input = { path = "crates/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-alfa" }
-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-alfa" }
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-alfa" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-alpha" }
+zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-alpha" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-alpha" }
 # Local development
 # zisk-sdk = { path = "../zisk/sdk" }
 # zkvm-interface = { path = "../zisk/zkvm-interface" }
