@@ -1,5 +1,14 @@
+#![cfg_attr(not(feature = "std"), no_std)]
+
+#[cfg(not(feature = "std"))]
+extern crate alloc;
+
+#[cfg(not(feature = "std"))]
+use alloc::{format, vec::Vec};
+
 use alloy_rlp::{Decodable, Encodable};
 use anyhow::{anyhow, Context, Result};
+#[cfg(feature = "std")]
 use rayon::prelude::*;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_with::{serde_as, DeserializeAs, SerializeAs};
@@ -11,11 +20,13 @@ use reth_ethereum_primitives::{Block, TransactionSigned};
 use stateless_reth::{StatelessInput, UncompressedPublicKey};
 
 mod crypto;
+#[cfg(feature = "std")]
 mod run;
 mod utils;
 mod validation;
 
 pub use crypto::*;
+#[cfg(feature = "std")]
 pub use run::*;
 pub use utils::*;
 pub use validation::*;
@@ -168,23 +179,33 @@ fn public_keys_from_block(block: &Block) -> Result<Vec<UncompressedPublicKey>> {
     recover_signers(&block.body.transactions)
 }
 
+fn recover_signer(i: usize, tx: &TransactionSigned) -> Result<UncompressedPublicKey> {
+    let keys = tx
+        .signature()
+        .recover_from_prehash(&tx.signature_hash())
+        .with_context(|| format!("Failed to recover signature for tx #{i}"))?;
+
+    let encoded_point: [u8; 65] = keys
+        .to_encoded_point(false)
+        .as_bytes()
+        .try_into()
+        .map_err(|e| anyhow!("Failed to encode public key for tx #{i}, error: {e}"))?;
+
+    Ok(UncompressedPublicKey(encoded_point))
+}
+
 // Recovers the public keys from a list of signed transactions
 pub fn recover_signers(txs: &[TransactionSigned]) -> Result<Vec<UncompressedPublicKey>> {
-    txs.par_iter()
+    #[cfg(feature = "std")]
+    return txs
+        .par_iter()
         .enumerate()
-        .map(|(i, tx)| {
-            let keys = tx
-                .signature()
-                .recover_from_prehash(&tx.signature_hash())
-                .with_context(|| format!("Failed to recover signature for tx #{i}"))?;
+        .map(|(i, tx)| recover_signer(i, tx))
+        .collect();
 
-            let encoded_point: [u8; 65] = keys
-                .to_encoded_point(false)
-                .as_bytes()
-                .try_into()
-                .map_err(|e| anyhow!("Failed to encode public key for tx #{i}, error: {e}"))?;
-
-            Ok(UncompressedPublicKey(encoded_point))
-        })
+    #[cfg(not(feature = "std"))]
+    txs.iter()
+        .enumerate()
+        .map(|(i, tx)| recover_signer(i, tx))
         .collect()
 }

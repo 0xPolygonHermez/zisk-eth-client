@@ -1,3 +1,6 @@
+extern crate alloc;
+use alloc::{vec, vec::Vec};
+
 use tiny_keccak::{Hasher, Keccak};
 
 use alloy_consensus::crypto::{CryptoProvider, RecoveryError};
