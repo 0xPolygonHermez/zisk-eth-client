@@ -11,11 +11,14 @@ edition = "2021"
 guest-common = { path = "crates/guest-common" }
 guest-ethrex = { path = "crates/guest-ethrex" }
 guest-reth = { path = "crates/guest-reth" }
+guest-ziskethone = { path = "crates/guest-ziskethone" }
 input = { path = "crates/input" }
 
 zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
 zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
 ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
+rust-input-gen = { path = "third_party/ziskethone/rust-input-gen" }
+
 # Local development
 # zisk-sdk = { path = "../zisk/sdk" }
 # zkvm-interface = { path = "../zisk/zkvm-interface" }
