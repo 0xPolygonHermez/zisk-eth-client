@@ -2,7 +2,7 @@
 # Run the host stateless-validator over the configured test blocks for one client.
 #
 # Usage: tools/ci/run-validation.sh <client> <action> <executor> [mode]
-#   client   : reth | ethrex
+#   client   : reth | ethrex | ziskethone
 #   action   : execute | verify-constraints
 #   executor : emulator | assembly
 #   mode     : standard (default) | hints
@@ -10,6 +10,7 @@
 # In `hints` mode the run adds `--gen-hints` (generate hints from the input, then
 # run with them). Hints require the assembly executor, and the host must have been
 # built with RUSTFLAGS="--cfg zisk_hints" — otherwise host rejects --gen-hints.
+# The ziskethone client is skipped in hints mode (CI does not run it there).
 #
 # Environment:
 #   <CLIENT>_TEST_BLOCKS  (required) space-separated block numbers to --include,

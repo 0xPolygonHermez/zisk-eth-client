@@ -22,10 +22,12 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-  # Block inputs to test per client (from less MGs to more MGs).
-  # It is good to have shared blocks between clients for easier comparison.
-  RETH_TEST_BLOCKS: "25229957 25229955 25229951"
-  ETHREX_TEST_BLOCKS: "25229957 25229955 25229951"
+  # Block inputs to test per client (from less MGs to more MGs). All clients use
+  # the SAME blocks so the report can compare them against each other (reth is
+  # the cross-client baseline). Every client must have an input file for each.
+  RETH_TEST_BLOCKS: "25431055 25431039 25431013"
+  ETHREX_TEST_BLOCKS: "25431055 25431039 25431013"
+  ZISKETHONE_TEST_BLOCKS: "25431055 25431039 25431013"
 
 jobs:
   cycle-tracking:
@@ -50,9 +52,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # ziskethone's guest sources live in the third_party/ziskethone submodule.
+          submodules: recursive
 
       - name: "Resolve ZisK ref"
         uses: ./.github/actions/zisk-ref
+
+      - name: "Install C++ guest cross-toolchain"
+        uses: ./.github/actions/cpp-guest-toolchain
 
       - name: "Clone ZisK"
         uses: actions/checkout@v4
@@ -93,9 +100,14 @@ jobs:
           path: |
             ${{ env.WS }}/target/release/cargo-zisk
             ${{ env.WS }}/target/release/ziskemu
+          # Key includes the CPU-flag fingerprint (see above) so a cached binary
+          # is never restored onto an incompatible CPU.
           key: zisk-emulator-${{ runner.os }}-${{ steps.zisk.outputs.cpu }}-${{ steps.zisk.outputs.sha }}
 
       - name: "Build emulator (cargo-zisk + ziskemu)"
+        # Build on a cache miss, OR if the restored binary can't run on this CPU
+        # (a cross-CPU cache restore SIGILLs — the CPU-keyed cache should prevent
+        # it, but smoke-test and rebuild as a self-healing backstop).
         working-directory: ${{ env.WS }}
         run: |
           need_build=0
@@ -122,6 +134,9 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.ref || inputs.base_ref }}
           path: base-tree
+          # No-op on a base branch that predates the ziskethone submodule; needed
+          # once the base branch also carries it so the base bench can build it.
+          submodules: recursive
 
       - name: "Benchmark base branch"
         env:
