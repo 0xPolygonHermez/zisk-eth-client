@@ -75,17 +75,53 @@ def split_prog(prog):
     return client, block
 
 
+BASELINE_CLIENT = "reth"
+
+
+def vs_baseline(baseline, value):
+    """Cross-client comparison: PR `value` relative to the baseline client's PR
+    value on the same block. 'baseline' for the reference client itself, a signed
+    percentage otherwise, or N/A when either side is missing."""
+    if baseline is None or value is None:
+        return "N/A"
+    if baseline == value:
+        return "0.00%"
+    if baseline == 0:
+        return "N/A"
+    return f"{(value - baseline) / baseline * 100:+.2f}%"
+
+
 def summary(rows):
-    """Headline table: Steps + Total Cost (PR value and delta) per guest + input."""
+    """Headline table: per guest + input, the PR Steps/Total Cost, the Δ vs the
+    base branch (regression check), and a cross-client comparison vs the baseline
+    client (reth) on the same block."""
+    # PR STEPS/TOTAL for the baseline client, keyed by block.
+    base_steps = {
+        block: pr.get("STEPS")
+        for client, block, _b, pr in rows
+        if client == BASELINE_CLIENT
+    }
+    base_total = {
+        block: pr.get("TOTAL")
+        for client, block, _b, pr in rows
+        if client == BASELINE_CLIENT
+    }
+
     out = [
-        "| Guest | Input | Steps | Δ Steps | Total Cost | Δ Total Cost |",
-        "| --- | --- | --- | --- | --- | --- |",
+        f"| Guest | Input | Steps | Δ Steps | Steps vs {BASELINE_CLIENT} "
+        f"| Total Cost | Δ Total Cost | Cost vs {BASELINE_CLIENT} |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for client, block, base, pr in rows:
+        if client == BASELINE_CLIENT:
+            steps_vs = cost_vs = "baseline"
+        else:
+            steps_vs = vs_baseline(base_steps.get(block), pr.get("STEPS"))
+            cost_vs = vs_baseline(base_total.get(block), pr.get("TOTAL"))
         out.append(
             f"| {client} | {block} "
-            f"| {fmt(pr.get('STEPS'))} | {delta(base.get('STEPS'), pr.get('STEPS'))} "
-            f"| {fmt(pr.get('TOTAL'))} | {delta(base.get('TOTAL'), pr.get('TOTAL'))} |"
+            f"| {fmt(pr.get('STEPS'))} | {delta(base.get('STEPS'), pr.get('STEPS'))} | {steps_vs} "
+            f"| {fmt(pr.get('TOTAL'))} | {delta(base.get('TOTAL'), pr.get('TOTAL'))} | {cost_vs} |"
         )
     return "\n".join(out)
 
@@ -123,7 +159,7 @@ def main():
 
     # Programs = the .txt reports present in the PR dir (fall back to base dir).
     src = pr_dir if os.path.isdir(pr_dir) else base_dir
-    programs = sorted(f[:-4] for f in os.listdir(src) if f.endswith(".txt"))
+    programs = [f[:-4] for f in os.listdir(src) if f.endswith(".txt")]
 
     rows = [
         (
@@ -133,11 +169,16 @@ def main():
         )
         for prog in programs
     ]
+    # Group by block, with the baseline client first in each group, so the
+    # cross-client comparison reads top-to-bottom per block.
+    rows.sort(key=lambda r: (r[1], r[0] != BASELINE_CLIENT, r[0]))
 
     out = ["## 🔄 zisk-eth-client Cycle Tracking", ""]
     out.append(
-        "Emulator cost report (`ziskemu -X`) comparing this PR against the base "
-        "branch, per guest client and block input."
+        "Emulator cost report (`ziskemu -X`) per guest client and block input. "
+        f"`Δ` columns compare this PR against the base branch (regression check); "
+        f"the `vs {BASELINE_CLIENT}` columns compare each client against "
+        f"`{BASELINE_CLIENT}` on the same block (lower is cheaper)."
     )
     out.append("")
 
