@@ -101,7 +101,8 @@ jobs:
   proving-key:
     name: Generate proving key
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-    runs-on: gpu-hosted
+    runs-on:
+      group: zisk-gpu
     timeout-minutes: 120
     container:
       image: ziskvm/zisk-runner-gpu:latest
@@ -196,7 +197,8 @@ jobs:
     name: Verify constraints
     needs: [proving-key]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-    runs-on: gpu-hosted
+    runs-on:
+      group: zisk-gpu
     timeout-minutes: 45
     container:
       image: ziskvm/zisk-runner-gpu:latest
