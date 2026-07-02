@@ -8,6 +8,7 @@ edition.workspace = true
 guest-common.workspace = true
 guest-reth.workspace = true
 guest-ethrex.workspace = true
+guest-ziskethone.workspace = true
 zisk-sdk.workspace = true
 ziskos.workspace = true
 # `sync` for the oneshot::Sender ready-signal in generate_hints_to_socket.
@@ -19,6 +20,8 @@ ethrex-rpc.workspace = true
 
 clap = { workspace = true, optional = true }
 url = { workspace = true }
+
+rust-input-gen.workspace = true
 
 async-trait.workspace = true
 anyhow.workspace = true

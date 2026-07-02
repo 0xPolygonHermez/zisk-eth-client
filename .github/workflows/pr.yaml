@@ -24,11 +24,18 @@ env:
   PIL2_PROOFMAN_JS_REF: pre-develop-0.19.0
   # Clients exercised by the execute / verify-constraints loops. To add a client,
   # append it here and add its <CLIENT>_TEST_BLOCKS below.
-  CLIENTS: "reth ethrex"
-  # Block inputs to test per client (from less MGs to more MGs).
-  # It is good to have shared blocks between clients for easier comparison.
-  RETH_TEST_BLOCKS: "25229957 25229955 25229951"
-  ETHREX_TEST_BLOCKS: "25229957 25229955 25229951"
+  # `ziskethone` is a C++ (evmone) guest; the hints-mode execute loop skips it
+  # (see the Execute job).
+  CLIENTS: "reth ethrex ziskethone"
+  # Block inputs to test per client (graduated, less MGs to more MGs). All three
+  # clients share the SAME block set for cross-client comparison; each block has
+  # a committed input under bin/guests/stateless-validator-<client>/inputs/.
+  #   25431013 ~17.0M gas / 172 tx   (small)
+  #   25431039 ~25.0M gas / 325 tx   (medium)
+  #   25431055 ~55.7M gas / 712 tx   (large)
+  RETH_TEST_BLOCKS: "25431013 25431039 25431055"
+  ETHREX_TEST_BLOCKS: "25431013 25431039 25431055"
+  ZISKETHONE_TEST_BLOCKS: "25431013 25431039 25431055"
 
 jobs:
   fmt:
@@ -38,6 +45,9 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
+        with:
+          # cargo needs the rust-input-gen submodule present to load the workspace.
+          submodules: recursive
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -53,6 +63,11 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install C++ guest cross-toolchain
+        uses: ./.github/actions/cpp-guest-toolchain
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -90,10 +105,24 @@ jobs:
       run:
         shell: bash
     steps:
+      # checkout needs git >= 2.18 in the container, else it falls back to the
+      # REST tarball download which can't fetch submodules. The base image ships
+      # without git, so install it before checkout.
+      - name: Install git (for submodule checkout)
+        run: |
+          if ! command -v git >/dev/null 2>&1; then
+            apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+          fi
+
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up ZisK build environment
         uses: ./.github/actions/zisk-setup
+
+      - name: Install C++ guest cross-toolchain
+        uses: ./.github/actions/cpp-guest-toolchain
 
       - name: Run cargo test
         run: cargo test --locked -p tests
@@ -160,10 +189,26 @@ jobs:
       matrix:
         mode: [standard, hints]
     steps:
+      # checkout needs git >= 2.18 in the container, else it falls back to the
+      # REST tarball download which can't fetch submodules. The base image ships
+      # without git, so install it before checkout.
+      - name: Install git (for submodule checkout)
+        run: |
+          if ! command -v git >/dev/null 2>&1; then
+            apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+          fi
+
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up ZisK build environment
         uses: ./.github/actions/zisk-setup
+
+      # ziskethone's guest ELF + native FFI lib are cross-compiled by the
+      # guest-ziskethone build.rs during `cargo build -p host`.
+      - name: Install C++ guest cross-toolchain
+        uses: ./.github/actions/cpp-guest-toolchain
 
       - name: Build host
         run: |
@@ -183,9 +228,15 @@ jobs:
             echo "::endgroup::"
           done
 
+      # In hints mode, skip ziskethone (the C++ guest is not run under hints in
+      # CI). Standard mode runs all clients.
       - name: Execute (assembly)
         run: |
           for client in $CLIENTS; do
+            if [ "${{ matrix.mode }}" = "hints" ] && [ "$client" = "ziskethone" ]; then
+              echo "::notice::skipping ziskethone in hints mode"
+              continue
+            fi
             echo "::group::execute $client (assembly, ${{ matrix.mode }})"
             bash tools/ci/run-validation.sh "$client" execute assembly "${{ matrix.mode }}"
             echo "::endgroup::"
@@ -207,7 +258,18 @@ jobs:
       run:
         shell: bash
     steps:
+      # checkout needs git >= 2.18 in the container, else it falls back to the
+      # REST tarball download which can't fetch submodules. Install it if the
+      # base image lacks it (no-op when already present).
+      - name: Install git (for submodule checkout)
+        run: |
+          if ! command -v git >/dev/null 2>&1; then
+            apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+          fi
+
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Verify proving key present
         run: |
@@ -215,6 +277,9 @@ jobs:
 
       - name: Set up ZisK build environment
         uses: ./.github/actions/zisk-setup
+
+      - name: Install C++ guest cross-toolchain
+        uses: ./.github/actions/cpp-guest-toolchain
 
       - name: Build host
         run: cargo build --locked --release -p host

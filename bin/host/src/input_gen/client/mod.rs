@@ -7,6 +7,7 @@ use crate::input_gen::provider::ProviderKind;
 
 mod ethrex;
 mod reth;
+mod ziskethone;
 
 pub use input::Client;
 
@@ -47,6 +48,7 @@ pub fn create_client(client: Client) -> Box<dyn InputGenClient> {
     match client {
         Client::Reth => Box::new(input::RethClient),
         Client::Ethrex => Box::new(input::EthrexClient),
+        Client::ZiskEthOne => Box::new(input::ZiskEthOneClient),
     }
 }
 

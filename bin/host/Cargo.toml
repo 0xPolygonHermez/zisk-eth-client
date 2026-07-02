@@ -6,6 +6,7 @@ edition = "2024"
 
 [dependencies]
 input = { workspace = true, features = ["cli"] }
+guest-ziskethone.workspace = true
 zisk-sdk.workspace = true
 ziskos.workspace = true
 
