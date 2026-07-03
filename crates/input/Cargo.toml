@@ -41,6 +41,10 @@ stateless-reth.workspace = true
 
 [features]
 cli = ["dep:clap"]
+# Enables the ziskethone input-gen client (ZiskEthOneClient), which uses the
+# native C++ `run()` FFI. Off by default so consumers that only need reth/ethrex
+# (or just the committed ELF) avoid the ziskethone C++ toolchain requirement.
+ziskethone = ["guest-ziskethone/ziskethone"]
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

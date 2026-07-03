@@ -4,7 +4,9 @@ use anyhow::{Context, Result};
 use async_trait::async_trait;
 use zisk_sdk::ZiskStdin;
 
-use crate::{EthrexClient, RethClient, ZiskEthOneClient};
+#[cfg(feature = "ziskethone")]
+use crate::ZiskEthOneClient;
+use crate::{EthrexClient, RethClient};
 
 /// Execution clients. To add one, see `docs/adding-a-client.md` — adding a
 /// variant here makes `create_client` (and the host's ELF/input-gen matches)
@@ -14,6 +16,7 @@ use crate::{EthrexClient, RethClient, ZiskEthOneClient};
 pub enum Client {
     Reth,
     Ethrex,
+    #[cfg(feature = "ziskethone")]
     #[cfg_attr(feature = "cli", value(name = "ziskethone"))]
     ZiskEthOne,
 }
@@ -74,6 +77,7 @@ pub fn create_client(client: Client) -> Box<dyn ExecutionClient> {
     match client {
         Client::Reth => Box::new(RethClient),
         Client::Ethrex => Box::new(EthrexClient),
+        #[cfg(feature = "ziskethone")]
         Client::ZiskEthOne => Box::new(ZiskEthOneClient),
     }
 }

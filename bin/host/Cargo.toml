@@ -4,6 +4,12 @@ description = "ZisK Ethereum Client Host"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+# Enables the ziskethone input-gen client path (native C++ `run()` FFI). Off by
+# default so `cargo build`/proving needs no ziskethone C++ toolchain — the guest
+# ELF is embedded from the committed file regardless. Opt in for input-gen.
+ziskethone = ["input/ziskethone"]
+
 [dependencies]
 input = { workspace = true, features = ["cli"] }
 guest-ziskethone.workspace = true

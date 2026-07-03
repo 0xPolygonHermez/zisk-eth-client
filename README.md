@@ -34,6 +34,15 @@ logic can also be invoked programmatically from `host` itself.
 - [zisk](https://0xpolygonhermez.github.io/zisk/getting_started/installation.html)
 - Ethereum RPC endpoint (Infura, Alchemy, or your own node) for input generation
 
+After cloning, run the bootstrap script once. It initializes the
+`third_party/ziskethone` submodule (a Cargo `path` dependency, so the workspace
+won't build without it) and installs the xPack RISC-V toolchain used to
+cross-compile the ziskethone C++ guest:
+
+```bash
+./setup.sh
+```
+
 ### Build the Guest Program
 
 To build the Reth stateless validator guest program:
