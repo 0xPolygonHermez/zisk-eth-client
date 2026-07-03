@@ -14,9 +14,9 @@ guest-reth = { path = "crates/guest-reth" }
 guest-ziskethone = { path = "crates/guest-ziskethone" }
 input = { path = "crates/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/rustflags" }
+zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/rustflags" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "fix/rustflags" }
 rust-input-gen = { path = "third_party/ziskethone/rust-input-gen" }
 
 # Local development
