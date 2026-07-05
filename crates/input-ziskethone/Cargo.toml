@@ -1,0 +1,24 @@
+[package]
+name = "input-ziskethone"
+description = ""
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+input-core.workspace = true
+guest-common.workspace = true
+# `native-ffi`: this crate's `run()` calls guest-ziskethone's native FFI, so the
+# C++ lib must be built + linked. Pulls in the clang/cmake toolchain requirement
+# — which is why depending on `input-ziskethone` at all implies that toolchain.
+guest-ziskethone = { workspace = true, features = ["native-ffi"] }
+zisk-sdk.workspace = true
+ziskos.workspace = true
+
+async-trait.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+
+rust-input-gen.workspace = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

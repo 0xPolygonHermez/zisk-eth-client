@@ -64,15 +64,23 @@ the resulting ELF.
 
 ## Host (fetches block data over RPC and wires up the CLI)
 
-Identical for both patterns.
+Identical for both patterns. Each client lives in its own `input-<client>` crate
+(mirroring the `guest-*` split), depending on `input-core` for the
+`ExecutionClient` trait, `RpcConfig`, and `BlockStats`; the `input` crate is a
+thin, feature-gated aggregator that re-exports whichever clients are enabled.
 
-1. **`crates/input/Cargo.toml`** — depend on the guest crate (for its input type
-   or fetch helper):
+1. **`crates/input-geth/`** (new crate) — `Cargo.toml` depends on
+   `input-core.workspace = true`, the guest crate (for its input type or fetch
+   helper), and geth's own RPC deps:
    ```toml
+   [dependencies]
+   input-core.workspace = true
    guest-geth.workspace = true
+   # ...RPC deps as needed
    ```
-2. **`crates/input/src/geth_client.rs`** — define a `GethClient` struct and
-   `impl ExecutionClient` for it, with these methods:
+   `src/lib.rs` defines a `GethClient` struct and `impl ExecutionClient` for it
+   (importing `ExecutionClient`/`RpcConfig`/`BlockStats` from `input_core`),
+   with these methods:
    - `name()` → `"geth"` — used in output filenames and the default
      `<client>-inputs` output dir. (The `--client` flag value comes from the
      `Client` enum variant via its `clap::ValueEnum` derive, not from `name()`.)
@@ -82,17 +90,32 @@ Identical for both patterns.
      clients usually fetch via the helper re-exported from their guest crate,
      e.g. `guest_geth::fetch_block_and_witness`.)
    - `run()`.
-3. **`crates/input/src/lib.rs`** — register the module:
-   ```rust
-   mod geth_client;
-   pub use geth_client::GethClient;
+2. Root `Cargo.toml` `[workspace.dependencies]` — add the new crate (the
+   `crates/*` glob already makes it a workspace member):
+   ```toml
+   input-geth = { path = "crates/input-geth" }
    ```
-4. **`crates/input/src/client.rs`** — add `Geth` to the `Client` enum, then add
-   the matching `create_client` arm:
-   ```rust
-   Client::Geth => Box::new(GethClient::default()),
+3. **`crates/input/Cargo.toml`** — add it as an optional dependency and a new
+   feature, then add that feature to `default`:
+   ```toml
+   input-geth = { workspace = true, optional = true }
+
+   [features]
+   default = [..., "geth"]
+   geth = ["dep:input-geth"]
    ```
-5. **`bin/host/src/input_gen/client/geth.rs`** — `impl InputGenClient` for the
+4. **`crates/input/src/client.rs`** — add a `#[cfg(feature = "geth")] Geth`
+   variant to the `Client` enum, then add the matching `create_client` arm:
+   ```rust
+   #[cfg(feature = "geth")]
+   Client::Geth => Box::new(input_geth::GethClient::default()),
+   ```
+5. **`crates/input/src/lib.rs`** — re-export the client:
+   ```rust
+   #[cfg(feature = "geth")]
+   pub use input_geth::GethClient;
+   ```
+6. **`bin/host/src/input_gen/client/geth.rs`** — `impl InputGenClient` for the
    client:
    ```rust
    impl InputGenClient for input::GethClient {
@@ -103,12 +126,12 @@ Identical for both patterns.
    ```
    Override `process_fixture` only if the client supports EEST fixtures (as `reth`
    does).
-6. **`bin/host/src/input_gen/client/mod.rs`** — add `mod geth;`, then add the
+7. **`bin/host/src/input_gen/client/mod.rs`** — add `mod geth;`, then add the
    `create_client` arm:
    ```rust
    Client::Geth => Box::new(input::GethClient::default()),
    ```
-7. **`bin/host/src/main.rs`** — map the client to its ELF:
+8. **`bin/host/src/main.rs`** — map the client to its ELF:
    ```rust
    Client::Geth => ELF_GETH,
    ```

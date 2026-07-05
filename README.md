@@ -34,6 +34,15 @@ logic can also be invoked programmatically from `host` itself.
 - [zisk](https://0xpolygonhermez.github.io/zisk/getting_started/installation.html)
 - Ethereum RPC endpoint (Infura, Alchemy, or your own node) for input generation
 
+After cloning, run the bootstrap script once. It initializes the
+`third_party/ziskethone` submodule (a Cargo `path` dependency, so the workspace
+won't build without it) and installs the xPack RISC-V toolchain used to
+cross-compile the ziskethone C++ guest:
+
+```bash
+./setup.sh
+```
+
 ### Build the Guest Program
 
 To build the Reth stateless validator guest program:
@@ -163,7 +172,9 @@ Then use the local binaries instead of the installed ones:
 | [**hints-gen**](bin/hints-gen/) | Run guests natively against `.bin` inputs to capture prover hints |
 | [**guest-reth**](crates/guest-reth/) | Core reth validation library: crypto, validation logic, input types |
 | [**guest-ethrex**](crates/guest-ethrex/) | Core ethrex validation library: crypto, validation logic, input types |
-| [**input**](crates/input/) | RPC data fetching and the shared `ExecutionClient` abstraction (reth, ethrex) |
+| [**input-core**](crates/input-core/) | Client-agnostic core: the `ExecutionClient` trait, `RpcConfig`, `BlockStats`, and native hints generation |
+| [**input-reth**](crates/input-reth/) / [**input-ethrex**](crates/input-ethrex/) / [**input-ziskethone**](crates/input-ziskethone/) | Per-client input generation (RPC data fetching), each depending only on its own guest crate and RPC deps |
+| [**input**](crates/input/) | Thin aggregator over `input-core` + the per-client crates; re-exports the `Client` enum and `create_client()`, feature-gated per client (`reth`/`ethrex`/`ziskethone`, all on by default) |
 
 ## Supported Chains
 

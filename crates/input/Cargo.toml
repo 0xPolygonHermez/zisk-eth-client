@@ -5,42 +5,24 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-guest-common.workspace = true
-guest-reth.workspace = true
-guest-ethrex.workspace = true
-guest-ziskethone.workspace = true
-zisk-sdk.workspace = true
-ziskos.workspace = true
-# `sync` for the oneshot::Sender ready-signal in generate_hints_to_socket.
-tokio = { workspace = true, features = ["sync"] }
-
-ethrex-config.workspace = true
-ethrex-common.workspace = true
-ethrex-rpc.workspace = true
+input-core.workspace = true
+input-reth = { workspace = true, optional = true }
+input-ethrex = { workspace = true, optional = true }
+input-ziskethone = { workspace = true, optional = true }
 
 clap = { workspace = true, optional = true }
-url = { workspace = true }
-
-rust-input-gen.workspace = true
-
-async-trait.workspace = true
-anyhow.workspace = true
-tracing.workspace = true
-rayon.workspace = true
-
-alloy-genesis.workspace = true
-alloy-provider = { workspace = true, features = ["debug-api"] }
-alloy-rpc-client.workspace = true
-alloy-rpc-types-eth.workspace = true
-alloy-rpc-types-debug.workspace = true
-alloy-transport-http.workspace = true
-
-reth-chainspec.workspace = true
-
-stateless-reth.workspace = true
 
 [features]
+default = ["reth", "ethrex", "ziskethone"]
 cli = ["dep:clap"]
+reth = ["dep:input-reth"]
+ethrex = ["dep:input-ethrex"]
+# Pulls in the ziskethone client. Like `reth`/`ethrex`, it just enables the
+# per-client crate — but `input-ziskethone` transitively builds guest-ziskethone's
+# native C++ FFI (needs clang >= 15 / g++ >= 12 and the submodule), so consumers
+# that want to avoid that toolchain build with `--no-default-features` and omit
+# `ziskethone` (keeping `reth`/`ethrex`).
+ziskethone = ["dep:input-ziskethone"]
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

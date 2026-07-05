@@ -14,7 +14,7 @@ use ethrex_rpc::EthClient;
 use guest_common::chain::chain_name;
 use guest_ethrex::EthrexInput;
 
-use super::client::{BlockStats, ExecutionClient, RpcConfig};
+use input_core::{BlockStats, ExecutionClient, RpcConfig};
 
 #[derive(Default)]
 pub struct EthrexClient;

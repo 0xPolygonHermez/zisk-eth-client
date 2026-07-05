@@ -4,10 +4,12 @@ Host-side glue for the **ziskethone** C++ (evmone-based) ZisK Ethereum guest.
 
 Pattern B (externally-built ELF) per `docs/adding-a-client.md`. Like
 `guest-zilkworm`, ziskethone exposes a native FFI run path (`zeg_run`), so this
-crate provides both:
-- `ELF` — the prebuilt guest ELF the prover runs.
+crate provides:
+- `ELF` — the prebuilt guest ELF the prover runs. Always available; embedding it
+  needs no C++ toolchain.
 - `run()` — the C++ EVM executed in-process on the host via FFI, used for fast
-  input checking and **hint generation**.
+  input checking and **hint generation**. Behind the `ziskethone` feature
+  (off by default), since compiling+linking it needs clang/g++ and the submodule.
 
 ## Layout
 - `build.rs` —
@@ -18,7 +20,7 @@ crate provides both:
   - `build_ffi()`: builds the `cpp-guest` native static lib (`libzeg_ffi.a`)
     plus its evmone/blst deps and links them so the host can call `zeg_run`.
 - `build-elf.sh` — cmake driver for `cpp-guest/zisk` (target `zisk_eth_guest.elf`).
-- `src/lib.rs` — `pub const ELF` and `pub fn run()`.
+- `src/lib.rs` — `pub const ELF` (always) and `pub fn run()` (feature `ziskethone`).
 
 ## Build the ELF manually
 ```bash
