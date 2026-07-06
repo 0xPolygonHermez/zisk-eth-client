@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 fn main() {
-    // The guest ELF is committed (crates/guest-ziskethone/elf/) and embedded by
+    // The guest ELF is committed (crates/clients/ziskethone/guest/elf/) and embedded by
     // `load_program!` at compile time — build.rs does NOT touch it on a normal
     // build, so no xPack RISC-V toolchain is ever needed just to use `ELF`.
     // Regenerate it only on demand, when the C++ guest changed:
@@ -42,7 +42,7 @@ fn ensure_submodule_initialized() {
         "ziskethone submodule not initialized at {}; running git submodule update…",
         dir.display()
     );
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../..");
     let status = std::process::Command::new("git")
         .args(["submodule", "update", "--init", "--recursive"])
         .current_dir(&root)
@@ -418,7 +418,7 @@ fn ziskethone_dir() -> PathBuf {
     std::env::var("ZISKETHONE_DIR")
         .map(PathBuf::from)
         .unwrap_or_else(|_| {
-            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../third_party/ziskethone")
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../../third_party/ziskethone")
         })
 }
 

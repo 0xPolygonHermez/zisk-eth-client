@@ -170,10 +170,10 @@ Then use the local binaries instead of the installed ones:
 | [**host**](bin/host/) | Benchmark runner for executing/proving guest programs; also hosts shared input-gen / hints-gen libraries |
 | [**input-gen**](bin/input-gen/) | Generate inputs from RPC endpoints or EEST test fixtures (reth + ethrex) |
 | [**hints-gen**](bin/hints-gen/) | Run guests natively against `.bin` inputs to capture prover hints |
-| [**guest-reth**](crates/guest-reth/) | Core reth validation library: crypto, validation logic, input types |
-| [**guest-ethrex**](crates/guest-ethrex/) | Core ethrex validation library: crypto, validation logic, input types |
-| [**input-core**](crates/input-core/) | Client-agnostic core: the `ExecutionClient` trait, `RpcConfig`, `BlockStats`, and native hints generation |
-| [**input-reth**](crates/input-reth/) / [**input-ethrex**](crates/input-ethrex/) / [**input-ziskethone**](crates/input-ziskethone/) | Per-client input generation (RPC data fetching), each depending only on its own guest crate and RPC deps |
+| [**guest-reth**](crates/clients/reth/guest/) | Core reth validation library: crypto, validation logic, input types |
+| [**guest-ethrex**](crates/clients/ethrex/guest/) | Core ethrex validation library: crypto, validation logic, input types |
+| [**input-core**](crates/common/input-core/) | Client-agnostic core: the `ExecutionClient` trait, `RpcConfig`, `BlockStats`, and native hints generation |
+| [**input-reth**](crates/clients/reth/input/) / [**input-ethrex**](crates/clients/ethrex/input/) / [**input-ziskethone**](crates/clients/ziskethone/input/) | Per-client input generation (RPC data fetching), each depending only on its own guest crate and RPC deps |
 | [**input**](crates/input/) | Thin aggregator over `input-core` + the per-client crates; re-exports the `Client` enum and `create_client()`, feature-gated per client (`reth`/`ethrex`/`ziskethone`, all on by default) |
 
 ## Supported Chains
