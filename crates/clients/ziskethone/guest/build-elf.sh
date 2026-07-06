@@ -2,7 +2,7 @@
 # Build ziskethone's C++ ZisK guest ELF (cpp-guest/zisk).
 #
 # Usage:
-#   ./crates/guest-ziskethone/build-elf.sh [--clean] [--ziskethone=PATH]
+#   ./crates/clients/ziskethone/guest/build-elf.sh [--clean] [--ziskethone=PATH]
 #                                           [--toolchain-prefix=PATH]
 #
 # Output: <ziskethone>/cpp-guest/zisk/build/zisk_eth_guest.elf
@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Default matches build.rs: the third_party/ziskethone submodule.
 # ZISKETHONE_DIR overrides (e.g. a local working checkout of ziskethone).
-ZISKETHONE_DIR="${ZISKETHONE_DIR:-$(cd "$(dirname "$0")/../.." && pwd)/third_party/ziskethone}"
+ZISKETHONE_DIR="${ZISKETHONE_DIR:-$(cd "$(dirname "$0")/../../../.." && pwd)/third_party/ziskethone}"
 TOOLCHAIN_PREFIX="${ZISK_TOOLCHAIN_PREFIX:-$HOME/opt/xpack/xpack-riscv-none-elf-gcc-15.2.0-1/bin}"
 CLEAN=0
 

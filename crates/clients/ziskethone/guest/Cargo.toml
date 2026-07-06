@@ -12,7 +12,7 @@ edition.workspace = true
 # proving path) need no C++ toolchain. `input-ziskethone` enables it.
 native-ffi = []
 
-# Regenerate the committed guest ELF (crates/guest-ziskethone/elf/) from the
+# Regenerate the committed guest ELF (crates/clients/ziskethone/guest/elf/) from the
 # ziskethone C++ sources. OFF by default: normal builds embed the checked-in ELF
 # and need no ziskethone submodule and no xPack RISC-V toolchain. Turn it on only
 # when you've changed the C++ guest and want to rebuild + re-commit the ELF.
