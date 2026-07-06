@@ -4,8 +4,18 @@ description = "ZisK Ethereum Client Host"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+# Enables the ziskethone input-gen client path (native C++ `run()` FFI). Off by
+# default so `cargo build`/proving needs no ziskethone C++ toolchain — the guest
+# ELF is embedded from the committed file regardless. Opt in for input-gen.
+ziskethone = ["input/ziskethone"]
+
 [dependencies]
-input = { workspace = true, features = ["cli"] }
+# Not `workspace = true`: Cargo doesn't allow a member to override
+# `default-features` on an inherited workspace dependency, and this crate needs
+# `default-features = false` to make `ziskethone` (below) an actual toggle
+# rather than a no-op against input's own defaults.
+input = { path = "../../crates/input", default-features = false, features = ["cli", "reth", "ethrex"] }
 guest-ziskethone.workspace = true
 zisk-sdk.workspace = true
 ziskos.workspace = true

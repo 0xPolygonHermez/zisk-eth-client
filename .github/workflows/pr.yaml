@@ -210,12 +210,16 @@ jobs:
       - name: Install C++ guest cross-toolchain
         uses: ./.github/actions/cpp-guest-toolchain
 
+      # `--features ziskethone` compiles the ziskethone client into host so the
+      # execute loop can run `--client ziskethone`; without it, host's default
+      # build omits that client and clap rejects the value. (The C++ toolchain it
+      # needs is installed above.)
       - name: Build host
         run: |
           if [ "${{ matrix.mode }}" = "hints" ]; then
-            RUSTFLAGS="--cfg zisk_hints" cargo build --locked --release -p host
+            RUSTFLAGS="--cfg zisk_hints" cargo build --locked --release -p host --features ziskethone
           else
-            cargo build --locked --release -p host
+            cargo build --locked --release -p host --features ziskethone
           fi
 
       # emulator runs standard only (hints requires the assembly executor).
@@ -281,8 +285,10 @@ jobs:
       - name: Install C++ guest cross-toolchain
         uses: ./.github/actions/cpp-guest-toolchain
 
+      # `--features ziskethone` so the verify-constraints loop can run
+      # `--client ziskethone` (C++ toolchain installed above).
       - name: Build host
-        run: cargo build --locked --release -p host
+        run: cargo build --locked --release -p host --features ziskethone
 
       - name: Verify constraints (emulator)
         run: |

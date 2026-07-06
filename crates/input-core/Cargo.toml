@@ -1,0 +1,19 @@
+[package]
+name = "input-core"
+description = ""
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+zisk-sdk.workspace = true
+ziskos.workspace = true
+# `sync` for the oneshot::Sender ready-signal in generate_hints_to_socket.
+tokio = { workspace = true, features = ["sync"] }
+
+async-trait.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+rayon.workspace = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

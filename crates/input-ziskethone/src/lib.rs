@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use guest_common::chain::chain_name;
 use zisk_sdk::ZiskStdin;
 
-use super::client::{BlockStats, ExecutionClient, RpcConfig};
+use input_core::{BlockStats, ExecutionClient, RpcConfig};
 
 /// Default ancestor depth for the PreviousBlocks section. The EVM BLOCKHASH
 /// opcode reaches back 256, matching `rust-input-gen`'s CLI default.
