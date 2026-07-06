@@ -13,15 +13,13 @@ input-ziskethone = { workspace = true, optional = true }
 clap = { workspace = true, optional = true }
 
 [features]
-default = ["reth", "ethrex", "ziskethone"]
+default = ["reth", "ethrex"]
 cli = ["dep:clap"]
 reth = ["dep:input-reth"]
 ethrex = ["dep:input-ethrex"]
 # Pulls in the ziskethone client. Like `reth`/`ethrex`, it just enables the
 # per-client crate — but `input-ziskethone` transitively builds guest-ziskethone's
-# native C++ FFI (needs clang >= 15 / g++ >= 12 and the submodule), so consumers
-# that want to avoid that toolchain build with `--no-default-features` and omit
-# `ziskethone` (keeping `reth`/`ethrex`).
+# native C++ FFI (needs clang >= 15 / g++ >= 12 and the submodule).
 ziskethone = ["dep:input-ziskethone"]
 
 [lints.rust]
