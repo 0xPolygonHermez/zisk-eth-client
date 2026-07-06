@@ -13,13 +13,22 @@ input-ziskethone = { workspace = true, optional = true }
 clap = { workspace = true, optional = true }
 
 [features]
-default = ["reth", "ethrex"]
+# Only `reth` is on by default — the primary client — so `input` stays lean for
+# consumers that just want reth. Enable `ethrex` / `ziskethone` explicitly (e.g.
+# `host` lists reth+ethrex; opt into ziskethone with `--features ziskethone`).
+#
+# `ziskethone` is kept out of the default because it transitively builds
+# guest-ziskethone's native C++ FFI (clang >= 15 / g++ >= 12 + the submodule), so
+# a default build stays toolchain-free. It also avoids a feature-unification
+# trap: were it default-on, `--workspace` would enable the `Client::ZiskEthOne`
+# variant workspace-wide while a consumer like `host` (ziskethone off) leaves its
+# match arm `#[cfg]`-gated out — a non-exhaustive match. Each client's enum
+# variant / re-export is feature-gated, so a consumer's `create_client` arms must
+# match exactly the features it enables.
+default = ["reth"]
 cli = ["dep:clap"]
 reth = ["dep:input-reth"]
 ethrex = ["dep:input-ethrex"]
-# Pulls in the ziskethone client. Like `reth`/`ethrex`, it just enables the
-# per-client crate — but `input-ziskethone` transitively builds guest-ziskethone's
-# native C++ FFI (needs clang >= 15 / g++ >= 12 and the submodule).
 ziskethone = ["dep:input-ziskethone"]
 
 [lints.rust]
