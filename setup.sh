@@ -22,7 +22,7 @@ echo "==> Initializing git submodules"
 git submodule update --init --recursive
 
 # --- 2. xPack RISC-V toolchain ----------------------------------------------
-# Version + install dir MUST match crates/guest-ziskethone/build.rs
+# Version + install dir MUST match crates/clients/ziskethone/guest/build.rs
 # (has_riscv_toolchain / the default ZISK_TOOLCHAIN_PREFIX).
 XPACK_VERSION="15.2.0-1"
 XPACK_DIR="$HOME/opt/xpack/xpack-riscv-none-elf-gcc-${XPACK_VERSION}"

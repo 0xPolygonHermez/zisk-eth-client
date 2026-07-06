@@ -46,7 +46,7 @@ declare -A CLIENT_BLOCKS=(
 build_guest_elf() {
   local client="$1"
   if [[ "$client" == "ziskethone" ]]; then
-    local script="crates/guest-ziskethone/build-elf.sh"
+    local script="crates/clients/ziskethone/guest/build-elf.sh"
     [[ -f "$script" ]] || { echo "WARNING: $script not found (submodule absent?); skipping ziskethone" >&2; return 1; }
     bash "$script" >&2 || return 1
     # build-elf.sh writes to <ziskethone>/cpp-guest/zisk/build/zisk_eth_guest.elf;

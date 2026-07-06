@@ -26,7 +26,9 @@ use zisk_sdk::ZiskStdin;
 use guest_common::chain::chain_name;
 use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
 
-use input_core::{BlockStats, ExecutionClient, RpcConfig};
+pub use guest_reth as guest;
+pub use input_core::RpcConfig;
+use input_core::{BlockStats, ExecutionClient};
 
 #[derive(Default)]
 pub struct RethClient;

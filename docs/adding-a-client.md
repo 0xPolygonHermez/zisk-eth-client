@@ -12,13 +12,13 @@ host code (the second half) is identical either way.
 
 Use this when the guest is written in Rust (like `reth` and `ethrex`).
 
-1. **`crates/guest-geth/`** — the validation library. Start from
-   `crates/guest-ethrex/`: rename the crate in `Cargo.toml` and adapt the
+1. **`crates/clients/geth/guest/`** — the validation library. Start from
+   `crates/clients/ethrex/guest/`: rename the crate in `Cargo.toml` and adapt the
    validation logic. Expose a serializable input type (e.g. `GethInput`). Then
-   add it to `[workspace.dependencies]` in the root `Cargo.toml` (the `crates/*`
-   glob already makes it a workspace member):
+   add it to `[workspace.dependencies]` in the root `Cargo.toml` (the
+   `crates/clients/*/*` glob already makes it a workspace member):
    ```toml
-   guest-geth = { path = "crates/guest-geth" }
+   guest-geth = { path = "crates/clients/geth/guest" }
    ```
 2. **`bin/guests/stateless-validator-geth/`** — the zkVM binary (its own nested
    workspace). Start from `bin/guests/stateless-validator-ethrex/`, depend on
@@ -41,7 +41,7 @@ Pattern A), so the layout below is the convention to follow: a crate whose
 `build.rs` shells out to the external build (e.g. a `build-elf.sh`) and embeds
 the resulting ELF.
 
-1. **`crates/guest-geth/`** — a crate that builds and embeds the ELF. Its
+1. **`crates/clients/geth/guest/`** — a crate that builds and embeds the ELF. Its
    `build.rs` runs the external build; `src/lib.rs` exposes:
    ```rust
    pub const ELF: GuestProgram = load_program!("geth_guest");
@@ -50,7 +50,7 @@ the resulting ELF.
    It usually also re-exports a block-fetch helper for the input client. Add it
    to `[workspace.dependencies]` in the root `Cargo.toml`:
    ```toml
-   guest-geth = { path = "crates/guest-geth" }
+   guest-geth = { path = "crates/clients/geth/guest" }
    ```
    (No `bin/host/build.rs` change — this crate's own `build.rs` produces the ELF.)
 2. **`bin/host/Cargo.toml`** — depend on the crate, for the re-export below:
@@ -64,12 +64,13 @@ the resulting ELF.
 
 ## Host (fetches block data over RPC and wires up the CLI)
 
-Identical for both patterns. Each client lives in its own `input-<client>` crate
-(mirroring the `guest-*` split), depending on `input-core` for the
-`ExecutionClient` trait, `RpcConfig`, and `BlockStats`; the `input` crate is a
-thin, feature-gated aggregator that re-exports whichever clients are enabled.
+Identical for both patterns. Each client's guest and input crates live together
+under `crates/clients/<client>/{guest,input}`; the input crate depends on
+`input-core` for the `ExecutionClient` trait, `RpcConfig`, and `BlockStats`, and
+on its sibling guest crate. The `input` crate is a thin, feature-gated aggregator
+that re-exports whichever clients are enabled.
 
-1. **`crates/input-geth/`** (new crate) — `Cargo.toml` depends on
+1. **`crates/clients/geth/input/`** (new crate) — `Cargo.toml` depends on
    `input-core.workspace = true`, the guest crate (for its input type or fetch
    helper), and geth's own RPC deps:
    ```toml
@@ -91,9 +92,9 @@ thin, feature-gated aggregator that re-exports whichever clients are enabled.
      e.g. `guest_geth::fetch_block_and_witness`.)
    - `run()`.
 2. Root `Cargo.toml` `[workspace.dependencies]` — add the new crate (the
-   `crates/*` glob already makes it a workspace member):
+   `crates/clients/*/*` glob already makes it a workspace member):
    ```toml
-   input-geth = { path = "crates/input-geth" }
+   input-geth = { path = "crates/clients/geth/input" }
    ```
 3. **`crates/input/Cargo.toml`** — add it as an optional dependency and a new
    feature, then add that feature to `default`:
@@ -145,7 +146,7 @@ each spot.
 ```bash
 # 1. Build the guest ELF.
 #    Pattern A: cd bin/guests/stateless-validator-geth && cargo-zisk build --release
-#    Pattern B: run your client's own build (e.g. crates/guest-geth/build-elf.sh)
+#    Pattern B: run your client's own build (e.g. crates/clients/geth/guest/build-elf.sh)
 
 # 2. Generate input files from an RPC endpoint → geth-inputs/ (default <client>-inputs).
 cargo run --release --bin input-gen -- -c geth rpc -u <RPC_URL> -b <block>

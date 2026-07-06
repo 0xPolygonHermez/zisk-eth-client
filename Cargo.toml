@@ -1,5 +1,16 @@
 [workspace]
-members = ["bin/host", "bin/hints-gen", "bin/input-gen", "crates/*", "tests"]
+members = [
+    "bin/host",
+    "bin/hints-gen",
+    "bin/input-gen",
+    "crates/input",
+    "crates/common/*",
+    # Each client is a pair of crates: crates/clients/<client>/{guest,input}.
+    # The glob requires that two-level nesting — a crate placed directly at
+    # crates/clients/<client>/ is silently NOT a workspace member.
+    "crates/clients/*/*",
+    "tests",
+]
 exclude = ["tools/migrate-inputs", "third_party/ziskethone/rust-input-gen"]
 resolver = "2"
 
@@ -8,15 +19,15 @@ version = "0.10.0"
 edition = "2021"
 
 [workspace.dependencies]
-guest-common = { path = "crates/guest-common" }
-guest-ethrex = { path = "crates/guest-ethrex" }
-guest-reth = { path = "crates/guest-reth" }
-guest-ziskethone = { path = "crates/guest-ziskethone" }
+guest-common = { path = "crates/common/guest-common" }
+guest-ethrex = { path = "crates/clients/ethrex/guest" }
+guest-reth = { path = "crates/clients/reth/guest" }
+guest-ziskethone = { path = "crates/clients/ziskethone/guest" }
 input = { path = "crates/input" }
-input-core = { path = "crates/input-core" }
-input-ethrex = { path = "crates/input-ethrex" }
-input-reth = { path = "crates/input-reth" }
-input-ziskethone = { path = "crates/input-ziskethone" }
+input-core = { path = "crates/common/input-core" }
+input-ethrex = { path = "crates/clients/ethrex/input" }
+input-reth = { path = "crates/clients/reth/input" }
+input-ziskethone = { path = "crates/clients/ziskethone/input" }
 
 zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
 zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }

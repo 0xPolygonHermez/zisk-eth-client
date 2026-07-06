@@ -18,7 +18,7 @@ ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-de
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
 common = { path = "reth/common" }
-guest-reth = { path = "../../crates/guest-reth" }
+guest-reth = { path = "../../crates/clients/reth/guest" }
 
 revm = { version = "38.0.0", default-features = false }
 

@@ -37,7 +37,7 @@ crate provides:
 ## Regenerate the committed ELF
 ```bash
 cargo build -p guest-ziskethone --features rebuild-guest
-# then commit crates/guest-ziskethone/elf/zisk_eth_guest.elf
+# then commit crates/clients/ziskethone/guest/elf/zisk_eth_guest.elf
 ```
-`ZISKETHONE_DIR` (default `../../third_party/ziskethone`) overrides the source
+`ZISKETHONE_DIR` (default `../../../../third_party/ziskethone`) overrides the source
 checkout; `ZISK_TOOLCHAIN_PREFIX` points at the RISC-V toolchain's `bin/`.
