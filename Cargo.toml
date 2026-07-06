@@ -1,6 +1,6 @@
 [workspace]
 members = ["bin/host", "bin/hints-gen", "bin/input-gen", "crates/*", "tests"]
-exclude = ["tools/migrate-inputs"]
+exclude = ["tools/migrate-inputs", "third_party/ziskethone/rust-input-gen"]
 resolver = "2"
 
 [workspace.package]
@@ -13,6 +13,10 @@ guest-ethrex = { path = "crates/guest-ethrex" }
 guest-reth = { path = "crates/guest-reth" }
 guest-ziskethone = { path = "crates/guest-ziskethone" }
 input = { path = "crates/input" }
+input-core = { path = "crates/input-core" }
+input-ethrex = { path = "crates/input-ethrex" }
+input-reth = { path = "crates/input-reth" }
+input-ziskethone = { path = "crates/input-ziskethone" }
 
 zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
 zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }

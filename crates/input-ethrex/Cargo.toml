@@ -1,0 +1,23 @@
+[package]
+name = "input-ethrex"
+description = ""
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+input-core.workspace = true
+guest-common.workspace = true
+guest-ethrex.workspace = true
+zisk-sdk.workspace = true
+
+async-trait.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+url.workspace = true
+
+ethrex-config.workspace = true
+ethrex-common.workspace = true
+ethrex-rpc.workspace = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }
