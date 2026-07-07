@@ -29,9 +29,9 @@ input-ethrex = { path = "crates/clients/ethrex/input" }
 input-reth = { path = "crates/clients/reth/input" }
 input-ziskethone = { path = "crates/clients/ziskethone/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "predev-1.0.0-beta-crates-io" }
+zisk-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "predev-1.0.0-beta-crates-io" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "predev-1.0.0-beta-crates-io" }
 rust-input-gen = { path = "third_party/ziskethone/rust-input-gen" }
 
 # Local development
@@ -109,3 +109,9 @@ http = "1.4.0"
 tempfile = "3"
 rkyv = { version = "0.8.10", features = ["std", "unaligned"] }
 hex-literal = "0.4.1"
+
+# Mirror pil2-proofman's mpi patch: a dependency's [patch] is ignored when ZisK
+# is the workspace root, so replicate it here so `mpi` resolves to the same
+# rsmpi rev proofman expects (fixes the registry mpi 0.8.1 binding issues).
+[patch.crates-io]
+mpi = { git = "https://github.com/rsmpi/rsmpi", rev = "fa1dc36cb9918fa4dc3a9626bc18c523d2b280a6" }
