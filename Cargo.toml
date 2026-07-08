@@ -4,6 +4,7 @@ members = [
     "bin/hints-gen",
     "bin/input-gen",
     "crates/input",
+    "crates/input-gen",
     "crates/common/*",
     # Each client is a pair of crates: crates/clients/<client>/{guest,input}.
     # The glob requires that two-level nesting — a crate placed directly at
