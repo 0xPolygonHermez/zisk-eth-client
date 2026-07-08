@@ -4246,21 +4246,14 @@ dependencies = [
 name = "host"
 version = "0.1.0"
 dependencies = [
- "alloy-provider",
  "anyhow",
- "async-trait",
  "clap",
  "guest-ziskethone",
  "input",
- "rayon",
  "serde",
  "serde_json",
- "tempfile",
  "tokio",
- "tokio-util",
  "tracing",
- "walkdir",
- "witness-generator",
  "zisk-sdk",
  "ziskos",
 ]
@@ -4769,9 +4762,29 @@ version = "0.10.0"
 dependencies = [
  "anyhow",
  "clap",
- "host",
+ "input-gen-lib",
  "tokio",
  "tracing-subscriber 0.3.23",
+]
+
+[[package]]
+name = "input-gen-lib"
+version = "0.10.0"
+dependencies = [
+ "alloy-provider",
+ "anyhow",
+ "async-trait",
+ "clap",
+ "input",
+ "rayon",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "walkdir",
+ "witness-generator",
 ]
 
 [[package]]

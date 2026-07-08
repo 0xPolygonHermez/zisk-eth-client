@@ -7,8 +7,8 @@ mod common;
 mod processor;
 mod provider;
 
-use client::{Client, create_client};
-use provider::{InputProvider, eest::EestProvider, rpc::RpcProvider};
+use client::{create_client, Client};
+use provider::{eest::EestProvider, rpc::RpcProvider, InputProvider};
 
 #[derive(Args, Debug, Clone)]
 pub struct InputGenArgs {

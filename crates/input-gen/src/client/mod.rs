@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use witness_generator::StatelessValidationFixture;
 
-use crate::input_gen::provider::ProviderKind;
+use crate::provider::ProviderKind;
 
 mod ethrex;
 mod reth;
