@@ -10,7 +10,7 @@ use alloy_provider::{Provider, ProviderBuilder};
 use input::{RpcConfig, parse_header};
 
 use super::{InputProvider, ProviderKind};
-use crate::input_gen::{client::InputGenClient, processor::ProcessingTracker};
+use crate::{client::InputGenClient, processor::ProcessingTracker};
 
 #[derive(Debug, Clone, Args)]
 pub struct RpcProvider {

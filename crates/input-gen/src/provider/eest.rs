@@ -7,7 +7,7 @@ use tracing::info;
 use witness_generator::{FixtureGenerator, eest_generator::EESTFixtureGeneratorBuilder};
 
 use super::{InputProvider, ProviderKind};
-use crate::input_gen::{
+use crate::{
     client::InputGenClient, common::fixtures_from_path, processor::ProcessingTracker,
 };
 
