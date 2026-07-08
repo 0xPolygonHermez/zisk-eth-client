@@ -70,11 +70,11 @@ primitive-types = "0.13.1"
 ethereum-types = "0.15.1"
 
 # ethrex
-ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0" }
-ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0", default-features = false }
-ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0" }
-ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0", default-features = false }
-stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0", default-features = false, package = "ethrex-guest-program" }
+ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0" }
+ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false }
+ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0" }
+ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false }
+stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false, package = "ethrex-guest-program" }
 
 # eth-act
 witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "6786b2b9f002151e383e88cf2a693899ca73d169" }
