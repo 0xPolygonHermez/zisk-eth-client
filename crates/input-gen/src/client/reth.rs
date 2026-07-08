@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use witness_generator::StatelessValidationFixture;
 
-use super::{InputGenClient, sanitize_filename};
+use super::{sanitize_filename, InputGenClient};
 use crate::provider::ProviderKind;
 
 impl InputGenClient for input::RethClient {

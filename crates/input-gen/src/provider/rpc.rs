@@ -7,7 +7,7 @@ use tracing::info;
 
 use alloy_provider::{Provider, ProviderBuilder};
 
-use input::{RpcConfig, parse_header};
+use input::{parse_header, RpcConfig};
 
 use super::{InputProvider, ProviderKind};
 use crate::{client::InputGenClient, processor::ProcessingTracker};
