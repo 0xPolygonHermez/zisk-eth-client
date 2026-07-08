@@ -15,7 +15,7 @@ panic = "abort"
 [dependencies]
 guest-reth = { path = "../../../crates/guest-reth" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/recurser-1.0.0-beta-merge" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "predev-1.0.0-beta-crates-io" }
 # Local development
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 
