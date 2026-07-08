@@ -316,19 +316,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bls12_381"
-version = "0.8.0"
-source = "git+https://github.com/lambdaclass/bls12_381?branch=expose-affine-constructors#78cad0378b17fc3157b83f514be192bf46edf9a1"
-dependencies = [
- "digest",
- "ff",
- "group",
- "pairing",
- "rand_core 0.6.4",
- "subtle",
-]
-
-[[package]]
 name = "blst"
 version = "0.3.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -822,8 +809,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-common"
-version = "11.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v12.0.0#d1e0be1d7ed2b37fa61f26824f408780c3aeb194"
+version = "20.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
 dependencies = [
  "bytes",
  "crc32fast",
@@ -839,7 +826,6 @@ dependencies = [
  "libc",
  "lru",
  "once_cell",
- "rayon",
  "rkyv",
  "rustc-hash",
  "serde",
@@ -851,15 +837,13 @@ dependencies = [
 
 [[package]]
 name = "ethrex-crypto"
-version = "11.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v12.0.0#d1e0be1d7ed2b37fa61f26824f408780c3aeb194"
+version = "20.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
 dependencies = [
  "ark-bn254",
  "ark-ec",
  "ark-ff",
- "bls12_381",
  "ethereum-types",
- "ff",
  "hex-literal",
  "k256",
  "num-bigint",
@@ -872,8 +856,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-guest-program"
-version = "11.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v12.0.0#d1e0be1d7ed2b37fa61f26824f408780c3aeb194"
+version = "20.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -891,8 +875,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-l2-common"
-version = "11.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v12.0.0#d1e0be1d7ed2b37fa61f26824f408780c3aeb194"
+version = "20.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -909,8 +893,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-levm"
-version = "11.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v12.0.0#d1e0be1d7ed2b37fa61f26824f408780c3aeb194"
+version = "20.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
 dependencies = [
  "bytes",
  "derive_more",
@@ -918,7 +902,6 @@ dependencies = [
  "ethrex-crypto",
  "ethrex-rlp",
  "malachite",
- "rayon",
  "rustc-hash",
  "serde",
  "strum",
@@ -927,8 +910,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-rlp"
-version = "11.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v12.0.0#d1e0be1d7ed2b37fa61f26824f408780c3aeb194"
+version = "20.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -937,8 +920,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-trie"
-version = "11.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v12.0.0#d1e0be1d7ed2b37fa61f26824f408780c3aeb194"
+version = "20.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
 dependencies = [
  "anyhow",
  "bytes",
@@ -956,8 +939,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-vm"
-version = "11.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v12.0.0#d1e0be1d7ed2b37fa61f26824f408780c3aeb194"
+version = "20.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
 dependencies = [
  "bytes",
  "derive_more",
@@ -966,7 +949,6 @@ dependencies = [
  "ethrex-crypto",
  "ethrex-levm",
  "ethrex-rlp",
- "rayon",
  "rustc-hash",
  "serde",
  "thiserror",
@@ -979,7 +961,6 @@ version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c0b50bfb653653f9ca9095b427bed08ab8d75a137839d9ad64eb11810d5b6393"
 dependencies = [
- "bitvec",
  "rand_core 0.6.4",
  "subtle",
 ]
@@ -1685,15 +1666,6 @@ dependencies = [
  "elliptic-curve",
  "primeorder",
  "sha2",
-]
-
-[[package]]
-name = "pairing"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81fec4625e73cf41ef4bb6846cafa6d44736525f442ba45e407c4a000a13996f"
-dependencies = [
- "group",
 ]
 
 [[package]]

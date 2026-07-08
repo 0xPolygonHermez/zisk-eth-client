@@ -5,8 +5,9 @@ use async_trait::async_trait;
 use url::Url;
 use zisk_sdk::ZiskStdin;
 
-use ethrex_common::types::block_execution_witness::RpcExecutionWitness;
+use ethrex_common::types::block_execution_witness::{decode_witness_headers, RpcExecutionWitness};
 use ethrex_common::types::Block;
+use ethrex_common::NativeCrypto;
 use ethrex_config::networks::Network;
 use ethrex_rpc::types::{block::RpcBlock, block_identifier::BlockIdentifier};
 use ethrex_rpc::EthClient;
@@ -88,8 +89,12 @@ impl ExecutionClient for EthrexClient {
             gas_used: block.header.gas_used,
         };
 
+        // v20 pushes header decoding + crypto injection to the caller.
+        // Host-side runs natively, so use `NativeCrypto`.
+        let decoded_headers = decode_witness_headers(&rpc_witness.headers)
+            .map_err(|e| anyhow::anyhow!("Failed to decode witness headers: {e}"))?;
         let witness = rpc_witness
-            .into_execution_witness(chain_config, block_number)
+            .into_execution_witness(chain_config, block_number, &decoded_headers, &NativeCrypto)
             .map_err(|e| anyhow::anyhow!("Failed to convert execution witness: {e}"))?;
 
         let input = EthrexInput::new(block, witness);
