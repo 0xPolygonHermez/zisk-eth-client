@@ -30,9 +30,9 @@ input-ethrex = { path = "crates/clients/ethrex/input" }
 input-reth = { path = "crates/clients/reth/input" }
 input-ziskethone = { path = "crates/clients/ziskethone/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.0.0-beta" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.1.0-alpha" }
+zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.1.0-alpha" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.1.0-alpha" }
 rust-input-gen = { path = "third_party/ziskethone/rust-input-gen" }
 
 # Local development

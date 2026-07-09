@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 fn main() {
-    // The guest ELF is committed (crates/clients/ziskethone/guest/elf/) and embedded by
+    // The guest ELF is committed (bin/guests/stateless-validator-ziskethone/elf/) and embedded by
     // `load_program!` at compile time — build.rs does NOT touch it on a normal
     // build, so no xPack RISC-V toolchain is ever needed just to use `ELF`.
     // Regenerate it only on demand, when the C++ guest changed:
@@ -340,7 +340,8 @@ fn build_ffi() {
 }
 
 /// Rebuild the guest ELF from the C++ sources (xPack RISC-V toolchain) and copy
-/// it into the committed location `elf/zisk_eth_guest.elf`. Only runs under the
+/// it into the committed location
+/// `bin/guests/stateless-validator-ziskethone/elf/zisk_eth_guest.elf`. Only runs under the
 /// `rebuild-guest` feature; the result is meant to be committed. `load_program!`
 /// embeds the committed file directly, so a normal build never calls this.
 fn regenerate_committed_elf() {
@@ -351,7 +352,8 @@ fn regenerate_committed_elf() {
         .join("build")
         .join("zisk_eth_guest.elf");
     let script = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("build-elf.sh");
-    let committed_elf = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("elf/zisk_eth_guest.elf");
+    let committed_elf = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../../bin/guests/stateless-validator-ziskethone/elf/zisk_eth_guest.elf");
 
     // Rerun the regeneration when the C++ guest sources or the build driver
     // change, so an edited guest doesn't leave a stale committed ELF behind.
