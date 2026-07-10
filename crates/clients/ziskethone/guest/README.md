@@ -14,17 +14,20 @@ crate provides:
   ziskethone submodule.
 
 ## Features
-- `native-ffi` — build + link `libzeg_ffi.a` (evmone/blst) and expose `run()`.
-  Enabled transitively by `input-ziskethone` (which calls `run()`); consumers
-  that only embed `ELF` leave it off.
-- `rebuild-guest` — regenerate the committed `elf/zisk_eth_guest.elf` from the
-  C++ sources (needs the xPack RISC-V toolchain). On-demand only; commit the
-  result. Normal builds embed the checked-in ELF and never run this.
+- `native-ffi` — build + link `libzeg_ffi.a` (evmone/blst) and provide the FFI
+  `run()`. Off by default; `input-ziskethone` (and its `native-ffi`
+  passthrough, surfaced up the stack as `ziskethone-native-ffi`) opts in when
+  the native input checker is wanted. Consumers that only embed `ELF`, or only
+  need input generation, leave it off — no C++ toolchain. Without it, `run()` is
+  a stub that panics.
+- `ziskethone-rebuild-guest` — regenerate the committed `elf/zisk_eth_guest.elf`
+  from the C++ sources (needs the xPack RISC-V toolchain). On-demand only; commit
+  the result. Normal builds embed the checked-in ELF and never run this.
 
 ## Layout
 - `build.rs` — does nothing on a normal build (the ELF is embedded from the
   committed file). Two on-demand paths, each gated by its feature:
-  - `regenerate_committed_elf()` (`rebuild-guest`): runs `build-elf.sh` to
+  - `regenerate_committed_elf()` (`ziskethone-rebuild-guest`): runs `build-elf.sh` to
     cross-compile `cpp-guest/zisk` and copies the result over the committed
     `elf/zisk_eth_guest.elf`.
   - `build_ffi()` (`native-ffi`): builds the `cpp-guest` native static lib
@@ -36,7 +39,7 @@ crate provides:
 
 ## Regenerate the committed ELF
 ```bash
-cargo build -p guest-ziskethone --features rebuild-guest
+cargo build -p guest-ziskethone --features ziskethone-rebuild-guest
 # then commit crates/clients/ziskethone/guest/elf/zisk_eth_guest.elf
 ```
 `ZISKETHONE_DIR` (default `../../../../third_party/ziskethone`) overrides the source

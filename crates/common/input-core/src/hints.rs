@@ -64,6 +64,20 @@ fn run_with_hints(
     Ok((execution, t0.elapsed()))
 }
 
+/// Reject clients whose `run()` emits no hints before opening any sink, so we
+/// never produce an empty hints file. See [`ExecutionClient::emits_hints`].
+#[cfg(zisk_hints)]
+fn ensure_emits_hints(client: &dyn ExecutionClient) -> Result<()> {
+    if !client.emits_hints() {
+        anyhow::bail!(
+            "client '{}' does not emit hints; its run() is a native input checker, \
+             not an instrumented guest run. Refusing to generate an empty hints file.",
+            client.name()
+        );
+    }
+    Ok(())
+}
+
 /// Generate hints for one input and write them to `output_path` (batch / file sink).
 #[cfg(zisk_hints)]
 pub fn generate_hints_to_file(
@@ -71,6 +85,7 @@ pub fn generate_hints_to_file(
     output_path: PathBuf,
     client: &dyn ExecutionClient,
 ) -> Result<(Duration, Duration)> {
+    ensure_emits_hints(client)?;
     let (execution, total) = run_with_hints(
         stdin,
         client,
@@ -108,6 +123,7 @@ pub fn generate_hints_to_socket(
     ready: Option<tokio::sync::oneshot::Sender<()>>,
     client: &dyn ExecutionClient,
 ) -> Result<(Duration, Duration)> {
+    ensure_emits_hints(client)?;
     run_with_hints(
         stdin,
         client,

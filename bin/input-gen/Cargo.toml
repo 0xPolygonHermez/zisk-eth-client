@@ -13,6 +13,5 @@ tokio.workspace = true
 tracing-subscriber.workspace = true
 
 [features]
-# Opt into the ziskethone client (pulls the C++ FFI guest); mirrors how `host`
-# exposed it. Off by default so a plain `input-gen` build stays toolchain-free.
+# ziskethone client for input generation (no C++ toolchain).
 ziskethone = ["input-gen-lib/ziskethone"]

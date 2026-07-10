@@ -6,7 +6,7 @@
 //! requires the xPack RISC-V toolchain,
 //! but *consuming* it does not, so proving works with nothing installed. To
 //! regenerate the committed ELF after changing the C++ guest, build with the
-//! `rebuild-guest` feature (see build.rs).
+//! `ziskethone-rebuild-guest` feature (see build.rs).
 //!
 //! [`run`] executes ziskethone's C++ block validation natively, in-process, via
 //! the `zeg_run` FFI (zilkworm-style) — the same pipeline the ZisK ELF runs, but
@@ -48,3 +48,16 @@ mod ffi {
 
 #[cfg(feature = "native-ffi")]
 pub use ffi::run;
+
+/// Stub for builds without `native-ffi`: the C++ lib isn't compiled, so there's
+/// nothing to call. Lets consumers build without the C++ toolchain (input
+/// generation / client creation never call `run`); panics with a remedy rather
+/// than being a missing-symbol link error if actually invoked.
+#[cfg(not(feature = "native-ffi"))]
+pub fn run(_input: &[u8]) -> [u8; 32] {
+    panic!(
+        "ziskethone run() requires the `native-ffi` feature (the C++ EVM lib), \
+         which this build lacks. Rebuild with `--features native-ffi` \
+         (needs clang >= 15 / g++ >= 12) to run the native input checker."
+    );
+}

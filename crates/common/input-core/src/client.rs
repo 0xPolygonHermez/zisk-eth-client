@@ -74,4 +74,12 @@ pub trait ExecutionClient: Send + Sync {
     ) -> Result<(ZiskStdin, BlockStats)>;
 
     fn run(&self);
+
+    /// Whether [`run`](Self::run) emits ZisK hints. `true` for instrumented
+    /// guest runs (reth, ethrex); `false` for native-only clients like
+    /// `ziskethone` whose `run()` is a C++ input checker. The hints harness
+    /// rejects `false` clients rather than writing an empty hints file.
+    fn emits_hints(&self) -> bool {
+        true
+    }
 }
