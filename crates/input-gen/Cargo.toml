@@ -29,6 +29,6 @@ tracing.workspace = true
 walkdir.workspace = true
 
 [features]
-# Mirror `input`'s ziskethone opt-in: enabling it here turns on the
-# `Client::ZiskEthOne` variant + match arm, and pulls the C++ FFI guest.
+# ziskethone client for input generation (no C++). input-gen never calls the
+# native `run()`, so there's no `ziskethone-native-ffi` here.
 ziskethone = ["input/ziskethone"]

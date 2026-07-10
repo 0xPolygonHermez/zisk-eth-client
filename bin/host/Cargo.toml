@@ -5,10 +5,9 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-# Enables the ziskethone input-gen client path (native C++ `run()` FFI). Off by
-# default so `cargo build`/proving needs no ziskethone C++ toolchain — the guest
-# ELF is embedded from the committed file regardless. Opt in for input-gen.
-ziskethone = ["input/ziskethone"]
+# ziskethone client + its native `run()` FFI (host benchmarks/hint-gen call
+# run(), so it needs the C++ toolchain). Off by default; proving needs no C++.
+ziskethone = ["input/ziskethone", "input/ziskethone-native-ffi"]
 
 [dependencies]
 # Not `workspace = true`: Cargo doesn't allow a member to override

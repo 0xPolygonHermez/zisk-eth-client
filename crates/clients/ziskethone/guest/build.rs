@@ -1,11 +1,11 @@
 use std::path::PathBuf;
 
 fn main() {
-    // The guest ELF is committed (crates/clients/ziskethone/guest/elf/) and embedded by
+    // The guest ELF is committed (bin/guests/stateless-validator-ziskethone/elf/) and embedded by
     // `load_program!` at compile time — build.rs does NOT touch it on a normal
     // build, so no xPack RISC-V toolchain is ever needed just to use `ELF`.
     // Regenerate it only on demand, when the C++ guest changed:
-    if std::env::var_os("CARGO_FEATURE_REBUILD_GUEST").is_some() {
+    if std::env::var_os("CARGO_FEATURE_ZISKETHONE_REBUILD_GUEST").is_some() {
         ensure_submodule_initialized();
         regenerate_committed_elf();
     }
@@ -340,8 +340,9 @@ fn build_ffi() {
 }
 
 /// Rebuild the guest ELF from the C++ sources (xPack RISC-V toolchain) and copy
-/// it into the committed location `elf/zisk_eth_guest.elf`. Only runs under the
-/// `rebuild-guest` feature; the result is meant to be committed. `load_program!`
+/// it into the committed location
+/// `bin/guests/stateless-validator-ziskethone/elf/zisk_eth_guest.elf`. Only runs under the
+/// `ziskethone-rebuild-guest` feature; the result is meant to be committed. `load_program!`
 /// embeds the committed file directly, so a normal build never calls this.
 fn regenerate_committed_elf() {
     let ziskethone_dir = ziskethone_dir();
@@ -351,7 +352,8 @@ fn regenerate_committed_elf() {
         .join("build")
         .join("zisk_eth_guest.elf");
     let script = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("build-elf.sh");
-    let committed_elf = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("elf/zisk_eth_guest.elf");
+    let committed_elf = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../../bin/guests/stateless-validator-ziskethone/elf/zisk_eth_guest.elf");
 
     // Rerun the regeneration when the C++ guest sources or the build driver
     // change, so an edited guest doesn't leave a stale committed ELF behind.
@@ -381,7 +383,7 @@ fn regenerate_committed_elf() {
 
     if !has_riscv_toolchain() {
         panic!(
-            "rebuild-guest requested but no xPack RISC-V toolchain detected.\n\
+            "ziskethone-rebuild-guest requested but no xPack RISC-V toolchain detected.\n\
              Install xPack `riscv-none-elf-gcc` (15.2+) — default location\n\
              `~/opt/xpack/xpack-riscv-none-elf-gcc-15.2.0-1/bin` (or run ./setup.sh),\n\
              or point ZISK_TOOLCHAIN_PREFIX at its `bin/` dir — then rebuild."
