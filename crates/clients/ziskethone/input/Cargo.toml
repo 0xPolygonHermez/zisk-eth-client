@@ -4,13 +4,14 @@ description = ""
 version.workspace = true
 edition.workspace = true
 
+[features]
+# Off by default: builds the C++ FFI so `run()` works. Off → `run()` panics.
+native-ffi = ["guest-ziskethone/native-ffi"]
+
 [dependencies]
 input-core.workspace = true
 guest-common.workspace = true
-# `native-ffi`: this crate's `run()` calls guest-ziskethone's native FFI, so the
-# C++ lib must be built + linked. Pulls in the clang/cmake toolchain requirement
-# — which is why depending on `input-ziskethone` at all implies that toolchain.
-guest-ziskethone = { workspace = true, features = ["native-ffi"] }
+guest-ziskethone = { workspace = true }
 zisk-sdk.workspace = true
 ziskos.workspace = true
 

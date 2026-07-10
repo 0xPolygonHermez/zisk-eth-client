@@ -75,4 +75,11 @@ impl ExecutionClient for ZiskEthOneClient {
         let hex: String = block_hash.iter().map(|b| format!("{b:02x}")).collect();
         tracing::info!("ziskethone run complete; execution block hash: 0x{hex}");
     }
+
+    /// `run()` runs the C++ EVM over FFI as a native input checker; it does not
+    /// emit ZisK hints. The hints harness rejects this client rather than
+    /// writing an empty hints file.
+    fn emits_hints(&self) -> bool {
+        false
+    }
 }
