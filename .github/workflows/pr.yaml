@@ -20,7 +20,7 @@ env:
   RUST_BACKTRACE: 1
   # ZISK_REF is resolved by the ./.github/actions/zisk-ref action.
   PIL2_COMPILER_REF: v0.12.0
-  PIL2_PROOFMAN_REF: pre-develop-1.1.0-alpha
+  PIL2_PROOFMAN_REF: pre-develop-1.2.0-alpha
   # Clients exercised by the execute / verify-constraints loops. To add a client,
   # append it here and add its <CLIENT>_TEST_BLOCKS below.
   # `ziskethone` is a C++ (evmone) guest; the hints-mode execute loop skips it
