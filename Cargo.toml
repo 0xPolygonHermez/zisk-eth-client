@@ -12,7 +12,7 @@ members = [
     "crates/clients/*/*",
     "tests",
 ]
-exclude = ["tools/migrate-inputs", "third_party/ziskethone/rust-input-gen"]
+exclude = ["tools/migrate-inputs", "tools/reth-to-ziskethone", "third_party/ziskethone/rust-input-gen"]
 resolver = "2"
 
 [workspace.package]
@@ -30,9 +30,9 @@ input-ethrex = { path = "crates/clients/ethrex/input" }
 input-reth = { path = "crates/clients/reth/input" }
 input-ziskethone = { path = "crates/clients/ziskethone/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/b_over_zisk" }
-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/b_over_zisk" }
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feature/b_over_zisk" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.2.0-alpha" }
+zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.2.0-alpha" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.2.0-alpha" }
 rust-input-gen = { path = "third_party/ziskethone/rust-input-gen" }
 
 # Local development
