@@ -35,5 +35,10 @@ alloy-evm = { git = "https://github.com/0xPolygonHermez/zisk-patch-alloy-evm.git
 reth-trie-common = { git = "https://github.com/0xPolygonHermez/zisk-patch-reth.git", branch = "zisk-hints/v2.1.0" }
 # reth-trie-common = { path = "../../../zisk-patch-reth/crates/trie/common" }
 
+[patch.crates-io]
+# Route 256-bit MULMOD/ADDMOD through the ZisK `arith256_mod` accelerator.
+ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branch = "zisk-patch/v1.19.0" }
+# ruint = { path = "../../../zisk-patch-ruint" }
+
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }
