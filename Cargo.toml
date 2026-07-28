@@ -110,3 +110,11 @@ http = "1.4.0"
 tempfile = "3"
 rkyv = { version = "0.8.10", features = ["std", "unaligned"] }
 hex-literal = "0.4.1"
+
+# Route 256-bit MULMOD/ADDMOD through the ZisK arith256_mod accelerator.
+# Must match the same patch in bin/guests/stateless-validator-reth/Cargo.toml
+# so the native hints-gen/host builds emit the same accelerator hints the
+# guest ELF consumes (otherwise the prover's event and hint streams desync).
+[patch.crates-io]
+ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branch = "zisk-patch/v1.19.0" }
+# ruint = { path = "../zisk-patch-ruint" }
