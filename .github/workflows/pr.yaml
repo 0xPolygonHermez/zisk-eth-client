@@ -19,9 +19,6 @@ env:
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
   RUST_BACKTRACE: 1
   # ZISK_REF is resolved by the ./.github/actions/zisk-ref action.
-  PIL2_COMPILER_REF: develop-0.10.0
-  PIL2_PROOFMAN_REF: pre-develop-1.0.0-alpha
-  PIL2_PROOFMAN_JS_REF: pre-develop-0.19.0
   # Clients exercised by the execute / verify-constraints loops. To add a client,
   # append it here and add its <CLIENT>_TEST_BLOCKS below.
   CLIENTS: "reth ethrex"
@@ -132,10 +129,8 @@ jobs:
           DISABLE_RECURSIVE_SETUP: "1"
           ONLY_CPU: "1"
           USE_CACHE_SETUP: "1" # reuse a previously generated setup
+          INSTALL_SETUP: "1"
           ZISK_REPO_DIR: ${{ env.WS }}
-          PIL2_COMPILER_BRANCH: ${{ env.PIL2_COMPILER_REF }}
-          PIL2_PROOFMAN_BRANCH: ${{ env.PIL2_PROOFMAN_REF }}
-          PIL2_PROOFMAN_JS_BRANCH: ${{ env.PIL2_PROOFMAN_JS_REF }}
         # build_setup installs the key to $HOME/.zisk/provingKey.
         run: ./build_setup.sh
 
