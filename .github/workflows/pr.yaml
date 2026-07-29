@@ -128,7 +128,8 @@ jobs:
           DISABLE_ENV_CONFIRM: "1"
           DISABLE_RECURSIVE_SETUP: "1"
           ONLY_CPU: "1"
-          USE_CACHE_SETUP: "0" # reuse a previously generated setup
+          USE_CACHE_SETUP: "1" # reuse a previously generated setup
+          INSTALL_SETUP: "1"
           ZISK_REPO_DIR: ${{ env.WS }}
         # build_setup installs the key to $HOME/.zisk/provingKey.
         run: ./build_setup.sh
