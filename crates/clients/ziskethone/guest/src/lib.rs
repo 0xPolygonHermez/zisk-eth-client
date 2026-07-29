@@ -20,7 +20,7 @@ use zisk_sdk::{load_program, GuestProgram};
 /// (path relative to this crate's `CARGO_MANIFEST_DIR`). No RISC-V toolchain
 /// needed to use it.
 pub const ELF: GuestProgram = load_program!(
-    "zisk_eth_guest",
+    "zec-ziskethone",
     "../../../../bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf"
 );
 
