@@ -380,6 +380,23 @@ fn regenerate_committed_elf() {
             println!("cargo:rerun-if-changed={}", entry.path().display());
         }
     }
+    // The evmone patches live outside `zisk/` but change the compiled guest just
+    // as much as its own sources. Without these, a submodule bump touching only
+    // `patches/` leaves the crate clean and the committed ELF stale.
+    println!(
+        "cargo:rerun-if-changed={}",
+        cpp_guest.join("CMakeLists.txt").display()
+    );
+    println!(
+        "cargo:rerun-if-changed={}",
+        cpp_guest.join("patches").display()
+    );
+    // Watch our own output, so reverting or deleting the committed ELF (e.g. a
+    // `git checkout` of it) restores it on the next build. Without this, cargo has
+    // no idea the file it asked us to produce went away: none of the inputs above
+    // changed, so this script never re-runs and the reverted ELF survives no
+    // matter how many times you rebuild.
+    println!("cargo:rerun-if-changed={}", committed_elf.display());
 
     if !has_riscv_toolchain() {
         panic!(

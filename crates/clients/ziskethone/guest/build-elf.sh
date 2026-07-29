@@ -48,22 +48,16 @@ if [ "$CLEAN" = 1 ]; then
     rm -rf "$BUILD_DIR"
 fi
 
-# cpp-guest/zisk/CMakeLists.txt locates evmone sources and intx headers that
-# the host cmake build populates via FetchContent + Hunter.  Run a host cmake
-# configure-only pass (no build) into cpp-guest/build-stub when neither
-# cpp-guest/build nor cpp-guest/build-stub already contain the _deps tree.
+# The host cmake configure fetches evmone AND applies cpp-guest/patches/* to it.
+# Always re-run it: the patch list grows, so a warm _deps from an older revision
+# would silently build an ELF missing newer patches. Cheap — FetchContent caches
+# the download and the patch loop skips already-applied patches.
+#
+# Use our own build-stub rather than the developer's cpp-guest/build, and pin the
+# guest to it with -DEVMONE_SRC so the tree we patched is the tree we compile.
 HOST_DIR="$ZISKETHONE_DIR/cpp-guest"
-EVMONE_FOUND=0
-for _b in build build-stub build-debug; do
-    if [ -f "$HOST_DIR/$_b/_deps/evmone-src/lib/evmone/vm.cpp" ]; then
-        EVMONE_FOUND=1
-        break
-    fi
-done
-if [ "$EVMONE_FOUND" = 0 ]; then
-    echo "==> running host cmake configure to fetch evmone + intx (one-time, no build)"
-    cmake -S "$HOST_DIR" -B "$HOST_DIR/build-stub"
-fi
+echo "==> host cmake configure (fetch evmone, apply patches)"
+cmake -S "$HOST_DIR" -B "$HOST_DIR/build-stub"
 
 echo "==> configuring cmake"
 cmake \
@@ -71,6 +65,7 @@ cmake \
     -B "$BUILD_DIR" \
     -DCMAKE_TOOLCHAIN_FILE="$GUEST_DIR/toolchain.cmake" \
     -DCMAKE_BUILD_TYPE=Release \
+    -DEVMONE_SRC="$HOST_DIR/build-stub/_deps/evmone-src" \
     -G "Unix Makefiles"
 
 echo "==> building zisk_eth_guest.elf"
