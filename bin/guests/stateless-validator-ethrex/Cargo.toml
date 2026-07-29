@@ -15,7 +15,7 @@ panic = "abort"
 [dependencies]
 guest-ethrex = { path = "../../../crates/guest-ethrex" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "imp/disable-arith256mod-hint" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.2.0-alpha" }
 # Local development
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 

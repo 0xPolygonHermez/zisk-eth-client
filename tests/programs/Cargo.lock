@@ -784,7 +784,7 @@ dependencies = [
  "bitflags",
  "cexpr",
  "clang-sys",
- "itertools 0.10.5",
+ "itertools 0.13.0",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -1028,7 +1028,7 @@ dependencies = [
 [[package]]
 name = "circuit"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=imp%2Fdisable-arith256mod-hint#47365e8816285a7c73d695653d3e4de1e2c22d12"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#e79218ef59a1f25b371ace6ee144b99b6e52f60c"
 
 [[package]]
 name = "clang-sys"
@@ -2110,7 +2110,7 @@ checksum = "09edd9e8b54e49e587e4f6295a7d29c3ea94d469cb40ab8ca70b288248a81db2"
 [[package]]
 name = "lib-c"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=imp%2Fdisable-arith256mod-hint#47365e8816285a7c73d695653d3e4de1e2c22d12"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#e79218ef59a1f25b371ace6ee144b99b6e52f60c"
 
 [[package]]
 name = "libc"
@@ -2570,7 +2570,7 @@ dependencies = [
 [[package]]
 name = "precompiles-helpers"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=imp%2Fdisable-arith256mod-hint#47365e8816285a7c73d695653d3e4de1e2c22d12"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#e79218ef59a1f25b371ace6ee144b99b6e52f60c"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -4703,12 +4703,12 @@ dependencies = [
 [[package]]
 name = "zisk-definitions"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=imp%2Fdisable-arith256mod-hint#47365e8816285a7c73d695653d3e4de1e2c22d12"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#e79218ef59a1f25b371ace6ee144b99b6e52f60c"
 
 [[package]]
 name = "zisk-stream"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=imp%2Fdisable-arith256mod-hint#47365e8816285a7c73d695653d3e4de1e2c22d12"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#e79218ef59a1f25b371ace6ee144b99b6e52f60c"
 dependencies = [
  "libc",
  "thiserror",
@@ -4718,7 +4718,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=imp%2Fdisable-arith256mod-hint#47365e8816285a7c73d695653d3e4de1e2c22d12"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#e79218ef59a1f25b371ace6ee144b99b6e52f60c"
 dependencies = [
  "proofman-verifier",
 ]
@@ -4726,7 +4726,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=imp%2Fdisable-arith256mod-hint#47365e8816285a7c73d695653d3e4de1e2c22d12"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#e79218ef59a1f25b371ace6ee144b99b6e52f60c"
 dependencies = [
  "anyhow",
  "ark-bn254",
@@ -4766,7 +4766,7 @@ dependencies = [
 [[package]]
 name = "zkvm-interface"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=imp%2Fdisable-arith256mod-hint#47365e8816285a7c73d695653d3e4de1e2c22d12"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#e79218ef59a1f25b371ace6ee144b99b6e52f60c"
 dependencies = [
  "bindgen",
 ]
