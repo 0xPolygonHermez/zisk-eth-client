@@ -341,7 +341,7 @@ fn build_ffi() {
 
 /// Rebuild the guest ELF from the C++ sources (xPack RISC-V toolchain) and copy
 /// it into the committed location
-/// `bin/guests/stateless-validator-ziskethone/elf/zisk_eth_guest.elf`. Only runs under the
+/// `bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf`. Only runs under the
 /// `ziskethone-rebuild-guest` feature; the result is meant to be committed. `load_program!`
 /// embeds the committed file directly, so a normal build never calls this.
 fn regenerate_committed_elf() {
@@ -352,8 +352,11 @@ fn regenerate_committed_elf() {
         .join("build")
         .join("zisk_eth_guest.elf");
     let script = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("build-elf.sh");
+    // Renamed on copy: the CMake target inside the submodule is
+    // `zisk_eth_guest.elf`, but the committed artifact follows the sibling guests'
+    // convention (`zec-reth.elf`, `zec-ethrex.elf`).
     let committed_elf = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../../bin/guests/stateless-validator-ziskethone/elf/zisk_eth_guest.elf");
+        .join("../../../../bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf");
 
     // Rerun the regeneration when the C++ guest sources or the build driver
     // change, so an edited guest doesn't leave a stale committed ELF behind.
@@ -380,6 +383,23 @@ fn regenerate_committed_elf() {
             println!("cargo:rerun-if-changed={}", entry.path().display());
         }
     }
+    // The evmone patches live outside `zisk/` but change the compiled guest just
+    // as much as its own sources. Without these, a submodule bump touching only
+    // `patches/` leaves the crate clean and the committed ELF stale.
+    println!(
+        "cargo:rerun-if-changed={}",
+        cpp_guest.join("CMakeLists.txt").display()
+    );
+    println!(
+        "cargo:rerun-if-changed={}",
+        cpp_guest.join("patches").display()
+    );
+    // Watch our own output, so reverting or deleting the committed ELF (e.g. a
+    // `git checkout` of it) restores it on the next build. Without this, cargo has
+    // no idea the file it asked us to produce went away: none of the inputs above
+    // changed, so this script never re-runs and the reverted ELF survives no
+    // matter how many times you rebuild.
+    println!("cargo:rerun-if-changed={}", committed_elf.display());
 
     if !has_riscv_toolchain() {
         panic!(
