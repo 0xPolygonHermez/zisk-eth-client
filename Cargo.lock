@@ -13335,14 +13335,11 @@ version = "0.10.0"
 dependencies = [
  "alloy-consensus",
  "alloy-eips 2.0.0",
- "alloy-genesis",
  "alloy-primitives",
  "alloy-provider",
  "alloy-rlp",
- "alloy-rpc-types-eth",
  "anyhow",
  "clap",
- "input-core",
  "input-reth",
  "reth-chainspec",
  "reth-ethereum-primitives",
@@ -13351,7 +13348,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber 0.3.23",
- "zisk-sdk",
 ]
 
 [[package]]

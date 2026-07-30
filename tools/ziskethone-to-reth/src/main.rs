@@ -71,46 +71,31 @@ async fn main() -> Result<()> {
         bail!("no .bin files found at {}", cli.input.display());
     }
 
-    // --check-only exercises the decode + trie rebuild + root check, which is
-    // everything that can actually go wrong in the reconstruction. The RPC leg
-    // only supplies header fields we cannot derive.
-    if cli.check_only {
-        let mut failures = 0usize;
-        for path in &inputs {
-            match check(path, cli.compare_reth.as_deref()) {
-                Ok(()) => {}
-                Err(e) => {
-                    failures += 1;
-                    warn!("err {}: {e:#}", path.display());
-                }
-            }
+    // `--check-only` is the same pipeline with the emit stage switched off, not
+    // a separate path: decode + rebuild + verify runs identically either way,
+    // and that is everything which can go wrong in the reconstruction. The RPC
+    // leg only supplies header fields the container cannot carry.
+    let emit = match (cli.rpc_url, cli.output_dir) {
+        _ if cli.check_only => None,
+        (Some(rpc_url), Some(output_dir)) => {
+            fs::create_dir_all(&output_dir)
+                .with_context(|| format!("creating output dir {}", output_dir.display()))?;
+            let provider = ProviderBuilder::new()
+                .connect(&rpc_url)
+                .await
+                .with_context(|| format!("connecting to RPC at {rpc_url}"))?;
+            Some((provider, output_dir))
         }
-        if failures > 0 {
-            bail!("{failures}/{} file(s) failed", inputs.len());
-        }
-        return Ok(());
-    }
-
-    let rpc_url = cli.rpc_url.expect("clap requires it unless --check-only");
-    let output_dir = cli
-        .output_dir
-        .expect("clap requires it unless --check-only");
-    fs::create_dir_all(&output_dir)
-        .with_context(|| format!("creating output dir {}", output_dir.display()))?;
-
-    let provider = ProviderBuilder::new()
-        .connect(&rpc_url)
-        .await
-        .with_context(|| format!("connecting to RPC at {rpc_url}"))?;
+        // Unreachable: clap enforces both unless --check-only.
+        _ => bail!("--rpc-url and --output-dir are required without --check-only"),
+    };
 
     let mut failures = 0usize;
     for path in &inputs {
-        match convert(&provider, path, &output_dir, &cli.chain).await {
-            Ok(out) => info!("ok  {} -> {}", path.display(), out.display()),
-            Err(e) => {
-                failures += 1;
-                warn!("err {}: {e:#}", path.display());
-            }
+        let result = process(path, cli.compare_reth.as_deref(), emit.as_ref(), &cli.chain).await;
+        if let Err(e) = result {
+            failures += 1;
+            warn!("err {}: {e:#}", path.display());
         }
     }
 
@@ -139,18 +124,15 @@ fn collect_inputs(path: &Path) -> Result<Vec<PathBuf>> {
 /// `bincode(RethInputWitness)`.
 fn reth_witness(path: &Path) -> Result<stateless_reth::ExecutionWitness> {
     let buf = fs::read(path).with_context(|| format!("reading {}", path.display()))?;
-    let read_slice = |cur: &mut usize| -> Result<Vec<u8>> {
-        let len =
-            u64::from_le_bytes(buf[*cur..*cur + 8].try_into().context("truncated slice")?) as usize;
-        *cur += 8;
-        let v = buf[*cur..*cur + len].to_vec();
-        *cur += len + (8 - ((8 + len) % 8)) % 8;
-        Ok(v)
-    };
-    let mut cur = 0usize;
-    let _public = read_slice(&mut cur)?;
-    let witness_bytes = read_slice(&mut cur)?;
-    Ok(input_reth::guest::RethInputWitness::deserialize(&witness_bytes)?.witness)
+    let slices = zeg0::reader::zisk_slices(&buf)?;
+    let witness_bytes = slices.get(1).with_context(|| {
+        format!(
+            "{} has {} slice(s), expected 2",
+            path.display(),
+            slices.len()
+        )
+    })?;
+    Ok(input_reth::guest::RethInputWitness::deserialize(witness_bytes)?.witness)
 }
 
 /// Every node we rebuilt must be present in the reference witness. The converse
@@ -199,19 +181,24 @@ fn reference_for(path: &Path, block: u64) -> Result<PathBuf> {
         .ok_or_else(|| anyhow!("no reth input for block {block} under {}", path.display()))
 }
 
-/// Decode + rebuild + verify, without RPC or output.
-fn check(in_path: &Path, compare_reth: Option<&Path>) -> Result<()> {
+/// Decode, rebuild the pre-state trie, and verify it against the anchor the
+/// container carries — then, if `emit` is set, fetch the header and write the
+/// reth input. The verify step is unconditional: a reconstruction that does not
+/// hash back to the parent state root never reaches the emit stage.
+async fn process<P: Provider>(
+    in_path: &Path,
+    compare_reth: Option<&Path>,
+    emit: Option<&(P, PathBuf)>,
+    chain: &str,
+) -> Result<()> {
     let bytes = fs::read(in_path).with_context(|| format!("reading {}", in_path.display()))?;
     let zeg = zeg0::parse(&bytes).context("parsing the ZEG0 container")?;
+    let block = zeg.consensus.number;
+
     let rebuilt = zeg0::rebuild(&zeg.trie_stream).context("rebuilding the pre-state trie")?;
     zeg0::check_root(&rebuilt, zeg.consensus.parent_state_root)?;
-    if let Some(dir) = compare_reth {
-        let reference = reference_for(dir, zeg.consensus.number)?;
-        compare(&rebuilt, &reference, zeg.consensus.number)?;
-    }
     info!(
-        "ok  block {} — {} txs, {} codes, {} ancestors, {} trie nodes, {} preimages, root {}",
-        zeg.consensus.number,
+        "block {block} — {} txs, {} codes, {} ancestors, {} trie nodes, {} preimages, root {} verified",
         zeg.transactions.len(),
         zeg.codes.len(),
         zeg.prev_blocks.len(),
@@ -219,54 +206,33 @@ fn check(in_path: &Path, compare_reth: Option<&Path>) -> Result<()> {
         rebuilt.keys.len(),
         rebuilt.root
     );
-    Ok(())
-}
 
-async fn convert<P: Provider>(
-    provider: &P,
-    in_path: &Path,
-    out_dir: &Path,
-    chain: &str,
-) -> Result<PathBuf> {
-    let bytes = fs::read(in_path).with_context(|| format!("reading {}", in_path.display()))?;
+    if let Some(dir) = compare_reth {
+        compare(&rebuilt, &reference_for(dir, block)?, block)?;
+    }
 
-    // Everything except the block's execution outputs comes from the file.
-    let zeg = zeg0::parse(&bytes).context("parsing the ZEG0 container")?;
-    let block_number = zeg.consensus.number;
+    let Some((provider, out_dir)) = emit else {
+        return Ok(());
+    };
 
-    // Rebuild the pre-state trie and refuse to continue unless it hashes back to
-    // the anchor the container carries. This is the gate that makes the whole
-    // approach trustworthy rather than best-effort.
-    let rebuilt = zeg0::rebuild(&zeg.trie_stream).context("rebuilding the pre-state trie")?;
-    zeg0::check_root(&rebuilt, zeg.consensus.parent_state_root)?;
-    info!(
-        "block {block_number}: rebuilt {} trie nodes, {} preimages, root {} verified",
-        rebuilt.state.len(),
-        rebuilt.keys.len(),
-        rebuilt.root
-    );
-
-    let header = fetch_header(provider, block_number).await?;
-    let gas_used = header.gas_used;
-    let tx_count = zeg.transactions.len();
-
-    let stateless = assemble::build_stateless_input(&zeg, header, rebuilt.state, rebuilt.keys)?;
-    let stdin = RethClient
-        .from_stateless_input(&stateless)
-        .context("building the reth ZiskStdin")?;
-
-    let filename = format!(
+    let header = fetch_header(provider, block).await?;
+    let out_path = out_dir.join(format!(
         "{}_{}_{}_{}_zec_reth.bin",
         chain.to_lowercase(),
-        block_number,
-        tx_count,
-        gas_used / 1_000_000,
-    );
-    let out_path = out_dir.join(filename);
-    stdin
+        block,
+        zeg.transactions.len(),
+        header.gas_used / 1_000_000,
+    ));
+
+    let stateless = assemble::build_stateless_input(&zeg, header, rebuilt.state, rebuilt.keys)?;
+    RethClient
+        .from_stateless_input(&stateless)
+        .context("building the reth ZiskStdin")?
         .save(&out_path)
         .with_context(|| format!("writing {}", out_path.display()))?;
-    Ok(out_path)
+
+    info!("ok  {} -> {}", in_path.display(), out_path.display());
+    Ok(())
 }
 
 /// Fetch just the header. Deliberately not `debug_executionWitness` — that is
