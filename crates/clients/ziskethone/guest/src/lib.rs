@@ -16,12 +16,12 @@
 use zisk_sdk::{load_program, GuestProgram};
 
 /// The committed guest ELF, embedded (and hashed) at compile time from the
-/// checked-in `bin/guests/stateless-validator-ziskethone/elf/zisk_eth_guest.elf`
+/// checked-in `bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf`
 /// (path relative to this crate's `CARGO_MANIFEST_DIR`). No RISC-V toolchain
 /// needed to use it.
 pub const ELF: GuestProgram = load_program!(
-    "zisk_eth_guest",
-    "../../../../bin/guests/stateless-validator-ziskethone/elf/zisk_eth_guest.elf"
+    "zec-ziskethone",
+    "../../../../bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf"
 );
 
 /// Native `zeg_run` FFI ([`run`]). Gated on `native-ffi`: `build.rs` builds the

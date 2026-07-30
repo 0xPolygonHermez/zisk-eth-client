@@ -6,7 +6,8 @@ Pattern B (externally-built ELF) per `docs/adding-a-client.md`. Like
 `guest-zilkworm`, ziskethone exposes a native FFI run path (`zeg_run`), so this
 crate provides:
 - `ELF` — the prebuilt guest ELF the prover runs. Committed at
-  `elf/zisk_eth_guest.elf` and embedded at compile time, so a normal build needs
+  `bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf` and embedded at
+  compile time, so a normal build needs
   no C++/RISC-V toolchain.
 - `run()` — the C++ EVM executed in-process on the host via FFI, used for fast
   input checking and **hint generation**. Behind the `native-ffi` feature (off by
@@ -20,7 +21,7 @@ crate provides:
   the native input checker is wanted. Consumers that only embed `ELF`, or only
   need input generation, leave it off — no C++ toolchain. Without it, `run()` is
   a stub that panics.
-- `ziskethone-rebuild-guest` — regenerate the committed `elf/zisk_eth_guest.elf`
+- `ziskethone-rebuild-guest` — regenerate the committed `elf/zec-ziskethone.elf`
   from the C++ sources (needs the xPack RISC-V toolchain). On-demand only; commit
   the result. Normal builds embed the checked-in ELF and never run this.
 
@@ -29,7 +30,8 @@ crate provides:
   committed file). Two on-demand paths, each gated by its feature:
   - `regenerate_committed_elf()` (`ziskethone-rebuild-guest`): runs `build-elf.sh` to
     cross-compile `cpp-guest/zisk` and copies the result over the committed
-    `elf/zisk_eth_guest.elf`.
+    `elf/zec-ziskethone.elf` (renamed on copy: the CMake target is
+    `zisk_eth_guest.elf`).
   - `build_ffi()` (`native-ffi`): builds the `cpp-guest` native static lib
     (`libzeg_ffi.a`) plus its evmone/blst deps and links them so `run()` can
     call `zeg_run`. Preflights the C++ toolchain and reconciles a stale CMake
@@ -40,7 +42,7 @@ crate provides:
 ## Regenerate the committed ELF
 ```bash
 cargo build -p guest-ziskethone --features ziskethone-rebuild-guest
-# then commit crates/clients/ziskethone/guest/elf/zisk_eth_guest.elf
+# then commit bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf
 ```
 `ZISKETHONE_DIR` (default `../../../../third_party/ziskethone`) overrides the source
 checkout; `ZISK_TOOLCHAIN_PREFIX` points at the RISC-V toolchain's `bin/`.
