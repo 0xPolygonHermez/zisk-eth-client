@@ -7,7 +7,7 @@
 //! `sections::write_consensus_info`).
 
 use alloy_primitives::{Address, Bytes, B256, U256};
-use anyhow::{bail, ensure, Result};
+use anyhow::{bail, ensure, Context, Result};
 
 /// Format version this reader understands, mirroring `sections::FORMAT_VERSION`.
 pub const FORMAT_VERSION: u32 = 8;
@@ -152,24 +152,40 @@ pub struct Zeg0 {
     pub trie_stream: Vec<u8>,
 }
 
-/// A committed ziskethone input is a `ZiskStdin` container: one length-prefixed
-/// slice (u64-le length, payload, pad to 8) holding the ZEG0 bytes. Unwrap it,
-/// while still accepting a bare ZEG0 payload.
+/// Split a `ZiskStdin` container into its length-prefixed slices: each is a
+/// u64-le length, the payload, then zero padding to the next 8-byte boundary.
+/// Used for both the ziskethone input (one slice) and a reth input (two).
+pub fn zisk_slices(buf: &[u8]) -> Result<Vec<&[u8]>> {
+    let mut out = Vec::new();
+    let mut cur = 0usize;
+    while cur < buf.len() {
+        let end = cur + 8;
+        let hdr = buf
+            .get(cur..end)
+            .context("truncated ZiskStdin length prefix")?;
+        let len = u64::from_le_bytes(hdr.try_into().unwrap()) as usize;
+        let payload = buf.get(end..end + len).with_context(|| {
+            format!(
+                "ZiskStdin slice of {len} B overruns the {} B file",
+                buf.len()
+            )
+        })?;
+        out.push(payload);
+        cur = end + len + (8 - ((8 + len) % 8)) % 8;
+    }
+    Ok(out)
+}
+
+/// A committed ziskethone input is a `ZiskStdin` container holding the ZEG0
+/// bytes in its first slice. Also accepts a bare ZEG0 payload.
 fn unwrap_zisk_slice(buf: &[u8]) -> Result<&[u8]> {
     if buf.starts_with(b"ZEG0") {
         return Ok(buf);
     }
-    ensure!(
-        buf.len() >= 8,
-        "file is too short to be a ZiskStdin container"
-    );
-    let len = u64::from_le_bytes(buf[..8].try_into().unwrap()) as usize;
-    ensure!(
-        8 + len <= buf.len(),
-        "ZiskStdin slice length {len} overruns the {} B file",
-        buf.len()
-    );
-    Ok(&buf[8..8 + len])
+    zisk_slices(buf)?
+        .into_iter()
+        .next()
+        .context("ZiskStdin container has no slices")
 }
 
 pub fn parse(outer: &[u8]) -> Result<Zeg0> {

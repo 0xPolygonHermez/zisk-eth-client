@@ -10,17 +10,13 @@ edition.workspace = true
 
 [dependencies]
 input-reth.workspace = true
-input-core.workspace = true
 stateless-reth.workspace = true
-zisk-sdk.workspace = true
 
 alloy-consensus.workspace = true
 alloy-eips.workspace = true
-alloy-genesis.workspace = true
 alloy-primitives.workspace = true
 alloy-provider.workspace = true
 alloy-rlp.workspace = true
-alloy-rpc-types-eth.workspace = true
 
 reth-chainspec.workspace = true
 reth-ethereum-primitives.workspace = true
