@@ -11,6 +11,7 @@ members = [
     # crates/clients/<client>/ is silently NOT a workspace member.
     "crates/clients/*/*",
     "tests",
+    "tools/ziskethone-to-reth",
 ]
 exclude = ["tools/migrate-inputs", "third_party/ziskethone/rust-input-gen"]
 resolver = "2"
