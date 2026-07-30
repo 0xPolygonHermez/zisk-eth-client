@@ -13330,6 +13330,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "ziskethone-to-reth"
+version = "0.10.0"
+dependencies = [
+ "alloy-consensus",
+ "alloy-eips 2.0.0",
+ "alloy-genesis",
+ "alloy-primitives",
+ "alloy-provider",
+ "alloy-rlp",
+ "alloy-rpc-types-eth",
+ "anyhow",
+ "clap",
+ "input-core",
+ "input-reth",
+ "reth-chainspec",
+ "reth-ethereum-primitives",
+ "stateless",
+ "tiny-keccak",
+ "tokio",
+ "tracing",
+ "tracing-subscriber 0.3.23",
+ "zisk-sdk",
+]
+
+[[package]]
 name = "ziskos"
 version = "1.2.0-alpha"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#5469c7fcdaeeb2f18bf2fbb0503b0a4c2c3a8c37"
