@@ -69,14 +69,14 @@ pub struct Rebuilt {
     pub root: B256,
 }
 
-pub fn rebuild(stream: &[u8]) -> Result<Rebuilt> {
+pub fn rebuild(stream: &[u8], version: u32) -> Result<Rebuilt> {
     let mut c = Cursor::new(stream);
     let mut out = Rebuilt {
         state: Vec::new(),
         keys: Vec::new(),
         root: B256::ZERO,
     };
-    let node = parse_node(&mut c, TreeKind::State, &mut out)?;
+    let node = parse_node(&mut c, TreeKind::State, &mut out, version)?;
     let (rlp, reference) = encode(&node, &mut out.state);
 
     // A witness is a set of nodes keyed by hash; the same node RLP can be
@@ -96,7 +96,7 @@ pub fn rebuild(stream: &[u8]) -> Result<Rebuilt> {
     Ok(out)
 }
 
-fn parse_node(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt) -> Result<Node> {
+fn parse_node(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt, version: u32) -> Result<Node> {
     let op = c.u64_le()?;
     match op {
         OP_EMPTY => Ok(Node::Empty),
@@ -105,25 +105,44 @@ fn parse_node(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt) -> Result<N
             Ok(Node::Hash(h))
         }
         OP_EXTENSION_HASH => {
-            let path = read_nibbles(c)?;
+            let path = read_nibbles(c, version)?;
             let h: [u8; 32] = c.take(32)?.try_into().unwrap();
             Ok(Node::Extension {
                 path,
                 child: Box::new(Node::Hash(h)),
             })
         }
-        OP_LEAF => parse_leaf(c, kind, out),
+        OP_LEAF => parse_leaf(c, kind, out, version),
         OP_BRANCH => {
             let mut children = Vec::with_capacity(16);
-            for _ in 0..16 {
-                children.push(parse_node(c, kind, out)?);
+            if version >= 9 {
+                // One word tags all 16 slots, two bits each at bit 2k. An Empty
+                // child costs no bytes and a Hash child only its 32, because
+                // neither carries an opcode word; tag 2 is a complete node.
+                let tags = c.u64_le()?;
+                for k in 0..16u32 {
+                    let child = match (tags >> (2 * k)) & 0b11 {
+                        0 => Node::Empty,
+                        1 => Node::Hash(c.take(32)?.try_into().unwrap()),
+                        2 => parse_node(c, kind, out, version)?,
+                        other => bail!(
+                            "invalid v9 branch child tag {other} at nibble {k} \
+                             (expected 0=Empty, 1=Hash, 2=node)"
+                        ),
+                    };
+                    children.push(child);
+                }
+            } else {
+                for _ in 0..16 {
+                    children.push(parse_node(c, kind, out, version)?);
+                }
             }
             Ok(fold(Node::Branch(children)))
         }
         OP_PHANTOM_LEAF => {
             // A keyless sibling: no table row, but it still contributes its
             // hash, and its value arrives pre-encoded.
-            let path = read_nibbles(c)?;
+            let path = read_nibbles(c, version)?;
             let value = c.len_prefixed()?;
             Ok(Node::Leaf { path, value })
         }
@@ -131,8 +150,8 @@ fn parse_node(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt) -> Result<N
     }
 }
 
-fn parse_leaf(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt) -> Result<Node> {
-    let path = read_nibbles(c)?;
+fn parse_leaf(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt, version: u32) -> Result<Node> {
+    let path = read_nibbles(c, version)?;
     match kind {
         TreeKind::State => {
             let address = c.address()?;
@@ -142,7 +161,7 @@ fn parse_leaf(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt) -> Result<N
             let code_hash = c.b256()?;
 
             // The account's storage subtree follows inline as a recursive node.
-            let storage = parse_node(c, TreeKind::Storage, out)?;
+            let storage = parse_node(c, TreeKind::Storage, out, version)?;
             let (storage_rlp, storage_ref) = encode(&storage, &mut out.state);
             let storage_root = match storage_ref {
                 NodeRef::Empty => EMPTY_TRIE_ROOT,
@@ -175,12 +194,26 @@ fn parse_leaf(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt) -> Result<N
     }
 }
 
-/// `u64 count` followed by one nibble per `u64` word (low 4 bits used).
-fn read_nibbles(c: &mut Cursor<'_>) -> Result<Vec<u8>> {
+/// `u64 count` then the nibbles themselves.
+///
+/// v8 spends a whole `u64` word per nibble (low 4 bits used). v9 packs two per
+/// byte, high nibble first, then zero-pads to the next 8-byte boundary — the
+/// stream is 8-byte aligned on entry (the count is a `u64`), so aligning the
+/// absolute position is the same as padding the run.
+fn read_nibbles(c: &mut Cursor<'_>, version: u32) -> Result<Vec<u8>> {
     let n = c.u64_le()? as usize;
     let mut v = Vec::with_capacity(n);
-    for _ in 0..n {
-        v.push((c.u64_le()? & 0x0f) as u8);
+    if version >= 9 {
+        let packed = c.take(n.div_ceil(2))?;
+        for i in 0..n {
+            let byte = packed[i / 2];
+            v.push(if i % 2 == 0 { byte >> 4 } else { byte & 0x0f });
+        }
+        c.align8()?;
+    } else {
+        for _ in 0..n {
+            v.push((c.u64_le()? & 0x0f) as u8);
+        }
     }
     Ok(v)
 }
