@@ -1,0 +1,12 @@
+# cargo-fmt does not honour `[workspace] exclude`: it formats every package
+# whose manifest lives under the workspace root, which includes the path
+# dependency `ziskethone/rust-input-gen` — a submodule we do not own. That left
+# the submodule dirty and made `cargo fmt --all -- --check` fail on formatting
+# that is not ours to fix.
+#
+# rustfmt resolves config per input file by walking up from it, so this file
+# covers everything under third_party/ while leaving our own crates alone. It
+# lives outside the submodule, so it does not dirty it. (`ignore` in the root
+# rustfmt.toml is not an alternative — that key is nightly-only and stable
+# rustfmt refuses it with a warning, then formats anyway.)
+disable_all_formatting = true

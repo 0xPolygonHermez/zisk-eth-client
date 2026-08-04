@@ -195,7 +195,8 @@ async fn process<P: Provider>(
     let zeg = zeg0::parse(&bytes).context("parsing the ZEG0 container")?;
     let block = zeg.consensus.number;
 
-    let rebuilt = zeg0::rebuild(&zeg.trie_stream).context("rebuilding the pre-state trie")?;
+    let rebuilt =
+        zeg0::rebuild(&zeg.trie_stream, zeg.version).context("rebuilding the pre-state trie")?;
     zeg0::check_root(&rebuilt, zeg.consensus.parent_state_root)?;
     info!(
         "block {block} — {} txs, {} codes, {} ancestors, {} trie nodes, {} preimages, root {} verified",
