@@ -9,8 +9,13 @@
 use alloy_primitives::{Address, Bytes, B256, U256};
 use anyhow::{bail, ensure, Context, Result};
 
-/// Format version this reader understands, mirroring `sections::FORMAT_VERSION`.
-pub const FORMAT_VERSION: u32 = 8;
+/// Format versions this reader understands, mirroring `sections::FORMAT_VERSION`.
+///
+/// v9 changed only the StateRoot section (see `trie.rs`): branches tag their 16
+/// children in one word, and nibble runs pack two per byte. Every other section
+/// is byte-identical to v8, so the two versions share this reader and differ
+/// only inside the trie walk.
+pub const SUPPORTED_VERSIONS: &[u32] = &[8, 9];
 
 /// Byte length of the ConsensusInfo fixed prefix in v8.
 const CONSENSUS_PREFIX_LEN: usize = 368;
@@ -138,6 +143,9 @@ pub struct PrevBlock {
 
 /// Everything the transcoder needs out of a ZEG0 file.
 pub struct Zeg0 {
+    /// The container's format version (one of `SUPPORTED_VERSIONS`). The trie
+    /// walk needs it: v9 packs nibbles and tags branch children, v8 does not.
+    pub version: u32,
     pub consensus: ConsensusInfo,
     pub withdrawals: Vec<Withdrawal>,
     /// Canonical EIP-2718 wire envelopes, in block order.
@@ -199,8 +207,8 @@ pub fn parse(outer: &[u8]) -> Result<Zeg0> {
     }
     let version = c.u32_le()?;
     ensure!(
-        version == FORMAT_VERSION,
-        "unsupported ZEG0 version {version} (this tool understands v{FORMAT_VERSION})"
+        SUPPORTED_VERSIONS.contains(&version),
+        "unsupported ZEG0 version {version} (this tool understands {SUPPORTED_VERSIONS:?})"
     );
 
     // Section 1 — ConsensusInfo. Only two fields are load-bearing here; the
@@ -324,6 +332,7 @@ pub fn parse(outer: &[u8]) -> Result<Zeg0> {
     let trie_stream = c.take(c.remaining())?.to_vec();
 
     Ok(Zeg0 {
+        version,
         consensus: ConsensusInfo {
             parent_state_root,
             number,
