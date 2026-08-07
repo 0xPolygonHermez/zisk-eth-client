@@ -36,13 +36,17 @@ fn hints_pool() -> Result<&'static rayon::ThreadPool> {
 fn run_with_hints(
     stdin: &ZiskStdin,
     client: &dyn ExecutionClient,
-    init: impl FnOnce() -> Result<()>,
+    init: impl FnOnce() -> Result<()> + Send,
     deinit: impl FnOnce() -> Result<()>,
 ) -> Result<(Duration, Duration)> {
     ziskos::set_native_input(stdin.read_data());
-    init()?;
 
     let pool = hints_pool()?;
+
+    // init pins MAIN_TID to the current thread; under zisk_hints_single_thread
+    // every hint written from any other thread is silently dropped, so init must
+    // run on the same pool thread that runs the client below.
+    pool.install(|| init())?;
 
     let t0 = std::time::Instant::now();
     let run_result =
