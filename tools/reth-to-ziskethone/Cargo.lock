@@ -19,15 +19,14 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "alloy"
-version = "2.2.0"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bdf7932042b511ad4ad67f7eeac896df62439ac91a8c516d678b79cbe3f9c27"
+checksum = "85805c194576017df6c11057504e1d60b36f3913f8e365945486931f6ee81e40"
 dependencies = [
  "alloy-consensus",
  "alloy-contract",
  "alloy-core",
  "alloy-eips",
- "alloy-ens",
  "alloy-genesis",
  "alloy-network",
  "alloy-provider",
@@ -222,24 +221,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "alloy-ens"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88c3d803649b2023413a5b84892ed3874977dfa8b8d5481dea05488f20f6f4ef"
-dependencies = [
- "alloy-contract",
- "alloy-primitives",
- "alloy-provider",
- "alloy-sol-types",
- "async-trait",
- "thiserror 2.0.19",
-]
-
-[[package]]
 name = "alloy-genesis"
-version = "2.2.0"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a60fa6337a6af8bae818de3030448827bf55c1321c90c7d1f6f3b79257ead2a"
+checksum = "1e111e22c1a2133e9ebfd9051ea0eaf63559594d2f50d43cbc6762fbb95fc3c2"
 dependencies = [
  "alloy-eips",
  "alloy-primitives",
