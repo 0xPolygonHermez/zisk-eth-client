@@ -102,7 +102,17 @@ HOST_DIR="$ZISKETHONE_DIR/cpp-guest"
 #
 # So stamp the patch set itself and start clean whenever it moves.
 PATCH_STAMP="$HOST_DIR/build-stub/.zec-patch-stamp"
-PATCH_NOW="$(cat "$HOST_DIR"/patches/*.patch 2>/dev/null | sha256sum | cut -d' ' -f1)"
+# Collect the patches explicitly rather than globbing straight into cat: with
+# `set -o pipefail`, an unmatched glob makes cat fail, the whole assignment
+# fails, and the script exits 1 with no message at all because the 2>/dev/null
+# swallowed the only clue. An empty patches/ means something is badly wrong, so
+# say so instead of dying silently.
+shopt -s nullglob
+ZEG_PATCHES=("$HOST_DIR"/patches/*.patch)
+shopt -u nullglob
+[ ${#ZEG_PATCHES[@]} -gt 0 ] \
+    || { echo "no evmone patches found in $HOST_DIR/patches" >&2; exit 1; }
+PATCH_NOW="$(cat "${ZEG_PATCHES[@]}" | sha256sum | cut -d' ' -f1)"
 if [ -d "$HOST_DIR/build-stub" ] && \
    [ "$(cat "$PATCH_STAMP" 2>/dev/null)" != "$PATCH_NOW" ]; then
     echo "==> evmone patch set changed; removing $HOST_DIR/build-stub"
