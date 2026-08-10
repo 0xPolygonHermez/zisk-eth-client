@@ -143,7 +143,7 @@ cmake --build "$BUILD_DIR" --target zisk_eth_guest.elf -j"$(nproc)"
 
 # A stock build is not marker-free: the ziskos mem* thunks contain 2 markers of
 # their own, so "greater than zero" would pass a non-DMA ELF. Compiler lowering
-# emits them inline throughout — measured 7,784 against the thunks' 2 — so any
+# emits them inline throughout — measured 7,780 against the thunks' 2 — so any
 # threshold in between separates the two cleanly.
 markers=$(riscv-none-elf-objdump -d "$ELF_PATH" | grep -cE 'csrs[[:space:]]+0x813,' || true)
 if [ "$markers" -lt 100 ]; then
