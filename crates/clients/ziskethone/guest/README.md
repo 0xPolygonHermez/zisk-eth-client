@@ -46,3 +46,7 @@ cargo build -p guest-ziskethone --features ziskethone-rebuild-guest
 ```
 `ZISKETHONE_DIR` (default `../../../../third_party/ziskethone`) overrides the source
 checkout; `ZISK_TOOLCHAIN_PREFIX` points at the RISC-V toolchain's `bin/`.
+The ELF is always built with `-mzisk-dma`, which needs a patched GCC 14.3.0
+that `build-elf.sh` installs on demand into `~/.local/xPacks/zisk-dma-gcc-14.3.0`
+(about 10 minutes the first time, then instant). It reuses the xPack toolchain's
+C++ headers and binutils, which is why that is pinned to 14.3.0-1.
