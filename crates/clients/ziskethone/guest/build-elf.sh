@@ -143,8 +143,10 @@ cmake --build "$BUILD_DIR" --target zisk_eth_guest.elf -j"$(nproc)"
 
 # A stock build is not marker-free: the ziskos mem* thunks contain 2 markers of
 # their own, so "greater than zero" would pass a non-DMA ELF. Compiler lowering
-# emits them inline throughout — measured 7,780 against the thunks' 2 — so any
-# threshold in between separates the two cleanly.
+# emits them inline throughout — thousands of them, against the thunks' 2 — so
+# any threshold in between separates the two cleanly. The exact count tracks the
+# guest sources and the evmone patch set (7,780 without fused dispatch, 7,784
+# with), which is why the check is a threshold and not an expected value.
 markers=$(riscv-none-elf-objdump -d "$ELF_PATH" | grep -cE 'csrs[[:space:]]+0x813,' || true)
 if [ "$markers" -lt 100 ]; then
     echo "ERROR: only $markers DMA markers in $ELF_PATH; -mzisk-dma did not lower anything." >&2
