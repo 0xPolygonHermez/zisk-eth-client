@@ -7,8 +7,10 @@
 #      dependency (see Cargo.toml), so the root workspace won't even resolve
 #      until its files exist on disk.
 #   2. Installs the xPack RISC-V bare-metal GCC toolchain (riscv-none-elf-gcc)
-#      used to cross-compile the ziskethone C++ guest. The guest needs GCC 15.2+
-#      (it uses the `zicsr` ISA extension and C++20); distro packages are too old.
+#      used to cross-compile the ziskethone C++ guest. Distro packages are too
+#      old. The version is pinned to 14.3.0-1 because the patched GCC that
+#      provides -mzisk-dma (step 3) reuses this toolchain's C++ headers and
+#      binutils, and the versions have to match exactly.
 #
 # The zisk Rust toolchain (for the reth/ethrex Rust guests) is separate — install
 # it with `cargo-zisk toolchain install`; see the ZisK docs.
@@ -24,7 +26,7 @@ git submodule update --init --recursive
 # --- 2. xPack RISC-V toolchain ----------------------------------------------
 # Version + install dir MUST match crates/clients/ziskethone/guest/build.rs
 # (has_riscv_toolchain / the default ZISK_TOOLCHAIN_PREFIX).
-XPACK_VERSION="15.2.0-1"
+XPACK_VERSION="14.3.0-1"
 XPACK_DIR="$HOME/opt/xpack/xpack-riscv-none-elf-gcc-${XPACK_VERSION}"
 
 if [ -x "$XPACK_DIR/bin/riscv-none-elf-gcc" ]; then
@@ -46,6 +48,14 @@ else
   [ -x "$XPACK_DIR/bin/riscv-none-elf-gcc" ] \
     || { echo "ERROR: install completed but $XPACK_DIR/bin/riscv-none-elf-gcc is missing" >&2; exit 1; }
 fi
+
+# --- 3. Patched GCC for -mzisk-dma ------------------------------------------
+# The guest ELF is always built with -mzisk-dma, which the stock compiler does
+# not have. This builds it once (~10 min) from a pristine GCC 14.3.0 tarball
+# plus ziskethone's patch; re-runs detect it and return immediately.
+echo "==> Building the patched GCC for -mzisk-dma (first run takes ~10 min)"
+PATH="$XPACK_DIR/bin:$PATH" ZISK_XPACK_DIR="$XPACK_DIR" \
+  third_party/ziskethone/cpp-guest/patches/gcc/build-toolchain.sh
 
 echo
 echo "Setup complete. You can now build the guests, e.g.:"

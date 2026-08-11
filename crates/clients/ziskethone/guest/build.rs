@@ -404,8 +404,10 @@ fn regenerate_committed_elf() {
     if !has_riscv_toolchain() {
         panic!(
             "ziskethone-rebuild-guest requested but no xPack RISC-V toolchain detected.\n\
-             Install xPack `riscv-none-elf-gcc` (15.2+) — default location\n\
-             `~/opt/xpack/xpack-riscv-none-elf-gcc-15.2.0-1/bin` (or run ./setup.sh),\n\
+             Install xPack `riscv-none-elf-gcc` (14.3.0-1 exactly — must match the\n\
+             patched GCC 14.3.0 that borrows this toolchain's headers/binutils) —\n\
+             default location `~/opt/xpack/xpack-riscv-none-elf-gcc-14.3.0-1/bin`\n\
+             (or run ./setup.sh),\n\
              or point ZISK_TOOLCHAIN_PREFIX at its `bin/` dir — then rebuild."
         );
     }
@@ -449,7 +451,7 @@ fn has_riscv_toolchain() -> bool {
         .map(PathBuf::from)
         .unwrap_or_else(|_| {
             PathBuf::from(std::env::var("HOME").unwrap_or_default())
-                .join("opt/xpack/xpack-riscv-none-elf-gcc-15.2.0-1/bin")
+                .join("opt/xpack/xpack-riscv-none-elf-gcc-14.3.0-1/bin")
         });
     prefix.join("riscv-none-elf-gcc").exists()
 }
