@@ -61,6 +61,12 @@ jobs:
       - name: "Install C++ guest cross-toolchain"
         uses: ./.github/actions/cpp-guest-toolchain
 
+      # Must follow cpp-guest-toolchain — see that action's note on symlinks.
+      # This is the only workflow that rebuilds the guest ELF (zec_bench.sh);
+      # pr.yaml's jobs embed the committed ELF and never cross-compile.
+      - name: "Build the patched GCC for -mzisk-dma"
+        uses: ./.github/actions/zisk-dma-gcc
+
       - name: "Clone ZisK"
         uses: actions/checkout@v4
         with:

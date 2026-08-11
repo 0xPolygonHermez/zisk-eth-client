@@ -9,7 +9,7 @@ description: >
 inputs:
   xpack-version:
     description: xPack riscv-none-elf-gcc release (without leading v).
-    default: "15.2.0-1"
+    default: "14.3.0-1"
 
 runs:
   using: composite
@@ -26,8 +26,12 @@ runs:
           $SUDO apt-get update
           # binutils (objcopy) is needed by guest-ziskethone build.rs; g++ pulls
           # it in, but request it explicitly so the dependency is not implicit.
+          # g++-12 is for the patched-GCC build (.github/actions/zisk-dma-gcc):
+          # GCC 14's bundled libcody does not compile under a host g++ newer
+          # than ~14, so build-toolchain.sh needs a 13/12/11 to be present.
+          # g++-12 exists on both Ubuntu 22.04 and 24.04.
           $SUDO apt-get install -y --no-install-recommends \
-            cmake make git ca-certificates curl tar xz-utils g++ binutils
+            cmake make git ca-certificates curl tar xz-utils g++ binutils g++-12
         fi
 
     - name: Install xPack riscv-none-elf-gcc
