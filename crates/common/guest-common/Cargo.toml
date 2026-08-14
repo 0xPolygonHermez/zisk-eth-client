@@ -5,7 +5,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-zkvm-interface.workspace = true
+zisk-zkvm-interface.workspace = true
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = [
