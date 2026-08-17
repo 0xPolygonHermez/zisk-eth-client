@@ -1,7 +1,7 @@
 name: Resolve ZisK ref
 description: >
-  Export ZISK_REF to $GITHUB_ENV as the exact git SHA that the root Cargo.lock
-  pins for the zisk-sdk dependency.
+  Export ZISK_REF to $GITHUB_ENV as the git SHA of the 0xPolygonHermez/zisk
+  repo matching the zisk-sdk dependency pinned by the root Cargo.lock.
 
 runs:
   using: composite
@@ -9,14 +9,43 @@ runs:
     - name: Resolve ZISK_REF from Cargo.lock
       shell: bash
       run: |
-        ref="$(awk '
-          /^\[\[package\]\]/        { in_zisk = 0 }
-          /^name = "zisk-sdk"$/     { in_zisk = 1 }
-          in_zisk && /^source = /   { s = $0; sub(/.*#/, "", s); sub(/".*/, "", s); print s; exit }
+        # Grab the zisk-sdk [[package]] block from Cargo.lock.
+        block="$(awk '
+          /^\[\[package\]\]/      { in_zisk = 0 }
+          /^name = "zisk-sdk"$/   { in_zisk = 1 }
+          in_zisk                 { print }
         ' Cargo.lock)"
+        version="$(sed -n 's/^version = "\(.*\)"$/\1/p' <<<"$block")"
+        source="$(sed -n 's/^source = "\(.*\)"$/\1/p' <<<"$block")"
+
+        ref=""
+        case "$source" in
+          git+*)
+            # Git dependency: the lock pins the exact SHA after '#'.
+            ref="${source##*#}"
+            ;;
+          registry+*)
+            # crates.io dependency: map the crate version to a repo ref and
+            # resolve it to a SHA. Prefer the v<version> release tag; fall
+            # back to the pre-develop-<version> branch while the tag isn't
+            # published yet. The trailing ^{} pattern peels annotated tags to
+            # their commit SHA (that line sorts after the tag line, so take
+            # the last one); it matches nothing for lightweight tags/branches.
+            for candidate in "refs/tags/v$version" "refs/heads/pre-develop-$version"; do
+              ref="$(git ls-remote https://github.com/0xPolygonHermez/zisk \
+                       "$candidate" "$candidate^{}" | awk 'END { print $1 }')"
+              if [[ -n "$ref" ]]; then
+                echo "Matched zisk-sdk $version to $candidate"
+                break
+              fi
+            done
+            ;;
+        esac
+
         [[ "$ref" =~ ^[0-9a-f]{40}$ ]] || {
-          echo "ERROR: could not parse a 40-hex zisk-sdk git SHA from Cargo.lock (is zisk-sdk pinned as a git dependency?)"
+          echo "ERROR: could not resolve a ZisK repo SHA for zisk-sdk (version='$version', source='$source')."
+          echo "Expected a git-pinned zisk-sdk in Cargo.lock, or a v$version tag / pre-develop-$version branch on 0xPolygonHermez/zisk."
           exit 1
         }
         echo "ZISK_REF=$ref" >> "$GITHUB_ENV"
-        echo "Resolved ZISK_REF=$ref from Cargo.lock"
+        echo "Resolved ZISK_REF=$ref from Cargo.lock (zisk-sdk $version)"
