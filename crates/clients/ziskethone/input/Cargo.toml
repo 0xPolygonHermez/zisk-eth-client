@@ -1,0 +1,25 @@
+[package]
+name = "input-ziskethone"
+description = ""
+version.workspace = true
+edition.workspace = true
+
+[features]
+# Off by default: builds the C++ FFI so `run()` works. Off → `run()` panics.
+native-ffi = ["guest-ziskethone/native-ffi"]
+
+[dependencies]
+input-core.workspace = true
+guest-common.workspace = true
+guest-ziskethone = { workspace = true }
+zisk-sdk.workspace = true
+ziskos.workspace = true
+
+async-trait.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+
+rust-input-gen.workspace = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

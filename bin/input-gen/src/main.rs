@@ -2,7 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use tracing_subscriber::EnvFilter;
 
-use host::input_gen::{run, InputGenArgs};
+use input_gen::{run, InputGenArgs};
 
 #[derive(Parser, Debug)]
 #[command(version, about = "Generate ZisK inputs from RPC or EEST fixtures", long_about = None)]

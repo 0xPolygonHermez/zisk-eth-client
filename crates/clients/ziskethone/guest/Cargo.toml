@@ -1,0 +1,29 @@
+[package]
+name = "guest-ziskethone"
+description = "ziskethone C++ EVM integration"
+version.workspace = true
+edition.workspace = true
+
+[features]
+# Build + link the native `zeg_run` FFI (`run`) — the C++ evmone lib, needs
+# clang >= 15 / g++ >= 12 and the submodule. `run` is always present in source;
+# this feature only drives whether `build.rs` compiles the lib it links against.
+# OFF by default: consumers that only embed the committed `ELF` (e.g. the host
+# proving path) need no C++ toolchain. `input-ziskethone` enables it.
+native-ffi = []
+
+# Regenerate the committed guest ELF (bin/guests/stateless-validator-ziskethone/elf/) from the
+# ziskethone C++ sources. OFF by default: normal builds embed the checked-in ELF
+# and need no ziskethone submodule and no xPack RISC-V toolchain. Turn it on only
+# when you've changed the C++ guest and want to rebuild + re-commit the ELF.
+ziskethone-rebuild-guest = []
+
+[dependencies]
+zisk-sdk.workspace = true
+
+[build-dependencies]
+blake3 = "1.5"
+cmake = "0.1"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_skip_guest_build)'] }

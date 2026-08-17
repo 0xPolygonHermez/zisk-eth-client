@@ -13,9 +13,11 @@ codegen-units = 1
 panic = "abort"
 
 [dependencies]
-guest-ethrex = { path = "../../../crates/guest-ethrex" }
+guest-ethrex = { path = "../../../crates/clients/ethrex/guest" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag ="v1.0.0-alpha" }
+# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.1.0-alpha" }
+# crates.io dependencies
+ziskos = "1.1.0-alpha"
 # Local development
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 

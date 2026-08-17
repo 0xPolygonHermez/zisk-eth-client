@@ -1,13 +1,17 @@
 [package]
 name = "input-gen"
-description = "ZisK Ethereum Client - Input generator binary (thin wrapper around host::input_gen)"
+description = "ZisK Ethereum Client - Input generator binary (thin wrapper around input-gen-lib)"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
-host = { path = "../host" }
+input-gen-lib = { path = "../../crates/input-gen" }
 
 anyhow.workspace = true
 clap.workspace = true
 tokio.workspace = true
 tracing-subscriber.workspace = true
+
+[features]
+# ziskethone client for input generation (no C++ toolchain).
+ziskethone = ["input-gen-lib/ziskethone"]

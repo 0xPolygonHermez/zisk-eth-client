@@ -1,6 +1,19 @@
 [workspace]
-members = ["bin/host", "bin/hints-gen", "bin/input-gen", "crates/*", "tests"]
-exclude = ["tools/migrate-inputs"]
+members = [
+    "bin/host",
+    "bin/hints-gen",
+    "bin/input-gen",
+    "crates/input",
+    "crates/input-gen",
+    "crates/common/*",
+    # Each client is a pair of crates: crates/clients/<client>/{guest,input}.
+    # The glob requires that two-level nesting — a crate placed directly at
+    # crates/clients/<client>/ is silently NOT a workspace member.
+    "crates/clients/*/*",
+    "tests",
+    "tools/ziskethone-to-reth",
+]
+exclude = ["tools/migrate-inputs", "third_party/ziskethone/rust-input-gen"]
 resolver = "2"
 
 [workspace.package]
@@ -8,17 +21,29 @@ version = "0.10.0"
 edition = "2021"
 
 [workspace.dependencies]
-guest-common = { path = "crates/guest-common" }
-guest-ethrex = { path = "crates/guest-ethrex" }
-guest-reth = { path = "crates/guest-reth" }
+guest-common = { path = "crates/common/guest-common" }
+guest-ethrex = { path = "crates/clients/ethrex/guest" }
+guest-reth = { path = "crates/clients/reth/guest" }
+guest-ziskethone = { path = "crates/clients/ziskethone/guest" }
 input = { path = "crates/input" }
+input-core = { path = "crates/common/input-core" }
+input-ethrex = { path = "crates/clients/ethrex/input" }
+input-reth = { path = "crates/clients/reth/input" }
+input-ziskethone = { path = "crates/clients/ziskethone/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v1.0.0-alpha" }
-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v1.0.0-alpha" }
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v1.0.0-alpha" }
+# zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.1.0-alpha" }
+# zisk-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.1.0-alpha" }
+# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.1.0-alpha" }
+rust-input-gen = { path = "third_party/ziskethone/rust-input-gen" }
+
+# crates.io dependencies
+zisk-sdk = "1.1.0-alpha"
+zisk-zkvm-interface = "1.1.0-alpha"
+ziskos = "1.1.0-alpha"
+
 # Local development
 # zisk-sdk = { path = "../zisk/sdk" }
-# zkvm-interface = { path = "../zisk/zkvm-interface" }
+# zisk-zkvm-interface = { path = "../zisk/zkvm-interface" }
 # ziskos = { path = "../zisk/ziskos/entrypoint" }
 
 revm = { version = "38.0.0", default-features = false }
@@ -52,11 +77,11 @@ primitive-types = "0.13.1"
 ethereum-types = "0.15.1"
 
 # ethrex
-ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0" }
-ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0", default-features = false }
-ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0" }
-ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0", default-features = false }
-stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v12.0.0", default-features = false, package = "ethrex-guest-program" }
+ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0" }
+ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false }
+ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0" }
+ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false }
+stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false, package = "ethrex-guest-program" }
 
 # eth-act
 witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "6786b2b9f002151e383e88cf2a693899ca73d169" }
@@ -91,3 +116,11 @@ http = "1.4.0"
 tempfile = "3"
 rkyv = { version = "0.8.10", features = ["std", "unaligned"] }
 hex-literal = "0.4.1"
+
+# Route 256-bit MULMOD/ADDMOD through the ZisK arith256_mod accelerator.
+# Must match the same patch in bin/guests/stateless-validator-reth/Cargo.toml
+# so the native hints-gen/host builds emit the same accelerator hints the
+# guest ELF consumes (otherwise the prover's event and hint streams desync).
+[patch.crates-io]
+ruint = { git = "https://github.com/0xPolygonHermez/zisk-patch-ruint.git", branch = "zisk-patch/v1.19.0" }
+# ruint = { path = "../zisk-patch-ruint" }

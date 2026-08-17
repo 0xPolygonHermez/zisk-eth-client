@@ -4,26 +4,27 @@ description = "ZisK Ethereum Client Host"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+# ziskethone client + its native `run()` FFI (host benchmarks/hint-gen call
+# run(), so it needs the C++ toolchain). Off by default; proving needs no C++.
+ziskethone = ["input/ziskethone", "input/ziskethone-native-ffi"]
+
 [dependencies]
-input = { workspace = true, features = ["cli"] }
+# Not `workspace = true`: Cargo doesn't allow a member to override
+# `default-features` on an inherited workspace dependency, and this crate needs
+# `default-features = false` to make `ziskethone` (below) an actual toggle
+# rather than a no-op against input's own defaults.
+input = { path = "../../crates/input", default-features = false, features = ["cli", "reth", "ethrex"] }
+guest-ziskethone.workspace = true
 zisk-sdk.workspace = true
 ziskos.workspace = true
 
-alloy-provider.workspace = true
-
-witness-generator.workspace = true
-
 anyhow.workspace = true
-async-trait.workspace = true
 clap.workspace = true
-rayon.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
-tempfile.workspace = true
 tokio.workspace = true
-tokio-util = { workspace = true, features = ["rt"] }
 tracing.workspace = true
-walkdir.workspace = true
 
 [build-dependencies]
 zisk-sdk.workspace = true

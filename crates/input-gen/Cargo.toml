@@ -1,0 +1,34 @@
+[package]
+name = "input-gen-lib"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "input_gen"
+path = "src/lib.rs"
+
+[dependencies]
+# Not `workspace = true`: this crate needs `default-features = false` to make
+# `ziskethone` an opt-in toggle rather than a no-op against input's own defaults
+# (mirrors the `host` crate's rationale).
+input = { path = "../input", default-features = false, features = ["cli", "reth", "ethrex"] }
+
+alloy-provider.workspace = true
+witness-generator.workspace = true
+
+anyhow.workspace = true
+async-trait.workspace = true
+clap.workspace = true
+rayon.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+tempfile.workspace = true
+tokio.workspace = true
+tokio-util = { workspace = true, features = ["rt"] }
+tracing.workspace = true
+walkdir.workspace = true
+
+[features]
+# ziskethone client for input generation (no C++). input-gen never calls the
+# native `run()`, so there's no `ziskethone-native-ffi` here.
+ziskethone = ["input/ziskethone"]

@@ -5,39 +5,26 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-guest-common.workspace = true
-guest-reth.workspace = true
-guest-ethrex.workspace = true
-zisk-sdk.workspace = true
-ziskos.workspace = true
-# `sync` for the oneshot::Sender ready-signal in generate_hints_to_socket.
-tokio = { workspace = true, features = ["sync"] }
-
-ethrex-config.workspace = true
-ethrex-common.workspace = true
-ethrex-rpc.workspace = true
+input-core.workspace = true
+input-reth = { workspace = true, optional = true }
+input-ethrex = { workspace = true, optional = true }
+# No C++ by default; the native FFI is opt-in via `ziskethone-native-ffi`.
+input-ziskethone = { workspace = true, optional = true }
 
 clap = { workspace = true, optional = true }
-url = { workspace = true }
-
-async-trait.workspace = true
-anyhow.workspace = true
-tracing.workspace = true
-rayon.workspace = true
-
-alloy-genesis.workspace = true
-alloy-provider = { workspace = true, features = ["debug-api"] }
-alloy-rpc-client.workspace = true
-alloy-rpc-types-eth.workspace = true
-alloy-rpc-types-debug.workspace = true
-alloy-transport-http.workspace = true
-
-reth-chainspec.workspace = true
-
-stateless-reth.workspace = true
 
 [features]
+# Per-client features keep each `match Client` exhaustive: a consumer's enabled
+# variants and its `create_client` arms must line up. `reth` is the default;
+# `ethrex`/`ziskethone` are opt-in. None pulls C++ — that's `ziskethone-native-ffi`.
+default = ["reth"]
 cli = ["dep:clap"]
+reth = ["dep:input-reth"]
+ethrex = ["dep:input-ethrex"]
+ziskethone = ["dep:input-ziskethone"]
+# Native C++ `run()` FFI (clang >= 15 / g++ >= 12 + submodule). Implies
+# `ziskethone` so the client is actually selectable, not just built.
+ziskethone-native-ffi = ["ziskethone", "input-ziskethone/native-ffi"]
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

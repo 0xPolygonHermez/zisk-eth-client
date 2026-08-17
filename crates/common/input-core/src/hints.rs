@@ -1,0 +1,162 @@
+//! Native hint generation: run an [`ExecutionClient`] over a single input and
+//! capture the hints into a sink (a file for batch generation, or a Unix socket
+//! for streaming them to a live prover). Lives next to [`ExecutionClient`] so any
+//! consumer of the trait can generate hints without depending on the host crate.
+
+use std::path::PathBuf;
+use std::time::Duration;
+
+use anyhow::Result;
+use zisk_sdk::ZiskStdin;
+
+use crate::ExecutionClient;
+
+#[cfg(zisk_hints)]
+fn hints_pool() -> Result<&'static rayon::ThreadPool> {
+    use std::sync::OnceLock;
+    static POOL: OnceLock<rayon::ThreadPool> = OnceLock::new();
+
+    if let Some(pool) = POOL.get() {
+        return Ok(pool);
+    }
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .map_err(|e| anyhow::anyhow!("failed to build deterministic hints rayon pool: {e}"))?;
+    // If another thread won the race, our pool is dropped and we use the winner's.
+    let _ = POOL.set(pool);
+    Ok(POOL.get().expect("pool was just set"))
+}
+
+/// Shared core: feed `stdin` as the native input, run `client.run()` under
+/// `catch_unwind` with the sink opened by `init`, then tear it down with `deinit`.
+/// `deinit` always runs — even if the client panics — so the sink flushes and
+/// closes. Returns `(execution, total)` durations.
+#[cfg(zisk_hints)]
+fn run_with_hints(
+    stdin: &ZiskStdin,
+    client: &dyn ExecutionClient,
+    init: impl FnOnce() -> Result<()> + Send,
+    deinit: impl FnOnce() -> Result<()>,
+) -> Result<(Duration, Duration)> {
+    ziskos::set_native_input(stdin.read_data());
+
+    let pool = hints_pool()?;
+
+    // init pins MAIN_TID to the current thread; under zisk_hints_single_thread
+    // every hint written from any other thread is silently dropped, so init must
+    // run on the same pool thread that runs the client below.
+    pool.install(|| init())?;
+
+    let t0 = std::time::Instant::now();
+    let run_result =
+        pool.install(|| std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| client.run())));
+    let execution = t0.elapsed();
+
+    // Always tear down, then surface a run panic over a teardown error.
+    let deinit_result = deinit();
+    if let Err(e) = run_result {
+        let msg = e
+            .downcast_ref::<String>()
+            .map(|s| s.as_str())
+            .or_else(|| e.downcast_ref::<&str>().copied())
+            .unwrap_or("unknown panic");
+        return Err(anyhow::anyhow!("Block execution failed: {}", msg));
+    }
+    deinit_result?;
+
+    Ok((execution, t0.elapsed()))
+}
+
+/// Reject clients whose `run()` emits no hints before opening any sink, so we
+/// never produce an empty hints file. See [`ExecutionClient::emits_hints`].
+#[cfg(zisk_hints)]
+fn ensure_emits_hints(client: &dyn ExecutionClient) -> Result<()> {
+    if !client.emits_hints() {
+        anyhow::bail!(
+            "client '{}' does not emit hints; its run() is a native input checker, \
+             not an instrumented guest run. Refusing to generate an empty hints file.",
+            client.name()
+        );
+    }
+    Ok(())
+}
+
+/// Generate hints for one input and write them to `output_path` (batch / file sink).
+#[cfg(zisk_hints)]
+pub fn generate_hints_to_file(
+    stdin: &ZiskStdin,
+    output_path: PathBuf,
+    client: &dyn ExecutionClient,
+) -> Result<(Duration, Duration)> {
+    ensure_emits_hints(client)?;
+    let (execution, total) = run_with_hints(
+        stdin,
+        client,
+        || {
+            // SAFETY: single-threaded setup, before the run begins.
+            unsafe { std::env::set_var("ZISK_HINTS_OUTPUT", &output_path) };
+            ziskos::zkvm_init();
+            Ok(())
+        },
+        || {
+            ziskos::zkvm_deinit();
+            Ok(())
+        },
+    )?;
+    tracing::info!(
+        "Written hints to {} (execution: {:.2?}, total: {:.2?})",
+        output_path.display(),
+        execution,
+        total,
+    );
+    Ok((execution, total))
+}
+
+/// Generate hints for one input and stream them to a Unix socket (live / streaming
+/// sink) so a prover can consume them while they are produced; no hints file is
+/// written. `debug_file`, when `Some`, tees a copy to disk. `ready`, when `Some`,
+/// is signalled once the socket is listening — before this call blocks waiting for
+/// the prover to connect. Returns `(execution, total)` durations.
+#[cfg(zisk_hints)]
+pub fn generate_hints_to_socket(
+    stdin: &ZiskStdin,
+    socket_path: PathBuf,
+    debug_file: Option<PathBuf>,
+    write_flush_threshold: Option<usize>,
+    ready: Option<tokio::sync::oneshot::Sender<()>>,
+    client: &dyn ExecutionClient,
+) -> Result<(Duration, Duration)> {
+    ensure_emits_hints(client)?;
+    run_with_hints(
+        stdin,
+        client,
+        move || ziskos::zkvm_init_socket(socket_path, debug_file, write_flush_threshold, ready),
+        || ziskos::hints::close_hints(),
+    )
+}
+
+#[cfg(not(zisk_hints))]
+const NO_HINTS_MSG: &str =
+    "Compiled without hints support. Rebuild with:\n  RUSTFLAGS=\"--cfg zisk_hints\" cargo build";
+
+#[cfg(not(zisk_hints))]
+pub fn generate_hints_to_file(
+    _stdin: &ZiskStdin,
+    _output_path: PathBuf,
+    _client: &dyn ExecutionClient,
+) -> Result<(Duration, Duration)> {
+    anyhow::bail!(NO_HINTS_MSG)
+}
+
+#[cfg(not(zisk_hints))]
+pub fn generate_hints_to_socket(
+    _stdin: &ZiskStdin,
+    _socket_path: PathBuf,
+    _debug_file: Option<PathBuf>,
+    _write_flush_threshold: Option<usize>,
+    _ready: Option<tokio::sync::oneshot::Sender<()>>,
+    _client: &dyn ExecutionClient,
+) -> Result<(Duration, Duration)> {
+    anyhow::bail!(NO_HINTS_MSG)
+}

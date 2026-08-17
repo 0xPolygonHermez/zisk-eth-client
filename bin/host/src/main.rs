@@ -6,6 +6,8 @@ use zisk_sdk::VerboseMode;
 
 use host::benchmark::BenchmarkRunner;
 use host::cli::{Cli, GuestProgramCommand};
+#[cfg(feature = "ziskethone")]
+use host::elfs::ELF_ZISKETHONE;
 use host::elfs::{ELF_ETHREX, ELF_RETH};
 use input::Client;
 
@@ -42,6 +44,8 @@ async fn main() -> Result<()> {
             let elf = match client {
                 Client::Reth => ELF_RETH,
                 Client::Ethrex => ELF_ETHREX,
+                #[cfg(feature = "ziskethone")]
+                Client::ZiskEthOne => ELF_ZISKETHONE,
             };
 
             info!(" ELF Name: {}", elf.name());

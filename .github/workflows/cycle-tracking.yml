@@ -22,10 +22,12 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-  # Block inputs to test per client (from less MGs to more MGs).
-  # It is good to have shared blocks between clients for easier comparison.
-  RETH_TEST_BLOCKS: "25229957 25229955 25229951"
-  ETHREX_TEST_BLOCKS: "25229957 25229955 25229951"
+  # Block inputs to test per client (from less MGs to more MGs). All clients use
+  # the SAME blocks so the report can compare them against each other (reth is
+  # the cross-client baseline). Every client must have an input file for each.
+  RETH_TEST_BLOCKS: "25431055 25431039 25431013"
+  ETHREX_TEST_BLOCKS: "25431055 25431039 25431013"
+  ZISKETHONE_TEST_BLOCKS: "25431055 25431039 25431013"
 
 jobs:
   cycle-tracking:
@@ -50,9 +52,20 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # ziskethone's guest sources live in the third_party/ziskethone submodule.
+          submodules: recursive
 
       - name: "Resolve ZisK ref"
         uses: ./.github/actions/zisk-ref
+
+      - name: "Install C++ guest cross-toolchain"
+        uses: ./.github/actions/cpp-guest-toolchain
+
+      # Must follow cpp-guest-toolchain — see that action's note on symlinks.
+      # This is the only workflow that rebuilds the guest ELF (zec_bench.sh);
+      # pr.yaml's jobs embed the committed ELF and never cross-compile.
+      - name: "Build the patched GCC for -mzisk-dma"
+        uses: ./.github/actions/zisk-dma-gcc
 
       - name: "Clone ZisK"
         uses: actions/checkout@v4
@@ -73,6 +86,14 @@ jobs:
         id: zisk
         run: |
           echo "sha=$(git -C "$WS" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          # GitHub's ubuntu-latest runners have heterogeneous CPUs. cargo-zisk /
+          # ziskemu (and their deps) can bake in build-host CPU instructions, so a
+          # binary built on one runner SIGILLs ("Illegal instruction") when the
+          # cache restores it onto a runner with an older CPU. Fingerprint the CPU
+          # feature set into the cache key so binaries are only reused on a
+          # compatible CPU (mismatched CPU -> cache miss -> rebuild here).
+          cpu="$(sort -u /proc/cpuinfo | grep -m1 '^flags' | sha256sum | cut -c1-16)"
+          echo "cpu=$cpu" >> "$GITHUB_OUTPUT"
           {
             echo "CARGO_ZISK=$WS/target/release/cargo-zisk"
             echo "ZISKEMU=$WS/target/release/ziskemu"
@@ -85,12 +106,26 @@ jobs:
           path: |
             ${{ env.WS }}/target/release/cargo-zisk
             ${{ env.WS }}/target/release/ziskemu
-          key: zisk-emulator-${{ runner.os }}-${{ steps.zisk.outputs.sha }}
+          # Key includes the CPU-flag fingerprint (see above) so a cached binary
+          # is never restored onto an incompatible CPU.
+          key: zisk-emulator-${{ runner.os }}-${{ steps.zisk.outputs.cpu }}-${{ steps.zisk.outputs.sha }}
 
       - name: "Build emulator (cargo-zisk + ziskemu)"
-        if: steps.cache-emulator.outputs.cache-hit != 'true'
+        # Build on a cache miss, OR if the restored binary can't run on this CPU
+        # (a cross-CPU cache restore SIGILLs — the CPU-keyed cache should prevent
+        # it, but smoke-test and rebuild as a self-healing backstop).
         working-directory: ${{ env.WS }}
-        run: cargo build --release -p cargo-zisk -p ziskemu --bin cargo-zisk --bin ziskemu
+        run: |
+          need_build=0
+          if [ "${{ steps.cache-emulator.outputs.cache-hit }}" != "true" ]; then
+            need_build=1
+          elif ! "$CARGO_ZISK" --version >/dev/null 2>&1; then
+            echo "::warning::cached cargo-zisk failed to run on this CPU; rebuilding"
+            need_build=1
+          fi
+          if [ "$need_build" = 1 ]; then
+            cargo build --release -p cargo-zisk -p ziskemu --bin cargo-zisk --bin ziskemu
+          fi
 
       - name: "Install ZisK rust toolchain"
         run: |
@@ -105,6 +140,9 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.ref || inputs.base_ref }}
           path: base-tree
+          # No-op on a base branch that predates the ziskethone submodule; needed
+          # once the base branch also carries it so the base bench can build it.
+          submodules: recursive
 
       - name: "Benchmark base branch"
         env:

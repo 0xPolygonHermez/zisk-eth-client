@@ -14,7 +14,10 @@
 # Requirements (provided by the workflow before calling this):
 #   - CARGO_ZISK / ZISKEMU env vars pointing at the binaries built from the local
 #     ZisK clone, and the ZisK rust toolchain installed
-#   - RETH_TEST_BLOCKS / ETHREX_TEST_BLOCKS env vars (space-separated block numbers)
+#   - RETH_TEST_BLOCKS / ETHREX_TEST_BLOCKS / ZISKETHONE_TEST_BLOCKS env vars
+#     (space-separated block numbers)
+#   - for ziskethone (Pattern B): the third_party/ziskethone submodule and the
+#     C++ guest cross-toolchain (build-elf.sh cross-compiles its ELF)
 set -euo pipefail
 
 OUTDIR="${1:?usage: zec_bench.sh <OUTDIR>}"
@@ -28,31 +31,52 @@ cd "$REPO"
 
 ZISK_TARGET="riscv64ima-zisk-zkvm-elf"
 
-# client -> space-separated block numbers to emulate.
+# client -> space-separated block numbers to emulate. All clients should use the
+# same blocks so the report can compare them against each other (reth baseline).
 declare -A CLIENT_BLOCKS=(
   [reth]="${RETH_TEST_BLOCKS:-25229957}"
   [ethrex]="${ETHREX_TEST_BLOCKS:-25229957}"
+  [ziskethone]="${ZISKETHONE_TEST_BLOCKS:-25229957}"
 )
 
-for client in reth ethrex; do
+# Build a client's guest ELF and echo its path on success (nothing on failure).
+# reth/ethrex are Pattern A (cargo-zisk builds the Rust guest). ziskethone is
+# Pattern B: the C++ guest ELF is cross-compiled by build-elf.sh and lives in the
+# third_party/ziskethone submodule — there is no cargo-zisk guest crate for it.
+build_guest_elf() {
+  local client="$1"
+  if [[ "$client" == "ziskethone" ]]; then
+    local script="crates/clients/ziskethone/guest/build-elf.sh"
+    [[ -f "$script" ]] || { echo "WARNING: $script not found (submodule absent?); skipping ziskethone" >&2; return 1; }
+    bash "$script" >&2 || return 1
+    # build-elf.sh writes to <ziskethone>/cpp-guest/zisk/build/zisk_eth_guest.elf;
+    # the default ziskethone dir is the third_party/ziskethone submodule.
+    local elf="${ZISKETHONE_DIR:-third_party/ziskethone}/cpp-guest/zisk/build/zisk_eth_guest.elf"
+    [[ -f "$elf" ]] && { echo "$elf"; return 0; }
+    echo "WARNING: ziskethone build reported success but no ELF at $elf" >&2
+    return 1
+  fi
+
+  local guest_dir="bin/guests/stateless-validator-${client}"
+  ( cd "$guest_dir" && "$CARGO_ZISK" build --release ) >&2 || return 1
+  local elf="$guest_dir/target/elf/$ZISK_TARGET/release/zec-${client}"
+  [[ -f "$elf" ]] && { echo "$elf"; return 0; }
+  echo "WARNING: $client build reported success but no ELF at $elf" >&2
+  return 1
+}
+
+for client in reth ethrex ziskethone; do
   guest_dir="bin/guests/stateless-validator-${client}"
 
   echo "::group::Build ${client} guest ELF"
-  # Build from the guest's own manifest, the same way the host's build.rs does.
   # Tolerate failure: a client/guest that is new in this PR won't build on the
   # base pass, and the diff renders the missing base side as N/A.
-  if ! ( cd "$guest_dir" && "$CARGO_ZISK" build --release ); then
+  if ! elf="$(build_guest_elf "$client")"; then
     echo "WARNING: build failed for '$client' guest; skipping" >&2
     echo "::endgroup::"
     continue
   fi
   echo "::endgroup::"
-
-  elf="$guest_dir/target/elf/$ZISK_TARGET/release/zec-${client}"
-  if [[ ! -f "$elf" ]]; then
-    echo "WARNING: build reported success but no ELF for '$client' at $elf; skipping" >&2
-    continue
-  fi
 
   for block in ${CLIENT_BLOCKS[$client]}; do
     input=$(ls "$guest_dir"/inputs/mainnet_"${block}"_*.bin 2>/dev/null | head -n1 || true)
