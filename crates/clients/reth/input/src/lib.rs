@@ -28,7 +28,7 @@ use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
 
 pub use guest_reth as guest;
 pub use input_core::RpcConfig;
-use input_core::{BlockStats, ExecutionClient};
+use input_core::{first_frame, BlockStats, ExecutionClient, InputStats};
 
 #[derive(Default)]
 pub struct RethClient;
@@ -126,6 +126,21 @@ impl ExecutionClient for RethClient {
 
     fn run(&self) {
         guest_reth::run();
+    }
+
+    /// The public frame is the first of the two written by
+    /// [`build_stdin`](RethClient::build_stdin), so the witness never has to be
+    /// decoded to answer this.
+    fn input_stats(&self, stdin: &ZiskStdin) -> Result<Option<InputStats>> {
+        let buf = stdin.read_data();
+        let public = RethInputPublic::deserialize(first_frame(&buf)?)
+            .context("Failed to deserialize the public input frame")?;
+        let block = public.block();
+        Ok(Some(InputStats {
+            block_number: block.header.number,
+            tx_count: block.body.transactions.len(),
+            gas_used: block.header.gas_used,
+        }))
     }
 }
 
