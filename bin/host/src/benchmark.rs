@@ -3,9 +3,9 @@ use std::{
     fs,
     path::{Path, PathBuf},
 };
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
-use input::{Client, ExecutionClient, create_client, generate_hints_to_file};
+use input::{Client, ExecutionClient, InputStats, create_client, generate_hints_to_file};
 use zisk_sdk::{GuestProgram, ZiskStdin};
 
 use crate::{
@@ -20,7 +20,7 @@ pub struct BenchmarkRunner {
     hints: Option<PathBuf>,
     gen_hints: bool,
     hints_out: Option<PathBuf>,
-    native_client: Option<Box<dyn ExecutionClient>>,
+    native_client: Box<dyn ExecutionClient>,
     zisk_client: ZiskClient,
 }
 
@@ -46,9 +46,20 @@ impl BenchmarkRunner {
         gen_hints: bool,
         hints_out: Option<PathBuf>,
         client: Client,
+        with_cost: bool,
     ) -> Result<Self> {
         let use_hints = hints.is_some() || gen_hints;
         let zisk_client = match &action {
+            // Proving cost is priced from the AIR setups, so it only exists on the
+            // full client.
+            Action::Execute if with_cost => ZiskClient::for_execution_with_cost(
+                elf,
+                proving_key,
+                emulator,
+                unlock_mapped_memory,
+                gpu,
+                use_hints,
+            )?,
             Action::Execute => {
                 ZiskClient::for_execution(elf, emulator, unlock_mapped_memory, use_hints)?
             }
@@ -72,17 +83,14 @@ impl BenchmarkRunner {
             )?,
         };
 
-        // The native client (reth/ethrex) generates hints in --gen-hints mode.
-        let native_client = if gen_hints {
-            Some(create_client(client))
-        } else {
-            None
-        };
+        // The native client (reth/ethrex) generates hints in --gen-hints mode, and
+        // decodes block stats off the input in every mode.
+        let native_client = create_client(client);
 
         // Default the hints output dir to <client>-hints, mirroring hints-gen.
-        let hints_out = native_client
-            .as_ref()
-            .map(|nc| hints_out.unwrap_or_else(|| PathBuf::from(format!("{}-hints", nc.name()))));
+        let hints_out = gen_hints.then(|| {
+            hints_out.unwrap_or_else(|| PathBuf::from(format!("{}-hints", native_client.name())))
+        });
 
         Ok(Self {
             action,
@@ -195,10 +203,7 @@ impl BenchmarkRunner {
         if self.hints.is_some() {
             Ok((None, Some(work_file.to_path_buf())))
         } else if self.gen_hints {
-            let client = self
-                .native_client
-                .as_deref()
-                .ok_or_else(|| anyhow::anyhow!("native client not initialized"))?;
+            let client = self.native_client.as_ref();
             let out = self
                 .hints_out
                 .as_ref()
@@ -214,6 +219,33 @@ impl BenchmarkRunner {
             Ok((None, Some(hints_path)))
         } else {
             Ok((Some(work_file.to_path_buf()), None))
+        }
+    }
+
+    /// Block stats for the report, decoded from the input file itself.
+    ///
+    /// `None` in `--hints` mode (the work file is a hints stream, not an input)
+    /// and for clients that cannot decode their own input format. A decode
+    /// failure is warned about rather than propagated: the execution metrics
+    /// alongside it are still valid.
+    fn input_stats(&self, work_file: &Path) -> Option<InputStats> {
+        if self.hints.is_some() {
+            return None;
+        }
+
+        let stats = ZiskStdin::from_file(work_file)
+            .context("Failed to load input file")
+            .and_then(|stdin| self.native_client.input_stats(&stdin));
+
+        match stats {
+            Ok(stats) => stats,
+            Err(e) => {
+                warn!(
+                    "Could not read block stats from {}: {e:#}",
+                    work_file.display()
+                );
+                None
+            }
         }
     }
 
@@ -238,10 +270,14 @@ impl BenchmarkRunner {
                 info!("[{}/{}] Running: {}", current, total, test_name);
 
                 let (input_file, hints_file) = self.prepare_sources(work_file)?;
-                let metrics = self
+                let mut metrics = self
                     .zisk_client
                     .execute(input_file.as_deref(), hints_file.as_deref())
                     .await?;
+                if let Some(stats) = self.input_stats(work_file) {
+                    metrics.tx_count = Some(stats.tx_count as u64);
+                    metrics.gas_used = Some(stats.gas_used);
+                }
                 let elapsed = metrics.duration.as_secs_f64();
 
                 info!("Execution metrics — {}", metrics);
