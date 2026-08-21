@@ -37,16 +37,59 @@ crate provides:
     call `zeg_run`. Preflights the C++ toolchain and reconciles a stale CMake
     cache first.
 - `build-elf.sh` — cmake driver for `cpp-guest/zisk` (target `zisk_eth_guest.elf`).
+  Installs the toolchains it needs before building.
+- `install-xpack.sh` — idempotent xPack `riscv-none-elf-gcc` installer, and the one
+  place the version and prefix are pinned. Also used by CI.
 - `src/lib.rs` — `pub const ELF` (always) and `pub fn run()` (feature `native-ffi`).
 
 ## Regenerate the committed ELF
+
+### Prerequisites
+
+- The `third_party/ziskethone` submodule. The root workspace has a Cargo `path`
+  dependency into it, so cargo cannot load the workspace until it exists:
+
+  ```bash
+  git submodule update --init --recursive
+  ```
+
+- **`g++-13`, `g++-12`, or `g++-11`** on the host — GCC 14's bundled libcody does
+  not build under a host g++ newer than ~14, so the build looks for an older one
+  and stops if it finds none. Usually already present (Ubuntu 24.04's default
+  `g++` is 13.3); otherwise `sudo apt install g++-13` on Debian/Ubuntu,
+  `brew install gcc@13` on macOS. Set `CXX`/`CC` to pick one explicitly.
+- `curl`, `tar`, `make`, `cmake`.
+
+Nothing else. The cross-toolchain is not a prerequisite: `build-elf.sh` installs
+the pinned xPack `riscv-none-elf-gcc` 14.3.0-1 (`install-xpack.sh`) and the
+patched GCC 14.3.0 that provides `-mzisk-dma`
+(ziskethone's `cpp-guest/patches/gcc/build-toolchain.sh`), then fetches evmone
+through CMake. Both installers are idempotent, so later builds re-check them in
+about a second.
+
+### Rebuild
+
 ```bash
 cargo build -p guest-ziskethone --features ziskethone-rebuild-guest
 # then commit bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf
 ```
-`ZISKETHONE_DIR` (default `../../../../third_party/ziskethone`) overrides the source
-checkout; `ZISK_TOOLCHAIN_PREFIX` points at the RISC-V toolchain's `bin/`.
-The ELF is always built with `-mzisk-dma`, which needs a patched GCC 14.3.0
-that `build-elf.sh` installs on demand into `~/.local/xPacks/zisk-dma-gcc-14.3.0`
-(about 10 minutes the first time, then instant). It reuses the xPack toolchain's
-C++ headers and binutils, which is why that is pinned to 14.3.0-1.
+
+On a cold machine the toolchain install costs ~10-15 minutes, and cargo hides
+build-script output unless you pass `-vv` — so for a first build, run the script
+directly to watch it work, then let cargo take over:
+
+```bash
+./crates/clients/ziskethone/guest/build-elf.sh
+```
+
+The ELF is always built with `-mzisk-dma`; `build-elf.sh` verifies the flag
+actually lowered by counting DMA markers in the output and fails if it did not.
+
+### Overrides
+
+- `ZISKETHONE_DIR` (default `../../../../third_party/ziskethone`) — the source checkout.
+- `ZISK_TOOLCHAIN_PREFIX` — the xPack toolchain's `bin/` dir. Setting it opts out
+  of the automatic install: if the path has no `riscv-none-elf-g++`, the build
+  reports that instead of installing over your choice.
+- `ZISK_DMA_GCC_PREFIX` (default `~/.local/xPacks/zisk-dma-gcc-14.3.0`) — where the
+  patched GCC is installed.
