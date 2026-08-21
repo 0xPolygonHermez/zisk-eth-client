@@ -34,14 +34,25 @@ logic can also be invoked programmatically from `host` itself.
 - [zisk](https://0xpolygonhermez.github.io/zisk/getting_started/installation.html)
 - Ethereum RPC endpoint (Infura, Alchemy, or your own node) for input generation
 
-After cloning, run the bootstrap script once. It initializes the
-`third_party/ziskethone` submodule (a Cargo `path` dependency, so the workspace
-won't build without it) and installs the xPack RISC-V toolchain used to
-cross-compile the ziskethone C++ guest:
+### Clone
+
+`third_party/ziskethone` is a Cargo `path` dependency, so cargo cannot load the
+workspace until the submodules are present:
 
 ```bash
-./setup.sh
+git clone --recurse-submodules https://github.com/0xPolygonHermez/zisk-eth-client.git
 ```
+
+Already cloned without them? Initialize them in place:
+
+```bash
+git submodule update --init --recursive
+```
+
+That is the whole bootstrap. Rebuilding the ziskethone C++ guest's ELF needs a
+cross-toolchain too, but that installs itself on demand — see
+[`crates/clients/ziskethone/guest/README.md`](crates/clients/ziskethone/guest/README.md)
+for its prerequisites and the rebuild command.
 
 ### Build the Guest Program
 
