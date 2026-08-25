@@ -7,9 +7,9 @@ use std::{
 use tracing::info;
 
 use zisk_sdk::{
-    AsmOptions, EmbeddedClient, EmbeddedClientBuilder, EmbeddedExecuteOnlyClient, ExecuteOutput,
-    ExecutorKind, GuestProgram, ProverClient, VerifyConstraintsExtension, WitnessBuilderExt,
-    ZiskHints, ZiskStdin, EmbeddedOpts
+    AsmOptions, EmbeddedClient, EmbeddedClientBuilder, EmbeddedExecuteOnlyClient, EmbeddedOpts,
+    ExecuteOutput, ExecutorKind, GuestProgram, ProverClient, VerifyConstraintsExtension,
+    WitnessBuilderExt, ZiskHints, ZiskStdin,
 };
 
 enum Backend {
