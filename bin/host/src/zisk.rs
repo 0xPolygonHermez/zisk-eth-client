@@ -7,9 +7,9 @@ use std::{
 use tracing::info;
 
 use zisk_sdk::{
-    AsmOptions, EmbeddedClient, EmbeddedClientBuilder, EmbeddedExecuteOnlyClient, ExecuteOutput,
-    ExecutorKind, GuestProgram, ProverClient, VerifyConstraintsExtension, WitnessBuilderExt,
-    ZiskHints, ZiskStdin,
+    AsmOptions, EmbeddedClient, EmbeddedClientBuilder, EmbeddedExecuteOnlyClient, EmbeddedOpts,
+    ExecuteOutput, ExecutorKind, GuestProgram, ProverClient, VerifyConstraintsExtension,
+    WitnessBuilderExt, ZiskHints, ZiskStdin,
 };
 
 enum Backend {
@@ -75,6 +75,38 @@ impl ZiskClient {
         })
     }
 
+    /// Execute on the full client, so the run is priced against the AIR setups
+    /// and reports a cost.
+    pub fn for_execution_with_cost(
+        program: GuestProgram,
+        proving_key: Option<PathBuf>,
+        use_emulator: bool,
+        unlock_mapped_memory: bool,
+        gpu: bool,
+        use_hints: bool,
+    ) -> Result<Self> {
+        let (mut builder, executor) =
+            Self::embedded_builder(use_emulator, unlock_mapped_memory, use_hints)?;
+        if let Some(pk) = proving_key {
+            builder = builder.proving_key(pk);
+        }
+        if gpu {
+            builder = builder.gpu();
+        }
+
+        let client = builder
+            .no_aggregation()
+            .with_embedded_opts(EmbeddedOpts::default().minimal_memory())
+            .build()
+            .context("Failed to build EmbeddedClient for costed execution")?;
+        Ok(Self {
+            program,
+            backend: Backend::Full(client),
+            executor,
+            use_hints,
+        })
+    }
+
     pub fn for_proving(
         program: GuestProgram,
         proving_key: Option<PathBuf>,
@@ -97,7 +129,10 @@ impl ZiskClient {
             builder = builder.verify_constraints();
         }
 
-        let client = builder.build().context("Failed to build EmbeddedClient")?;
+        let client = builder
+            .no_aggregation()
+            .build()
+            .context("Failed to build EmbeddedClient for costed execution")?;
         Ok(Self {
             program,
             backend: Backend::Full(client),
@@ -295,44 +330,4 @@ fn log_plan(output: &ExecuteOutput) {
         );
     }
     info!("-----------------");
-}
-
-#[expect(dead_code)]
-fn parse_metrics(output: &str) -> Result<ZiskExecutionMetrics> {
-    let mut steps = 0u64;
-    let mut cost = 0u64;
-    let mut tx_count = None;
-    let mut gas_used = None;
-
-    for line in output.lines() {
-        if line.contains("STEPS")
-            && let Some(val) = line.split_whitespace().last()
-        {
-            steps = val.replace(",", "").parse().unwrap_or(0);
-        }
-        if line.contains("TOTAL")
-            && line.contains("100.00%")
-            && let Some(val) = line.split_whitespace().nth(1)
-        {
-            cost = val.replace(",", "").parse().unwrap_or(0);
-        }
-        if line.contains("- Transaction Count:")
-            && let Some(val) = line.split(':').next_back()
-        {
-            tx_count = val.trim().replace(",", "").parse().ok();
-        }
-        if line.contains("- Gas Consumed:")
-            && let Some(val) = line.split(':').next_back()
-        {
-            gas_used = val.trim().replace(",", "").parse().ok();
-        }
-    }
-
-    Ok(ZiskExecutionMetrics {
-        duration: Duration::default(),
-        steps,
-        cost: Some(cost),
-        tx_count,
-        gas_used,
-    })
 }

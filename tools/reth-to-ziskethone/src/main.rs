@@ -22,7 +22,7 @@
 //!   5. `encode_binary` → ZEG0 bytes → wrap in one length-prefixed ZiskStdin
 //!      slice, matching what the ziskethone client writes.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -54,6 +54,28 @@ struct Cli {
     /// Chain slug used in the output filename (these inputs are mainnet).
     #[arg(long, default_value = "mainnet")]
     chain: String,
+
+    /// Keep the input file's own name for the output, instead of deriving
+    /// `<chain>_<block>_<txs>_<mgas>_zec_ziskethone.bin` from block metadata.
+    /// Required for corpora whose blocks share metadata — every EEST fixture
+    /// is block 1, so the derived name collides across the whole corpus.
+    #[arg(long)]
+    keep_name: bool,
+
+    /// How to resolve the fork. `auto` reads the block timestamp against the
+    /// compiled-in mainnet schedule. `eest-osaka` forces Osaka with the EEST
+    /// base-Osaka blob schedule, for fixtures whose synthetic timestamps
+    /// (12, 24, ...) carry no mainnet meaning.
+    #[arg(long, value_enum, default_value_t = ForkMode::Auto)]
+    fork: ForkMode,
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, Debug, clap::ValueEnum)]
+enum ForkMode {
+    /// Derive the fork from the block timestamp via the mainnet schedule.
+    Auto,
+    /// Force Osaka + the EEST base-Osaka blob schedule.
+    EestOsaka,
 }
 
 fn main() -> Result<()> {
@@ -74,8 +96,12 @@ fn main() -> Result<()> {
     };
 
     let mut failures = 0usize;
+    // Two inputs must never resolve to one output path: the metadata-derived
+    // name collides for any corpus of same-shaped blocks, and a silent
+    // overwrite would look like a clean run that dropped most of the corpus.
+    let mut claimed: HashSet<PathBuf> = HashSet::new();
     for in_path in &inputs {
-        match convert_file(in_path, &cli.output_dir, &cli.chain) {
+        match convert_file(in_path, &cli.output_dir, &cli.chain, &cli, &mut claimed) {
             Ok(out) => println!("ok  {} -> {}", in_path.display(), out.display()),
             Err(e) => {
                 failures += 1;
@@ -89,7 +115,13 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn convert_file(in_path: &Path, out_dir: &Path, chain: &str) -> Result<PathBuf> {
+fn convert_file(
+    in_path: &Path,
+    out_dir: &Path,
+    chain: &str,
+    cli: &Cli,
+    claimed: &mut HashSet<PathBuf>,
+) -> Result<PathBuf> {
     let bytes = fs::read(in_path).with_context(|| format!("read {}", in_path.display()))?;
 
     // Two ZiskStdin slices: [public][witness].
@@ -100,18 +132,33 @@ fn convert_file(in_path: &Path, out_dir: &Path, chain: &str) -> Result<PathBuf> 
     let block = decode_block(public_slice).context("decode block from public slice")?;
     let witness = decode_witness(witness_slice).context("decode witness slice")?;
 
-    let sources = build_sources(block, witness).context("assemble OfflineSources")?;
+    let sources = build_sources(block, witness, cli.fork).context("assemble OfflineSources")?;
     let stats = &sources.0;
     let zeg0 = encode_binary(&sources.1).context("encode ZEG0 container")?;
 
-    let filename = format!(
-        "{}_{}_{}_{}_zec_ziskethone.bin",
-        chain.to_lowercase(),
-        stats.number,
-        stats.tx_count,
-        stats.gas_used / 1_000_000,
-    );
+    let filename = if cli.keep_name {
+        let stem = in_path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .ok_or_else(|| anyhow!("input {} has no usable file stem", in_path.display()))?;
+        format!("{stem}.bin")
+    } else {
+        format!(
+            "{}_{}_{}_{}_zec_ziskethone.bin",
+            chain.to_lowercase(),
+            stats.number,
+            stats.tx_count,
+            stats.gas_used / 1_000_000,
+        )
+    };
     let out_path = out_dir.join(filename);
+    if !claimed.insert(out_path.clone()) {
+        bail!(
+            "output {} already written by an earlier input -- name collision; \
+             re-run with --keep-name to name outputs after their input files",
+            out_path.display()
+        );
+    }
 
     let mut out = Vec::with_capacity(zeg0.len() + 8);
     write_zisk_slice(&mut out, &zeg0);
@@ -166,6 +213,7 @@ fn decode_witness(witness_slice: &[u8]) -> Result<ExecutionWitness> {
 fn build_sources(
     block: ConsensusBlock<TxEnvelope>,
     witness: ExecutionWitness,
+    fork: ForkMode,
 ) -> Result<(Stats, OfflineSources)> {
     let stats = Stats {
         number: block.header.number,
@@ -202,7 +250,7 @@ fn build_sources(
     let parent = parent_from_witness(&witness, parent_hash)?;
     let ancestors = build_ancestors_from_witness(&witness, &parent);
     let (is_osaka, blob_base_fee_update_fraction, target_blob_gas_per_block, max_blob_gas_per_block) =
-        mainnet_fork_params(timestamp);
+        fork_params(fork, timestamp);
 
     let sources = OfflineSources {
         current,
@@ -226,6 +274,23 @@ fn build_sources(
 // changes. `mainnet_fork_params` in particular MUST be updated at each mainnet
 // fork / blob-schedule (BPO) change.
 // ---------------------------------------------------------------------------
+
+/// `(is_osaka, blob_base_fee_update_fraction, target_blob_gas_per_block,
+/// max_blob_gas_per_block)` for this block.
+fn fork_params(mode: ForkMode, timestamp: u64) -> (bool, u64, u64, u64) {
+    match mode {
+        ForkMode::Auto => mainnet_fork_params(timestamp),
+        // EEST base-Osaka. The fixtures' timestamps are synthetic (12, 24, ...)
+        // so the mainnet schedule would read them as pre-Cancun and, since the
+        // headers are Prague-shaped, emit fork_id = FORK_PRAGUE -- running
+        // Osaka tests under Prague EVM rules (wrong MODEXP gas, no CLZ, no
+        // P256VERIFY). Fraction 5_007_716 is EEST base-Osaka's, per
+        // eest-witness-gen's manifest; target/max stay 0 so the guest skips
+        // its excess_blob_gas re-derivation, matching what that canonical
+        // manifest path emits (it carries no target/max fields at all).
+        ForkMode::EestOsaka => (true, 5_007_716, 0, 0),
+    }
+}
 
 fn mainnet_fork_params(timestamp: u64) -> (bool, u64, u64, u64) {
     const OSAKA_ACTIVATION: u64 = 1767747671;

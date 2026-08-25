@@ -5,9 +5,14 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-# ziskethone client + its native `run()` FFI (host benchmarks/hint-gen call
-# run(), so it needs the C++ toolchain). Off by default; proving needs no C++.
-ziskethone = ["input/ziskethone", "input/ziskethone-native-ffi"]
+# ziskethone client. Off by default. Mirrors `input`'s own split: selecting the
+# client needs no C++ — only the native `run()` FFI does, and that is reached
+# solely via `--gen-hints` (execute/verify-constraints never call it, and
+# `emits_hints()` is false for this client anyway). Kept separate so an
+# execute/prove run builds on a box without clang >= 15 / libstdc++ >= 12.
+ziskethone = ["input/ziskethone"]
+# The above plus the native C++ `run()` FFI (needs clang >= 15 / g++ >= 12).
+ziskethone-native-ffi = ["ziskethone", "input/ziskethone-native-ffi"]
 
 [dependencies]
 # Not `workspace = true`: Cargo doesn't allow a member to override

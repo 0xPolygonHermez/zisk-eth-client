@@ -38,6 +38,10 @@ pub struct Cli {
     #[arg(long, default_value_t = false)]
     pub gpu: bool,
 
+    /// Report proving cost alongside the execution metrics.
+    #[arg(long, default_value_t = false)]
+    pub with_cost: bool,
+
     /// Increase log verbosity (`-v` = debug, `-vv` = trace)
     #[arg(short, long, action = clap::ArgAction::Count)]
     pub verbose: u8,
