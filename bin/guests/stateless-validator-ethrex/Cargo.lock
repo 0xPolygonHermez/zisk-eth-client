@@ -1815,7 +1815,8 @@ dependencies = [
 [[package]]
 name = "proofman-fields"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.2.0-alpha#6467ad66c1633f9da807bc354d2511da21eeeeaa"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "124c75a333fd7209e5f77da6c7734260ad54eaabf7e2e20db24917f7ec4505cd"
 dependencies = [
  "cfg-if",
  "num-bigint",
@@ -1827,7 +1828,8 @@ dependencies = [
 [[package]]
 name = "proofman-starks-lib-c"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.2.0-alpha#6467ad66c1633f9da807bc354d2511da21eeeeaa"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d1f0b940c17f32bcc0b289fd11bd0f8a812c82a4d44a067cd67d773fef54b13f"
 dependencies = [
  "crossbeam-channel",
  "proofman-starks-src",
@@ -1836,12 +1838,14 @@ dependencies = [
 [[package]]
 name = "proofman-starks-src"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.2.0-alpha#6467ad66c1633f9da807bc354d2511da21eeeeaa"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0efcb2cd92919487f86364fc3b51c8efa8ac2ea3a56f3d6c4d39b3bd464a5b50"
 
 [[package]]
 name = "proofman-verifier"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.2.0-alpha#6467ad66c1633f9da807bc354d2511da21eeeeaa"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d265453d0cb920c636de66ef3d7dffbcef6a1a8adea91b8484d1b09398d2f51"
 dependencies = [
  "num-traits",
  "proofman-fields",
@@ -2883,22 +2887,26 @@ dependencies = [
 [[package]]
 name = "zisk-circuit"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#f06f3c35db0e9adedaccf1da354a8ba7f16dfd89"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c1bc6041f337ea1540da88363df1c7bddfadf0e9e9433faee038aa15fa374126"
 
 [[package]]
 name = "zisk-definitions"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#f06f3c35db0e9adedaccf1da354a8ba7f16dfd89"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7d1a44ad1d2ce15db39bfff3dfe4d5dd4736962c7badbd089f1f292d9347879"
 
 [[package]]
 name = "zisk-lib-c"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#f06f3c35db0e9adedaccf1da354a8ba7f16dfd89"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0238eb80fe6909d395453dba79ca27587c2ea34a87ba9f98efc55f94bde12eb0"
 
 [[package]]
 name = "zisk-precomp-helpers"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#f06f3c35db0e9adedaccf1da354a8ba7f16dfd89"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9a713dd3bd7b1ac61c7aaee725bb185afc8439f63881708a8408ab2e59694144"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -2916,7 +2924,8 @@ dependencies = [
 [[package]]
 name = "zisk-stream"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#f06f3c35db0e9adedaccf1da354a8ba7f16dfd89"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b7fdc26065c9ee8153b8eb1e086573bf88c5dacea0a7665ca68adb20a25c056"
 dependencies = [
  "libc",
  "thiserror",
@@ -2926,7 +2935,8 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#f06f3c35db0e9adedaccf1da354a8ba7f16dfd89"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9a218c0e2c72facb1324751f19f37a5a58df629e5a2d154c6932f516a22f367c"
 dependencies = [
  "proofman-verifier",
 ]
@@ -2934,7 +2944,8 @@ dependencies = [
 [[package]]
 name = "zisk-zkvm-interface"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#f06f3c35db0e9adedaccf1da354a8ba7f16dfd89"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9eb81c441a0ce460f430facfb1a31e54f4a949c35468cf04d9577c86be8146e3"
 dependencies = [
  "bindgen",
 ]
@@ -2942,7 +2953,8 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "1.2.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.2.0-alpha#f06f3c35db0e9adedaccf1da354a8ba7f16dfd89"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08a9eee9ae285d36dd52ab8322e4e870ec2c07f8befca02813554e907c43e3ea"
 dependencies = [
  "anyhow",
  "ark-bn254",
