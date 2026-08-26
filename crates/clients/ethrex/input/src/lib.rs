@@ -17,7 +17,7 @@ use guest_ethrex::EthrexInput;
 
 pub use guest_ethrex as guest;
 pub use input_core::RpcConfig;
-use input_core::{BlockStats, ExecutionClient};
+use input_core::{first_frame, BlockStats, ExecutionClient, InputStats};
 
 #[derive(Default)]
 pub struct EthrexClient;
@@ -104,5 +104,19 @@ impl ExecutionClient for EthrexClient {
 
     fn run(&self) {
         guest_ethrex::run();
+    }
+
+    /// Ethrex writes block and witness as one rkyv frame, so this pays for a
+    /// full deserialize of the witness too.
+    fn input_stats(&self, stdin: &ZiskStdin) -> Result<Option<InputStats>> {
+        let buf = stdin.read_data();
+        let input = EthrexInput::deserialize(first_frame(&buf)?)
+            .map_err(|e| anyhow::anyhow!("Failed to deserialize EthrexInput: {e}"))?;
+        let block = input.block();
+        Ok(Some(InputStats {
+            block_number: block.header.number,
+            tx_count: block.body.transactions.len(),
+            gas_used: block.header.gas_used,
+        }))
     }
 }

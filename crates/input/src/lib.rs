@@ -3,7 +3,7 @@ mod client;
 pub use client::{create_client, Client};
 pub use input_core::{
     generate_hints_to_file, generate_hints_to_socket, parse_header, BlockStats, ExecutionClient,
-    RpcConfig,
+    InputStats, RpcConfig,
 };
 
 #[cfg(feature = "ethrex")]

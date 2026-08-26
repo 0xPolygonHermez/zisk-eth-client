@@ -124,46 +124,6 @@ jobs:
       - name: Run cargo test
         run: cargo test --locked -p tests
 
-  proving-key:
-    name: Generate proving key
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
-    runs-on:
-      group: zisk-gpu
-    timeout-minutes: 120
-    container:
-      image: ziskvm/zisk-runner-gpu:latest
-      options: --gpus all --shm-size=48g
-    defaults:
-      run:
-        shell: bash
-    env:
-      WS: ${{ github.workspace }}/.zk-setup
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install ZisK dependencies
-        uses: ./.github/actions/zisk-deps
-
-      - name: Build cargo-zisk
-        working-directory: ${{ env.WS }}
-        run: |
-          cargo build --release -p cargo-zisk --bin cargo-zisk
-          mkdir -p "$HOME/.zisk/bin"
-          install -m 0755 target/release/cargo-zisk "$HOME/.zisk/bin/cargo-zisk"
-
-      - name: Generate proving key (zisk build_setup.sh)
-        working-directory: ${{ env.WS }}/tools/test-env
-        env:
-          ZISK_GHA: "1" # skip the interactive confirm prompt
-          DISABLE_ENV_CONFIRM: "1"
-          DISABLE_RECURSIVE_SETUP: "1"
-          ONLY_CPU: "1"
-          USE_CACHE_SETUP: "1" # reuse a previously generated setup
-          INSTALL_SETUP: "1"
-          ZISK_REPO_DIR: ${{ env.WS }}
-        # build_setup installs the key to $HOME/.zisk/provingKey.
-        run: ./build_setup.sh
-
   # Matrix on mode only (not client): zisk-setup (full build_zisk.sh) and the host
   # build are mode-dependent but client-independent, so we run them once per mode
   # and loop over the clients inside. On a single self-hosted runner the cells
@@ -245,17 +205,20 @@ jobs:
   # zisk-setup + the host build once and loop over both clients inside.
   test:
     name: Verify constraints
-    needs: [proving-key]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
     runs-on:
       group: zisk-gpu
-    timeout-minutes: 45
+    # Was 45 with the proving key handed over by a separate job; this job now also
+    # builds it (+~6 min, or a cache hit on a runner that has built it before).
+    timeout-minutes: 75
     container:
       image: ziskvm/zisk-runner-gpu:latest
       options: --gpus all --shm-size=48g
     defaults:
       run:
         shell: bash
+    env:
+      WS: ${{ github.workspace }}/.zk-setup
     steps:
       # checkout needs git >= 2.18 in the container, else it falls back to the
       # REST tarball download which can't fetch submodules. Install it if the
@@ -270,12 +233,33 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Verify proving key present
-        run: |
-          [ -d "$HOME/.zisk/provingKey" ] || { echo "ERROR: proving key not found at \$HOME/.zisk/provingKey (the proving-key job installs it on the shared volume)"; exit 1; }
-
       - name: Set up ZisK build environment
         uses: ./.github/actions/zisk-setup
+
+      # Same job == same runner: zisk-gpu picks randomly, so a separate job can't hand
+      # $HOME/.zisk/provingKey over. --gen-exps is stripped below — 59m of the 65m
+      # build, and verify-constraints never reaches the .exps.so path.
+      - name: Drop --gen-exps from build_setup.sh
+        working-directory: ${{ env.WS }}/tools/test-env
+        run: |
+          grep -q -- '--gen-exps --exps-arch major' build_setup.sh || {
+            echo "ERROR: build_setup.sh no longer hardcodes '--gen-exps --exps-arch major' — recheck this step." >&2
+            exit 1
+          }
+          sed -i 's/ --gen-exps --exps-arch major//' build_setup.sh
+          grep -n 'build_flags=(--build-dir' build_setup.sh
+
+      - name: Generate proving key (zisk build_setup.sh)
+        working-directory: ${{ env.WS }}/tools/test-env
+        env:
+          ZISK_GHA: "1" # skip the interactive confirm prompt
+          DISABLE_ENV_CONFIRM: "1"
+          DISABLE_RECURSIVE_SETUP: "1"
+          USE_CACHE_SETUP: "1" # reuse a previously generated setup
+          INSTALL_SETUP: "1"
+          ZISK_REPO_DIR: ${{ env.WS }}
+        # build_setup installs the key to $HOME/.zisk/provingKey.
+        run: ./build_setup.sh
 
       - name: Install C++ guest cross-toolchain
         uses: ./.github/actions/cpp-guest-toolchain

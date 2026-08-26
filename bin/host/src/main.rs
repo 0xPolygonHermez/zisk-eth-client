@@ -78,6 +78,7 @@ async fn main() -> Result<()> {
                 *gen_hints,
                 hints_out.clone(),
                 *client,
+                cli.with_cost,
             )?;
             runner
                 .run(

@@ -26,7 +26,7 @@ fn main() {
 /// Mirrors pil2-proofman's build.rs. Note this only rescues builds of *this*
 /// crate; the root workspace has a `path` dependency into the submodule, which
 /// cargo resolves before any build.rs runs — so a fresh root build still needs
-/// `setup.sh` (or the manual submodule command). See setup.sh.
+/// `git submodule update --init --recursive` run by hand first.
 fn ensure_submodule_initialized() {
     let dir = ziskethone_dir();
     // A checked-out submodule has a `.git` entry; a non-empty dir also counts
@@ -52,7 +52,7 @@ fn ensure_submodule_initialized() {
         Ok(s) => panic!("`git submodule update --init --recursive` failed with {s}"),
         Err(e) => panic!(
             "failed to run git to init the ziskethone submodule ({e}).\n\
-             Run `git submodule update --init --recursive` (or ./setup.sh) manually."
+             Run `git submodule update --init --recursive` manually."
         ),
     }
 }
@@ -365,8 +365,8 @@ fn regenerate_committed_elf() {
     // mark the crate perpetually dirty (every rebuild writes into it) and re-run
     // the cross-compile on every subsequent build.
     let guest_src = cpp_guest.join("zisk");
-    // Both env vars are read below (ziskethone_dir / has_riscv_toolchain); a
-    // change to either must re-run this regeneration.
+    // Both env vars are read downstream (ziskethone_dir here, ZISK_TOOLCHAIN_PREFIX
+    // in build-elf.sh); a change to either must re-run this regeneration.
     println!("cargo:rerun-if-env-changed=ZISKETHONE_DIR");
     println!("cargo:rerun-if-env-changed=ZISK_TOOLCHAIN_PREFIX");
     println!("cargo:rerun-if-changed={}", script.display());
@@ -401,16 +401,10 @@ fn regenerate_committed_elf() {
     // matter how many times you rebuild.
     println!("cargo:rerun-if-changed={}", committed_elf.display());
 
-    if !has_riscv_toolchain() {
-        panic!(
-            "ziskethone-rebuild-guest requested but no xPack RISC-V toolchain detected.\n\
-             Install xPack `riscv-none-elf-gcc` (14.3.0-1 exactly — must match the\n\
-             patched GCC 14.3.0 that borrows this toolchain's headers/binutils) —\n\
-             default location `~/opt/xpack/xpack-riscv-none-elf-gcc-14.3.0-1/bin`\n\
-             (or run ./setup.sh),\n\
-             or point ZISK_TOOLCHAIN_PREFIX at its `bin/` dir — then rebuild."
-        );
-    }
+    // No toolchain preflight here: build-elf.sh installs the pinned xPack itself
+    // when ZISK_TOOLCHAIN_PREFIX is unset, and reports the mismatch when it is
+    // set but empty. A check in front of it could only refuse a build that would
+    // otherwise have fixed itself.
 
     let status = std::process::Command::new("bash")
         .arg(&script)
@@ -444,14 +438,4 @@ fn ziskethone_dir() -> PathBuf {
         .unwrap_or_else(|_| {
             PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../../third_party/ziskethone")
         })
-}
-
-fn has_riscv_toolchain() -> bool {
-    let prefix = std::env::var("ZISK_TOOLCHAIN_PREFIX")
-        .map(PathBuf::from)
-        .unwrap_or_else(|_| {
-            PathBuf::from(std::env::var("HOME").unwrap_or_default())
-                .join("opt/xpack/xpack-riscv-none-elf-gcc-14.3.0-1/bin")
-        });
-    prefix.join("riscv-none-elf-gcc").exists()
 }

@@ -11,15 +11,28 @@ set -euo pipefail
 
 # Default matches build.rs: the third_party/ziskethone submodule.
 # ZISKETHONE_DIR overrides (e.g. a local working checkout of ziskethone).
-ZISKETHONE_DIR="${ZISKETHONE_DIR:-$(cd "$(dirname "$0")/../../../.." && pwd)/third_party/ziskethone}"
-TOOLCHAIN_PREFIX="${ZISK_TOOLCHAIN_PREFIX:-$HOME/opt/xpack/xpack-riscv-none-elf-gcc-14.3.0-1/bin}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ZISKETHONE_DIR="${ZISKETHONE_DIR:-$(cd "$SCRIPT_DIR/../../../.." && pwd)/third_party/ziskethone}"
 CLEAN=0
+
+# install-xpack.sh owns the version and the install prefix, so the default is
+# asked for rather than repeated here. Whether the prefix was chosen by the caller
+# decides what a missing toolchain means below: a caller-supplied path that is
+# empty is a mistake worth reporting, while a missing default is simply not
+# installed yet, and we can fix that.
+XPACK_EXPLICIT=1
+if [ -z "${ZISK_TOOLCHAIN_PREFIX:-}" ]; then
+    XPACK_EXPLICIT=0
+    TOOLCHAIN_PREFIX="$("$SCRIPT_DIR/install-xpack.sh" --print-prefix)/bin"
+else
+    TOOLCHAIN_PREFIX="$ZISK_TOOLCHAIN_PREFIX"
+fi
 
 for arg in "$@"; do
     case "$arg" in
         --clean) CLEAN=1 ;;
         --ziskethone=*) ZISKETHONE_DIR="${arg#*=}" ;;
-        --toolchain-prefix=*) TOOLCHAIN_PREFIX="${arg#*=}" ;;
+        --toolchain-prefix=*) TOOLCHAIN_PREFIX="${arg#*=}"; XPACK_EXPLICIT=1 ;;
         -h|--help)
             sed -n '2,/^$/p' "$0" | sed 's/^# \?//'
             exit 0
@@ -34,8 +47,20 @@ done
 GUEST_DIR="$ZISKETHONE_DIR/cpp-guest/zisk"
 [ -f "$GUEST_DIR/CMakeLists.txt" ] \
     || { echo "ziskethone cpp-guest/zisk not found at $GUEST_DIR" >&2; exit 1; }
-[ -x "$TOOLCHAIN_PREFIX/riscv-none-elf-g++" ] \
-    || { echo "riscv-none-elf-g++ not found in $TOOLCHAIN_PREFIX" >&2; exit 1; }
+# The cross-toolchain is installed on demand, for the same reason the patched GCC
+# below is: a rebuild should need nothing but a checkout. An explicitly chosen
+# prefix is left alone — installing to the default would not populate the path the
+# caller asked for, so silence there would be misleading.
+if [ ! -x "$TOOLCHAIN_PREFIX/riscv-none-elf-g++" ]; then
+    if [ "$XPACK_EXPLICIT" = 1 ]; then
+        echo "riscv-none-elf-g++ not found in $TOOLCHAIN_PREFIX" >&2
+        echo "(unset ZISK_TOOLCHAIN_PREFIX to install the pinned xPack automatically)" >&2
+        exit 1
+    fi
+    "$SCRIPT_DIR/install-xpack.sh" >/dev/null
+    [ -x "$TOOLCHAIN_PREFIX/riscv-none-elf-g++" ] \
+        || { echo "install-xpack.sh ran but $TOOLCHAIN_PREFIX is still empty" >&2; exit 1; }
+fi
 
 # The guest is always built with -mzisk-dma, which needs the patched GCC 14.3.0
 # built from ziskethone's cpp-guest/patches/gcc. build-toolchain.sh is

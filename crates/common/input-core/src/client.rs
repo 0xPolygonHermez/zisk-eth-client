@@ -32,6 +32,30 @@ pub fn parse_header(s: &str) -> Result<(String, String)> {
     Ok((k.trim().to_string(), v.trim().to_string()))
 }
 
+/// Block-level facts the host can recover from an input file on its own, with
+/// no guest run. Unlike [`BlockStats`] it carries no chain identity: not every
+/// input format embeds the chain config.
+#[derive(Debug, Clone, Copy)]
+pub struct InputStats {
+    pub block_number: u64,
+    pub tx_count: usize,
+    pub gas_used: u64,
+}
+
+/// Borrow the first length-prefixed frame of a raw `ZiskStdin` buffer.
+///
+/// Frames are laid out by `ZiskStdin::write_slice`: an 8-byte little-endian
+/// payload length, the payload, then padding to an 8-byte boundary.
+pub fn first_frame(buf: &[u8]) -> Result<&[u8]> {
+    let len_bytes: [u8; 8] = buf
+        .get(..8)
+        .and_then(|s| s.try_into().ok())
+        .context("input is too short to hold a frame length prefix")?;
+    let len = u64::from_le_bytes(len_bytes) as usize;
+    buf.get(8..8 + len)
+        .with_context(|| format!("input is truncated: first frame claims {len} bytes"))
+}
+
 #[derive(Debug, Clone)]
 pub struct BlockStats {
     pub chain_name: &'static str,
@@ -74,6 +98,14 @@ pub trait ExecutionClient: Send + Sync {
     ) -> Result<(ZiskStdin, BlockStats)>;
 
     fn run(&self);
+
+    /// Decode the block-level stats out of an input built by
+    /// [`from_rpc`](Self::from_rpc), so a benchmark can report tx count and gas
+    /// without the guest reporting them back. `None` for clients whose input
+    /// format the host cannot decode.
+    fn input_stats(&self, _stdin: &ZiskStdin) -> Result<Option<InputStats>> {
+        Ok(None)
+    }
 
     /// Whether [`run`](Self::run) emits ZisK hints. `true` for instrumented
     /// guest runs (reth, ethrex); `false` for native-only clients like

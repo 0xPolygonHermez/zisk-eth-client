@@ -3,13 +3,9 @@ description: >
   Install the xPack riscv-none-elf-gcc cross-toolchain + cmake/git used to
   build ziskethone's C++ ZisK guest ELF and its native FFI lib. Needed by any
   job that builds `-p host` (the guest-ziskethone build.rs cross-compiles the
-  cpp-guest). Installs to the default prefix guest-ziskethone/build-elf.sh
-  expects ($HOME/opt/xpack/...), so no ZISK_TOOLCHAIN_PREFIX override is needed.
-
-inputs:
-  xpack-version:
-    description: xPack riscv-none-elf-gcc release (without leading v).
-    default: "14.3.0-1"
+  cpp-guest). The toolchain itself comes from the repo's own install-xpack.sh, so
+  the version and the prefix are pinned in one place; that prefix is what
+  build-elf.sh defaults to, so no ZISK_TOOLCHAIN_PREFIX override is needed.
 
 runs:
   using: composite
@@ -38,19 +34,9 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        ver="${{ inputs.xpack-version }}"
-        prefix="$HOME/opt/xpack/xpack-riscv-none-elf-gcc-${ver}"
-        if [ -x "$prefix/bin/riscv-none-elf-g++" ]; then
-          echo "toolchain already present at $prefix"
-        else
-          mkdir -p "$HOME/opt/xpack"
-          url="https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v${ver}/xpack-riscv-none-elf-gcc-${ver}-linux-x64.tar.gz"
-          echo "downloading $url"
-          curl -fSL --retry 3 -o /tmp/xpack-riscv.tar.gz "$url"
-          tar -xzf /tmp/xpack-riscv.tar.gz -C "$HOME/opt/xpack"
-          rm -f /tmp/xpack-riscv.tar.gz
-        fi
+        # The script is idempotent and prints its prefix on stdout, so a warm
+        # cache costs a second and the version stays pinned in exactly one file.
+        prefix="$(./crates/clients/ziskethone/guest/install-xpack.sh)"
         # build-elf.sh defaults ZISK_TOOLCHAIN_PREFIX to this path; also expose
         # on PATH for any direct cmake invocation.
         echo "$prefix/bin" >> "$GITHUB_PATH"
-        "$prefix/bin/riscv-none-elf-g++" --version | head -1
