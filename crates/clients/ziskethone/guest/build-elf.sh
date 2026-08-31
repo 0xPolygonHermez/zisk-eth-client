@@ -15,6 +15,25 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ZISKETHONE_DIR="${ZISKETHONE_DIR:-$(cd "$SCRIPT_DIR/../../../.." && pwd)/third_party/ziskethone}"
 CLEAN=0
 
+# `nproc` and `sha256sum` are GNU-only, and macOS has neither. Go through these
+# so a missing one doesn't take the whole script down.
+_ncpu() {
+    if command -v nproc >/dev/null 2>&1; then
+        nproc
+    elif command -v sysctl >/dev/null 2>&1; then
+        sysctl -n hw.ncpu
+    else
+        echo 1
+    fi
+}
+_sha256() {
+    if command -v sha256sum >/dev/null 2>&1; then
+        sha256sum
+    else
+        shasum -a 256
+    fi
+}
+
 # install-xpack.sh owns the version and the install prefix, so the default is
 # asked for rather than repeated here. Whether the prefix was chosen by the caller
 # decides what a missing toolchain means below: a caller-supplied path that is
@@ -137,7 +156,7 @@ ZEG_PATCHES=("$HOST_DIR"/patches/*.patch)
 shopt -u nullglob
 [ ${#ZEG_PATCHES[@]} -gt 0 ] \
     || { echo "no evmone patches found in $HOST_DIR/patches" >&2; exit 1; }
-PATCH_NOW="$(cat "${ZEG_PATCHES[@]}" | sha256sum | cut -d' ' -f1)"
+PATCH_NOW="$(cat "${ZEG_PATCHES[@]}" | _sha256 | cut -d' ' -f1)"
 if [ -d "$HOST_DIR/build-stub" ] && \
    [ "$(cat "$PATCH_STAMP" 2>/dev/null)" != "$PATCH_NOW" ]; then
     echo "==> evmone patch set changed; removing $HOST_DIR/build-stub"
@@ -161,7 +180,7 @@ cmake \
 printf '%s\n' "$STAMP_NOW" > "$STAMP_FILE"
 
 echo "==> building zisk_eth_guest.elf"
-cmake --build "$BUILD_DIR" --target zisk_eth_guest.elf -j"$(nproc)"
+cmake --build "$BUILD_DIR" --target zisk_eth_guest.elf -j"$(_ncpu)"
 
 [ -f "$ELF_PATH" ] \
     || { echo "build finished but ELF not at $ELF_PATH" >&2; exit 1; }

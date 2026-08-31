@@ -56,9 +56,11 @@ crate provides:
 - **`g++-13`, `g++-12`, or `g++-11`** on the host — GCC 14's bundled libcody does
   not build under a host g++ newer than ~14, so the build looks for an older one
   and stops if it finds none. Usually already present (Ubuntu 24.04's default
-  `g++` is 13.3); otherwise `sudo apt install g++-13` on Debian/Ubuntu,
-  `brew install gcc@13` on macOS. Set `CXX`/`CC` to pick one explicitly.
-- `curl`, `tar`, `make`, `cmake`.
+  `g++` is 13.3); otherwise `sudo apt install g++-13` on Debian/Ubuntu. Set
+  `CXX`/`CC` to pick one explicitly. Not needed on macOS, where the build uses
+  Apple clang.
+- `curl`, `tar`, `make`, `cmake`. On macOS, the Xcode Command Line Tools and
+  `brew install cmake`.
 
 Nothing else. The cross-toolchain is not a prerequisite: `build-elf.sh` installs
 the pinned xPack `riscv-none-elf-gcc` 14.3.0-1 (`install-xpack.sh`) and the
