@@ -13,9 +13,9 @@ codegen-units = 1
 panic = "abort"
 
 [workspace.dependencies]
-# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.2.0-alpha" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/blake3-recursion" }
 # crates.io dependencies
-ziskos = "1.2.0-alpha"
+# ziskos = "1.2.0-alpha"
 # Local development
 # ziskos = { path = "../../../../zisk/ziskos/entrypoint" }
 

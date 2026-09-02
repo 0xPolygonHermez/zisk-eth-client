@@ -1035,6 +1035,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "blake3"
+version = "1.8.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d9e454fc11f76977dc803893aff6304ed33d6a26efae8696573bea74baa27ae"
+dependencies = [
+ "arrayvec",
+ "cc",
+ "cfg-if",
+ "constant_time_eq",
+ "cpufeatures 0.3.0",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1233,6 +1246,12 @@ dependencies = [
  "quote",
  "unicode-xid",
 ]
+
+[[package]]
+name = "constant_time_eq"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3d52eff69cd5e647efe296129160853a42795992097e8af39800e1060caeea9b"
 
 [[package]]
 name = "convert_case"
@@ -1830,7 +1849,7 @@ dependencies = [
 name = "guest-common"
 version = "0.10.0"
 dependencies = [
- "zisk-zkvm-interface 1.3.0-alpha",
+ "zisk-zkvm-interface",
 ]
 
 [[package]]
@@ -1857,7 +1876,7 @@ dependencies = [
  "stateless",
  "tiny-keccak",
  "tries",
- "ziskos 1.3.0-alpha",
+ "ziskos",
 ]
 
 [[package]]
@@ -2738,14 +2757,14 @@ dependencies = [
 
 [[package]]
 name = "proofman-fields"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "124c75a333fd7209e5f77da6c7734260ad54eaabf7e2e20db24917f7ec4505cd"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feat%2Fblake3-recursion#0399bd0d0c02bdbfd4265e163225ce8bad462d8a"
 dependencies = [
+ "blake3",
  "cfg-if",
  "num-bigint",
  "paste",
- "proofman-starks-lib-c 1.2.0-alpha",
+ "proofman-starks-lib-c 1.3.0-alpha (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feat%2Fblake3-recursion)",
  "serde",
 ]
 
@@ -2757,18 +2776,17 @@ dependencies = [
  "cfg-if",
  "num-bigint",
  "paste",
- "proofman-starks-lib-c 1.3.0-alpha",
+ "proofman-starks-lib-c 1.3.0-alpha (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.3.0-alpha)",
  "serde",
 ]
 
 [[package]]
 name = "proofman-starks-lib-c"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d1f0b940c17f32bcc0b289fd11bd0f8a812c82a4d44a067cd67d773fef54b13f"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feat%2Fblake3-recursion#0399bd0d0c02bdbfd4265e163225ce8bad462d8a"
 dependencies = [
  "crossbeam-channel",
- "proofman-starks-src 1.2.0-alpha",
+ "proofman-starks-src 1.3.0-alpha (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feat%2Fblake3-recursion)",
 ]
 
 [[package]]
@@ -2777,14 +2795,13 @@ version = "1.3.0-alpha"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.3.0-alpha#14974d0d4b65759f9e4060a415f7175077295fd1"
 dependencies = [
  "crossbeam-channel",
- "proofman-starks-src 1.3.0-alpha",
+ "proofman-starks-src 1.3.0-alpha (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.3.0-alpha)",
 ]
 
 [[package]]
 name = "proofman-starks-src"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0efcb2cd92919487f86364fc3b51c8efa8ac2ea3a56f3d6c4d39b3bd464a5b50"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feat%2Fblake3-recursion#0399bd0d0c02bdbfd4265e163225ce8bad462d8a"
 
 [[package]]
 name = "proofman-starks-src"
@@ -2793,22 +2810,11 @@ source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-de
 
 [[package]]
 name = "proofman-verifier"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d265453d0cb920c636de66ef3d7dffbcef6a1a8adea91b8484d1b09398d2f51"
-dependencies = [
- "num-traits",
- "proofman-fields 1.2.0-alpha",
- "serde",
-]
-
-[[package]]
-name = "proofman-verifier"
 version = "1.3.0-alpha"
 source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.3.0-alpha#14974d0d4b65759f9e4060a415f7175077295fd1"
 dependencies = [
  "num-traits",
- "proofman-fields 1.3.0-alpha",
+ "proofman-fields 1.3.0-alpha (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.3.0-alpha)",
  "serde",
 ]
 
@@ -4745,7 +4751,7 @@ dependencies = [
  "alloy-primitives",
  "guest-reth",
  "revm",
- "ziskos 1.2.0-alpha",
+ "ziskos",
 ]
 
 [[package]]
@@ -4855,42 +4861,23 @@ dependencies = [
 
 [[package]]
 name = "zisk-circuit"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1bc6041f337ea1540da88363df1c7bddfadf0e9e9433faee038aa15fa374126"
-
-[[package]]
-name = "zisk-circuit"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#3ae1246b0cb6b2de32611f8407f148e35f889e65"
-
-[[package]]
-name = "zisk-definitions"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7d1a44ad1d2ce15db39bfff3dfe4d5dd4736962c7badbd089f1f292d9347879"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion#5f3dc743e678c71254c058a46451535d1f35a708"
 
 [[package]]
 name = "zisk-definitions"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#3ae1246b0cb6b2de32611f8407f148e35f889e65"
-
-[[package]]
-name = "zisk-lib-c"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0238eb80fe6909d395453dba79ca27587c2ea34a87ba9f98efc55f94bde12eb0"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion#5f3dc743e678c71254c058a46451535d1f35a708"
 
 [[package]]
 name = "zisk-lib-c"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#3ae1246b0cb6b2de32611f8407f148e35f889e65"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion#5f3dc743e678c71254c058a46451535d1f35a708"
 
 [[package]]
 name = "zisk-precomp-helpers"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a713dd3bd7b1ac61c7aaee725bb185afc8439f63881708a8408ab2e59694144"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion#5f3dc743e678c71254c058a46451535d1f35a708"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -4901,43 +4888,14 @@ dependencies = [
  "crunchy",
  "num-bigint",
  "num-traits",
- "zisk-circuit 1.2.0-alpha",
- "zisk-lib-c 1.2.0-alpha",
-]
-
-[[package]]
-name = "zisk-precomp-helpers"
-version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#3ae1246b0cb6b2de32611f8407f148e35f889e65"
-dependencies = [
- "ark-bls12-381",
- "ark-bn254",
- "ark-ff 0.5.0",
- "ark-secp256k1",
- "ark-secp256r1",
- "cfg-if",
- "crunchy",
- "num-bigint",
- "num-traits",
- "zisk-circuit 1.3.0-alpha",
- "zisk-lib-c 1.3.0-alpha",
-]
-
-[[package]]
-name = "zisk-stream"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b7fdc26065c9ee8153b8eb1e086573bf88c5dacea0a7665ca68adb20a25c056"
-dependencies = [
- "libc",
- "thiserror",
- "tracing",
+ "zisk-circuit",
+ "zisk-lib-c",
 ]
 
 [[package]]
 name = "zisk-stream"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#3ae1246b0cb6b2de32611f8407f148e35f889e65"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion#5f3dc743e678c71254c058a46451535d1f35a708"
 dependencies = [
  "libc",
  "thiserror",
@@ -4946,43 +4904,24 @@ dependencies = [
 
 [[package]]
 name = "zisk-verifier"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a218c0e2c72facb1324751f19f37a5a58df629e5a2d154c6932f516a22f367c"
-dependencies = [
- "proofman-verifier 1.2.0-alpha",
-]
-
-[[package]]
-name = "zisk-verifier"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#3ae1246b0cb6b2de32611f8407f148e35f889e65"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion#5f3dc743e678c71254c058a46451535d1f35a708"
 dependencies = [
- "proofman-verifier 1.3.0-alpha",
-]
-
-[[package]]
-name = "zisk-zkvm-interface"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9eb81c441a0ce460f430facfb1a31e54f4a949c35468cf04d9577c86be8146e3"
-dependencies = [
- "bindgen",
+ "proofman-verifier",
 ]
 
 [[package]]
 name = "zisk-zkvm-interface"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#3ae1246b0cb6b2de32611f8407f148e35f889e65"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion#5f3dc743e678c71254c058a46451535d1f35a708"
 dependencies = [
  "bindgen",
 ]
 
 [[package]]
 name = "ziskos"
-version = "1.2.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08a9eee9ae285d36dd52ab8322e4e870ec2c07f8befca02813554e907c43e3ea"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion#5f3dc743e678c71254c058a46451535d1f35a708"
 dependencies = [
  "anyhow",
  "ark-bn254",
@@ -5003,7 +4942,7 @@ dependencies = [
  "num-traits",
  "once_cell",
  "paste",
- "proofman-fields 1.2.0-alpha",
+ "proofman-fields 1.3.0-alpha (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=feat%2Fblake3-recursion)",
  "rand 0.8.6",
  "ripemd",
  "secp256k1 0.31.1",
@@ -5011,52 +4950,12 @@ dependencies = [
  "sha2",
  "tiny-keccak",
  "tokio",
- "zisk-definitions 1.2.0-alpha",
- "zisk-lib-c 1.2.0-alpha",
- "zisk-precomp-helpers 1.2.0-alpha",
- "zisk-stream 1.2.0-alpha",
- "zisk-verifier 1.2.0-alpha",
- "zisk-zkvm-interface 1.2.0-alpha",
-]
-
-[[package]]
-name = "ziskos"
-version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#3ae1246b0cb6b2de32611f8407f148e35f889e65"
-dependencies = [
- "anyhow",
- "ark-bn254",
- "ark-ec",
- "ark-ff 0.5.0",
- "ark-serialize 0.5.0",
- "aurora-engine-modexp",
- "bincode",
- "blst",
- "bytes",
- "cfg-if",
- "ctor",
- "getrandom 0.2.17",
- "lazy_static",
- "libc",
- "num-bigint",
- "num-integer",
- "num-traits",
- "once_cell",
- "paste",
- "proofman-fields 1.3.0-alpha",
- "rand 0.8.6",
- "ripemd",
- "secp256k1 0.31.1",
- "serde",
- "sha2",
- "tiny-keccak",
- "tokio",
- "zisk-definitions 1.3.0-alpha",
- "zisk-lib-c 1.3.0-alpha",
- "zisk-precomp-helpers 1.3.0-alpha",
- "zisk-stream 1.3.0-alpha",
- "zisk-verifier 1.3.0-alpha",
- "zisk-zkvm-interface 1.3.0-alpha",
+ "zisk-definitions",
+ "zisk-lib-c",
+ "zisk-precomp-helpers",
+ "zisk-stream",
+ "zisk-verifier",
+ "zisk-zkvm-interface",
 ]
 
 [[package]]

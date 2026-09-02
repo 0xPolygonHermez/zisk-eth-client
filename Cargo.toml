@@ -31,9 +31,9 @@ input-ethrex = { path = "crates/clients/ethrex/input" }
 input-reth = { path = "crates/clients/reth/input" }
 input-ziskethone = { path = "crates/clients/ziskethone/input" }
 
-zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.0-alpha" }
-zisk-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.0-alpha" }
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.0-alpha" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/blake3-recursion" }
+zisk-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/blake3-recursion" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/blake3-recursion" }
 rust-input-gen = { path = "third_party/ziskethone/rust-input-gen" }
 
 # crates.io dependencies
