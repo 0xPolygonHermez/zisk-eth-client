@@ -375,10 +375,15 @@ fn regenerate_committed_elf() {
     // mark the crate perpetually dirty (every rebuild writes into it) and re-run
     // the cross-compile on every subsequent build.
     let guest_src = cpp_guest.join("zisk");
-    // Both env vars are read downstream (ziskethone_dir here, ZISK_TOOLCHAIN_PREFIX
-    // in build-elf.sh); a change to either must re-run this regeneration.
+    // These env vars are all read downstream (ziskethone_dir here, the rest in
+    // build-elf.sh); a change to any of them must re-run this regeneration.
+    // ZISK_MARCH especially: it changes the ELF's ISA without touching a single
+    // source file, so without this an A/B run would silently reuse the old one.
     println!("cargo:rerun-if-env-changed=ZISKETHONE_DIR");
     println!("cargo:rerun-if-env-changed=ZISK_TOOLCHAIN_PREFIX");
+    println!("cargo:rerun-if-env-changed=ZISK_DMA_GCC_PREFIX");
+    println!("cargo:rerun-if-env-changed=ZISK_MARCH");
+    println!("cargo:rerun-if-env-changed=ZEG_ZISK_DMA");
     println!("cargo:rerun-if-changed={}", script.display());
     println!(
         "cargo:rerun-if-changed={}",

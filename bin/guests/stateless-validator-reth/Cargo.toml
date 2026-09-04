@@ -15,7 +15,7 @@ panic = "abort"
 [dependencies]
 guest-reth = { path = "../../../crates/clients/reth/guest" }
 
-ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/blake3-recursion" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "feat/blake3-recursion-zba" }
 # crates.io dependencies
 # ziskos = "1.2.0-alpha"
 # Local development
