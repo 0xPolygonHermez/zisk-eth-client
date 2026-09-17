@@ -970,7 +970,7 @@ dependencies = [
  "bitflags",
  "cexpr",
  "clang-sys",
- "itertools 0.10.5",
+ "itertools 0.13.0",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -4836,22 +4836,22 @@ dependencies = [
 [[package]]
 name = "zisk-circuit"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#c8ad0160d9e6e1a360f3312b4766726f369ca78a"
 
 [[package]]
 name = "zisk-definitions"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#c8ad0160d9e6e1a360f3312b4766726f369ca78a"
 
 [[package]]
 name = "zisk-lib-c"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#c8ad0160d9e6e1a360f3312b4766726f369ca78a"
 
 [[package]]
 name = "zisk-precomp-helpers"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#c8ad0160d9e6e1a360f3312b4766726f369ca78a"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -4869,7 +4869,7 @@ dependencies = [
 [[package]]
 name = "zisk-stream"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#c8ad0160d9e6e1a360f3312b4766726f369ca78a"
 dependencies = [
  "libc",
  "thiserror",
@@ -4879,7 +4879,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#c8ad0160d9e6e1a360f3312b4766726f369ca78a"
 dependencies = [
  "proofman-fields",
  "proofman-verifier",
@@ -4888,7 +4888,7 @@ dependencies = [
 [[package]]
 name = "zisk-zkvm-interface"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#c8ad0160d9e6e1a360f3312b4766726f369ca78a"
 dependencies = [
  "bindgen",
 ]
@@ -4896,7 +4896,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#c8ad0160d9e6e1a360f3312b4766726f369ca78a"
 dependencies = [
  "anyhow",
  "ark-bn254",
