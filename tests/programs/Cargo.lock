@@ -889,7 +889,7 @@ dependencies = [
  "guest-reth",
  "hex",
  "revm",
- "ziskos",
+ "ziskos 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
 ]
 
 [[package]]
@@ -915,7 +915,7 @@ dependencies = [
  "hex",
  "num-bigint",
  "revm",
- "ziskos",
+ "ziskos 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
 ]
 
 [[package]]
@@ -1700,7 +1700,7 @@ dependencies = [
 name = "guest-common"
 version = "0.10.0"
 dependencies = [
- "zisk-zkvm-interface",
+ "zisk-zkvm-interface 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha)",
 ]
 
 [[package]]
@@ -1727,7 +1727,7 @@ dependencies = [
  "stateless",
  "tiny-keccak",
  "tries",
- "ziskos",
+ "ziskos 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha)",
 ]
 
 [[package]]
@@ -1773,7 +1773,7 @@ dependencies = [
  "guest-reth",
  "hex",
  "revm",
- "ziskos",
+ "ziskos 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
 ]
 
 [[package]]
@@ -2212,7 +2212,7 @@ dependencies = [
  "guest-reth",
  "hex",
  "revm",
- "ziskos",
+ "ziskos 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
 ]
 
 [[package]]
@@ -2391,7 +2391,7 @@ dependencies = [
  "guest-reth",
  "hex",
  "revm",
- "ziskos",
+ "ziskos 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
 ]
 
 [[package]]
@@ -3626,7 +3626,7 @@ dependencies = [
  "guest-reth",
  "hex",
  "revm",
- "ziskos",
+ "ziskos 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
 ]
 
 [[package]]
@@ -3680,7 +3680,7 @@ dependencies = [
  "guest-reth",
  "hex",
  "revm",
- "ziskos",
+ "ziskos 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
 ]
 
 [[package]]
@@ -4748,14 +4748,29 @@ version = "1.3.0-alpha"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba#521749269bf973b760101842490fdfb0338c98a4"
 
 [[package]]
+name = "zisk-circuit"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+
+[[package]]
 name = "zisk-definitions"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba#521749269bf973b760101842490fdfb0338c98a4"
+
+[[package]]
+name = "zisk-definitions"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+
+[[package]]
+name = "zisk-lib-c"
 version = "1.3.0-alpha"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba#521749269bf973b760101842490fdfb0338c98a4"
 
 [[package]]
 name = "zisk-lib-c"
 version = "1.3.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba#521749269bf973b760101842490fdfb0338c98a4"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
 
 [[package]]
 name = "zisk-precomp-helpers"
@@ -4771,14 +4786,42 @@ dependencies = [
  "crunchy",
  "num-bigint",
  "num-traits",
- "zisk-circuit",
- "zisk-lib-c",
+ "zisk-circuit 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
+ "zisk-lib-c 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
+]
+
+[[package]]
+name = "zisk-precomp-helpers"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+dependencies = [
+ "ark-bls12-381",
+ "ark-bn254",
+ "ark-ff 0.5.0",
+ "ark-secp256k1",
+ "ark-secp256r1",
+ "cfg-if",
+ "crunchy",
+ "num-bigint",
+ "num-traits",
+ "zisk-circuit 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha)",
+ "zisk-lib-c 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha)",
 ]
 
 [[package]]
 name = "zisk-stream"
 version = "1.3.0-alpha"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba#521749269bf973b760101842490fdfb0338c98a4"
+dependencies = [
+ "libc",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
+name = "zisk-stream"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
 dependencies = [
  "libc",
  "thiserror",
@@ -4794,9 +4837,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "zisk-verifier"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+dependencies = [
+ "proofman-fields 1.3.0-alpha (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.3.0-alpha)",
+ "proofman-verifier",
+]
+
+[[package]]
 name = "zisk-zkvm-interface"
 version = "1.3.0-alpha"
 source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba#521749269bf973b760101842490fdfb0338c98a4"
+dependencies = [
+ "bindgen",
+]
+
+[[package]]
+name = "zisk-zkvm-interface"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
 dependencies = [
  "bindgen",
 ]
@@ -4833,12 +4893,52 @@ dependencies = [
  "sha2",
  "tiny-keccak",
  "tokio",
- "zisk-definitions",
- "zisk-lib-c",
- "zisk-precomp-helpers",
- "zisk-stream",
- "zisk-verifier",
- "zisk-zkvm-interface",
+ "zisk-definitions 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
+ "zisk-lib-c 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
+ "zisk-precomp-helpers 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
+ "zisk-stream 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
+ "zisk-verifier 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
+ "zisk-zkvm-interface 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Fblake3-recursion-zba)",
+]
+
+[[package]]
+name = "ziskos"
+version = "1.3.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha#9e9291d244867aaa6334e6dabef3cba4f604db86"
+dependencies = [
+ "anyhow",
+ "ark-bn254",
+ "ark-ec",
+ "ark-ff 0.5.0",
+ "ark-serialize 0.5.0",
+ "aurora-engine-modexp",
+ "bincode",
+ "blst",
+ "bytes",
+ "cfg-if",
+ "ctor",
+ "getrandom 0.2.17",
+ "lazy_static",
+ "libc",
+ "num-bigint",
+ "num-integer",
+ "num-traits",
+ "once_cell",
+ "paste",
+ "proofman-fields 1.3.0-alpha (git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.3.0-alpha)",
+ "rand 0.8.6",
+ "ripemd",
+ "secp256k1 0.31.1",
+ "serde",
+ "sha2",
+ "tiny-keccak",
+ "tokio",
+ "zisk-definitions 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha)",
+ "zisk-lib-c 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha)",
+ "zisk-precomp-helpers 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha)",
+ "zisk-stream 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha)",
+ "zisk-verifier 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha)",
+ "zisk-zkvm-interface 1.3.0-alpha (git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.3.0-alpha)",
 ]
 
 [[package]]
