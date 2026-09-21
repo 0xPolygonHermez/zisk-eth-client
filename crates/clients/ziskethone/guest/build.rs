@@ -297,12 +297,16 @@ fn build_ffi() {
     // evmone's copies local symbols in the precompiles archive so libziskc's
     // stay the sole globals; evmone's intra-archive callers still resolve to
     // their (now-local) definition.
+    //
+    // Apple targets are exempt: there evmone's copy is already a local symbol,
+    // so there is nothing to clash and no objcopy to find. Keyed on the target,
+    // not the host, so a cross-compile to Linux still gets the fix.
+    let target = std::env::var("TARGET").unwrap_or_default();
     let precompiles_a =
         build.join("_deps/evmone-build/lib/evmone_precompiles/libevmone_precompiles.a");
-    if precompiles_a.exists() {
+    if precompiles_a.exists() && !target.contains("-apple-") {
         // GNU binutils `objcopy` (override with the `OBJCOPY` env var, the cc/cmake
-        // convention). Not available on non-GNU toolchains (e.g. macOS llvm), where
-        // this localize-symbol trick wouldn't apply anyway.
+        // convention).
         let objcopy = std::env::var("OBJCOPY").unwrap_or_else(|_| "objcopy".to_string());
         for sym in ["ethash_keccak256", "ethash_keccak256_32"] {
             let st = std::process::Command::new(&objcopy)
@@ -330,13 +334,19 @@ fn build_ffi() {
 
     // Link order: the FFI archive first, then its dependencies. evmc is
     // bundled into libevmone in evmone v0.21, so there is no separate evmc
-    // archive. stdc++ resolves the C++ runtime symbols.
+    // archive. Last the C++ runtime: libstdc++ on GNU platforms, libc++ on
+    // Apple ones, where asking for `stdc++` fails to link.
+    let cxx_runtime = if target.contains("-apple-") {
+        "c++"
+    } else {
+        "stdc++"
+    };
     println!("cargo:rustc-link-lib=static=zeg_ffi");
     println!("cargo:rustc-link-lib=static=evmone");
     println!("cargo:rustc-link-lib=static=evmone-state");
     println!("cargo:rustc-link-lib=static=evmone_precompiles");
     println!("cargo:rustc-link-lib=static=blst");
-    println!("cargo:rustc-link-lib=dylib=stdc++");
+    println!("cargo:rustc-link-lib=dylib={cxx_runtime}");
 }
 
 /// Rebuild the guest ELF from the C++ sources (xPack RISC-V toolchain) and copy
@@ -365,10 +375,15 @@ fn regenerate_committed_elf() {
     // mark the crate perpetually dirty (every rebuild writes into it) and re-run
     // the cross-compile on every subsequent build.
     let guest_src = cpp_guest.join("zisk");
-    // Both env vars are read downstream (ziskethone_dir here, ZISK_TOOLCHAIN_PREFIX
-    // in build-elf.sh); a change to either must re-run this regeneration.
+    // These env vars are all read downstream (ziskethone_dir here, the rest in
+    // build-elf.sh); a change to any of them must re-run this regeneration.
+    // ZISK_MARCH especially: it changes the ELF's ISA without touching a single
+    // source file, so without this an A/B run would silently reuse the old one.
     println!("cargo:rerun-if-env-changed=ZISKETHONE_DIR");
     println!("cargo:rerun-if-env-changed=ZISK_TOOLCHAIN_PREFIX");
+    println!("cargo:rerun-if-env-changed=ZISK_DMA_GCC_PREFIX");
+    println!("cargo:rerun-if-env-changed=ZISK_MARCH");
+    println!("cargo:rerun-if-env-changed=ZEG_ZISK_DMA");
     println!("cargo:rerun-if-changed={}", script.display());
     println!(
         "cargo:rerun-if-changed={}",

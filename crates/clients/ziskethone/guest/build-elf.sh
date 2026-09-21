@@ -3,7 +3,20 @@
 #
 # Usage:
 #   ./crates/clients/ziskethone/guest/build-elf.sh [--clean] [--ziskethone=PATH]
-#                                           [--toolchain-prefix=PATH]
+#                                           [--toolchain-prefix=PATH] [--march=STR]
+#                                           [--no-dma]
+#
+# The guest -march is pinned below (see ZISK_MARCH) so a plain rebuild
+# reproduces the committed ELF. ZISK_MARCH or --march= overrides it for an A/B;
+# an empty ZISK_MARCH falls back to cpp-guest/zisk/toolchain.cmake's own
+# default. Changing it reconfigures from scratch, so a switch really takes
+# effect instead of leaving the old value in the CMake cache.
+#
+# --no-dma (or ZEG_ZISK_DMA=OFF) drops -mzisk-dma, for an A/B of the compiler's
+# block-mem* lowering. It is not "no DMA": the mem* thunks in cpp-guest/zisk/dma
+# and the 33 explicit zeg::zisk::zisk_* call sites (gated on ZEG_ZISK, not on
+# this flag) still reach the precompiles. That is exactly why the marker count
+# alone cannot tell the two builds apart, and why this override exists.
 #
 # Output: <ziskethone>/cpp-guest/zisk/build/zisk_eth_guest.elf
 
@@ -14,6 +27,45 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ZISKETHONE_DIR="${ZISKETHONE_DIR:-$(cd "$SCRIPT_DIR/../../../.." && pwd)/third_party/ziskethone}"
 CLEAN=0
+# The march the committed ELF is built with. Pinned here rather than left to
+# ziskethone's toolchain.cmake default for the same reason ZEG_ZISK_DMA is
+# forced ON below: this repo owns the committed ELF, so a plain rebuild has to
+# reproduce it. The delta from upstream's default is `_zba`, worth -2.34% steps
+# and -0.41% area over three 140M-gas mainnet blocks now that
+# zisk-transpiler-riscv proves sh<n>add/slli.uw natively (its `zba_native`
+# feature, on by default from the zisk branch this workspace pins).
+#
+# `_zbkb` is carried over from upstream's string and is inert here — the guest
+# emits none of its own instructions (pack/packh/packw/brev8/zip/unzip) and its
+# `rev8` already comes with `_zbb`. Kept so the only difference from
+# ziskethone's default is the one that pays.
+#
+# Set ZISK_MARCH to A/B a different string, or to the empty string to fall back
+# to whatever toolchain.cmake defaults to. Either way the change reconfigures
+# from scratch (see the stamp below).
+ZISK_MARCH="${ZISK_MARCH-rv64ima_zicsr_zba_zbb_zbs_zbkb}"
+# ON unless asked otherwise: the committed ELF is a DMA build, so a plain run of
+# this script has to reproduce it.
+ZEG_ZISK_DMA="${ZEG_ZISK_DMA:-ON}"
+
+# `nproc` and `sha256sum` are GNU-only, and macOS has neither. Go through these
+# so a missing one doesn't take the whole script down.
+_ncpu() {
+    if command -v nproc >/dev/null 2>&1; then
+        nproc
+    elif command -v sysctl >/dev/null 2>&1; then
+        sysctl -n hw.ncpu
+    else
+        echo 1
+    fi
+}
+_sha256() {
+    if command -v sha256sum >/dev/null 2>&1; then
+        sha256sum
+    else
+        shasum -a 256
+    fi
+}
 
 # install-xpack.sh owns the version and the install prefix, so the default is
 # asked for rather than repeated here. Whether the prefix was chosen by the caller
@@ -33,6 +85,8 @@ for arg in "$@"; do
         --clean) CLEAN=1 ;;
         --ziskethone=*) ZISKETHONE_DIR="${arg#*=}" ;;
         --toolchain-prefix=*) TOOLCHAIN_PREFIX="${arg#*=}"; XPACK_EXPLICIT=1 ;;
+        --march=*) ZISK_MARCH="${arg#*=}" ;;
+        --no-dma) ZEG_ZISK_DMA=OFF ;;
         -h|--help)
             sed -n '2,/^$/p' "$0" | sed 's/^# \?//'
             exit 0
@@ -108,7 +162,7 @@ fi
 # CMAKE_CXX_COMPILER moves, so detect the move ourselves and start clean instead
 # of handing the user a cache error. Also covers future flag changes.
 STAMP_FILE="$BUILD_DIR/.zec-toolchain-stamp"
-STAMP_NOW="$(command -v riscv-none-elf-g++) $(riscv-none-elf-g++ -dumpversion) ZEG_ZISK_DMA=ON"
+STAMP_NOW="$(command -v riscv-none-elf-g++) $(riscv-none-elf-g++ -dumpversion) ZEG_ZISK_DMA=$ZEG_ZISK_DMA ZISK_MARCH=${ZISK_MARCH:-<toolchain.cmake default>}"
 if [ -f "$STAMP_FILE" ] && [ "$(cat "$STAMP_FILE")" != "$STAMP_NOW" ]; then
     echo "==> toolchain or flags changed since last configure; removing $BUILD_DIR"
     rm -rf "$BUILD_DIR"
@@ -137,7 +191,7 @@ ZEG_PATCHES=("$HOST_DIR"/patches/*.patch)
 shopt -u nullglob
 [ ${#ZEG_PATCHES[@]} -gt 0 ] \
     || { echo "no evmone patches found in $HOST_DIR/patches" >&2; exit 1; }
-PATCH_NOW="$(cat "${ZEG_PATCHES[@]}" | sha256sum | cut -d' ' -f1)"
+PATCH_NOW="$(cat "${ZEG_PATCHES[@]}" | _sha256 | cut -d' ' -f1)"
 if [ -d "$HOST_DIR/build-stub" ] && \
    [ "$(cat "$PATCH_STAMP" 2>/dev/null)" != "$PATCH_NOW" ]; then
     echo "==> evmone patch set changed; removing $HOST_DIR/build-stub"
@@ -148,20 +202,30 @@ echo "==> host cmake configure (fetch evmone, apply patches)"
 cmake -S "$HOST_DIR" -B "$HOST_DIR/build-stub"
 printf '%s\n' "$PATCH_NOW" > "$PATCH_STAMP"
 
-echo "==> configuring cmake"
+# Unquoted on purpose: empty must expand to no argument at all, and an -march
+# string never contains whitespace. An array would need the
+# ${a[@]+"${a[@]}"} dance to survive `set -u` on macOS's bash 3.2.
+MARCH_FLAG=""
+if [ -n "$ZISK_MARCH" ]; then
+    MARCH_FLAG="-DZISK_MARCH=$ZISK_MARCH"
+fi
+
+echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA)"
+# shellcheck disable=SC2086
 cmake \
     -S "$GUEST_DIR" \
     -B "$BUILD_DIR" \
     -DCMAKE_TOOLCHAIN_FILE="$GUEST_DIR/toolchain.cmake" \
     -DCMAKE_BUILD_TYPE=Release \
     -DEVMONE_SRC="$HOST_DIR/build-stub/_deps/evmone-src" \
-    -DZEG_ZISK_DMA=ON \
+    -DZEG_ZISK_DMA="$ZEG_ZISK_DMA" \
+    $MARCH_FLAG \
     -G "Unix Makefiles"
 
 printf '%s\n' "$STAMP_NOW" > "$STAMP_FILE"
 
 echo "==> building zisk_eth_guest.elf"
-cmake --build "$BUILD_DIR" --target zisk_eth_guest.elf -j"$(nproc)"
+cmake --build "$BUILD_DIR" --target zisk_eth_guest.elf -j"$(_ncpu)"
 
 [ -f "$ELF_PATH" ] \
     || { echo "build finished but ELF not at $ELF_PATH" >&2; exit 1; }
@@ -173,12 +237,26 @@ cmake --build "$BUILD_DIR" --target zisk_eth_guest.elf -j"$(nproc)"
 # guest sources and the evmone patch set (7,780 without fused dispatch, 7,784
 # with), which is why the check is a threshold and not an expected value.
 markers=$(riscv-none-elf-objdump -d "$ELF_PATH" | grep -cE 'csrs[[:space:]]+0x813,' || true)
-if [ "$markers" -lt 100 ]; then
+if [ "$ZEG_ZISK_DMA" = ON ] && [ "$markers" -lt 100 ]; then
     echo "ERROR: only $markers DMA markers in $ELF_PATH; -mzisk-dma did not lower anything." >&2
     echo "       A stock build has 2 (the ziskos thunks); a DMA build has thousands." >&2
     exit 1
 fi
-echo "==> DMA markers: $markers"
+echo "==> DMA markers: $markers (ZEG_ZISK_DMA=$ZEG_ZISK_DMA)"
+
+# Same reasoning as the DMA check: an -march that names an extension GCC never
+# reaches for is indistinguishable from not passing it, and the ELF looks fine
+# either way. Report rather than fail — an A/B run wants the number, and an
+# override may legitimately add extensions with no Zba in them.
+case "$ZISK_MARCH" in
+    *zba*)
+        zba_insns=$(riscv-none-elf-objdump -d "$ELF_PATH" \
+            | grep -cE '\b(sh[123]add(\.uw)?|add\.uw|slli\.uw|zext\.w)\b' || true)
+        echo "==> Zba instructions: $zba_insns"
+        [ "$zba_insns" -gt 0 ] \
+            || echo "WARNING: -march names zba but GCC emitted no Zba instruction." >&2
+        ;;
+esac
 
 echo
 echo "ELF: $ELF_PATH"

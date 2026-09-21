@@ -327,6 +327,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "blake3"
+version = "1.8.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d9e454fc11f76977dc803893aff6304ed33d6a26efae8696573bea74baa27ae"
+dependencies = [
+ "arrayvec",
+ "cc",
+ "cfg-if",
+ "constant_time_eq",
+ "cpufeatures 0.3.1",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -488,6 +501,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "constant_time_eq"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3d52eff69cd5e647efe296129160853a42795992097e8af39800e1060caeea9b"
+
+[[package]]
 name = "convert_case"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -507,6 +526,15 @@ name = "cpufeatures"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "59ed5838eebb26a2bb2e58f6d5b5316989ae9d08bab10e0e6d103e656d1b0280"
+dependencies = [
+ "libc",
+]
+
+[[package]]
+name = "cpufeatures"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ca28b0ae3115b884660db4118d803791fd6756b6e88f39c0f3f7859060d7566"
 dependencies = [
  "libc",
 ]
@@ -1364,7 +1392,7 @@ version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cb26cec98cce3a3d96cbb7bced3c4b16e3d13f27ec56dbd62cbc8f39cfb9d653"
 dependencies = [
- "cpufeatures",
+ "cpufeatures 0.2.17",
 ]
 
 [[package]]
@@ -1814,10 +1842,11 @@ dependencies = [
 
 [[package]]
 name = "proofman-fields"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "124c75a333fd7209e5f77da6c7734260ad54eaabf7e2e20db24917f7ec4505cd"
+checksum = "eb8d460b2e0e01f448eb78bd5486877239130674572be8f5c334bc86948cd65b"
 dependencies = [
+ "blake3",
  "cfg-if",
  "num-bigint",
  "paste",
@@ -1827,9 +1856,9 @@ dependencies = [
 
 [[package]]
 name = "proofman-starks-lib-c"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d1f0b940c17f32bcc0b289fd11bd0f8a812c82a4d44a067cd67d773fef54b13f"
+checksum = "620e15078fdf0acae3ced9f2c773ab10eb376dcaf7a192cc6204a37ce292fe57"
 dependencies = [
  "crossbeam-channel",
  "proofman-starks-src",
@@ -1837,15 +1866,15 @@ dependencies = [
 
 [[package]]
 name = "proofman-starks-src"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0efcb2cd92919487f86364fc3b51c8efa8ac2ea3a56f3d6c4d39b3bd464a5b50"
+checksum = "3a7ebe850e6ba9c8cfbdae2d68c196e5453ff4548e91c4ce01b91ffc2e727384"
 
 [[package]]
 name = "proofman-verifier"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d265453d0cb920c636de66ef3d7dffbcef6a1a8adea91b8484d1b09398d2f51"
+checksum = "369dc577fafca5499350103a31de6a57c614cfb1b1e9298347b6e2d0561baec4"
 dependencies = [
  "num-traits",
  "proofman-fields",
@@ -2286,7 +2315,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
 dependencies = [
  "cfg-if",
- "cpufeatures",
+ "cpufeatures 0.2.17",
  "digest",
 ]
 
@@ -2886,27 +2915,27 @@ dependencies = [
 
 [[package]]
 name = "zisk-circuit"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1bc6041f337ea1540da88363df1c7bddfadf0e9e9433faee038aa15fa374126"
+checksum = "2e620c55ff505ea5bd8305e301b64b19b8e645715380f2beca257e206e1f6757"
 
 [[package]]
 name = "zisk-definitions"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7d1a44ad1d2ce15db39bfff3dfe4d5dd4736962c7badbd089f1f292d9347879"
+checksum = "9098679a2ae1ae037f629e6a449154a19d9b4bf981648b2045ee77797bb04347"
 
 [[package]]
 name = "zisk-lib-c"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0238eb80fe6909d395453dba79ca27587c2ea34a87ba9f98efc55f94bde12eb0"
+checksum = "af2c550f1c21c3c8b401d5ceb8d83b59cce17578724b3559f960ffee0c87ed78"
 
 [[package]]
 name = "zisk-precomp-helpers"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a713dd3bd7b1ac61c7aaee725bb185afc8439f63881708a8408ab2e59694144"
+checksum = "8860c99c4d8b77fb6ef5ac0558a5586198abce62a617054e398064cd825ec5c0"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -2923,9 +2952,9 @@ dependencies = [
 
 [[package]]
 name = "zisk-stream"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b7fdc26065c9ee8153b8eb1e086573bf88c5dacea0a7665ca68adb20a25c056"
+checksum = "c162073a2f76b78fbe42d8483adc1a25b25abfbaa17860c1c33c23412bc85370"
 dependencies = [
  "libc",
  "thiserror",
@@ -2934,27 +2963,28 @@ dependencies = [
 
 [[package]]
 name = "zisk-verifier"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a218c0e2c72facb1324751f19f37a5a58df629e5a2d154c6932f516a22f367c"
+checksum = "c89f2583bba06f0cca2a6580c171920289c7452466fad51b1631d3414b02546f"
 dependencies = [
+ "proofman-fields",
  "proofman-verifier",
 ]
 
 [[package]]
 name = "zisk-zkvm-interface"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9eb81c441a0ce460f430facfb1a31e54f4a949c35468cf04d9577c86be8146e3"
+checksum = "0dfb08e112069201fe52e3a86d76a3e5118882330e543a81fa6d79ca8276649b"
 dependencies = [
  "bindgen",
 ]
 
 [[package]]
 name = "ziskos"
-version = "1.2.0-alpha"
+version = "1.3.0-alpha"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08a9eee9ae285d36dd52ab8322e4e870ec2c07f8befca02813554e907c43e3ea"
+checksum = "9dc921082bf9abc69cb3510ca1a0723a9b4bbf85a57d4ab51de5df7071d28d2f"
 dependencies = [
  "anyhow",
  "ark-bn254",

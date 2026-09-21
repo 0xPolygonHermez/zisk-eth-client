@@ -56,9 +56,11 @@ crate provides:
 - **`g++-13`, `g++-12`, or `g++-11`** on the host — GCC 14's bundled libcody does
   not build under a host g++ newer than ~14, so the build looks for an older one
   and stops if it finds none. Usually already present (Ubuntu 24.04's default
-  `g++` is 13.3); otherwise `sudo apt install g++-13` on Debian/Ubuntu,
-  `brew install gcc@13` on macOS. Set `CXX`/`CC` to pick one explicitly.
-- `curl`, `tar`, `make`, `cmake`.
+  `g++` is 13.3); otherwise `sudo apt install g++-13` on Debian/Ubuntu. Set
+  `CXX`/`CC` to pick one explicitly. Not needed on macOS, where the build uses
+  Apple clang.
+- `curl`, `tar`, `make`, `cmake`. On macOS, the Xcode Command Line Tools and
+  `brew install cmake`.
 
 Nothing else. The cross-toolchain is not a prerequisite: `build-elf.sh` installs
 the pinned xPack `riscv-none-elf-gcc` 14.3.0-1 (`install-xpack.sh`) and the
@@ -93,3 +95,33 @@ actually lowered by counting DMA markers in the output and fails if it did not.
   reports that instead of installing over your choice.
 - `ZISK_DMA_GCC_PREFIX` (default `~/.local/xPacks/zisk-dma-gcc-14.3.0`) — where the
   patched GCC is installed.
+- `ZISK_MARCH` (or `--march=`) — the guest `-march`. `build-elf.sh` pins
+  `rv64ima_zicsr_zba_zbb_zbs_zbkb`, one `_zba` ahead of ziskethone's own
+  `toolchain.cmake` default, so a plain rebuild reproduces the committed ELF.
+  Override it to A/B a different string, or pass it empty
+  (`ZISK_MARCH= ./build-elf.sh`) to fall back to the toolchain default. The
+  value is stamped, so a switch reconfigures from scratch instead of leaving
+  the old march in the CMake cache, and with `zba` in the string the script
+  reports how many Zba instructions GCC actually emitted.
+
+  Measured for `_zba` over three 140M-gas mainnet blocks: **-2.34% steps**,
+  **-0.41% area**. It needs `zba_native` on `zisk-transpiler-riscv`, which the
+  zisk branch this workspace pins enables by default — so both the host here
+  and a `ziskemu` built from that branch run the ELF as-is. A zisk rev that
+  defaults it off rejects the ELF outright ("found invalid
+  riscv_instruction.inst_name=sh3add"), which is the thing to check first if a
+  zisk bump ever breaks the ziskethone client.
+
+## Extensions that are not worth enabling
+
+Verified by building the guest with each and counting what GCC actually emits:
+
+| extension | instructions emitted | why |
+|---|---|---|
+| `zbkb` | 0 of its own | `pack`/`packh`/`packw`/`brev8`/`zip`/`unzip` never appear; its `rev8` comes with `zbb` anyway |
+| `zbc`, `zbkc` | 0 | `clmul` needs explicit intrinsics; no GHASH/CRC here |
+| `zbkx` | 0 | `xperm4`/`xperm8`, same — crypto intrinsics only |
+| `zicond` | 23 | if-conversion, which *loses* in a zkVM: `czero.eqz`+`czero.nez`+`add` is 3 steps where the branch it replaces cost 1-2. 22 of the 23 sit in `modexp_compute`, which executed 0 times on the blocks measured; the one live site cost +165 steps |
+
+A build with all nine extensions produces an instruction mix identical to
+`_zba`+`_zicond` alone.
