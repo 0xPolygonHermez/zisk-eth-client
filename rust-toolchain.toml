@@ -1,0 +1,4 @@
+[toolchain]
+# 1.99.0 links ethrex-crypto's x86_64 keccak asm with rust-lld and fails
+# (".note.gnu.property: data is too short"); 1.98.0 links it fine.
+channel = "1.98.0"
