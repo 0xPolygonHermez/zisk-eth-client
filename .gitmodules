@@ -1,7 +1,8 @@
 [submodule "third_party/ziskethone"]
 	path = third_party/ziskethone
 	url = https://github.com/0xPolygonHermez/ziskethone.git
-	# Pinned on the zkVM ABI branch: the guest reaches ZisK only through the
-	# zkvm_* C ABI, so it needs zisk >= 1.4.0 (the ZisK library built in).
+	# Pinned on the zkVM ABI branch plus the keccak-f memo: the guest reaches
+	# ZisK through the zkvm_* C ABI (needs zisk >= 1.4.0, the ZisK library built
+	# in), except the memo's two fcalls.
 	# Init with `git submodule update --init --recursive`.
-	branch = feature/zkvm-abi
+	branch = feature/zkvm-abi-keccakf-cache
