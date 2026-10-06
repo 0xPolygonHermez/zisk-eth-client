@@ -9660,6 +9660,7 @@ dependencies = [
  "futures",
  "hex",
  "k256",
+ "rayon",
  "serde",
  "serde_json",
  "sha3 0.10.9",
