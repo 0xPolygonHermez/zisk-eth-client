@@ -32,45 +32,45 @@ input-reth = { path = "crates/clients/reth/input" }
 input-ziskethone = { path = "crates/clients/ziskethone/input" }
 rust-input-gen = { path = "third_party/ziskethone/rust-input-gen" }
 
-# zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.1-alpha" }
-# zisk-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.1-alpha" }
-# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.1-alpha" }
+zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.2-alpha" }
+zisk-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.2-alpha" }
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.2-alpha" }
 
 # crates.io dependencies
-zisk-sdk = "1.3.1-alpha"
-zisk-zkvm-interface = "1.3.1-alpha"
-ziskos = "1.3.1-alpha"
+# zisk-sdk = "1.3.2-alpha"
+# zisk-zkvm-interface = "1.3.2-alpha"
+# ziskos = "1.3.2-alpha"
 
 # Local development
 # zisk-sdk = { path = "../zisk/sdk" }
 # zisk-zkvm-interface = { path = "../zisk/zkvm-interface" }
 # ziskos = { path = "../zisk/ziskos/entrypoint" }
 
-revm = { version = "38.0.0", default-features = false }
+revm = { version = "43.0.3", default-features = false }
 
 # types (for reth)
 alloy-rlp = "0.3"
-alloy-primitives = "1.5.6"
-alloy = "2.0.0"
-alloy-consensus = { version = "2.0.0", default-features = false }
-alloy-json-rpc = "2.0.0"
-alloy-provider = "2.0.0"
-alloy-rpc-client = "2.0.0"
-alloy-transport = "2.0.0"
-alloy-transport-http = { version = "2.0.0", features = ["reqwest"] }
-alloy-genesis = "2.0.0"
-alloy-eips = "2.0.0"
-alloy-rpc-types-eth = "2.0.0"
-alloy-rpc-types-debug = "2.0.0"
+alloy-primitives = "1.6.1"
+alloy = "2.5.0"
+alloy-consensus = { version = "2.5.0", default-features = false }
+alloy-json-rpc = "2.5.0"
+alloy-provider = "2.5.0"
+alloy-rpc-client = "2.5.0"
+alloy-transport = "2.5.0"
+alloy-transport-http = { version = "2.5.0", features = ["reqwest"] }
+alloy-genesis = "2.5.0"
+alloy-eips = "2.5.0"
+alloy-rpc-types-eth = "2.5.0"
+alloy-rpc-types-debug = "2.5.0"
 
 # reth
-reth-primitives-traits = { version = "0.3.0", default-features = false }
-reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v2.1.0", default-features = false }
-reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v2.1.0", default-features = false }
-reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v2.1.0", default-features = false }
-reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v2.1.0", default-features = false }
-stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "e5480e71a8031641ff471cad9dc482a7a14b32d5", package = "stateless" }
-stateless-reth-tries = { git = "https://github.com/paradigmxyz/stateless", rev = "e5480e71a8031641ff471cad9dc482a7a14b32d5", package = "tries" }
+reth-primitives-traits = { version = "0.8.1", default-features = false }
+reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v2.7.0", default-features = false }
+reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v2.7.0", default-features = false }
+reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v2.7.0", default-features = false }
+reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v2.7.0", default-features = false }
+stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", package = "stateless" }
+stateless-reth-tries = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", package = "tries" }
 
 # types (for ethrex)
 primitive-types = "0.13.1"
