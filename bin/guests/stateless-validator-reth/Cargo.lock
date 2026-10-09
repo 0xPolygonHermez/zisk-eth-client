@@ -970,7 +970,7 @@ dependencies = [
  "bitflags",
  "cexpr",
  "clang-sys",
- "itertools 0.10.5",
+ "itertools 0.13.0",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -2758,7 +2758,7 @@ dependencies = [
 [[package]]
 name = "proofman-fields"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#23eaf736806875aec8ac2ff0f1a47659e458a481"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#27119b4ef3bdd2f74ebd4a0c17c374503ab90837"
 dependencies = [
  "blake3",
  "cfg-if",
@@ -2771,7 +2771,7 @@ dependencies = [
 [[package]]
 name = "proofman-starks-lib-c"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#23eaf736806875aec8ac2ff0f1a47659e458a481"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#27119b4ef3bdd2f74ebd4a0c17c374503ab90837"
 dependencies = [
  "crossbeam-channel",
  "proofman-starks-src",
@@ -2780,12 +2780,12 @@ dependencies = [
 [[package]]
 name = "proofman-starks-src"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#23eaf736806875aec8ac2ff0f1a47659e458a481"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#27119b4ef3bdd2f74ebd4a0c17c374503ab90837"
 
 [[package]]
 name = "proofman-verifier"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#23eaf736806875aec8ac2ff0f1a47659e458a481"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#27119b4ef3bdd2f74ebd4a0c17c374503ab90837"
 dependencies = [
  "num-traits",
  "proofman-fields",
@@ -4836,18 +4836,22 @@ dependencies = [
 [[package]]
 name = "zisk-circuit"
 version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#444e03b90155b78765d7d08fc79b84b740ac2e20"
 
 [[package]]
 name = "zisk-definitions"
 version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#444e03b90155b78765d7d08fc79b84b740ac2e20"
 
 [[package]]
 name = "zisk-lib-c"
 version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#444e03b90155b78765d7d08fc79b84b740ac2e20"
 
 [[package]]
 name = "zisk-precomp-helpers"
 version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#444e03b90155b78765d7d08fc79b84b740ac2e20"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -4865,6 +4869,7 @@ dependencies = [
 [[package]]
 name = "zisk-stream"
 version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#444e03b90155b78765d7d08fc79b84b740ac2e20"
 dependencies = [
  "libc",
  "thiserror",
@@ -4874,6 +4879,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#444e03b90155b78765d7d08fc79b84b740ac2e20"
 dependencies = [
  "proofman-fields",
  "proofman-verifier",
@@ -4882,6 +4888,7 @@ dependencies = [
 [[package]]
 name = "zisk-zkvm-interface"
 version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#444e03b90155b78765d7d08fc79b84b740ac2e20"
 dependencies = [
  "bindgen",
 ]
@@ -4889,6 +4896,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#444e03b90155b78765d7d08fc79b84b740ac2e20"
 dependencies = [
  "anyhow",
  "ark-bn254",
