@@ -2647,7 +2647,7 @@ dependencies = [
 [[package]]
 name = "proofman-fields"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#531a963554835666fafe19babb7dea1d55d4da9a"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#b4e94d57b20dbf68b32028896c1d26739db476de"
 dependencies = [
  "blake3",
  "cfg-if",
@@ -2660,7 +2660,7 @@ dependencies = [
 [[package]]
 name = "proofman-starks-lib-c"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#531a963554835666fafe19babb7dea1d55d4da9a"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#b4e94d57b20dbf68b32028896c1d26739db476de"
 dependencies = [
  "crossbeam-channel",
  "proofman-starks-src",
@@ -2669,12 +2669,12 @@ dependencies = [
 [[package]]
 name = "proofman-starks-src"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#531a963554835666fafe19babb7dea1d55d4da9a"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#b4e94d57b20dbf68b32028896c1d26739db476de"
 
 [[package]]
 name = "proofman-verifier"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#531a963554835666fafe19babb7dea1d55d4da9a"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#b4e94d57b20dbf68b32028896c1d26739db476de"
 dependencies = [
  "num-traits",
  "proofman-fields",
@@ -4719,22 +4719,22 @@ dependencies = [
 [[package]]
 name = "zisk-circuit"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#f2352859d00f0b656e3b387e6942cfe356307fff"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#5fad0cedd310e0eae8d9e04541c491bb409327cb"
 
 [[package]]
 name = "zisk-definitions"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#f2352859d00f0b656e3b387e6942cfe356307fff"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#5fad0cedd310e0eae8d9e04541c491bb409327cb"
 
 [[package]]
 name = "zisk-lib-c"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#f2352859d00f0b656e3b387e6942cfe356307fff"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#5fad0cedd310e0eae8d9e04541c491bb409327cb"
 
 [[package]]
 name = "zisk-precomp-helpers"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#f2352859d00f0b656e3b387e6942cfe356307fff"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#5fad0cedd310e0eae8d9e04541c491bb409327cb"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -4752,7 +4752,7 @@ dependencies = [
 [[package]]
 name = "zisk-stream"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#f2352859d00f0b656e3b387e6942cfe356307fff"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#5fad0cedd310e0eae8d9e04541c491bb409327cb"
 dependencies = [
  "libc",
  "thiserror",
@@ -4762,7 +4762,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#f2352859d00f0b656e3b387e6942cfe356307fff"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#5fad0cedd310e0eae8d9e04541c491bb409327cb"
 dependencies = [
  "proofman-fields",
  "proofman-verifier",
@@ -4771,7 +4771,7 @@ dependencies = [
 [[package]]
 name = "zisk-zkvm-interface"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#f2352859d00f0b656e3b387e6942cfe356307fff"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#5fad0cedd310e0eae8d9e04541c491bb409327cb"
 dependencies = [
  "bindgen",
 ]
@@ -4779,7 +4779,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#f2352859d00f0b656e3b387e6942cfe356307fff"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#5fad0cedd310e0eae8d9e04541c491bb409327cb"
 dependencies = [
  "anyhow",
  "ark-bn254",
