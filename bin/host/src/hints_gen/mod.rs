@@ -99,7 +99,8 @@ fn process_input_file(
     let stem = input
         .file_stem()
         .with_context(|| format!("Input path has no file stem: {}", input.display()))?;
-    let output_path = output_dir.join(stem).with_extension("hints");
+    // Not `with_extension`: input names may contain dots (EEST test ids).
+    let output_path = output_dir.join(format!("{}.hints", stem.to_string_lossy()));
     info!(
         "Generating hints: {} -> {}",
         input.display(),

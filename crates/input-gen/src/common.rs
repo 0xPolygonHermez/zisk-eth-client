@@ -31,6 +31,8 @@ pub fn fixtures_from_path(path: &Path) -> Result<Vec<StatelessFixture>> {
     let mut fixtures = WalkDir::new(path)
         .min_depth(1)
         .into_iter()
+        // Skip the archive's `.meta/` index files and other dot entries.
+        .filter_entry(|entry| !entry.file_name().to_string_lossy().starts_with('.'))
         .filter_map(|entry| entry.ok())
         .filter(|entry| {
             entry.file_type().is_file() && entry.path().extension().is_some_and(|ext| ext == "json")

@@ -211,7 +211,8 @@ impl BenchmarkRunner {
             let stem = work_file
                 .file_stem()
                 .with_context(|| format!("Input has no file stem: {}", work_file.display()))?;
-            let hints_path = out.join(stem).with_extension("hints");
+            // Not `with_extension`: input names may contain dots (EEST test ids).
+            let hints_path = out.join(format!("{}.hints", stem.to_string_lossy()));
 
             let stdin = ZiskStdin::from_file(work_file).context("Failed to load input file")?;
             generate_hints_to_file(&stdin, hints_path.clone(), client)?;
@@ -401,10 +402,14 @@ fn collect_files(root: &Path) -> Result<Vec<PathBuf>> {
     Ok(files)
 }
 
-/// Inputs are the `.bin` files; sidecars such as the `.output` expected guest
-/// result written by input-gen live next to them and are skipped.
+/// Work files are the `.bin` inputs or, in hints mode, the `.hints` files;
+/// sidecars such as the `.output` expected guest result written by input-gen
+/// live next to them and are skipped.
 fn is_input_file(path: &std::path::Path) -> bool {
-    path.is_file() && path.extension().is_some_and(|ext| ext == "bin")
+    path.is_file()
+        && path
+            .extension()
+            .is_some_and(|ext| ext == "bin" || ext == "hints")
 }
 
 fn hex(bytes: &[u8]) -> String {
