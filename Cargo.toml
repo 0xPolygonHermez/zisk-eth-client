@@ -63,14 +63,23 @@ alloy-eips = "2.5.0"
 alloy-rpc-types-eth = "2.5.0"
 alloy-rpc-types-debug = "2.5.0"
 
-# reth
-reth-primitives-traits = { version = "0.8.1", default-features = false }
-reth-chainspec = { git = "https://github.com/paradigmxyz/reth", tag = "v2.7.0", default-features = false }
-reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", tag = "v2.7.0", default-features = false }
-reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", tag = "v2.7.0", default-features = false }
-reth-rpc-api = { git = "https://github.com/paradigmxyz/reth", tag = "v2.7.0", default-features = false }
-stateless-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", package = "stateless" }
-stateless-reth-tries = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", package = "tries" }
+# reth stateless validator (paradigmxyz/stateless). All reth-* crates enter the
+# graph through these two, pinned to the reth rev that stateless itself pins, so
+# the guest never sees two copies of reth. The input/output format is the
+# execution-specs one (tests-zkevm v21.0.1): schema-prefixed SSZ
+# `StatelessInput` in, plain SSZ `StatelessValidationResult` out.
+stateless-validator-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", default-features = false }
+stateless-validator-common = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", default-features = false }
+# Fork activation timestamps per network, used to pick the input schema fork.
+alloy-hardforks = "0.4.9"
+# Host-side native block execution (offline input generation re-executes a
+# block to recover its EIP-7685 requests). Same stateless rev as the guest, and
+# the reth crates at the exact rev stateless pins, so the graph stays unified.
+stateless = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", default-features = false }
+stateless-tries = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", package = "tries", default-features = false }
+reth-chainspec = { git = "https://github.com/paradigmxyz/reth", rev = "db702b511a9dfe5a80ef76685dd93652ffe37cc5", default-features = false }
+reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", rev = "db702b511a9dfe5a80ef76685dd93652ffe37cc5", default-features = false }
+reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", rev = "db702b511a9dfe5a80ef76685dd93652ffe37cc5", default-features = false }
 
 # types (for ethrex)
 primitive-types = "0.13.1"
@@ -82,9 +91,6 @@ ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.
 ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0" }
 ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false }
 stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false, package = "ethrex-guest-program" }
-
-# eth-act
-witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "6786b2b9f002151e383e88cf2a693899ca73d169" }
 
 # common dependencies
 anyhow = "1.0"
@@ -114,6 +120,9 @@ walkdir = "2"
 jsonrpsee = { version = "0.26", features = ["http-client"] }
 http = "1.4.0"
 tempfile = "3"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "http2"] }
+flate2 = "1"
+tar = "0.4"
 rkyv = { version = "0.8.10", features = ["std", "unaligned"] }
 hex-literal = "0.4.1"
 

@@ -8,8 +8,8 @@ use tracing::info;
 
 use zisk_sdk::{
     AsmOptions, EmbeddedClient, EmbeddedClientBuilder, EmbeddedExecuteOnlyClient, EmbeddedOpts,
-    ExecuteOutput, ExecutorKind, GuestProgram, ProverClient, VerifyConstraintsExtension,
-    WitnessBuilderExt, ZiskHints, ZiskStdin,
+    ExecuteOutput, ExecutorKind, GuestProgram, ProverClient, PublicValues,
+    VerifyConstraintsExtension, WitnessBuilderExt, ZiskHints, ZiskStdin,
 };
 
 enum Backend {
@@ -34,6 +34,9 @@ pub struct ZiskExecutionMetrics {
     pub cost: Option<u64>,
     pub tx_count: Option<u64>,
     pub gas_used: Option<u64>,
+    /// Raw public output of the run, for checking against the expected one.
+    #[serde(skip)]
+    pub publics: Option<PublicValues>,
 }
 
 impl std::fmt::Display for ZiskExecutionMetrics {
@@ -227,6 +230,7 @@ impl ZiskClient {
                     result.get_execution_time(),
                     result.get_execution_steps(),
                     result.get_execution_cost(),
+                    result.get_publics().clone(),
                 ))
             }
             Backend::Full(client) => {
@@ -240,6 +244,7 @@ impl ZiskClient {
                     result.get_execution_time(),
                     result.get_execution_steps(),
                     result.get_execution_cost(),
+                    result.get_publics().clone(),
                 ))
             }
         }
@@ -277,6 +282,7 @@ impl ZiskClient {
             cost: Some(result.get_execution_total_cost()),
             tx_count: None,
             gas_used: None,
+            publics: Some(result.get_publics().clone()),
         })
     }
 }
@@ -295,13 +301,19 @@ fn group_thousands(n: u64) -> String {
     out
 }
 
-fn execute_metrics(time_ms: u64, steps: u64, cost: Option<u64>) -> ZiskExecutionMetrics {
+fn execute_metrics(
+    time_ms: u64,
+    steps: u64,
+    cost: Option<u64>,
+    publics: PublicValues,
+) -> ZiskExecutionMetrics {
     ZiskExecutionMetrics {
         duration: Duration::from_millis(time_ms),
         steps,
         cost,
         tx_count: None,
         gas_used: None,
+        publics: Some(publics),
     }
 }
 

@@ -1,6 +1,6 @@
 [package]
 name = "guest-reth"
-description = ""
+description = "ZisK guest for the reth stateless validator (execution-specs stateless I/O)"
 version.workspace = true
 edition.workspace = true
 
@@ -8,33 +8,21 @@ edition.workspace = true
 guest-common.workspace = true
 ziskos.workspace = true
 
-anyhow.workspace = true
-bincode.workspace = true
-serde.workspace = true
-serde_with.workspace = true
-rayon.workspace = true
-k256.workspace = true
 tiny-keccak.workspace = true
 
 alloy-consensus = { workspace = true, default-features = false, features = [
   "crypto-backend",
   "k256",
 ] }
-alloy-genesis.workspace = true
 alloy-primitives.workspace = true
-alloy-rlp.workspace = true
-alloy-rpc-types-debug.workspace = true
 
 revm.workspace = true
 
-reth-chainspec.workspace = true
-reth-ethereum-primitives.workspace = true
-reth-primitives-traits.workspace = true
-reth-evm-ethereum.workspace = true
+stateless-validator-reth.workspace = true
+stateless-validator-common.workspace = true
 
-stateless-reth-tries.workspace = true
-
-stateless-reth.workspace = true
+[dev-dependencies]
+serde_json.workspace = true
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = [

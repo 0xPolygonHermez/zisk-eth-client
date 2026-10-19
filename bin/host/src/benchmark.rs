@@ -3,7 +3,7 @@ use std::{
     fs,
     path::{Path, PathBuf},
 };
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 
 use input::{Client, ExecutionClient, InputStats, create_client, generate_hints_to_file};
 use zisk_sdk::{GuestProgram, ZiskStdin};
@@ -249,6 +249,51 @@ impl BenchmarkRunner {
         }
     }
 
+    /// Check the guest's public output against what a correct run of this
+    /// input must produce. The expected bytes come from a `.output` sidecar
+    /// next to the input (written by input-gen for EEST fixtures) or, failing
+    /// that, from the client, which derives them from the input itself. A
+    /// mismatch is a failed run: the guest reports an invalid block through
+    /// its output, not by aborting.
+    fn check_output(
+        &self,
+        input_file: Option<&Path>,
+        metrics: &ZiskExecutionMetrics,
+    ) -> Result<()> {
+        let Some(input_file) = input_file else {
+            return Ok(());
+        };
+        let Some(publics) = metrics.publics.as_ref() else {
+            return Ok(());
+        };
+        let sidecar = input_file.with_extension("output");
+        let expected = if sidecar.is_file() {
+            fs::read(&sidecar).with_context(|| format!("reading {}", sidecar.display()))?
+        } else {
+            let stdin = ZiskStdin::from_file(input_file).context("Failed to load input file")?;
+            match self.native_client.expected_output(&stdin)? {
+                Some(expected) => expected,
+                None => {
+                    debug!("no expected output known for {}", input_file.display());
+                    return Ok(());
+                }
+            }
+        };
+        let mut actual = vec![0u8; expected.len()];
+        publics.head();
+        publics.read_slice(&mut actual);
+        if actual != expected {
+            anyhow::bail!(
+                "guest output does not match the expected one for {}\n  expected: 0x{}\n  actual:   0x{}",
+                input_file.display(),
+                hex(&expected),
+                hex(&actual),
+            );
+        }
+        debug!("guest output verified for {}", input_file.display());
+        Ok(())
+    }
+
     async fn run_single(&self, work_file: &Path, current: usize, total: usize) -> Result<bool> {
         let test_name = work_file
             .file_stem()
@@ -274,6 +319,7 @@ impl BenchmarkRunner {
                     .zisk_client
                     .execute(input_file.as_deref(), hints_file.as_deref())
                     .await?;
+                self.check_output(input_file.as_deref(), &metrics)?;
                 if let Some(stats) = self.input_stats(work_file) {
                     metrics.tx_count = Some(stats.tx_count as u64);
                     metrics.gas_used = Some(stats.gas_used);
@@ -313,6 +359,7 @@ impl BenchmarkRunner {
                     .zisk_client
                     .verify_constraints(input_file.as_deref(), hints_file.as_deref())
                     .await?;
+                self.check_output(input_file.as_deref(), &metrics)?;
                 let elapsed = metrics.duration.as_secs_f64();
 
                 info!("[{}/{}] PASSED in {:.2}s", current, total, elapsed);
@@ -338,11 +385,11 @@ fn collect_files(root: &Path) -> Result<Vec<PathBuf>> {
                 for sub_entry in fs::read_dir(&path)? {
                     let sub_entry = sub_entry?;
                     let sub_path = sub_entry.path();
-                    if sub_path.is_file() {
+                    if is_input_file(&sub_path) {
                         files.push(sub_path);
                     }
                 }
-            } else if path.is_file() {
+            } else if is_input_file(&path) {
                 files.push(path);
             }
         }
@@ -352,4 +399,14 @@ fn collect_files(root: &Path) -> Result<Vec<PathBuf>> {
 
     files.sort();
     Ok(files)
+}
+
+/// Inputs are the `.bin` files; sidecars such as the `.output` expected guest
+/// result written by input-gen live next to them and are skipped.
+fn is_input_file(path: &std::path::Path) -> bool {
+    path.is_file() && path.extension().is_some_and(|ext| ext == "bin")
+}
+
+fn hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|b| format!("{b:02x}")).collect()
 }

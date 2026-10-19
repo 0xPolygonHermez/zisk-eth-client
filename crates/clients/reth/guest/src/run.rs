@@ -5,56 +5,50 @@ use revm::install_crypto;
 
 use guest_common::chain::chain_name;
 
-use super::{
-    extract_block_info, get_chain_spec, validate_block_stateless, verify_signatures,
-    CustomEvmCrypto, RethInputPublic, RethInputWitness,
-};
+use super::{validate, CustomEvmCrypto, InputPeek, SszDecode, StatelessValidationResult};
 
-/// Run the full block validation: read inputs, validate, commit output.
-pub fn run() {
+/// Install the ZisK-accelerated crypto backends for revm and alloy. Idempotent.
+pub fn install_zisk_crypto() {
     static INSTALL_CRYPTO: Once = Once::new();
     INSTALL_CRYPTO.call_once(|| {
         install_crypto(CustomEvmCrypto);
         install_default_provider(Arc::new(CustomEvmCrypto))
             .expect("Failed to install default crypto provider");
     });
+}
 
-    // Read the public input
-    let public: RethInputPublic = ziskos::io::read();
+/// Run the full block validation: read the stateless input, validate, commit
+/// the output. Printing costs cycles, so output is kept minimal.
+pub fn run() {
+    install_zisk_crypto();
 
-    // Get chain config
-    let chain_config = public.chain_config().clone();
+    // The whole input is one frame: `schema_id || SSZ(StatelessInput)`.
+    let input = ziskos::io::read_slice();
 
-    // Extract useful information for logging
-    let block = public.block().clone();
-    let (block_number, gas_used, tx_count) = extract_block_info(&block);
-    let chain_id = chain_config.chain_id;
-    let chain = chain_name(chain_id);
-    println!(
-        "Executing block validation for {} Block #{} ({} txs)",
-        chain, block_number, tx_count
-    );
-
-    // Verify signatures
-    let chain_spec = get_chain_spec(&chain_config);
-    let block = verify_signatures(block, chain_spec.clone(), public.public_keys)
-        .expect("Signature verification failed");
-
-    // Read the witness
-    let witness: RethInputWitness = ziskos::io::read();
+    // Block facts come from fixed offsets of the input, not from decoding it:
+    // the validator decodes internally and takes only bytes, and a second
+    // full SSZ decode would cost cycles for no validation value.
+    match InputPeek::peek(&input) {
+        Some(block) => println!(
+            "Executing block validation for {} Block #{} ({} txs)",
+            chain_name(block.chain_id),
+            block.block_number,
+            block.tx_count,
+        ),
+        None => println!("Executing block validation"),
+    }
 
     // Validate the block
-    let execution_witness = witness.witness().clone();
-    let block_hash = validate_block_stateless(block, execution_witness, chain_spec)
-        .expect("Block validation failed");
+    let output = validate(&input);
 
-    // Commit to block hash as the output
-    ziskos::io::commit(&block_hash);
+    // Commit the validation result as the public output
+    ziskos::io::commit_slice(&output);
 
-    // Print block number and calculated hash
-    println!("Block validation succeeded!");
-    println!(
-        "Execution summary:\n  - Chain: {} (ID: {})\n  - Block Number: {}\n  - Block Hash: {}\n  - Transaction Count: {}\n  - Gas Consumed: {}",
-        chain, chain_id, block_number, block_hash, tx_count, gas_used
-    );
+    let result = StatelessValidationResult::from_ssz_bytes(&output)
+        .expect("validator output is always a well-formed StatelessValidationResult");
+    if result.successful_validation {
+        println!("Block validation succeeded!");
+    } else {
+        println!("Block validation FAILED!");
+    }
 }

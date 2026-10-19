@@ -13,8 +13,8 @@ path = "src/lib.rs"
 # (mirrors the `host` crate's rationale).
 input = { path = "../input", default-features = false, features = ["cli", "reth", "ethrex"] }
 
+alloy-primitives.workspace = true
 alloy-provider.workspace = true
-witness-generator.workspace = true
 
 anyhow.workspace = true
 async-trait.workspace = true
@@ -23,6 +23,9 @@ rayon.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 tempfile.workspace = true
+reqwest.workspace = true
+flate2.workspace = true
+tar.workspace = true
 tokio.workspace = true
 tokio-util = { workspace = true, features = ["rt"] }
 tracing.workspace = true

@@ -107,6 +107,13 @@ pub trait ExecutionClient: Send + Sync {
         Ok(None)
     }
 
+    /// The public output a correct guest run must produce for this input, so
+    /// the host can check the run and not just that it finished. `None` for
+    /// clients whose output the host cannot predict from the input.
+    fn expected_output(&self, _stdin: &ZiskStdin) -> Result<Option<Vec<u8>>> {
+        Ok(None)
+    }
+
     /// Whether [`run`](Self::run) emits ZisK hints. `true` for instrumented
     /// guest runs (reth, ethrex); `false` for native-only clients like
     /// `ziskethone` whose `run()` is a C++ input checker. The hints harness

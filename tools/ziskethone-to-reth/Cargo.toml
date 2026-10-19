@@ -5,21 +5,18 @@ version.workspace = true
 edition.workspace = true
 
 # A workspace member (unlike tools/reth-to-ziskethone, which is detached): this
-# tool produces reth types, so it needs guest-reth / stateless-reth from the
-# workspace rather than a standalone alloy-2.x world.
+# tool produces stateless inputs through input-reth.
 
 [dependencies]
 input-reth.workspace = true
-stateless-reth.workspace = true
+stateless-validator-common = { workspace = true, features = ["std"] }
 
 alloy-consensus.workspace = true
 alloy-eips.workspace = true
 alloy-primitives.workspace = true
 alloy-provider.workspace = true
 alloy-rlp.workspace = true
-
-reth-chainspec.workspace = true
-reth-ethereum-primitives.workspace = true
+alloy-rpc-types-debug.workspace = true
 
 anyhow.workspace = true
 clap.workspace = true

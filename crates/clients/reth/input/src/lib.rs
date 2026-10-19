@@ -1,31 +1,25 @@
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::time::Instant;
+//! Host-side input handling for the reth guest.
+//!
+//! The guest consumes the execution-specs stateless input
+//! (`schema_id || SSZ(StatelessInput)`, tests-zkevm v21.0.1) as a single
+//! `ZiskStdin` frame, and writes the `StatelessValidationResult`.
+//! [`block_input`] builds such inputs from block data, [`rpc`] fetches that data
+//! from an execution-layer node (re-executing natively when the EIP-7685
+//! requests are needed), and EEST fixtures already carry the bytes verbatim.
+
+pub mod block_input;
+pub mod native;
+pub mod rpc;
 
 use anyhow::{Context, Result};
 use async_trait::async_trait;
-use tracing::debug;
-use url::Url;
 
-use alloy_genesis::ChainConfig;
-use alloy_provider::{ext::DebugApi, Provider, ProviderBuilder};
-use alloy_rpc_client::RpcClient;
-use alloy_rpc_types_debug::ExecutionWitness;
-use alloy_rpc_types_eth::Block as RpcBlock;
-use alloy_transport_http::{
-    reqwest::{
-        header::{HeaderMap, HeaderName, HeaderValue},
-        Client as ReqwestClient,
-    },
-    Http,
-};
-
-use reth_chainspec::{mainnet_chain_config, Chain, NamedChain, HOLESKY, HOODI, SEPOLIA};
-use stateless_reth::StatelessInput;
 use zisk_sdk::ZiskStdin;
 
 use guest_common::chain::chain_name;
-use guest_reth::{RethInput, RethInputPublic, RethInputWitness};
+use guest_reth::InputSummary;
 
+pub use block_input::BlockInput;
 pub use guest_reth as guest;
 pub use input_core::RpcConfig;
 use input_core::{first_frame, BlockStats, ExecutionClient, InputStats};
@@ -34,55 +28,23 @@ use input_core::{first_frame, BlockStats, ExecutionClient, InputStats};
 pub struct RethClient;
 
 impl RethClient {
-    /// Inherent (not trait-level): only reth can consume a `StatelessInput`,
-    /// so this lives outside the [`ExecutionClient`] abstraction.
-    pub fn from_stateless_input(&self, stateless_input: &StatelessInput) -> Result<ZiskStdin> {
-        let input = RethInput::new(stateless_input)
-            .context("Failed to create RethInput from StatelessInput")?;
-        self.build_stdin(&input)
-    }
-
-    pub async fn witness_from_rpc(
-        &self,
-        config: &RpcConfig,
-        block_number: u64,
-    ) -> Result<RethInputWitness> {
-        let provider = connect_provider(config).await?;
-        let witness = fetch_witness(&provider, block_number).await?;
-        Ok(RethInputWitness::new(witness))
-    }
-
-    pub async fn public_from_rpc(
-        &self,
-        config: &RpcConfig,
-        block_number: u64,
-    ) -> Result<RethInputPublic> {
-        let provider = connect_provider(config).await?;
-        let chain_config = fetch_chain_config(&provider).await?;
-        let block = fetch_block(&provider, block_number).await?;
-
-        RethInputPublic::new(block.into(), chain_config)
-            .with_context(|| format!("Failed to build RethInputPublic for block {block_number}"))
-    }
-
-    fn build_stdin(&self, input: &RethInput) -> Result<ZiskStdin> {
-        let public = RethInputPublic {
-            block: input.stateless_input.block.clone(),
-            chain_config: input.stateless_input.chain_config.clone(),
-            public_keys: input.public_keys.clone(),
-        };
-        let public_bytes =
-            RethInputPublic::serialize(&public).context("Failed to serialize public input")?;
-        let witness = RethInputWitness {
-            witness: input.stateless_input.witness.clone(),
-        };
-        let witness_bytes =
-            RethInputWitness::serialize(&witness).context("Failed to serialize witness")?;
-
+    /// Wrap stateless input bytes as the guest's single-frame stdin. The bytes
+    /// are decoded first so a malformed input fails here, not in the guest.
+    pub fn stdin_from_bytes(&self, input: &[u8]) -> Result<ZiskStdin> {
+        InputSummary::decode(input)
+            .map_err(|err| anyhow::anyhow!("invalid stateless input: {err:?}"))?;
         let stdin = ZiskStdin::new();
-        stdin.write_slice(&public_bytes);
-        stdin.write_slice(&witness_bytes);
+        stdin.write_slice(input);
         Ok(stdin)
+    }
+
+    /// Stdin plus block stats for an input built by
+    /// [`block_input::build_block_input`].
+    pub fn stdin_from_input(&self, input: &BlockInput) -> Result<(ZiskStdin, BlockStats)> {
+        let stdin = self
+            .stdin_from_bytes(&input.stateless_input_bytes)
+            .with_context(|| format!("block {}", input.block_number))?;
+        Ok((stdin, input.block_stats()))
     }
 }
 
@@ -101,124 +63,43 @@ impl ExecutionClient for RethClient {
         config: &RpcConfig,
         block_number: u64,
     ) -> Result<(ZiskStdin, BlockStats)> {
-        let provider = connect_provider(config).await?;
-        let chain_config = fetch_chain_config(&provider).await?;
-        let block = fetch_block(&provider, block_number).await?;
-        let witness = fetch_witness(&provider, block_number).await?;
-
-        let stats = BlockStats {
-            chain_name: chain_name(chain_config.chain_id),
-            block_number,
-            tx_count: block.transactions.len(),
-            gas_used: block.header.gas_used,
-        };
-
-        let stateless_input = StatelessInput {
-            block: block.into(),
-            witness,
-            chain_config,
-        };
-        let stdin = self
-            .from_stateless_input(&stateless_input)
-            .with_context(|| format!("Failed to build RethInput for block {block_number}"))?;
-        Ok((stdin, stats))
+        let input = rpc::fetch_block_input(config, block_number).await?;
+        self.stdin_from_input(&input)
     }
 
     fn run(&self) {
         guest_reth::run();
     }
 
-    /// The public frame is the first of the two written by
-    /// [`build_stdin`](RethClient::build_stdin), so the witness never has to be
-    /// decoded to answer this.
+    /// The 43-byte `StatelessValidationResult` for a valid block is a function
+    /// of the input alone (payload root, chain id, schema id).
+    fn expected_output(&self, stdin: &ZiskStdin) -> Result<Option<Vec<u8>>> {
+        let buf = stdin.read_data();
+        let output = guest_reth::expected_output(first_frame(&buf)?)
+            .map_err(|err| anyhow::anyhow!("failed to decode the stateless input: {err:?}"))?;
+        Ok(Some(output))
+    }
+
+    /// The input is a single frame holding the stateless input bytes.
     fn input_stats(&self, stdin: &ZiskStdin) -> Result<Option<InputStats>> {
         let buf = stdin.read_data();
-        let public = RethInputPublic::deserialize(first_frame(&buf)?)
-            .context("Failed to deserialize the public input frame")?;
-        let block = public.block();
+        let summary = InputSummary::decode(first_frame(&buf)?)
+            .map_err(|err| anyhow::anyhow!("failed to decode the stateless input: {err:?}"))?;
         Ok(Some(InputStats {
-            block_number: block.header.number,
-            tx_count: block.body.transactions.len(),
-            gas_used: block.header.gas_used,
+            block_number: summary.block_number,
+            tx_count: summary.tx_count,
+            gas_used: summary.gas_used,
         }))
     }
 }
 
-async fn connect_provider(config: &RpcConfig) -> Result<impl Provider + DebugApi> {
-    let url: Url = config.url.parse().context("Invalid RPC URL")?;
-
-    let mut header_map = HeaderMap::new();
-    for (k, v) in &config.headers {
-        let name = HeaderName::from_bytes(k.as_bytes())
-            .with_context(|| format!("Invalid header name: {k}"))?;
-        let value =
-            HeaderValue::from_str(v).with_context(|| format!("Invalid header value for {k}"))?;
-        header_map.insert(name, value);
-    }
-
-    let http_client = ReqwestClient::builder()
-        .default_headers(header_map)
-        .build()
-        .context("Failed to build HTTP client")?;
-
-    let start = Instant::now();
-    let http = Http::with_client(http_client, url);
-    let rpc_client = RpcClient::new(http, false);
-    let provider = ProviderBuilder::new().connect_client(rpc_client);
-    debug!("RPC connect time: {:?}", start.elapsed());
-    Ok(provider)
-}
-
-async fn fetch_block<P: Provider>(provider: &P, block_number: u64) -> Result<RpcBlock> {
-    let start = Instant::now();
-    let block = provider
-        .get_block(block_number.into())
-        .full()
-        .await?
-        .with_context(|| format!("Block #{block_number} not found"))?;
-    debug!(
-        "Block fetch time for block {block_number}: {:?}",
-        start.elapsed()
-    );
-    Ok(block)
-}
-
-async fn fetch_witness<P: Provider + DebugApi>(
-    provider: &P,
-    block_number: u64,
-) -> Result<ExecutionWitness> {
-    let start = Instant::now();
-    let witness = provider
-        .debug_execution_witness(block_number.into())
-        .await
-        .context("Failed to fetch execution witness")?;
-    debug!(
-        "Witness fetch time for block {block_number}: {:?}",
-        start.elapsed()
-    );
-    Ok(witness)
-}
-
-async fn fetch_chain_config<P: Provider>(provider: &P) -> Result<ChainConfig> {
-    let start = Instant::now();
-    let chain_id = provider.get_chain_id().await?;
-
-    let chain = Chain::from_id(chain_id);
-    let chain_config = match chain.named() {
-        Some(NamedChain::Mainnet) => mainnet_chain_config(),
-        Some(NamedChain::Sepolia) => SEPOLIA.genesis.config.clone(),
-        Some(NamedChain::Hoodi) => HOODI.genesis.config.clone(),
-        Some(NamedChain::Holesky) => HOLESKY.genesis.config.clone(),
-        _ => anyhow::bail!("Unsupported chain ID: {}", chain_id),
-    };
-
-    if chain_name(chain_id) == "Unknown" {
-        static WARNED: AtomicBool = AtomicBool::new(false);
-        if !WARNED.swap(true, Ordering::Relaxed) {
-            tracing::warn!("Unrecognized chain ID {chain_id}; output filenames will use 'unknown'");
+impl BlockInput {
+    pub fn block_stats(&self) -> BlockStats {
+        BlockStats {
+            chain_name: chain_name(self.chain_id),
+            block_number: self.block_number,
+            tx_count: self.tx_count,
+            gas_used: self.gas_used,
         }
     }
-
-    debug!("Chain config fetch time: {:?}", start.elapsed());
-    Ok(chain_config)
 }

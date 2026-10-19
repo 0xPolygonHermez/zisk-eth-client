@@ -1,6 +1,6 @@
 [package]
 name = "input-reth"
-description = ""
+description = "Stateless inputs for the reth guest"
 version.workspace = true
 edition.workspace = true
 
@@ -13,18 +13,28 @@ zisk-sdk.workspace = true
 async-trait.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
+
+alloy-consensus = { workspace = true, features = ["std"] }
+alloy-eips.workspace = true
+alloy-genesis.workspace = true
+alloy-hardforks.workspace = true
+alloy-primitives.workspace = true
+alloy-provider.workspace = true
+alloy-rlp.workspace = true
+alloy-rpc-client.workspace = true
+alloy-rpc-types-debug.workspace = true
+alloy-rpc-types-eth.workspace = true
+alloy-transport-http.workspace = true
 url.workspace = true
 
-alloy-genesis.workspace = true
-alloy-provider = { workspace = true, features = ["debug-api"] }
-alloy-rpc-client.workspace = true
-alloy-rpc-types-eth.workspace = true
-alloy-rpc-types-debug.workspace = true
-alloy-transport-http.workspace = true
+stateless-validator-common = { workspace = true, features = ["std"] }
 
+# Native re-execution (requests recovery and block check)
+stateless.workspace = true
+stateless-tries.workspace = true
 reth-chainspec.workspace = true
-
-stateless-reth.workspace = true
+reth-ethereum-primitives.workspace = true
+reth-evm-ethereum.workspace = true
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(zisk_hints)'] }

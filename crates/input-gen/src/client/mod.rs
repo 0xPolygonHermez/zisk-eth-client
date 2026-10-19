@@ -1,7 +1,7 @@
 use std::path::Path;
 
+use crate::common::StatelessFixture;
 use anyhow::Result;
-use witness_generator::StatelessValidationFixture;
 
 use crate::provider::ProviderKind;
 
@@ -32,11 +32,7 @@ pub trait InputGenClient: input::ExecutionClient {
     /// Default impl bails — only clients that support fixture-based providers
     /// (i.e. those listing `ProviderKind::Eest` in `supported_providers`) need
     /// to override this.
-    fn process_fixture(
-        &self,
-        _fixture: &StatelessValidationFixture,
-        _output_dir: &Path,
-    ) -> Result<()> {
+    fn process_fixture(&self, _fixture: &StatelessFixture, _output_dir: &Path) -> Result<()> {
         anyhow::bail!(
             "{} does not support fixture-based input generation",
             self.name()

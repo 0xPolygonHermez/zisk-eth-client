@@ -1,5 +1,5 @@
-//! Assemble a `StatelessInput` from a decoded ZEG0 container plus the block
-//! header fetched over RPC.
+//! Assemble a stateless input from a decoded ZEG0 container plus the
+//! block header fetched over RPC.
 //!
 //! ZEG0 omits the current block's execution outputs (`state_root`,
 //! `receipts_root`, `logs_bloom`, `gas_used`, `blob_gas_used`) because the guest
@@ -8,14 +8,15 @@
 //! transactions, withdrawals, ancestors, code, and the pre-state trie — comes
 //! from the file.
 
-use alloy_consensus::Header;
+use alloy_consensus::{Block, BlockBody, Header, TxEnvelope};
 use alloy_eips::eip2718::Decodable2718;
 use alloy_eips::eip4895::{Withdrawal, Withdrawals};
+use alloy_eips::eip7685::EMPTY_REQUESTS_HASH;
 use alloy_primitives::Bytes;
 use alloy_rlp::Encodable;
+use alloy_rpc_types_debug::ExecutionWitness;
 use anyhow::{ensure, Context, Result};
-use reth_ethereum_primitives::{Block, BlockBody, TransactionSigned};
-use stateless_reth::{ExecutionWitness, StatelessInput};
+use input_reth::block_input::{self, BlockInput, ExecutionRequests};
 
 use crate::zeg0::reader::{PrevBlock, Zeg0};
 
@@ -79,10 +80,10 @@ pub fn ancestor_header_rlp(p: &PrevBlock) -> Result<Bytes> {
 }
 
 /// Build the block: header from RPC, body from the ZEG0 file.
-pub fn build_block(zeg: &Zeg0, header: Header) -> Result<Block> {
+pub fn build_block(zeg: &Zeg0, header: Header) -> Result<Block<TxEnvelope>> {
     let mut transactions = Vec::with_capacity(zeg.transactions.len());
     for (i, raw) in zeg.transactions.iter().enumerate() {
-        let tx = TransactionSigned::decode_2718(&mut raw.as_ref())
+        let tx = TxEnvelope::decode_2718(&mut raw.as_ref())
             .with_context(|| format!("decoding transaction {i} from its EIP-2718 envelope"))?;
         transactions.push(tx);
     }
@@ -123,31 +124,46 @@ pub fn build_block(zeg: &Zeg0, header: Header) -> Result<Block> {
     })
 }
 
-/// Assemble the full `StatelessInput`.
-pub fn build_stateless_input(
+/// Assemble the stateless input. ZEG0 carries neither the EIP-7685 execution
+/// requests nor the EIP-7928 block access list, so a block that needs them
+/// (non-empty `requests_hash`, or any Amsterdam block) is rejected rather than
+/// built wrong: those need a consensus-layer node, which this tool avoids.
+pub fn build_block_input(
     zeg: &Zeg0,
     header: Header,
     state: Vec<Bytes>,
     keys: Vec<Bytes>,
-) -> Result<StatelessInput> {
+    chain_id: u64,
+) -> Result<BlockInput> {
+    ensure!(
+        header.block_access_list_hash.is_none(),
+        "block {} is post-Amsterdam: its block access list is not in the ZEG0 container",
+        header.number
+    );
+    ensure!(
+        header
+            .requests_hash
+            .is_none_or(|hash| hash == EMPTY_REQUESTS_HASH),
+        "block {} has execution requests, which the ZEG0 container does not carry",
+        header.number
+    );
     let block = build_block(zeg, header)?;
-
     let headers = zeg
         .prev_blocks
         .iter()
         .map(ancestor_header_rlp)
         .collect::<Result<Vec<_>>>()?;
-
     let witness = ExecutionWitness {
         state,
         codes: zeg.codes.clone(),
         keys,
         headers,
     };
-
-    Ok(StatelessInput {
-        block,
-        witness,
-        chain_config: reth_chainspec::mainnet_chain_config(),
-    })
+    block_input::build_block_input(
+        chain_id,
+        &block,
+        None,
+        ExecutionRequests::default(),
+        &witness,
+    )
 }

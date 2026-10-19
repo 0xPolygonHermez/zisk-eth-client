@@ -23,6 +23,7 @@ use tracing::{info, warn};
 use tracing_subscriber::EnvFilter;
 
 use input_reth::RethClient;
+use stateless_validator_common::guest::StatelessInput;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -119,29 +120,30 @@ fn collect_inputs(path: &Path) -> Result<Vec<PathBuf>> {
     }
 }
 
-/// Read the witness out of a reth stateless-validator `.bin`. The container is
-/// two `ZiskStdin` slices — `[public][witness]` — and the second is
-/// `bincode(RethInputWitness)`.
-fn reth_witness(path: &Path) -> Result<stateless_reth::ExecutionWitness> {
+/// Read the witness state nodes out of a reth stateless-validator `.bin`. The
+/// container is one `ZiskStdin` slice holding `schema_id || SSZ(StatelessInput)`.
+fn reth_witness_state(path: &Path) -> Result<Vec<Vec<u8>>> {
     let buf = fs::read(path).with_context(|| format!("reading {}", path.display()))?;
     let slices = zeg0::reader::zisk_slices(&buf)?;
-    let witness_bytes = slices.get(1).with_context(|| {
-        format!(
-            "{} has {} slice(s), expected 2",
-            path.display(),
-            slices.len()
-        )
-    })?;
-    Ok(input_reth::guest::RethInputWitness::deserialize(witness_bytes)?.witness)
+    let stateless_input_bytes = slices
+        .first()
+        .with_context(|| format!("{} has no input slice", path.display()))?;
+    let (_, input) = StatelessInput::from_schema_prefixed_ssz(stateless_input_bytes)
+        .map_err(|e| anyhow!("{} is not a stateless input: {e:?}", path.display()))?;
+    Ok(input
+        .witness
+        .state
+        .iter()
+        .map(|node| node.to_vec())
+        .collect())
 }
 
 /// Every node we rebuilt must be present in the reference witness. The converse
 /// need not hold: `debug_executionWitness` can reveal nodes the guest's trie
 /// walk never reaches.
 fn compare(rebuilt: &zeg0::trie::Rebuilt, reference_path: &Path, block: u64) -> Result<()> {
-    let reference = reth_witness(reference_path)?;
-    let have: std::collections::HashSet<&[u8]> =
-        reference.state.iter().map(|b| b.as_ref()).collect();
+    let reference = reth_witness_state(reference_path)?;
+    let have: std::collections::HashSet<&[u8]> = reference.iter().map(|b| b.as_slice()).collect();
     let missing = rebuilt
         .state
         .iter()
@@ -158,7 +160,7 @@ fn compare(rebuilt: &zeg0::trie::Rebuilt, reference_path: &Path, block: u64) -> 
     info!(
         "block {block}: all {} rebuilt nodes present in the reference witness ({} nodes)",
         rebuilt.state.len(),
-        reference.state.len()
+        reference.len()
     );
     Ok(())
 }
@@ -217,6 +219,7 @@ async fn process<P: Provider>(
     };
 
     let header = fetch_header(provider, block).await?;
+    let chain_id = provider.get_chain_id().await.context("eth_chainId")?;
     let out_path = out_dir.join(format!(
         "{}_{}_{}_{}_zec_reth.bin",
         chain.to_lowercase(),
@@ -225,12 +228,16 @@ async fn process<P: Provider>(
         header.gas_used / 1_000_000,
     ));
 
-    let stateless = assemble::build_stateless_input(&zeg, header, rebuilt.state, rebuilt.keys)?;
-    RethClient
-        .from_stateless_input(&stateless)
-        .context("building the reth ZiskStdin")?
+    let input = assemble::build_block_input(&zeg, header, rebuilt.state, rebuilt.keys, chain_id)?;
+    let (stdin, _) = RethClient
+        .stdin_from_input(&input)
+        .context("building the reth ZiskStdin")?;
+    stdin
         .save(&out_path)
         .with_context(|| format!("writing {}", out_path.display()))?;
+    let expected_path = out_path.with_extension("output");
+    fs::write(&expected_path, &input.stateless_output_bytes)
+        .with_context(|| format!("writing {}", expected_path.display()))?;
 
     info!("ok  {} -> {}", in_path.display(), out_path.display());
     Ok(())
