@@ -224,7 +224,9 @@ impl ZiskClient {
 
         match &self.backend {
             Backend::ExecuteOnly(client) => {
-                let result = client.execute(&self.program, stdin, hints)?;
+                // `None` seed: the SDK draws a fresh one; execution-only runs
+                // do not depend on it.
+                let result = client.execute(&self.program, stdin, hints, None)?;
                 log_plan(&result);
                 Ok(execute_metrics(
                     result.get_execution_time(),

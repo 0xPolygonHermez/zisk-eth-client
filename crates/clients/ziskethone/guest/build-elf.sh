@@ -47,6 +47,11 @@ ZISK_MARCH="${ZISK_MARCH-rv64ima_zicsr_zba_zbb_zbs_zbkb}"
 # ON unless asked otherwise: the committed ELF is a DMA build, so a plain run of
 # this script has to reproduce it.
 ZEG_ZISK_DMA="${ZEG_ZISK_DMA:-ON}"
+# The chain id is compiled into the ziskethone guest (`zeg/config.hpp`), so
+# one ELF validates one chain. The committed ELF is the mainnet build;
+# ZEG_CHAIN=sepolia produces a Sepolia ELF for A/B runs against testnet blocks.
+# Part of the stamp below, so switching reconfigures from scratch.
+ZEG_CHAIN="${ZEG_CHAIN:-mainnet}"
 
 # `nproc` and `sha256sum` are GNU-only, and macOS has neither. Go through these
 # so a missing one doesn't take the whole script down.
@@ -162,7 +167,7 @@ fi
 # CMAKE_CXX_COMPILER moves, so detect the move ourselves and start clean instead
 # of handing the user a cache error. Also covers future flag changes.
 STAMP_FILE="$BUILD_DIR/.zec-toolchain-stamp"
-STAMP_NOW="$(command -v riscv-none-elf-g++) $(riscv-none-elf-g++ -dumpversion) ZEG_ZISK_DMA=$ZEG_ZISK_DMA ZISK_MARCH=${ZISK_MARCH:-<toolchain.cmake default>}"
+STAMP_NOW="$(command -v riscv-none-elf-g++) $(riscv-none-elf-g++ -dumpversion) ZEG_ZISK_DMA=$ZEG_ZISK_DMA ZISK_MARCH=${ZISK_MARCH:-<toolchain.cmake default>} ZEG_CHAIN=$ZEG_CHAIN"
 if [ -f "$STAMP_FILE" ] && [ "$(cat "$STAMP_FILE")" != "$STAMP_NOW" ]; then
     echo "==> toolchain or flags changed since last configure; removing $BUILD_DIR"
     rm -rf "$BUILD_DIR"
@@ -210,7 +215,7 @@ if [ -n "$ZISK_MARCH" ]; then
     MARCH_FLAG="-DZISK_MARCH=$ZISK_MARCH"
 fi
 
-echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA)"
+echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA, ZEG_CHAIN=$ZEG_CHAIN)"
 # shellcheck disable=SC2086
 cmake \
     -S "$GUEST_DIR" \
@@ -219,6 +224,7 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DEVMONE_SRC="$HOST_DIR/build-stub/_deps/evmone-src" \
     -DZEG_ZISK_DMA="$ZEG_ZISK_DMA" \
+    -DZEG_CHAIN="$ZEG_CHAIN" \
     $MARCH_FLAG \
     -G "Unix Makefiles"
 
