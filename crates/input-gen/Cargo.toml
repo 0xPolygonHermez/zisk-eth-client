@@ -14,6 +14,7 @@ path = "src/lib.rs"
 input = { path = "../input", default-features = false, features = ["cli", "reth", "ethrex"] }
 
 alloy-primitives.workspace = true
+zisk-sdk.workspace = true
 alloy-provider.workspace = true
 
 anyhow.workspace = true

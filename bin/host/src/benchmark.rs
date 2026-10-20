@@ -305,7 +305,8 @@ impl BenchmarkRunner {
             Action::Execute => {
                 if let Some(ref output_folder) = self.output_folder {
                     let filename = work_file.file_name().unwrap_or_default();
-                    let output_file = output_folder.join(filename).with_extension("json");
+                    let output_file =
+                        output_folder.join(format!("{}.json", filename.to_string_lossy()));
 
                     if output_file.exists() && !self.force_rerun {
                         info!("[{}/{}] Skipping {}", current, total, test_name);
@@ -332,7 +333,8 @@ impl BenchmarkRunner {
 
                 if let Some(ref output_folder) = self.output_folder {
                     let filename = work_file.file_name().unwrap_or_default();
-                    let output_file = output_folder.join(filename).with_extension("json");
+                    let output_file =
+                        output_folder.join(format!("{}.json", filename.to_string_lossy()));
 
                     if let Some(parent) = output_file.parent() {
                         fs::create_dir_all(parent)?;

@@ -4145,6 +4145,7 @@ dependencies = [
  "tokio-util",
  "tracing",
  "walkdir",
+ "zisk-sdk",
 ]
 
 [[package]]

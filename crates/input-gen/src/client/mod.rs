@@ -50,6 +50,39 @@ pub fn create_client(client: Client) -> Box<dyn InputGenClient> {
     }
 }
 
+/// Maximum length of a generated file stem. EEST test ids run past the
+/// 255-byte file name limit of most filesystems; longer names are cut and
+/// suffixed with a hash of the full name so they stay unique.
+const MAX_STEM_LEN: usize = 180;
+
 pub(crate) fn sanitize_filename(name: &str) -> String {
-    name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_")
+    let sanitized = name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_");
+    if sanitized.len() <= MAX_STEM_LEN {
+        return sanitized;
+    }
+    let digest = alloy_primitives::keccak256(name.as_bytes());
+    let suffix = format!("~{}", alloy_primitives::hex::encode(&digest[..6]));
+    let mut head = sanitized;
+    let mut cut = MAX_STEM_LEN - suffix.len();
+    while !head.is_char_boundary(cut) {
+        cut -= 1;
+    }
+    head.truncate(cut);
+    head + &suffix
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn long_names_are_shortened_and_unique() {
+        let base = "tests/amsterdam/x.py::test[".to_string() + &"a".repeat(400) + "]#block0";
+        let other = base.replace("]#block0", "]#block1");
+        let (a, b) = (sanitize_filename(&base), sanitize_filename(&other));
+        assert!(a.len() <= MAX_STEM_LEN && b.len() <= MAX_STEM_LEN);
+        assert_ne!(a, b);
+        assert!(a.starts_with("tests_amsterdam_x.py__test["));
+        assert_eq!(sanitize_filename("short/name:1"), "short_name_1");
+    }
 }
