@@ -3819,6 +3819,7 @@ dependencies = [
  "reth-evm",
  "reth-primitives-traits",
  "reth-trie-common",
+ "revm",
  "revm-bytecode",
  "revm-database-interface",
  "revm-state",
@@ -3826,6 +3827,7 @@ dependencies = [
  "serde_with",
  "thiserror",
  "tries",
+ "zkvm-interface",
 ]
 
 [[package]]
@@ -3861,6 +3863,7 @@ dependencies = [
  "stateless-validator-common",
  "thiserror",
  "tries",
+ "zkvm-interface",
 ]
 
 [[package]]
@@ -4637,6 +4640,14 @@ dependencies = [
  "zisk-stream",
  "zisk-verifier",
  "zisk-zkvm-interface",
+]
+
+[[package]]
+name = "zkvm-interface"
+version = "0.1.0"
+source = "git+https://github.com/eth-act/zkvm-standards?rev=282cd356c3a0498416bb0619f9c8a347ce9933fb#282cd356c3a0498416bb0619f9c8a347ce9933fb"
+dependencies = [
+ "bindgen",
 ]
 
 [[package]]

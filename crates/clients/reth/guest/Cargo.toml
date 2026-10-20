@@ -18,7 +18,12 @@ alloy-primitives.workspace = true
 
 revm.workspace = true
 
-stateless-validator-reth.workspace = true
+# `zkvm-interface` makes the validator hash SSZ (the EIP-8025 payload root)
+# through the standard zkVM C interface, whose `zkvm_sha256` symbol ziskos
+# provides (the ZisK precompile on the guest, software natively). Without it
+# the SSZ merkleization runs SHA-256 in software: ~5M extra steps per block.
+# Only the hasher is affected; the crypto provider stays `CustomEvmCrypto`.
+stateless-validator-reth = { workspace = true, features = ["zkvm-interface"] }
 stateless-validator-common.workspace = true
 
 [dev-dependencies]
