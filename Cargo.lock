@@ -9128,6 +9128,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "reth-to-ethrex"
+version = "0.10.0"
+dependencies = [
+ "alloy-rlp",
+ "anyhow",
+ "clap",
+ "ethrex-common",
+ "ethrex-config",
+ "ethrex-rlp",
+ "guest-ethrex",
+ "input-reth",
+ "zisk-sdk",
+]
+
+[[package]]
 name = "reth-to-ziskethone"
 version = "0.10.0"
 dependencies = [

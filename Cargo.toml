@@ -11,6 +11,7 @@ members = [
     # crates/clients/<client>/ is silently NOT a workspace member.
     "crates/clients/*/*",
     "tests",
+    "tools/reth-to-ethrex",
     "tools/reth-to-ziskethone",
     "tools/ziskethone-to-reth",
 ]
