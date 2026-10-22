@@ -61,7 +61,7 @@ enum Node {
 pub struct Rebuilt {
     /// Every revealed node's RLP, in depth-first order.
     pub state: Vec<Bytes>,
-    /// Plaintext preimages (20-byte addresses, 32-byte slot positions).
+    /// Plaintext preimages: each address followed by its slot positions.
     pub keys: Vec<Bytes>,
     /// The recomputed state root — must equal the container's parent state root.
     pub root: B256,
@@ -82,8 +82,6 @@ pub fn rebuild(stream: &[u8], version: u32) -> Result<Rebuilt> {
     // shipping redundant bytes.
     let mut seen = std::collections::HashSet::new();
     out.state.retain(|n| seen.insert(n.clone()));
-    let mut seen_keys = std::collections::HashSet::new();
-    out.keys.retain(|k| seen_keys.insert(k.clone()));
 
     out.root = match reference {
         // A root under 32 bytes is still hashed to form the root commitment.
@@ -161,6 +159,11 @@ fn parse_leaf(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt, version: u3
                 c.skip(8 + 8)?; // next_sorted_account + first_sorted_storage
             }
 
+            // `keys` lists each address followed by its slots (the
+            // `debug_executionWitness` layout, which consumers rely on), so the
+            // address goes in before the storage subtree adds the slots.
+            out.keys.push(Bytes::from(address.to_vec()));
+
             // The account's storage subtree follows inline as a recursive node.
             let storage = parse_node(c, TreeKind::Storage, out, version)?;
             let (storage_rlp, storage_ref) = encode(&storage, &mut out.state);
@@ -172,10 +175,9 @@ fn parse_leaf(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt, version: u3
 
             // An absent accessed account (v12+). Its storage is Empty too.
             if version >= 12 && nonce == 0 && balance.is_zero() && code_hash == KECCAK256_EMPTY {
+                out.keys.pop();
                 return Ok(Node::Empty);
             }
-
-            out.keys.push(Bytes::from(address.to_vec()));
 
             let account = rlp_list(&[
                 rlp_uint(U256::from(nonce)),
