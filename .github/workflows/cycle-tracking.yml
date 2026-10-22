@@ -25,8 +25,8 @@ env:
   # Block inputs to test per client (from less MGs to more MGs). All clients use
   # the SAME blocks so the report can compare them against each other (reth is
   # the cross-client baseline). Every client must have an input file for each.
-  RETH_TEST_BLOCKS: "25431055 25431039 25431013"
-  ETHREX_TEST_BLOCKS: "25431055 25431039 25431013"
+  RETH_TEST_BLOCKS: "26235159 26235168 26235156"
+  ETHREX_TEST_BLOCKS: "26235159 26235168 26235156"
   ZISKETHONE_TEST_BLOCKS: "26235159 26235168 26235156"
 
 jobs:
