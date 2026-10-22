@@ -221,7 +221,7 @@ impl ZiskClient {
 
         match &self.backend {
             Backend::ExecuteOnly(client) => {
-                let result = client.execute(&self.program, stdin, hints)?;
+                let result = client.execute(&self.program, stdin, hints, None)?;
                 log_plan(&result);
                 Ok(execute_metrics(
                     result.get_execution_time(),

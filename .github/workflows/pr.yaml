@@ -24,15 +24,17 @@ env:
   # `ziskethone` is a C++ (evmone) guest; the hints-mode execute loop skips it
   # (see the Execute job).
   CLIENTS: "reth ethrex ziskethone"
-  # Block inputs to test per client (graduated, less MGs to more MGs). All three
-  # clients share the SAME block set for cross-client comparison; each block has
-  # a committed input under bin/guests/stateless-validator-<client>/inputs/.
-  #   25431013 ~17.0M gas / 172 tx   (small)
-  #   25431039 ~25.0M gas / 325 tx   (medium)
-  #   25431055 ~55.7M gas / 712 tx   (large)
+  # Block inputs to test per client (graduated, less MGs to more MGs). Each block
+  # has a committed input under bin/guests/stateless-validator-<client>/inputs/.
+  # reth and ethrex share the same block set; ziskethone uses a newer set because
+  # its inputs had to be regenerated in the v13 container format that the
+  # upgrade/zisk-1.4.0 guest requires:
+  #   26235156 ~5M gas / 91 tx   (small)
+  #   26235168 ~29M gas / 260 tx   (medium)
+  #   26235159 ~57M gas / 532 tx   (large)
   RETH_TEST_BLOCKS: "25431013 25431039 25431055"
   ETHREX_TEST_BLOCKS: "25431013 25431039 25431055"
-  ZISKETHONE_TEST_BLOCKS: "25431013 25431039 25431055"
+  ZISKETHONE_TEST_BLOCKS: "26235156 26235168 26235159"
 
 jobs:
   fmt:
