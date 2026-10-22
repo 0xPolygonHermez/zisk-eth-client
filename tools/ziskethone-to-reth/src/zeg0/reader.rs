@@ -1,30 +1,44 @@
 //! Cursor over a ZEG0 container — the inverse of `rust-input-gen`'s `Writer`.
 //!
-//! Layout is defined by `third_party/ziskethone/BINARY_FORMAT.md`. Note the doc
-//! states a 344-byte ConsensusInfo prefix; that is stale. Format v8 appends
-//! `blob_base_fee_update_fraction`, `target_blob_gas_per_block` and
-//! `max_blob_gas_per_block`, making the real prefix 368 bytes (see
-//! `sections::write_consensus_info`).
+//! Layout is defined by `rust-input-gen`'s `sections.rs` / `state_root.rs`;
+//! `third_party/ziskethone/BINARY_FORMAT.md` lags behind them.
 
 use alloy_primitives::{Address, Bytes, B256, U256};
-use anyhow::{bail, ensure, Context, Result};
+use anyhow::{bail, ensure, Result};
 
 /// Format versions this reader understands, mirroring `sections::FORMAT_VERSION`.
 ///
-/// v9 changed only the StateRoot section (see `trie.rs`): branches tag their 16
-/// children in one word, and nibble runs pack two per byte. Every other section
-/// is byte-identical to v8, so the two versions share this reader and differ
-/// only inside the trie walk.
-pub const SUPPORTED_VERSIONS: &[u32] = &[8, 9];
+/// v9: compact StateRoot — branches tag their 16 children in one word, nibble
+///     runs pack two per byte (see `trie.rs`).
+/// v10: Amsterdam fields — ConsensusInfo prefix 368 → 408 B, PreviousBlocks
+///      records 728 → 768 B (block_access_list_hash + slot_number).
+/// v11: ConsensusInfo prefix 408 → 376 B (the BAL hash leaves it), plus a
+///      trailing BalHint section after StateRoot, which the trie walk ignores.
+/// v12: sorted-order links — the StateRoot header gains a fourth u64, leaves
+///      carry link words, and absent accessed keys appear as empty leaves.
+/// v13: a 16-byte hash seed right after the magic + version.
+pub const SUPPORTED_VERSIONS: &[u32] = &[8, 9, 10, 11, 12, 13];
 
-/// Byte length of the ConsensusInfo fixed prefix in v8.
-const CONSENSUS_PREFIX_LEN: usize = 368;
+/// Byte length of the ConsensusInfo fixed prefix.
+fn consensus_prefix_len(version: u32) -> usize {
+    match version {
+        ..=9 => 368,
+        10 => 408,
+        _ => 376,
+    }
+}
 
 /// One EIP-4895 withdrawal record.
 const WITHDRAWAL_RECORD_LEN: usize = 48;
 
 /// One PreviousBlocks record.
-const PREV_BLOCK_RECORD_LEN: usize = 728;
+fn prev_block_record_len(version: u32) -> usize {
+    if version >= 10 {
+        768
+    } else {
+        728
+    }
+}
 
 pub struct Cursor<'a> {
     buf: &'a [u8],
@@ -119,7 +133,7 @@ pub struct PrevBlock {
     pub parent_hash: B256,
     pub ommers_hash: B256,
     pub beneficiary: Address,
-    /// How many header fields to RLP-encode (fork-dependent: 15..=21).
+    /// How many header fields to RLP-encode (fork-dependent: 15..=23).
     pub field_count: u32,
     pub state_root: B256,
     pub transactions_root: B256,
@@ -139,12 +153,16 @@ pub struct PrevBlock {
     pub excess_blob_gas: u64,
     pub parent_beacon_block_root: B256,
     pub requests_hash: B256,
+    /// Zero before v10 and pre-Amsterdam.
+    pub block_access_list_hash: B256,
+    pub slot_number: u64,
 }
 
 /// Everything the transcoder needs out of a ZEG0 file.
 pub struct Zeg0 {
     /// The container's format version (one of `SUPPORTED_VERSIONS`). The trie
-    /// walk needs it: v9 packs nibbles and tags branch children, v8 does not.
+    /// walk needs it: v9 packs nibbles and tags branch children, v12 adds link
+    /// words to leaves.
     pub version: u32,
     pub consensus: ConsensusInfo,
     pub withdrawals: Vec<Withdrawal>,
@@ -160,44 +178,17 @@ pub struct Zeg0 {
     pub trie_stream: Vec<u8>,
 }
 
-/// Split a `ZiskStdin` container into its length-prefixed slices: each is a
-/// u64-le length, the payload, then zero padding to the next 8-byte boundary.
-/// Used for both the ziskethone input (one slice) and a reth input (two).
-pub fn zisk_slices(buf: &[u8]) -> Result<Vec<&[u8]>> {
-    let mut out = Vec::new();
-    let mut cur = 0usize;
-    while cur < buf.len() {
-        let end = cur + 8;
-        let hdr = buf
-            .get(cur..end)
-            .context("truncated ZiskStdin length prefix")?;
-        let len = u64::from_le_bytes(hdr.try_into().unwrap()) as usize;
-        let payload = buf.get(end..end + len).with_context(|| {
-            format!(
-                "ZiskStdin slice of {len} B overruns the {} B file",
-                buf.len()
-            )
-        })?;
-        out.push(payload);
-        cur = end + len + (8 - ((8 + len) % 8)) % 8;
-    }
-    Ok(out)
-}
-
 /// A committed ziskethone input is a `ZiskStdin` container holding the ZEG0
-/// bytes in its first slice. Also accepts a bare ZEG0 payload.
-fn unwrap_zisk_slice(buf: &[u8]) -> Result<&[u8]> {
+/// bytes in its first frame. Also accepts a bare ZEG0 payload.
+fn unwrap_zisk_frame(buf: &[u8]) -> Result<&[u8]> {
     if buf.starts_with(b"ZEG0") {
         return Ok(buf);
     }
-    zisk_slices(buf)?
-        .into_iter()
-        .next()
-        .context("ZiskStdin container has no slices")
+    input_core::first_frame(buf)
 }
 
 pub fn parse(outer: &[u8]) -> Result<Zeg0> {
-    let buf = unwrap_zisk_slice(outer)?;
+    let buf = unwrap_zisk_frame(outer)?;
     let mut c = Cursor::new(buf);
 
     // Section 0 — magic.
@@ -210,11 +201,14 @@ pub fn parse(outer: &[u8]) -> Result<Zeg0> {
         SUPPORTED_VERSIONS.contains(&version),
         "unsupported ZEG0 version {version} (this tool understands {SUPPORTED_VERSIONS:?})"
     );
+    if version >= 13 {
+        c.skip(16)?; // hash seed: guest-internal, never affects the block
+    }
 
     // Section 1 — ConsensusInfo. Only two fields are load-bearing here; the
     // rest of the current header comes from RPC, which is authoritative for
     // the fields ZEG0 omits anyway.
-    let prefix_start = 8;
+    let prefix_start = c.pos;
     let parent_state_root = c.b256()?;
     c.skip(20 + 4)?; // beneficiary + pad
     let number = c.u64_le()?;
@@ -228,7 +222,7 @@ pub fn parse(outer: &[u8]) -> Result<Zeg0> {
     // requests_hash, difficulty, nonce, ommers_hash, fork_id, blob schedule) are
     // all supplied by the RPC header.
     let consumed = c.pos - prefix_start;
-    c.skip(CONSENSUS_PREFIX_LEN - consumed)?;
+    c.skip(consensus_prefix_len(version) - consumed)?;
 
     let mut withdrawals = Vec::with_capacity(withdrawals_count);
     for _ in 0..withdrawals_count {
@@ -293,10 +287,16 @@ pub fn parse(outer: &[u8]) -> Result<Zeg0> {
         let excess_blob_gas = c.u64_le()?;
         let parent_beacon_block_root = c.b256()?;
         let requests_hash = c.b256()?;
+        let (block_access_list_hash, slot_number) = if version >= 10 {
+            (c.b256()?, c.u64_le()?)
+        } else {
+            (B256::ZERO, 0)
+        };
         ensure!(
-            c.pos - start == PREV_BLOCK_RECORD_LEN,
-            "PreviousBlocks record was {} B, expected {PREV_BLOCK_RECORD_LEN}",
-            c.pos - start
+            c.pos - start == prev_block_record_len(version),
+            "PreviousBlocks record was {} B, expected {}",
+            c.pos - start,
+            prev_block_record_len(version)
         );
         prev_blocks.push(PrevBlock {
             parent_hash,
@@ -321,14 +321,19 @@ pub fn parse(outer: &[u8]) -> Result<Zeg0> {
             excess_blob_gas,
             parent_beacon_block_root,
             requests_hash,
+            block_access_list_hash,
+            slot_number,
         });
     }
 
-    // Section 7 — StateRoot trie hints. Three u64 counts, then the stream,
-    // which runs to end of file.
+    // Section 7 — StateRoot trie hints. Three u64 counts (v12+: plus the head
+    // of the sorted-account links), then the stream, which runs to end of file.
     let _number_of_nodes = c.u64_le()?;
     let _number_of_accounts = c.u64_le()?;
     let _number_of_storages = c.u64_le()?;
+    if version >= 12 {
+        let _first_sorted_account = c.u64_le()?;
+    }
     let trie_stream = c.take(c.remaining())?.to_vec();
 
     Ok(Zeg0 {

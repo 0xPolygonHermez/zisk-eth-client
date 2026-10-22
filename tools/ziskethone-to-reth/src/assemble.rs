@@ -27,8 +27,8 @@ pub fn ancestor_header_rlp(p: &PrevBlock) -> Result<Bytes> {
     // Reject anything else rather than silently dropping trailing fields — the
     // symptom would be a wrong ancestor hash, surfacing far from the cause.
     ensure!(
-        matches!(p.field_count, 15 | 16 | 17 | 20 | 21),
-        "ancestor block {} has an unrecognised header field count {} (expected 15, 16, 17, 20 or 21)",
+        matches!(p.field_count, 15 | 16 | 17 | 20 | 21 | 23),
+        "ancestor block {} has an unrecognised header field count {} (expected 15, 16, 17, 20, 21 or 23)",
         p.number,
         p.field_count
     );
@@ -71,6 +71,10 @@ pub fn ancestor_header_rlp(p: &PrevBlock) -> Result<Bytes> {
     }
     if p.field_count >= 21 {
         h.requests_hash = Some(p.requests_hash);
+    }
+    if p.field_count >= 23 {
+        h.block_access_list_hash = Some(p.block_access_list_hash);
+        h.slot_number = Some(p.slot_number);
     }
 
     let mut buf = Vec::new();

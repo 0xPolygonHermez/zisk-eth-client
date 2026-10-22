@@ -22,7 +22,9 @@ use clap::Parser;
 use tracing::{info, warn};
 use tracing_subscriber::EnvFilter;
 
+use input_reth::guest::{RethInputPublic, RethInputWitness};
 use input_reth::RethClient;
+use zisk_sdk::ZiskStdin;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -119,20 +121,17 @@ fn collect_inputs(path: &Path) -> Result<Vec<PathBuf>> {
     }
 }
 
-/// Read the witness out of a reth stateless-validator `.bin`. The container is
-/// two `ZiskStdin` slices — `[public][witness]` — and the second is
-/// `bincode(RethInputWitness)`.
+/// Read the witness out of a reth stateless-validator `.bin`: the second of
+/// its two `ZiskStdin` frames, `[public][witness]`.
 fn reth_witness(path: &Path) -> Result<stateless_reth::ExecutionWitness> {
-    let buf = fs::read(path).with_context(|| format!("reading {}", path.display()))?;
-    let slices = zeg0::reader::zisk_slices(&buf)?;
-    let witness_bytes = slices.get(1).with_context(|| {
-        format!(
-            "{} has {} slice(s), expected 2",
-            path.display(),
-            slices.len()
-        )
-    })?;
-    Ok(input_reth::guest::RethInputWitness::deserialize(witness_bytes)?.witness)
+    let stdin = ZiskStdin::from_file(path)?;
+    stdin
+        .read::<RethInputPublic>()
+        .context("reading the public frame")?;
+    Ok(stdin
+        .read::<RethInputWitness>()
+        .context("reading the witness frame")?
+        .witness)
 }
 
 /// Every node we rebuilt must be present in the reference witness. The converse

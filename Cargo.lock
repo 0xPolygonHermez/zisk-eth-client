@@ -9128,6 +9128,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "reth-to-ziskethone"
+version = "0.10.0"
+dependencies = [
+ "alloy-consensus",
+ "alloy-eips 2.0.0",
+ "alloy-primitives",
+ "alloy-rlp",
+ "anyhow",
+ "clap",
+ "input-reth",
+ "reth-ethereum-primitives",
+ "reth-evm",
+ "reth-evm-ethereum",
+ "revm",
+ "rust-input-gen",
+ "stateless",
+ "tracing-subscriber 0.3.23",
+ "tries",
+ "zisk-sdk",
+]
+
+[[package]]
 name = "reth-tokio-util"
 version = "2.1.0"
 source = "git+https://github.com/paradigmxyz/reth?tag=v2.1.0#d58c6e3d0723a28f655e89da83c3738e47dcc364"
@@ -13522,14 +13544,15 @@ dependencies = [
  "alloy-rlp",
  "anyhow",
  "clap",
+ "input-core",
  "input-reth",
  "reth-chainspec",
  "reth-ethereum-primitives",
  "stateless",
- "tiny-keccak",
  "tokio",
  "tracing",
  "tracing-subscriber 0.3.23",
+ "zisk-sdk",
 ]
 
 [[package]]
