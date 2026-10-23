@@ -14,7 +14,7 @@ alloy-rlp.workspace = true
 
 ethrex-common.workspace = true
 ethrex-config.workspace = true
-ethrex-rlp = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0" }
+ethrex-rlp = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v30.0.0" }
 
 anyhow.workspace = true
 clap.workspace = true
