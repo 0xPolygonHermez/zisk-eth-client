@@ -5,6 +5,7 @@
 //! otherwise fetch over RPC (the witness needs an archive node), so a reth
 //! input carries everything it needs.
 
+use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -51,8 +52,11 @@ fn main() -> Result<()> {
     };
 
     let mut failures = 0usize;
+    // The output name comes from block metadata, so two inputs for the same
+    // block would map to one file; refuse rather than silently overwrite.
+    let mut claimed: HashSet<PathBuf> = HashSet::new();
     for in_path in &inputs {
-        match convert_file(in_path, &cli.output_dir) {
+        match convert_file(in_path, &cli.output_dir, &mut claimed) {
             Ok(out) => println!("ok  {} -> {}", in_path.display(), out.display()),
             Err(e) => {
                 failures += 1;
@@ -66,7 +70,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn convert_file(in_path: &Path, out_dir: &Path) -> Result<PathBuf> {
+fn convert_file(in_path: &Path, out_dir: &Path, claimed: &mut HashSet<PathBuf>) -> Result<PathBuf> {
     let stdin = ZiskStdin::from_file(in_path)?;
     let public: RethInputPublic = stdin.read().context("reading the public frame")?;
     let witness = stdin
@@ -109,6 +113,13 @@ fn convert_file(in_path: &Path, out_dir: &Path) -> Result<PathBuf> {
         block.body.transactions.len(),
         block.header.gas_used / 1_000_000,
     ));
+
+    if !claimed.insert(out_path.clone()) {
+        bail!(
+            "output {} already written by an earlier input (same block)",
+            out_path.display()
+        );
+    }
 
     let bytes = EthrexInput::new(block, execution_witness)
         .serialize()
