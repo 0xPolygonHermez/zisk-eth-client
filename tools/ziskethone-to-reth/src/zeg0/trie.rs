@@ -12,13 +12,17 @@
 //!     canonical MPT, so the fold is unambiguous.
 //!   * Leaves carry decoded fields rather than RLP, so account and storage
 //!     values are re-encoded.
+//!   * From v12 the encoder places every accessed key that doesn't exist as an
+//!     empty leaf, splitting the leaf it diverges from. Such a leaf hashes as
+//!     Empty (as in the guest), so it is dropped and the split folds back.
 //!
 //! Correctness is not assumed: [`rebuild`] returns the recomputed root, and the
 //! caller checks it against the parent `state_root` the container carries.
 
+use alloy_consensus::EMPTY_ROOT_HASH;
+use alloy_primitives::{keccak256, KECCAK256_EMPTY};
 use alloy_primitives::{Bytes, B256, U256};
 use anyhow::{bail, ensure, Result};
-use tiny_keccak::{Hasher, Keccak};
 
 use super::reader::Cursor;
 
@@ -28,12 +32,6 @@ const OP_EXTENSION_HASH: u64 = 2;
 const OP_LEAF: u64 = 3;
 const OP_BRANCH: u64 = 4;
 const OP_PHANTOM_LEAF: u64 = 5;
-
-/// keccak256(rlp("")) — the empty-trie root.
-const EMPTY_TRIE_ROOT: [u8; 32] = [
-    0x56, 0xe8, 0x1f, 0x17, 0x1b, 0xcc, 0x55, 0xa6, 0xff, 0x83, 0x45, 0xe6, 0x92, 0xc0, 0xf8, 0x6e,
-    0x5b, 0x48, 0xe0, 0x1b, 0x99, 0x6c, 0xad, 0xc0, 0x01, 0x62, 0x2f, 0xb5, 0xe3, 0x63, 0xb4, 0x21,
-];
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum TreeKind {
@@ -63,7 +61,7 @@ enum Node {
 pub struct Rebuilt {
     /// Every revealed node's RLP, in depth-first order.
     pub state: Vec<Bytes>,
-    /// Plaintext preimages (20-byte addresses, 32-byte slot positions).
+    /// Plaintext preimages: each address followed by its slot positions.
     pub keys: Vec<Bytes>,
     /// The recomputed state root — must equal the container's parent state root.
     pub root: B256,
@@ -84,14 +82,12 @@ pub fn rebuild(stream: &[u8], version: u32) -> Result<Rebuilt> {
     // shipping redundant bytes.
     let mut seen = std::collections::HashSet::new();
     out.state.retain(|n| seen.insert(n.clone()));
-    let mut seen_keys = std::collections::HashSet::new();
-    out.keys.retain(|k| seen_keys.insert(k.clone()));
 
     out.root = match reference {
         // A root under 32 bytes is still hashed to form the root commitment.
         NodeRef::Inline => B256::from(keccak(&rlp)),
         NodeRef::Hash(h) => B256::from(h),
-        NodeRef::Empty => B256::from(EMPTY_TRIE_ROOT),
+        NodeRef::Empty => EMPTY_ROOT_HASH,
     };
     Ok(out)
 }
@@ -159,17 +155,29 @@ fn parse_leaf(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt, version: u3
             let balance = c.u256_be()?;
             let nonce = c.u64_le()?;
             let code_hash = c.b256()?;
+            if version >= 12 {
+                c.skip(8 + 8)?; // next_sorted_account + first_sorted_storage
+            }
+
+            // `keys` lists each address followed by its slots (the
+            // `debug_executionWitness` layout, which consumers rely on), so the
+            // address goes in before the storage subtree adds the slots.
+            out.keys.push(Bytes::from(address.to_vec()));
 
             // The account's storage subtree follows inline as a recursive node.
             let storage = parse_node(c, TreeKind::Storage, out, version)?;
             let (storage_rlp, storage_ref) = encode(&storage, &mut out.state);
             let storage_root = match storage_ref {
-                NodeRef::Empty => EMPTY_TRIE_ROOT,
+                NodeRef::Empty => EMPTY_ROOT_HASH.0,
                 NodeRef::Hash(h) => h,
                 NodeRef::Inline => keccak(&storage_rlp),
             };
 
-            out.keys.push(Bytes::from(address.to_vec()));
+            // An absent accessed account (v12+). Its storage is Empty too.
+            if version >= 12 && nonce == 0 && balance.is_zero() && code_hash == KECCAK256_EMPTY {
+                out.keys.pop();
+                return Ok(Node::Empty);
+            }
 
             let account = rlp_list(&[
                 rlp_uint(U256::from(nonce)),
@@ -185,6 +193,13 @@ fn parse_leaf(c: &mut Cursor<'_>, kind: TreeKind, out: &mut Rebuilt, version: u3
         TreeKind::Storage => {
             let position = c.b256()?;
             let value = c.b256()?;
+            if version >= 12 {
+                c.skip(8)?; // next_sorted_storage
+                            // An absent accessed slot.
+                if value.is_zero() {
+                    return Ok(Node::Empty);
+                }
+            }
             out.keys.push(Bytes::from(position.to_vec()));
             Ok(Node::Leaf {
                 path,
@@ -221,7 +236,8 @@ fn read_nibbles(c: &mut Cursor<'_>, version: u32) -> Result<Vec<u8>> {
 /// Collapse a branch that has exactly one non-empty child and no value: in a
 /// canonical MPT that node is an extension. This inverts the encoder's
 /// extension-to-branch-chain expansion, merging with the child's own path so a
-/// multi-nibble extension folds back in one piece.
+/// multi-nibble extension folds back in one piece. A branch left with no
+/// children (all its leaves were absent keys) is Empty.
 fn fold(node: Node) -> Node {
     let Node::Branch(mut children) = node else {
         return node;
@@ -232,6 +248,9 @@ fn fold(node: Node) -> Node {
         .filter(|(_, c)| !matches!(c, Node::Empty))
         .map(|(i, _)| i)
         .collect();
+    if non_empty.is_empty() {
+        return Node::Empty;
+    }
     if non_empty.len() != 1 {
         return Node::Branch(children);
     }
@@ -343,49 +362,31 @@ fn hex_prefix(nibbles: &[u8], is_leaf: bool) -> Vec<u8> {
     out
 }
 
-// ----- minimal RLP -----------------------------------------------------------
+// ----- RLP -------------------------------------------------------------------
 
 fn rlp_bytes(b: &[u8]) -> Vec<u8> {
-    if b.len() == 1 && b[0] < 0x80 {
-        return vec![b[0]];
-    }
-    let mut out = encode_len(b.len(), 0x80);
-    out.extend_from_slice(b);
-    out
+    alloy_rlp::encode(b)
 }
 
+/// A list of already-encoded items.
 fn rlp_list(items: &[Vec<u8>]) -> Vec<u8> {
-    let payload: Vec<u8> = items.concat();
-    let mut out = encode_len(payload.len(), 0xc0);
+    let payload = items.concat();
+    let mut out = Vec::with_capacity(payload.len() + 9);
+    alloy_rlp::Header {
+        list: true,
+        payload_length: payload.len(),
+    }
+    .encode(&mut out);
     out.extend_from_slice(&payload);
     out
 }
 
-/// RLP of an integer: big-endian, minimal (leading zeros stripped; zero is "").
 fn rlp_uint(v: U256) -> Vec<u8> {
-    let be = v.to_be_bytes::<32>();
-    let first = be.iter().position(|b| *b != 0).unwrap_or(be.len());
-    rlp_bytes(&be[first..])
-}
-
-fn encode_len(len: usize, offset: u8) -> Vec<u8> {
-    if len <= 55 {
-        return vec![offset + len as u8];
-    }
-    let be = len.to_be_bytes();
-    let first = be.iter().position(|b| *b != 0).unwrap();
-    let len_bytes = &be[first..];
-    let mut out = vec![offset + 55 + len_bytes.len() as u8];
-    out.extend_from_slice(len_bytes);
-    out
+    alloy_rlp::encode(v)
 }
 
 fn keccak(data: &[u8]) -> [u8; 32] {
-    let mut h = Keccak::v256();
-    h.update(data);
-    let mut out = [0u8; 32];
-    h.finalize(&mut out);
-    out
+    keccak256(data).0
 }
 
 /// Guard used by the caller: the rebuilt root must match the anchor the

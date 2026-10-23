@@ -4,13 +4,14 @@ description = "Transcode ziskethone ZEG0 inputs back into reth stateless-validat
 version.workspace = true
 edition.workspace = true
 
-# A workspace member (unlike tools/reth-to-ziskethone, which is detached): this
-# tool produces reth types, so it needs guest-reth / stateless-reth from the
-# workspace rather than a standalone alloy-2.x world.
+# A workspace member: it produces reth types, so it needs guest-reth /
+# stateless-reth from the workspace.
 
 [dependencies]
+input-core.workspace = true
 input-reth.workspace = true
 stateless-reth.workspace = true
+zisk-sdk.workspace = true
 
 alloy-consensus.workspace = true
 alloy-eips.workspace = true
@@ -23,7 +24,6 @@ reth-ethereum-primitives.workspace = true
 
 anyhow.workspace = true
 clap.workspace = true
-tiny-keccak.workspace = true
 tokio = { workspace = true, features = ["macros"] }
 tracing.workspace = true
 tracing-subscriber.workspace = true
