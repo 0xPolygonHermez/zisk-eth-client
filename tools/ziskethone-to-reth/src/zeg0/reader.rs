@@ -119,12 +119,28 @@ pub struct Withdrawal {
 
 /// The header fields ZEG0 does carry for the current block. The execution
 /// outputs it omits (state_root, receipts_root, logs_bloom, gas_used,
-/// blob_gas_used) come from RPC.
+/// blob_gas_used) come from RPC, or from re-execution with `--offline`.
 #[derive(Debug, Clone)]
 pub struct ConsensusInfo {
     /// The parent's **state root** — this slot is not a parent block hash.
     pub parent_state_root: B256,
+    pub beneficiary: Address,
     pub number: u64,
+    pub gas_limit: u64,
+    pub timestamp: u64,
+    pub extra_data: Vec<u8>,
+    pub mix_hash: B256,
+    pub parent_beacon_block_root: B256,
+    pub base_fee_per_gas: U256,
+    pub excess_blob_gas: u64,
+    pub requests_hash: B256,
+    pub difficulty: U256,
+    pub nonce: [u8; 8],
+    pub ommers_hash: B256,
+    /// The guest's `ForkId`: 1 Berlin, 2 London, 4 Shanghai, 5 Cancun,
+    /// 6 Prague, 7 Osaka, 8 Amsterdam. Decides which optional header fields
+    /// the block has.
+    pub fork_id: u64,
 }
 
 /// A fully-specified ancestor header, enough to re-encode its RLP.
@@ -205,22 +221,29 @@ pub fn parse(outer: &[u8]) -> Result<Zeg0> {
         c.skip(16)?; // hash seed: guest-internal, never affects the block
     }
 
-    // Section 1 — ConsensusInfo. Only two fields are load-bearing here; the
-    // rest of the current header comes from RPC, which is authoritative for
-    // the fields ZEG0 omits anyway.
+    // Section 1 — ConsensusInfo.
     let prefix_start = c.pos;
     let parent_state_root = c.b256()?;
-    c.skip(20 + 4)?; // beneficiary + pad
+    let beneficiary = c.address()?;
+    c.skip(4)?; // pad
     let number = c.u64_le()?;
-    c.skip(8 + 8)?; // gas_limit + timestamp
+    let gas_limit = c.u64_le()?;
+    let timestamp = c.u64_le()?;
     let extra_len = c.u64_le()? as usize;
     ensure!(extra_len <= 32, "extra_data_len {extra_len} exceeds 32");
-    c.skip(32)?; // extra_data buffer
-    c.skip(32 + 32 + 32)?; // prev_randao + parent_beacon_block_root + base_fee
+    let extra_data = c.take(32)?[..extra_len].to_vec();
+    let mix_hash = c.b256()?;
+    let parent_beacon_block_root = c.b256()?;
+    let base_fee_per_gas = c.u256_be()?;
     let withdrawals_count = c.u64_le()? as usize;
-    // Skip to the end of the fixed prefix — the remaining fields (excess_blob_gas,
-    // requests_hash, difficulty, nonce, ommers_hash, fork_id, blob schedule) are
-    // all supplied by the RPC header.
+    let excess_blob_gas = c.u64_le()?;
+    let requests_hash = c.b256()?;
+    let difficulty = c.u256_be()?;
+    let nonce: [u8; 8] = c.take(8)?.try_into().unwrap();
+    let ommers_hash = c.b256()?;
+    let fork_id = c.u64_le()?;
+    // Skip to the end of the fixed prefix — the blob schedule (and v10+'s
+    // Amsterdam fields) are re-derived by the encoder, not read back.
     let consumed = c.pos - prefix_start;
     c.skip(consensus_prefix_len(version) - consumed)?;
 
@@ -340,7 +363,20 @@ pub fn parse(outer: &[u8]) -> Result<Zeg0> {
         version,
         consensus: ConsensusInfo {
             parent_state_root,
+            beneficiary,
             number,
+            gas_limit,
+            timestamp,
+            extra_data,
+            mix_hash,
+            parent_beacon_block_root,
+            base_fee_per_gas,
+            excess_blob_gas,
+            requests_hash,
+            difficulty,
+            nonce,
+            ommers_hash,
+            fork_id,
         },
         withdrawals,
         transactions,

@@ -24,6 +24,7 @@ reth-evm-ethereum.workspace = true
 reth-ethereum-primitives.workspace = true
 revm.workspace = true
 reth-evm = { git = "https://github.com/paradigmxyz/reth", tag = "v2.1.0", default-features = false }
+reth-trie-common = { git = "https://github.com/paradigmxyz/reth", tag = "v2.1.0", default-features = false }
 
 anyhow.workspace = true
 clap.workspace = true

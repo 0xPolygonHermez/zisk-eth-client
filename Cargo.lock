@@ -9213,6 +9213,7 @@ dependencies = [
  "reth-ethereum-primitives",
  "reth-evm",
  "reth-evm-ethereum",
+ "reth-trie-common",
  "revm",
  "rust-input-gen",
  "stateless",

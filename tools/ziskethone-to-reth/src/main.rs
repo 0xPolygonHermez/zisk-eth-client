@@ -36,9 +36,16 @@ struct Cli {
     input: PathBuf,
 
     /// RPC endpoint. Only `eth_getBlockByNumber` is called, so a normal full
-    /// node is enough — no archive state required. Not needed with --check-only.
-    #[arg(short = 'u', long, required_unless_present = "check_only")]
+    /// node is enough — no archive state required. Not needed with --check-only
+    /// or --offline.
+    #[arg(short = 'u', long, required_unless_present_any = ["check_only", "offline"])]
     rpc_url: Option<String>,
+
+    /// Build the header from the file instead of RPC. Its execution outputs
+    /// (state_root, receipts_root, logs_bloom, gas_used) are left zero, so the
+    /// output is only fit for `reth-to-ziskethone --fill-outputs`.
+    #[arg(long, default_value_t = false, conflicts_with = "rpc_url")]
+    offline: bool,
 
     /// Output directory for the generated `*_zec_reth.bin` files.
     #[arg(short, long, required_unless_present = "check_only")]
@@ -79,17 +86,23 @@ async fn main() -> Result<()> {
     // leg only supplies header fields the container cannot carry.
     let emit = match (cli.rpc_url, cli.output_dir) {
         _ if cli.check_only => None,
-        (Some(rpc_url), Some(output_dir)) => {
+        (rpc_url, Some(output_dir)) => {
             fs::create_dir_all(&output_dir)
                 .with_context(|| format!("creating output dir {}", output_dir.display()))?;
-            let provider = ProviderBuilder::new()
-                .connect(&rpc_url)
-                .await
-                .with_context(|| format!("connecting to RPC at {rpc_url}"))?;
+            // `None` means --offline: clap requires one of the two.
+            let provider = match rpc_url {
+                Some(rpc_url) => Some(
+                    ProviderBuilder::new()
+                        .connect(&rpc_url)
+                        .await
+                        .with_context(|| format!("connecting to RPC at {rpc_url}"))?,
+                ),
+                None => None,
+            };
             Some((provider, output_dir))
         }
-        // Unreachable: clap enforces both unless --check-only.
-        _ => bail!("--rpc-url and --output-dir are required without --check-only"),
+        // Unreachable: clap enforces it unless --check-only.
+        _ => bail!("--output-dir is required without --check-only"),
     };
 
     let mut failures = 0usize;
@@ -181,13 +194,13 @@ fn reference_for(path: &Path, block: u64) -> Result<PathBuf> {
 }
 
 /// Decode, rebuild the pre-state trie, and verify it against the anchor the
-/// container carries — then, if `emit` is set, fetch the header and write the
-/// reth input. The verify step is unconditional: a reconstruction that does not
+/// container carries — then, if `emit` is set, fetch the header (or rebuild it
+/// offline) and write the reth input. The verify step is unconditional: a reconstruction that does not
 /// hash back to the parent state root never reaches the emit stage.
 async fn process<P: Provider>(
     in_path: &Path,
     compare_reth: Option<&Path>,
-    emit: Option<&(P, PathBuf)>,
+    emit: Option<&(Option<P>, PathBuf)>,
     chain: &str,
 ) -> Result<()> {
     let bytes = fs::read(in_path).with_context(|| format!("reading {}", in_path.display()))?;
@@ -215,7 +228,10 @@ async fn process<P: Provider>(
         return Ok(());
     };
 
-    let header = fetch_header(provider, block).await?;
+    let header = match provider {
+        Some(provider) => fetch_header(provider, block).await?,
+        None => assemble::offline_header(&zeg)?,
+    };
     let out_path = out_dir.join(format!(
         "{}_{}_{}_{}_zec_reth.bin",
         chain.to_lowercase(),

@@ -31,9 +31,10 @@ use anyhow::{anyhow, bail, Context, Result};
 use clap::Parser;
 use tracing_subscriber::EnvFilter;
 
-use alloy_consensus::Header;
+use alloy_consensus::proofs::calculate_receipt_root;
+use alloy_consensus::{Header, TxReceipt};
 use alloy_eips::eip2718::{Decodable2718, Encodable2718};
-use alloy_primitives::{keccak256, map::B256IndexMap, Address, B256, U256};
+use alloy_primitives::{keccak256, map::B256IndexMap, Address, Bloom, B256, U256};
 use input_reth::guest::{
     get_chain_spec, validate_block_stateless, RethInputPublic, RethInputWitness,
 };
@@ -41,7 +42,9 @@ use reth_ethereum_primitives::Block;
 use reth_evm::block::BlockExecutor;
 use reth_evm::ConfigureEvm;
 use reth_evm_ethereum::EthEvmConfig;
+use reth_trie_common::{HashedPostState, KeccakKeyHasher};
 use revm::bytecode::{opcode, Bytecode};
+use revm::database::states::bundle_state::BundleRetention;
 use revm::database::State;
 use revm::interpreter::interpreter::EthInterpreter;
 use revm::interpreter::interpreter_types::Jumps;
@@ -86,6 +89,14 @@ struct Cli {
     /// timestamps (12, 24, ...) carry no mainnet meaning.
     #[arg(long, value_enum, default_value_t = ForkMode::Auto)]
     fork: ForkMode,
+
+    /// Compute the header's execution outputs (state_root, receipts_root,
+    /// logs_bloom, gas_used) by executing the block, before validating it. For
+    /// inputs from `ziskethone-to-reth --offline`, which leaves them zero.
+    /// Validation still checks everything else, but no longer that the block
+    /// matches the canonical chain.
+    #[arg(long)]
+    fill_outputs: bool,
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, clap::ValueEnum)]
@@ -145,14 +156,14 @@ fn convert_file(in_path: &Path, cli: &Cli, claimed: &mut HashSet<PathBuf>) -> Re
         .context("reading the witness frame")?
         .witness;
 
-    let block = &public.block;
-    let (number, tx_count, gas_used) = (
-        block.header.number,
-        block.body.transactions.len(),
-        block.header.gas_used,
+    let (number, tx_count) = (
+        public.block.header.number,
+        public.block.body.transactions.len(),
     );
 
-    let sources = build_sources(public, witness, cli.fork).context("assemble OfflineSources")?;
+    // `gas_used` is returned rather than read here: --fill-outputs computes it.
+    let (sources, gas_used) = build_sources(public, witness, cli.fork, cli.fill_outputs)
+        .context("assemble OfflineSources")?;
     let zeg0 = encode_binary(&sources).context("encode ZEG0 container")?;
 
     let filename = if cli.keep_name {
@@ -190,12 +201,15 @@ fn build_sources(
     public: RethInputPublic,
     witness: ExecutionWitness,
     fork: ForkMode,
-) -> Result<OfflineSources> {
+    fill_outputs: bool,
+) -> Result<(OfflineSources, u64)> {
     let chain_id = public.chain_config.chain_id;
-    let (senders, accessed) = accessed_keys(public.block.clone(), &public, witness.clone())?;
+    let (block, senders, accessed) =
+        accessed_keys(public.block.clone(), &public, witness.clone(), fill_outputs)?;
+    let gas_used = block.header.gas_used;
 
     // reth's transactions → alloy envelopes, through their EIP-2718 bytes.
-    let Block { header, body } = public.block;
+    let Block { header, body } = block;
     let txs = body
         .transactions
         .iter()
@@ -231,21 +245,32 @@ fn build_sources(
         sources.target_blob_gas_per_block = 0;
         sources.max_blob_gas_per_block = 0;
     }
-    Ok(sources)
+    Ok((sources, gas_used))
 }
 
 /// Validate `block` statelessly, then re-execute it recording every account
-/// and slot it accesses. Returns the transaction senders and the accessed keys.
+/// and slot it accesses. With `fill_outputs`, execute first and write the
+/// execution outputs into the header before validating. Returns the block (as
+/// validated), the transaction senders and the accessed keys.
 fn accessed_keys(
-    block: Block,
+    mut block: Block,
     public: &RethInputPublic,
     witness: ExecutionWitness,
-) -> Result<(Vec<Address>, Accessed)> {
+    fill_outputs: bool,
+) -> Result<(Block, Vec<Address>, Accessed)> {
     let chain_spec = get_chain_spec(&public.chain_config);
-    let block = recover_block_with_public_keys(block, public.public_keys.clone(), &*chain_spec)
-        .map_err(|e| anyhow!("recovering transaction senders: {e}"))?;
-    validate_block_stateless(block.clone(), witness.clone(), chain_spec.clone())
-        .map_err(|e| anyhow!("reth stateless validation failed: {e}"))?;
+    let recover = |block: Block| {
+        recover_block_with_public_keys(block, public.public_keys.clone(), &*chain_spec)
+            .map_err(|e| anyhow!("recovering transaction senders: {e}"))
+    };
+    let validate = |recovered| {
+        validate_block_stateless(recovered, witness.clone(), chain_spec.clone())
+            .map_err(|e| anyhow!("reth stateless validation failed: {e}"))
+    };
+    let recovered = recover(block.clone())?;
+    if !fill_outputs {
+        validate(recovered.clone())?;
+    }
 
     // Ancestor hashes for BLOCKHASH, and the parent's state root.
     let mut block_hashes = BTreeMap::new();
@@ -254,14 +279,14 @@ fn accessed_keys(
         let header: Header = alloy_rlp::decode_exact(raw.as_ref())
             .map_err(|e| anyhow!("decoding an ancestor header: {e}"))?;
         let hash = keccak256(raw);
-        if hash == block.header().parent_hash {
+        if hash == block.header.parent_hash {
             parent_state_root = Some(header.state_root);
         }
         block_hashes.insert(header.number, hash);
     }
     let parent_state_root = parent_state_root.context("parent header not in witness.headers")?;
 
-    let (trie, bytecode) = SparseState::new(&witness, parent_state_root)
+    let (mut trie, bytecode) = SparseState::new(&witness, parent_state_root)
         .map_err(|e| anyhow!("building the pre-state trie: {e}"))?;
     let mut state = State::builder()
         .with_database(RecordingDb {
@@ -278,24 +303,55 @@ fn accessed_keys(
     // contract created in this block, which revm knows starts empty — since the
     // guest needs every slot it loads as a leaf.
     let mut recorder = SlotRecorder::default();
-    let evm_config = EthEvmConfig::new(chain_spec);
+    let evm_config = EthEvmConfig::new(chain_spec.clone());
     let evm_env = evm_config
-        .evm_env(block.header())
+        .evm_env(recovered.header())
         .map_err(|e| anyhow!("{e}"))?;
     let evm = evm_config.evm_with_env_and_inspector(&mut state, evm_env, &mut recorder);
     let ctx = evm_config
-        .context_for_block(block.sealed_block())
+        .context_for_block(recovered.sealed_block())
         .map_err(|e| anyhow!("{e}"))?;
-    evm_config
+    let result = evm_config
         .create_executor(evm, ctx)
-        .execute_block(block.transactions_recovered())
+        .execute_block(recovered.transactions_recovered())
         .map_err(|e| anyhow!("re-execution failed: {e}"))?;
 
     let mut accessed = std::mem::take(&mut state.database.accessed);
     for (addr, slots) in recorder.0 {
         accessed.entry(addr).or_default().extend(slots);
     }
-    Ok((block.senders().to_vec(), accessed))
+
+    if fill_outputs {
+        // The same computations reth's post-execution validation compares.
+        let receipts: Vec<_> = result
+            .receipts
+            .iter()
+            .map(TxReceipt::with_bloom_ref)
+            .collect();
+        // execute_block leaves changes in the transition state; Executor::execute
+        // merges them the same way before taking the bundle.
+        state.merge_transitions(BundleRetention::Reverts);
+        let bundle = state.take_bundle();
+        drop(state);
+        let hashed = HashedPostState::from_bundle_state::<KeccakKeyHasher>(&bundle.state);
+        let header = &mut block.header;
+        header.gas_used = result.gas_used;
+        header.receipts_root = calculate_receipt_root(&receipts);
+        header.logs_bloom = receipts
+            .iter()
+            .fold(Bloom::ZERO, |bloom, r| bloom | r.bloom_ref());
+        header.state_root = trie
+            .calculate_state_root(hashed)
+            .map_err(|e| anyhow!("computing the post-state root: {e}"))?;
+        validate(recover(block.clone())?)?;
+        // Matches the canonical hash only if every filled field is right.
+        println!(
+            "filled block {} hash {}",
+            block.header.number,
+            block.header.hash_slow()
+        );
+    }
+    Ok((block, recovered.senders().to_vec(), accessed))
 }
 
 /// Records the (address, slot) of every SLOAD and SSTORE.
