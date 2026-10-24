@@ -264,7 +264,9 @@ fn build_ffi() {
         cpp_guest.join("CMakeLists.txt").display()
     );
 
+    // Same public output as the ELF (build-elf.sh): `run` returns the block hash.
     let dst = cmake::Config::new(&cpp_guest)
+        .define("ZEG_PUBLIC_OUTPUT", "block_hash")
         .build_target("zeg_ffi")
         .build();
 

@@ -47,6 +47,11 @@ ZISK_MARCH="${ZISK_MARCH-rv64ima_zicsr_zba_zbb_zbs_zbkb}"
 # ON unless asked otherwise: the committed ELF is a DMA build, so a plain run of
 # this script has to reproduce it.
 ZEG_ZISK_DMA="${ZEG_ZISK_DMA:-ON}"
+# The ELF publishes the execution block hash, not the EIP-8025
+# new_payload_request_root (ziskethone's ZEG_PUBLIC_OUTPUT; `npr` is only for
+# the exex / proof-engine pipeline). Always passed, so a cached configure can't
+# keep the other output.
+ZEG_PUBLIC_OUTPUT=block_hash
 
 # `nproc` and `sha256sum` are GNU-only, and macOS has neither. Go through these
 # so a missing one doesn't take the whole script down.
@@ -210,7 +215,7 @@ if [ -n "$ZISK_MARCH" ]; then
     MARCH_FLAG="-DZISK_MARCH=$ZISK_MARCH"
 fi
 
-echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA)"
+echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA, ZEG_PUBLIC_OUTPUT=$ZEG_PUBLIC_OUTPUT)"
 # shellcheck disable=SC2086
 cmake \
     -S "$GUEST_DIR" \
@@ -219,6 +224,7 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DEVMONE_SRC="$HOST_DIR/build-stub/_deps/evmone-src" \
     -DZEG_ZISK_DMA="$ZEG_ZISK_DMA" \
+    -DZEG_PUBLIC_OUTPUT="$ZEG_PUBLIC_OUTPUT" \
     $MARCH_FLAG \
     -G "Unix Makefiles"
 
