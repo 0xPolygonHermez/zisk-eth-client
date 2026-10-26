@@ -264,14 +264,9 @@ fn build_ffi() {
         cpp_guest.join("CMakeLists.txt").display()
     );
 
-    // `run` returns the block hash, as the mainnet ELF publishes (build-elf.sh),
-    // whatever the chain. The chain is compile-time, as in the ELF: ZEG_CHAIN
-    // picks it (default mainnet).
-    println!("cargo:rerun-if-env-changed=ZEG_CHAIN");
-    let chain = std::env::var("ZEG_CHAIN").unwrap_or_else(|_| "mainnet".to_string());
+    // Same public output as the mainnet ELF (build-elf.sh): `run` returns the block hash.
     let dst = cmake::Config::new(&cpp_guest)
         .define("ZEG_PUBLIC_OUTPUT", "block_hash")
-        .define("ZEG_CHAIN", &chain)
         .build_target("zeg_ffi")
         .build();
 
@@ -371,10 +366,9 @@ fn regenerate_committed_elf() {
     // convention (`zec-reth.elf`, `zec-ethrex.elf`).
     let elf_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../../../bin/guests/stateless-validator-ziskethone/elf");
-    // (chain, build-elf.sh build dir, committed name)
     let chains = [
-        ("mainnet", "build", "zec-ziskethone.elf"),
-        ("sepolia", "build-sepolia", "zec-ziskethone-sepolia.elf"),
+        ("mainnet", "zec-ziskethone.elf"),
+        ("sepolia", "zec-ziskethone-sepolia.elf"),
     ];
 
     // Rerun the regeneration when the C++ guest sources or the build driver
@@ -423,7 +417,7 @@ fn regenerate_committed_elf() {
     // no idea the file it asked us to produce went away: none of the inputs above
     // changed, so this script never re-runs and the reverted ELF survives no
     // matter how many times you rebuild.
-    for (_, _, name) in chains {
+    for (_, name) in chains {
         println!("cargo:rerun-if-changed={}", elf_dir.join(name).display());
     }
 
@@ -432,29 +426,16 @@ fn regenerate_committed_elf() {
     // set but empty. A check in front of it could only refuse a build that would
     // otherwise have fixed itself.
 
-    std::fs::create_dir_all(&elf_dir)
-        .unwrap_or_else(|e| panic!("failed to create {}: {e}", elf_dir.display()));
-    for (chain, build_dir, name) in chains {
+    for (chain, name) in chains {
+        let committed_elf = elf_dir.join(name);
         let status = std::process::Command::new("bash")
             .arg(&script)
             .arg(format!("--ziskethone={}", ziskethone_dir.display()))
             .arg(format!("--chain={chain}"))
+            .arg(format!("--out={}", committed_elf.display()))
             .status()
             .unwrap_or_else(|e| panic!("failed to invoke {}: {e}", script.display()));
         assert!(status.success(), "ziskethone guest build failed ({chain})");
-
-        let built_elf = cpp_guest
-            .join("zisk")
-            .join(build_dir)
-            .join("zisk_eth_guest.elf");
-        let committed_elf = elf_dir.join(name);
-        std::fs::copy(&built_elf, &committed_elf).unwrap_or_else(|e| {
-            panic!(
-                "failed to copy {} -> {}: {e}",
-                built_elf.display(),
-                committed_elf.display()
-            )
-        });
         println!(
             "cargo:warning=Regenerated committed ELF at {} — commit this file.",
             committed_elf.display()

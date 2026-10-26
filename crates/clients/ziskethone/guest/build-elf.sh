@@ -5,6 +5,7 @@
 #   ./crates/clients/ziskethone/guest/build-elf.sh [--clean] [--ziskethone=PATH]
 #                                           [--toolchain-prefix=PATH] [--march=STR]
 #                                           [--no-dma] [--chain=mainnet|sepolia]
+#                                           [--out=FILE]
 #
 # The guest -march is pinned below (see ZISK_MARCH) so a plain rebuild
 # reproduces the committed ELF. ZISK_MARCH or --march= overrides it for an A/B;
@@ -25,6 +26,7 @@
 #
 # Output: <ziskethone>/cpp-guest/zisk/build/zisk_eth_guest.elf (mainnet)
 #         <ziskethone>/cpp-guest/zisk/build-<chain>/zisk_eth_guest.elf (otherwise)
+#         --out=FILE also copies it to FILE.
 
 set -euo pipefail
 
@@ -33,6 +35,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ZISKETHONE_DIR="${ZISKETHONE_DIR:-$(cd "$SCRIPT_DIR/../../../.." && pwd)/third_party/ziskethone}"
 CLEAN=0
+OUT=""
 # The march the committed ELF is built with. Pinned here rather than left to
 # ziskethone's toolchain.cmake default for the same reason ZEG_ZISK_DMA is
 # forced ON below: this repo owns the committed ELF, so a plain rebuild has to
@@ -95,6 +98,7 @@ for arg in "$@"; do
         --march=*) ZISK_MARCH="${arg#*=}" ;;
         --no-dma) ZEG_ZISK_DMA=OFF ;;
         --chain=*) ZEG_CHAIN="${arg#*=}" ;;
+        --out=*) OUT="${arg#*=}" ;;
         -h|--help)
             sed -n '2,/^$/p' "$0" | sed 's/^# \?//'
             exit 0
@@ -184,7 +188,7 @@ fi
 # CMAKE_CXX_COMPILER moves, so detect the move ourselves and start clean instead
 # of handing the user a cache error. Also covers future flag changes.
 STAMP_FILE="$BUILD_DIR/.zec-toolchain-stamp"
-STAMP_NOW="$(command -v riscv-none-elf-g++) $(riscv-none-elf-g++ -dumpversion) ZEG_ZISK_DMA=$ZEG_ZISK_DMA ZEG_CHAIN=$ZEG_CHAIN ZISK_MARCH=${ZISK_MARCH:-<toolchain.cmake default>}"
+STAMP_NOW="$(command -v riscv-none-elf-g++) $(riscv-none-elf-g++ -dumpversion) ZEG_ZISK_DMA=$ZEG_ZISK_DMA ZISK_MARCH=${ZISK_MARCH:-<toolchain.cmake default>}"
 if [ -f "$STAMP_FILE" ] && [ "$(cat "$STAMP_FILE")" != "$STAMP_NOW" ]; then
     echo "==> toolchain or flags changed since last configure; removing $BUILD_DIR"
     rm -rf "$BUILD_DIR"
@@ -201,7 +205,8 @@ HOST_DIR="$ZISKETHONE_DIR/cpp-guest"
 # stale Aug-4 _deps missed 05-evmone-zisk-jumpdest-precompile.patch and the
 # resulting guest died in ziskemu with an out-of-range write.
 #
-# So stamp the patch set itself and start clean whenever it moves.
+# So stamp the patch set itself, with the CMakeLists that fetches and patches
+# evmone, and start clean whenever either moves.
 PATCH_STAMP="$HOST_DIR/build-stub/.zec-patch-stamp"
 # Collect the patches explicitly rather than globbing straight into cat: with
 # `set -o pipefail`, an unmatched glob makes cat fail, the whole assignment
@@ -213,18 +218,18 @@ ZEG_PATCHES=("$HOST_DIR"/patches/*.patch)
 shopt -u nullglob
 [ ${#ZEG_PATCHES[@]} -gt 0 ] \
     || { echo "no evmone patches found in $HOST_DIR/patches" >&2; exit 1; }
-PATCH_NOW="$(cat "${ZEG_PATCHES[@]}" | _sha256 | cut -d' ' -f1)"
+PATCH_NOW="$(cat "${ZEG_PATCHES[@]}" "$HOST_DIR/CMakeLists.txt" | _sha256 | cut -d' ' -f1)"
 if [ -d "$HOST_DIR/build-stub" ] && \
    [ "$(cat "$PATCH_STAMP" 2>/dev/null)" != "$PATCH_NOW" ]; then
-    echo "==> evmone patch set changed; removing $HOST_DIR/build-stub"
+    echo "==> evmone patch set or CMakeLists changed; removing $HOST_DIR/build-stub"
     rm -rf "$HOST_DIR/build-stub"
 fi
 
-# Configure only a fresh tree. The CMakeLists' "already applied" test is
-# `git apply --reverse --check` per patch, which fails for a patch whose context a
-# later one rewrote (12 after 13), so a second configure of a patched tree dies.
-if [ -d "$HOST_DIR/build-stub/_deps/evmone-src" ] && \
-   [ "$(cat "$PATCH_STAMP" 2>/dev/null)" = "$PATCH_NOW" ]; then
+# Configure only a fresh tree (a surviving one matches the stamp). The CMakeLists'
+# "already applied" test is `git apply --reverse --check` per patch, which fails
+# for a patch whose context a later one rewrote (12 after 13), so a second
+# configure of a patched tree dies.
+if [ -d "$HOST_DIR/build-stub/_deps/evmone-src" ]; then
     echo "==> evmone already fetched and patched ($HOST_DIR/build-stub)"
 else
     echo "==> host cmake configure (fetch evmone, apply patches)"
@@ -289,6 +294,12 @@ case "$ZISK_MARCH" in
             || echo "WARNING: -march names zba but GCC emitted no Zba instruction." >&2
         ;;
 esac
+
+if [ -n "$OUT" ]; then
+    mkdir -p "$(dirname "$OUT")"
+    cp "$ELF_PATH" "$OUT"
+    echo "==> copied to $OUT"
+fi
 
 echo
 echo "ELF: $ELF_PATH"

@@ -32,10 +32,9 @@ crate provides:
 ## Layout
 - `build.rs` — does nothing on a normal build (the ELF is embedded from the
   committed file). Two on-demand paths, each gated by its feature:
-  - `regenerate_committed_elf()` (`ziskethone-rebuild-guest`): runs `build-elf.sh` to
-    cross-compile `cpp-guest/zisk` and copies the result over the committed
-    `elf/zec-ziskethone.elf` (renamed on copy: the CMake target is
-    `zisk_eth_guest.elf`).
+  - `regenerate_committed_elf()` (`ziskethone-rebuild-guest`): runs `build-elf.sh`
+    once per chain to cross-compile `cpp-guest/zisk` into the committed
+    `elf/zec-ziskethone.elf` (mainnet) and `elf/zec-ziskethone-sepolia.elf`.
   - `build_ffi()` (`native-ffi`): builds the `cpp-guest` native static lib
     (`libzeg_ffi.a`) plus its evmone/blst deps and links them so `run()` can
     call `zeg_run`. Preflights the C++ toolchain and reconciles a stale CMake
