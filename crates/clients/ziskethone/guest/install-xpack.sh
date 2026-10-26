@@ -11,9 +11,11 @@
 # second, so it is safe to call from a build script or a CI step.
 #
 # Usage:
-#     install-xpack.sh [--print-prefix]
+#     install-xpack.sh [--print-prefix | --print-gcc-version]
 #
-#   --print-prefix   Print the install prefix and exit without installing.
+#   --print-prefix        Print the install prefix and exit without installing.
+#   --print-gcc-version   Print the GCC release (e.g. 15.2.0) and exit; the
+#                         patched -mzisk-dma GCC must be the same release.
 #
 # The prefix is echoed on success either way, so a caller can capture it:
 #     XPACK_DIR="$(install-xpack.sh --print-prefix)"
@@ -28,17 +30,23 @@ set -euo pipefail
 #   - build-elf.sh (TOOLCHAIN_PREFIX default)
 #   - ziskethone's cpp-guest/patches/gcc/build-toolchain.sh, which symlinks this
 #     toolchain's C++ headers and binutils into the patched GCC. That is the
-#     reason the version is exact rather than a floor: the patched compiler is
-#     GCC 14.3.0, so its target side must come from a 14.3.0 xPack.
-XPACK_VERSION="14.3.0-1"
+#     reason the version is exact rather than a floor: build-elf.sh builds the
+#     patched compiler at this same GCC release (--print-gcc-version), so its
+#     target side comes from the matching xPack. ziskethone ships the patch for
+#     14.3.0 and 15.2.0 only.
+XPACK_VERSION="15.2.0-1"
 PREFIX="${ZISK_XPACK_DIR:-$HOME/opt/xpack/xpack-riscv-none-elf-gcc-${XPACK_VERSION}}"
 
 if [ "${1:-}" = "--print-prefix" ]; then
     printf '%s\n' "$PREFIX"
     exit 0
 fi
+if [ "${1:-}" = "--print-gcc-version" ]; then
+    printf '%s\n' "${XPACK_VERSION%-*}"
+    exit 0
+fi
 if [ -n "${1:-}" ]; then
-    echo "unknown arg: $1 (try --print-prefix)" >&2
+    echo "unknown arg: $1 (try --print-prefix or --print-gcc-version)" >&2
     exit 2
 fi
 
