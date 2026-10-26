@@ -1,7 +1,7 @@
 [submodule "third_party/ziskethone"]
 	path = third_party/ziskethone
 	url = https://github.com/0xPolygonHermez/ziskethone.git
-	# Pinned on the integration branch, which carries the FFI (zeg_run), the
-	# zeg::run rename, and the witness-completeness fix (state_root.rs).
+	# Pinned on the ZisK 1.4.0 integration branch (2 GB input map, audit
+	# fixes, block-hash public output).
 	# Init with `git submodule update --init --recursive`.
-	branch = develop
+	branch = upgrade/zisk-1.4.0
