@@ -63,8 +63,8 @@ crate provides:
   `brew install cmake`.
 
 Nothing else. The cross-toolchain is not a prerequisite: `build-elf.sh` installs
-the pinned xPack `riscv-none-elf-gcc` 14.3.0-1 (`install-xpack.sh`) and the
-patched GCC 14.3.0 that provides `-mzisk-dma`
+the pinned xPack `riscv-none-elf-gcc` 15.2.0-1 (`install-xpack.sh`) and the
+patched GCC 15.2.0 that provides `-mzisk-dma`
 (ziskethone's `cpp-guest/patches/gcc/build-toolchain.sh`), then fetches evmone
 through CMake. Both installers are idempotent, so later builds re-check them in
 about a second.
@@ -93,7 +93,7 @@ actually lowered by counting DMA markers in the output and fails if it did not.
 - `ZISK_TOOLCHAIN_PREFIX` — the xPack toolchain's `bin/` dir. Setting it opts out
   of the automatic install: if the path has no `riscv-none-elf-g++`, the build
   reports that instead of installing over your choice.
-- `ZISK_DMA_GCC_PREFIX` (default `~/.local/xPacks/zisk-dma-gcc-14.3.0`) — where the
+- `ZISK_DMA_GCC_PREFIX` (default `~/.local/xPacks/zisk-dma-gcc-15.2.0`) — where the
   patched GCC is installed.
 - `ZISK_MARCH` (or `--march=`) — the guest `-march`. `build-elf.sh` pins
   `rv64ima_zicsr_zba_zbb_zbs_zbkb`, one `_zba` ahead of ziskethone's own

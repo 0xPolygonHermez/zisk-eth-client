@@ -47,6 +47,11 @@ ZISK_MARCH="${ZISK_MARCH-rv64ima_zicsr_zba_zbb_zbs_zbkb}"
 # ON unless asked otherwise: the committed ELF is a DMA build, so a plain run of
 # this script has to reproduce it.
 ZEG_ZISK_DMA="${ZEG_ZISK_DMA:-ON}"
+# The ELF publishes the execution block hash, not the EIP-8025
+# new_payload_request_root (ziskethone's ZEG_PUBLIC_OUTPUT; `npr` is only for
+# the exex / proof-engine pipeline). Always passed, so a cached configure can't
+# keep the other output.
+ZEG_PUBLIC_OUTPUT=block_hash
 
 # `nproc` and `sha256sum` are GNU-only, and macOS has neither. Go through these
 # so a missing one doesn't take the whole script down.
@@ -116,8 +121,8 @@ if [ ! -x "$TOOLCHAIN_PREFIX/riscv-none-elf-g++" ]; then
         || { echo "install-xpack.sh ran but $TOOLCHAIN_PREFIX is still empty" >&2; exit 1; }
 fi
 
-# The guest is always built with -mzisk-dma, which needs the patched GCC 14.3.0
-# built from ziskethone's cpp-guest/patches/gcc. build-toolchain.sh is
+# The guest is always built with -mzisk-dma, which needs the patched GCC built
+# from ziskethone's cpp-guest/patches/gcc, at the xPack's GCC release. build-toolchain.sh is
 # idempotent — it detects an installed compiler and returns in about a second —
 # so calling it unconditionally is cheap, and a warm prefix and a cold one
 # produce the same ELF. That is what makes the CI cache purely a speed
@@ -125,9 +130,11 @@ fi
 #
 # Mind the trailing component: ZISK_TOOLCHAIN_PREFIX is a bin/ directory,
 # ZISK_XPACK_DIR is its parent. The script reuses that xPack's C++ headers and
-# binutils, so its version must match GCC 14.3.0 exactly.
-DMA_GCC_PREFIX="${ZISK_DMA_GCC_PREFIX:-$HOME/.local/xPacks/zisk-dma-gcc-14.3.0}"
-echo "==> ensuring the patched GCC (-mzisk-dma) is installed"
+# binutils, so both are the same GCC release.
+GCC_VERSION="$("$SCRIPT_DIR/install-xpack.sh" --print-gcc-version)"
+DMA_GCC_PREFIX="${ZISK_DMA_GCC_PREFIX:-$HOME/.local/xPacks/zisk-dma-gcc-$GCC_VERSION}"
+echo "==> ensuring the patched GCC $GCC_VERSION (-mzisk-dma) is installed"
+ZISK_GCC_VERSION="$GCC_VERSION" \
 ZISK_DMA_GCC_PREFIX="$DMA_GCC_PREFIX" \
 ZISK_XPACK_DIR="${TOOLCHAIN_PREFIX%/bin}" \
 PATH="$TOOLCHAIN_PREFIX:$PATH" \
@@ -210,7 +217,7 @@ if [ -n "$ZISK_MARCH" ]; then
     MARCH_FLAG="-DZISK_MARCH=$ZISK_MARCH"
 fi
 
-echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA)"
+echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA, ZEG_PUBLIC_OUTPUT=$ZEG_PUBLIC_OUTPUT)"
 # shellcheck disable=SC2086
 cmake \
     -S "$GUEST_DIR" \
@@ -219,6 +226,7 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DEVMONE_SRC="$HOST_DIR/build-stub/_deps/evmone-src" \
     -DZEG_ZISK_DMA="$ZEG_ZISK_DMA" \
+    -DZEG_PUBLIC_OUTPUT="$ZEG_PUBLIC_OUTPUT" \
     $MARCH_FLAG \
     -G "Unix Makefiles"
 
