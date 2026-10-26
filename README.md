@@ -126,7 +126,8 @@ host [EXECUTION_OPTIONS] stateless-validator -i <INPUT_FOLDER> [OPTIONS]
 | Option | Description | Default |
 |---|---|---|
 | `-i, --input-folder <PATH>` | Folder containing `.bin` inputs (required unless `--hints` is given) | — |
-| `-c, --client <CLIENT>` | Execution client: `reth`, `ethrex` | `reth` |
+| `-c, --client <CLIENT>` | Execution client: `reth`, `ethrex`, `ziskethone` (host built with `--features ziskethone`) | `reth` |
+| `--chain <CHAIN>` | Chain of the inputs: `mainnet`, `sepolia`. Selects the ziskethone ELF (its chain is compile-time); reth and ethrex read the chain from the input | `mainnet` |
 | `--include <PATTERN>` | Only process inputs whose name contains the pattern (repeatable) | — |
 | `--exclude <PATTERN>` | Skip inputs whose name contains the pattern (repeatable) | — |
 | `--hints <PATH>` | Run against a pre-generated `.hints` file/folder (mutually exclusive with `--input-folder`) | — |
