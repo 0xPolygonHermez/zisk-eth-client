@@ -21,6 +21,7 @@
 # --chain= (or ZEG_CHAIN) picks the chain the guest validates: its chain id and
 # fork schedule are compile-time constants, since the ZEG0 input carries neither.
 # Each chain builds in its own directory so switching does not reconfigure.
+# The chain also fixes the public output (see ZEG_PUBLIC_OUTPUT below).
 #
 # Output: <ziskethone>/cpp-guest/zisk/build/zisk_eth_guest.elf (mainnet)
 #         <ziskethone>/cpp-guest/zisk/build-<chain>/zisk_eth_guest.elf (otherwise)
@@ -52,11 +53,6 @@ ZISK_MARCH="${ZISK_MARCH-rv64ima_zicsr_zba_zbb_zbs_zbkb}"
 # ON unless asked otherwise: the committed ELF is a DMA build, so a plain run of
 # this script has to reproduce it.
 ZEG_ZISK_DMA="${ZEG_ZISK_DMA:-ON}"
-# The ELF publishes the execution block hash, not the EIP-8025
-# new_payload_request_root (ziskethone's ZEG_PUBLIC_OUTPUT; `npr` is only for
-# the exex / proof-engine pipeline). Always passed, so a cached configure can't
-# keep the other output.
-ZEG_PUBLIC_OUTPUT=block_hash
 ZEG_CHAIN="${ZEG_CHAIN:-mainnet}"
 
 # `nproc` and `sha256sum` are GNU-only, and macOS has neither. Go through these
@@ -110,8 +106,14 @@ for arg in "$@"; do
     esac
 done
 
+# The public output (ziskethone's ZEG_PUBLIC_OUTPUT). The mainnet ELF publishes
+# the execution block hash; the Sepolia one the EIP-8025
+# new_payload_request_root, so its proofs are the ones reth-zisk submits and the
+# proof engine verifies. Always passed, so a cached configure can't keep the
+# other output.
 case "$ZEG_CHAIN" in
-    mainnet|sepolia) ;;
+    mainnet) ZEG_PUBLIC_OUTPUT=block_hash ;;
+    sepolia) ZEG_PUBLIC_OUTPUT=npr ;;
     *) echo "unknown chain: $ZEG_CHAIN (mainnet | sepolia)" >&2; exit 2 ;;
 esac
 

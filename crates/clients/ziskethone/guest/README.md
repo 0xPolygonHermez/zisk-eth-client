@@ -10,7 +10,9 @@ crate provides:
   neither). Committed at
   `bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone{,-sepolia}.elf` and
   embedded at compile time, so a normal build needs no C++/RISC-V toolchain. The
-  host picks one with `--chain mainnet|sepolia`.
+  host picks one with `--chain mainnet|sepolia`. The mainnet ELF publishes the
+  block hash; the Sepolia one the EIP-8025 `new_payload_request_root` (`npr`),
+  as reth-zisk and the proof engine expect.
 - `run()` — the C++ EVM executed in-process on the host via FFI, used for fast
   input checking and **hint generation**. Behind the `native-ffi` feature (off by
   default), since compiling+linking it needs clang >= 15 / g++ >= 12 and the

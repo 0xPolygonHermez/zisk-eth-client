@@ -26,7 +26,9 @@ pub const ELF: GuestProgram = load_program!(
 
 /// [`ELF`] built for Sepolia. The chain id and fork schedule are compile-time
 /// constants of the guest (the ZEG0 input carries neither), so each chain has
-/// its own ELF.
+/// its own ELF. Unlike [`ELF`], it publishes the EIP-8025
+/// `new_payload_request_root` (`npr`), the output reth-zisk proves and the
+/// proof engine verifies.
 pub const ELF_SEPOLIA: GuestProgram = load_program!(
     "zec-ziskethone-sepolia",
     "../../../../bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone-sepolia.elf"

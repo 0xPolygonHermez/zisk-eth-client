@@ -264,8 +264,9 @@ fn build_ffi() {
         cpp_guest.join("CMakeLists.txt").display()
     );
 
-    // Same public output as the ELF (build-elf.sh): `run` returns the block hash.
-    // The chain is compile-time, as in the ELF: ZEG_CHAIN picks it (default mainnet).
+    // `run` returns the block hash, as the mainnet ELF publishes (build-elf.sh),
+    // whatever the chain. The chain is compile-time, as in the ELF: ZEG_CHAIN
+    // picks it (default mainnet).
     println!("cargo:rerun-if-env-changed=ZEG_CHAIN");
     let chain = std::env::var("ZEG_CHAIN").unwrap_or_else(|_| "mainnet".to_string());
     let dst = cmake::Config::new(&cpp_guest)
