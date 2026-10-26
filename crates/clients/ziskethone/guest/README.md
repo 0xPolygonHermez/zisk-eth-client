@@ -5,10 +5,12 @@ Host-side glue for the **ziskethone** C++ (evmone-based) ZisK Ethereum guest.
 Pattern B (externally-built ELF) per `docs/adding-a-client.md`. Like
 `guest-zilkworm`, ziskethone exposes a native FFI run path (`zeg_run`), so this
 crate provides:
-- `ELF` — the prebuilt guest ELF the prover runs. Committed at
-  `bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf` and embedded at
-  compile time, so a normal build needs
-  no C++/RISC-V toolchain.
+- `ELF` / `ELF_SEPOLIA` — the prebuilt guest ELFs the prover runs, one per chain
+  (the chain id and fork schedule are compile-time; the ZEG0 input carries
+  neither). Committed at
+  `bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone{,-sepolia}.elf` and
+  embedded at compile time, so a normal build needs no C++/RISC-V toolchain. The
+  host picks one with `--chain mainnet|sepolia`.
 - `run()` — the C++ EVM executed in-process on the host via FFI, used for fast
   input checking and **hint generation**. Behind the `native-ffi` feature (off by
   default), since compiling+linking it needs clang >= 15 / g++ >= 12 and the
@@ -21,7 +23,7 @@ crate provides:
   the native input checker is wanted. Consumers that only embed `ELF`, or only
   need input generation, leave it off — no C++ toolchain. Without it, `run()` is
   a stub that panics.
-- `ziskethone-rebuild-guest` — regenerate the committed `elf/zec-ziskethone.elf`
+- `ziskethone-rebuild-guest` — regenerate the committed `elf/zec-ziskethone{,-sepolia}.elf`
   from the C++ sources (needs the xPack RISC-V toolchain). On-demand only; commit
   the result. Normal builds embed the checked-in ELF and never run this.
 
@@ -40,7 +42,7 @@ crate provides:
   Installs the toolchains it needs before building.
 - `install-xpack.sh` — idempotent xPack `riscv-none-elf-gcc` installer, and the one
   place the version and prefix are pinned. Also used by CI.
-- `src/lib.rs` — `pub const ELF` (always) and `pub fn run()` (feature `native-ffi`).
+- `src/lib.rs` — `pub const ELF`, `ELF_SEPOLIA` (always) and `pub fn run()` (feature `native-ffi`).
 
 ## Regenerate the committed ELF
 
@@ -73,7 +75,7 @@ about a second.
 
 ```bash
 cargo build -p guest-ziskethone --features ziskethone-rebuild-guest
-# then commit bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf
+# then commit bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone{,-sepolia}.elf
 ```
 
 On a cold machine the toolchain install costs ~10-15 minutes, and cargo hides

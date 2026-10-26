@@ -4,7 +4,7 @@
 # Usage:
 #   ./crates/clients/ziskethone/guest/build-elf.sh [--clean] [--ziskethone=PATH]
 #                                           [--toolchain-prefix=PATH] [--march=STR]
-#                                           [--no-dma]
+#                                           [--no-dma] [--chain=mainnet|sepolia]
 #
 # The guest -march is pinned below (see ZISK_MARCH) so a plain rebuild
 # reproduces the committed ELF. ZISK_MARCH or --march= overrides it for an A/B;
@@ -18,7 +18,12 @@
 # this flag) still reach the precompiles. That is exactly why the marker count
 # alone cannot tell the two builds apart, and why this override exists.
 #
-# Output: <ziskethone>/cpp-guest/zisk/build/zisk_eth_guest.elf
+# --chain= (or ZEG_CHAIN) picks the chain the guest validates: its chain id and
+# fork schedule are compile-time constants, since the ZEG0 input carries neither.
+# Each chain builds in its own directory so switching does not reconfigure.
+#
+# Output: <ziskethone>/cpp-guest/zisk/build/zisk_eth_guest.elf (mainnet)
+#         <ziskethone>/cpp-guest/zisk/build-<chain>/zisk_eth_guest.elf (otherwise)
 
 set -euo pipefail
 
@@ -52,6 +57,7 @@ ZEG_ZISK_DMA="${ZEG_ZISK_DMA:-ON}"
 # the exex / proof-engine pipeline). Always passed, so a cached configure can't
 # keep the other output.
 ZEG_PUBLIC_OUTPUT=block_hash
+ZEG_CHAIN="${ZEG_CHAIN:-mainnet}"
 
 # `nproc` and `sha256sum` are GNU-only, and macOS has neither. Go through these
 # so a missing one doesn't take the whole script down.
@@ -92,6 +98,7 @@ for arg in "$@"; do
         --toolchain-prefix=*) TOOLCHAIN_PREFIX="${arg#*=}"; XPACK_EXPLICIT=1 ;;
         --march=*) ZISK_MARCH="${arg#*=}" ;;
         --no-dma) ZEG_ZISK_DMA=OFF ;;
+        --chain=*) ZEG_CHAIN="${arg#*=}" ;;
         -h|--help)
             sed -n '2,/^$/p' "$0" | sed 's/^# \?//'
             exit 0
@@ -102,6 +109,11 @@ for arg in "$@"; do
             ;;
     esac
 done
+
+case "$ZEG_CHAIN" in
+    mainnet|sepolia) ;;
+    *) echo "unknown chain: $ZEG_CHAIN (mainnet | sepolia)" >&2; exit 2 ;;
+esac
 
 GUEST_DIR="$ZISKETHONE_DIR/cpp-guest/zisk"
 [ -f "$GUEST_DIR/CMakeLists.txt" ] \
@@ -158,6 +170,7 @@ fi
 export PATH="$DMA_GCC_PREFIX/bin:$TOOLCHAIN_PREFIX:$PATH"
 
 BUILD_DIR="$GUEST_DIR/build"
+[ "$ZEG_CHAIN" = mainnet ] || BUILD_DIR="$GUEST_DIR/build-$ZEG_CHAIN"
 ELF_PATH="$BUILD_DIR/zisk_eth_guest.elf"
 
 if [ "$CLEAN" = 1 ]; then
@@ -169,7 +182,7 @@ fi
 # CMAKE_CXX_COMPILER moves, so detect the move ourselves and start clean instead
 # of handing the user a cache error. Also covers future flag changes.
 STAMP_FILE="$BUILD_DIR/.zec-toolchain-stamp"
-STAMP_NOW="$(command -v riscv-none-elf-g++) $(riscv-none-elf-g++ -dumpversion) ZEG_ZISK_DMA=$ZEG_ZISK_DMA ZISK_MARCH=${ZISK_MARCH:-<toolchain.cmake default>}"
+STAMP_NOW="$(command -v riscv-none-elf-g++) $(riscv-none-elf-g++ -dumpversion) ZEG_ZISK_DMA=$ZEG_ZISK_DMA ZEG_CHAIN=$ZEG_CHAIN ZISK_MARCH=${ZISK_MARCH:-<toolchain.cmake default>}"
 if [ -f "$STAMP_FILE" ] && [ "$(cat "$STAMP_FILE")" != "$STAMP_NOW" ]; then
     echo "==> toolchain or flags changed since last configure; removing $BUILD_DIR"
     rm -rf "$BUILD_DIR"
@@ -205,9 +218,17 @@ if [ -d "$HOST_DIR/build-stub" ] && \
     rm -rf "$HOST_DIR/build-stub"
 fi
 
-echo "==> host cmake configure (fetch evmone, apply patches)"
-cmake -S "$HOST_DIR" -B "$HOST_DIR/build-stub"
-printf '%s\n' "$PATCH_NOW" > "$PATCH_STAMP"
+# Configure only a fresh tree. The CMakeLists' "already applied" test is
+# `git apply --reverse --check` per patch, which fails for a patch whose context a
+# later one rewrote (12 after 13), so a second configure of a patched tree dies.
+if [ -d "$HOST_DIR/build-stub/_deps/evmone-src" ] && \
+   [ "$(cat "$PATCH_STAMP" 2>/dev/null)" = "$PATCH_NOW" ]; then
+    echo "==> evmone already fetched and patched ($HOST_DIR/build-stub)"
+else
+    echo "==> host cmake configure (fetch evmone, apply patches)"
+    cmake -S "$HOST_DIR" -B "$HOST_DIR/build-stub"
+    printf '%s\n' "$PATCH_NOW" > "$PATCH_STAMP"
+fi
 
 # Unquoted on purpose: empty must expand to no argument at all, and an -march
 # string never contains whitespace. An array would need the
@@ -217,7 +238,7 @@ if [ -n "$ZISK_MARCH" ]; then
     MARCH_FLAG="-DZISK_MARCH=$ZISK_MARCH"
 fi
 
-echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA, ZEG_PUBLIC_OUTPUT=$ZEG_PUBLIC_OUTPUT)"
+echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA, ZEG_PUBLIC_OUTPUT=$ZEG_PUBLIC_OUTPUT, ZEG_CHAIN=$ZEG_CHAIN)"
 # shellcheck disable=SC2086
 cmake \
     -S "$GUEST_DIR" \
@@ -227,6 +248,7 @@ cmake \
     -DEVMONE_SRC="$HOST_DIR/build-stub/_deps/evmone-src" \
     -DZEG_ZISK_DMA="$ZEG_ZISK_DMA" \
     -DZEG_PUBLIC_OUTPUT="$ZEG_PUBLIC_OUTPUT" \
+    -DZEG_CHAIN="$ZEG_CHAIN" \
     $MARCH_FLAG \
     -G "Unix Makefiles"
 
