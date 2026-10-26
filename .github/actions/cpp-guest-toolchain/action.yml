@@ -30,38 +30,6 @@ runs:
             cmake make git ca-certificates curl tar xz-utils g++ binutils g++-12
         fi
 
-    - name: Ensure cmake >= 3.25
-      shell: bash
-      run: |
-        set -euo pipefail
-        # ziskethone's cpp-guest needs 3.25 (evmone v0.24); Ubuntu 22.04's apt
-        # cmake is 3.22. Keep the system one when it is new enough, else install
-        # Kitware's release. Stay on 3.x: CMake 4 rejects dependencies that
-        # declare cmake_minimum_required below 3.5.
-        MIN=3.25
-        have="$(cmake --version 2>/dev/null | sed -n 's/^cmake version //p')"
-        if [ -n "$have" ] && [ "$(printf '%s\n' "$MIN" "$have" | sort -V | head -1)" = "$MIN" ]; then
-          echo "cmake $have is new enough"
-          exit 0
-        fi
-        V=3.31.6
-        case "$(uname -m)" in
-          x86_64)  ARCH=x86_64;  SHA=5a1133ff103c71eb5120e2cc3de922733e7d8a26a98ae716397e8676adb367bf ;;
-          aarch64) ARCH=aarch64; SHA=b4cc788d63112b2749b40627e719eb5d3b8ed8f00c36d77189f4019cfe64bc9e ;;
-          *) echo "no cmake build for $(uname -m)" >&2; exit 1 ;;
-        esac
-        dir="$HOME/.local/cmake-$V-linux-$ARCH"
-        if [ ! -x "$dir/bin/cmake" ]; then
-          tgz="$RUNNER_TEMP/cmake-$V.tar.gz"
-          curl -fsSL -o "$tgz" "https://github.com/Kitware/CMake/releases/download/v$V/cmake-$V-linux-$ARCH.tar.gz"
-          echo "$SHA  $tgz" | sha256sum -c -
-          mkdir -p "$HOME/.local"
-          tar -xzf "$tgz" -C "$HOME/.local"
-          rm -f "$tgz"
-        fi
-        echo "replacing cmake ${have:-<none>} with $V"
-        echo "$dir/bin" >> "$GITHUB_PATH"
-
     - name: Install xPack riscv-none-elf-gcc
       shell: bash
       run: |
