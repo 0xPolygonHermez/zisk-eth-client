@@ -24,7 +24,9 @@ crate provides:
   passthrough, surfaced up the stack as `ziskethone-native-ffi`) opts in when
   the native input checker is wanted. Consumers that only embed `ELF`, or only
   need input generation, leave it off — no C++ toolchain. Without it, `run()` is
-  a stub that panics.
+  a stub that panics. The chain is compile-time here too: `ZEG_CHAIN=sepolia`
+  builds the lib for Sepolia (default `mainnet`); `run()` returns the block hash
+  either way.
 - `ziskethone-rebuild-guest` — regenerate the committed `elf/zec-ziskethone{,-sepolia}.elf`
   from the C++ sources (needs the xPack RISC-V toolchain). On-demand only; commit
   the result. Normal builds embed the checked-in ELF and never run this.

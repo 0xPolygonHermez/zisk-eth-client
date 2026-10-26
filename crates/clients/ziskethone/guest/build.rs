@@ -264,9 +264,33 @@ fn build_ffi() {
         cpp_guest.join("CMakeLists.txt").display()
     );
 
-    // Same public output as the mainnet ELF (build-elf.sh): `run` returns the block hash.
+    // The chain is compile-time, as in the ELFs: ZEG_CHAIN picks it (default
+    // mainnet). The output stays the block hash whatever the chain, since that
+    // is what `run` returns.
+    println!("cargo:rerun-if-env-changed=ZEG_CHAIN");
+    let chain = std::env::var("ZEG_CHAIN").unwrap_or_else(|_| "mainnet".to_string());
+    assert!(
+        matches!(chain.as_str(), "mainnet" | "sepolia"),
+        "ZEG_CHAIN must be mainnet | sepolia (got {chain})"
+    );
+    // cmake-rs reconfigures on every rerun, and the CMakeLists' "already applied"
+    // patch test (`git apply --reverse --check`) fails for patch 12 once 13 is
+    // applied over it. Hand it the pristine evmone checkout it fetched instead.
+    let evmone = PathBuf::from(std::env::var("OUT_DIR").unwrap()).join("build/_deps/evmone-src");
+    if evmone.join(".git").exists() {
+        for args in [&["reset", "--hard", "-q"][..], &["clean", "-fdq"][..]] {
+            let ok = std::process::Command::new("git")
+                .arg("-C")
+                .arg(&evmone)
+                .args(args)
+                .status()
+                .is_ok_and(|s| s.success());
+            assert!(ok, "git {args:?} failed in {}", evmone.display());
+        }
+    }
     let dst = cmake::Config::new(&cpp_guest)
         .define("ZEG_PUBLIC_OUTPUT", "block_hash")
+        .define("ZEG_CHAIN", &chain)
         .build_target("zeg_ffi")
         .build();
 
