@@ -263,6 +263,12 @@ fn build_ffi() {
         "cargo:rerun-if-changed={}",
         cpp_guest.join("CMakeLists.txt").display()
     );
+    // The evmone patches change the lib as much as the sources; the reset below
+    // reapplies them on the rerun.
+    println!(
+        "cargo:rerun-if-changed={}",
+        cpp_guest.join("patches").display()
+    );
 
     // The chain is compile-time, as in the ELFs: ZEG_CHAIN picks it (default
     // mainnet). The output stays the block hash whatever the chain, since that
