@@ -11,13 +11,15 @@ members = [
     # crates/clients/<client>/ is silently NOT a workspace member.
     "crates/clients/*/*",
     "tests",
+    "tools/reth-to-ethrex",
+    "tools/reth-to-ziskethone",
     "tools/ziskethone-to-reth",
 ]
 exclude = ["tools/migrate-inputs", "third_party/ziskethone/rust-input-gen"]
 resolver = "2"
 
 [workspace.package]
-version = "0.10.0"
+version = "0.14.0"
 edition = "2021"
 
 [workspace.dependencies]
@@ -32,14 +34,14 @@ input-reth = { path = "crates/clients/reth/input" }
 input-ziskethone = { path = "crates/clients/ziskethone/input" }
 rust-input-gen = { path = "third_party/ziskethone/rust-input-gen" }
 
-# zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.2-alpha" }
-# zisk-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.2-alpha" }
-# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.3.2-alpha" }
+# zisk-sdk = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.4.0-alpha" }
+# zisk-zkvm-interface = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.4.0-alpha" }
+# ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", branch = "pre-develop-1.4.0-alpha" }
 
 # crates.io dependencies
-zisk-sdk = "1.3.2-alpha"
-zisk-zkvm-interface = "1.3.2-alpha"
-ziskos = "1.3.2-alpha"
+zisk-sdk = "1.4.0-alpha"
+zisk-zkvm-interface = "1.4.0-alpha"
+ziskos = "1.4.0-alpha"
 
 # Local development
 # zisk-sdk = { path = "../zisk/sdk" }
@@ -77,11 +79,11 @@ primitive-types = "0.13.1"
 ethereum-types = "0.15.1"
 
 # ethrex
-ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0" }
-ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false }
-ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0" }
-ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false }
-stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v20.0.0", default-features = false, package = "ethrex-guest-program" }
+ethrex-config = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v30.0.0" }
+ethrex-common = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v30.0.0", default-features = false }
+ethrex-rpc = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v30.0.0" }
+ethrex-crypto = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v30.0.0", default-features = false }
+stateless-ethrex = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v30.0.0", default-features = false, package = "ethrex-guest-program" }
 
 # eth-act
 witness-generator = { git = "https://github.com/eth-act/zkevm-benchmark-workload.git", rev = "6786b2b9f002151e383e88cf2a693899ca73d169" }

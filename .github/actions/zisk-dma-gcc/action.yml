@@ -1,6 +1,6 @@
 name: Build the patched GCC for -mzisk-dma
 description: >
-  Build (or restore from cache) the patched GCC 14.3.0 that lowers block mem*
+  Build (or restore from cache) the patched GCC 15.2.0 that lowers block mem*
   operations to the ZisK DMA precompiles. Only needed by jobs that rebuild the
   guest ELF — jobs that embed the committed ELF do not cross-compile at all.
 
@@ -15,12 +15,12 @@ runs:
       id: cache
       uses: actions/cache@v4
       with:
-        path: ~/.local/xPacks/zisk-dma-gcc-14.3.0
+        path: ~/.local/xPacks/zisk-dma-gcc-15.2.0
         # Hash the patch AND this action file on purpose: the resulting
         # compiler depends on how it was built, not only on the patch (e.g.
         # the PATH/env wiring below), so a change to either must invalidate
         # the cache and force a rebuild.
-        key: zisk-dma-gcc-${{ runner.os }}-14.3.0-${{ hashFiles('third_party/ziskethone/cpp-guest/patches/gcc/0001-*.patch', '.github/actions/zisk-dma-gcc/action.yml') }}
+        key: zisk-dma-gcc-${{ runner.os }}-15.2.0-${{ hashFiles('third_party/ziskethone/cpp-guest/patches/gcc/gcc-15.2.0/0001-*.patch', '.github/actions/zisk-dma-gcc/action.yml') }}
 
     - name: Build the patched GCC
       shell: bash
@@ -36,7 +36,9 @@ runs:
         # gcc_cv_as_riscv_attribute=no and the build silently produces a
         # compiler that still accepts -mzisk-dma but miscompiles the guest,
         # crashing ziskemu at runtime instead of failing here.
-        ZISK_XPACK_DIR="$HOME/opt/xpack/xpack-riscv-none-elf-gcc-14.3.0-1" \
-        PATH="$HOME/opt/xpack/xpack-riscv-none-elf-gcc-14.3.0-1/bin:$PATH" \
+        # Same release as install-xpack.sh's XPACK_VERSION.
+        ZISK_GCC_VERSION=15.2.0 \
+        ZISK_XPACK_DIR="$HOME/opt/xpack/xpack-riscv-none-elf-gcc-15.2.0-1" \
+        PATH="$HOME/opt/xpack/xpack-riscv-none-elf-gcc-15.2.0-1/bin:$PATH" \
         CXX=g++-12 CC=gcc-12 \
           third_party/ziskethone/cpp-guest/patches/gcc/build-toolchain.sh

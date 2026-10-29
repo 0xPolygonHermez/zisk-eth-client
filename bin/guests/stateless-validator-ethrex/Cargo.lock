@@ -851,8 +851,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-common"
-version = "20.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
+version = "30.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v30.0.0#80b774a959c09148012a49f8cc293d9c988d0250"
 dependencies = [
  "bytes",
  "crc32fast",
@@ -860,12 +860,17 @@ dependencies = [
  "ethrex-crypto",
  "ethrex-rlp",
  "ethrex-trie",
+ "foldhash 0.2.0",
  "hex",
  "hex-literal",
  "hex-simd",
  "indexmap 2.14.0",
  "lazy_static",
  "libc",
+ "libssz",
+ "libssz-derive",
+ "libssz-merkle",
+ "libssz-types",
  "lru",
  "once_cell",
  "rkyv",
@@ -879,8 +884,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-crypto"
-version = "20.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
+version = "30.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v30.0.0#80b774a959c09148012a49f8cc293d9c988d0250"
 dependencies = [
  "ark-bn254",
  "ark-ec",
@@ -888,6 +893,7 @@ dependencies = [
  "ethereum-types",
  "hex-literal",
  "k256",
+ "malachite",
  "num-bigint",
  "p256",
  "ripemd",
@@ -898,8 +904,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-guest-program"
-version = "20.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
+version = "30.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v30.0.0#80b774a959c09148012a49f8cc293d9c988d0250"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -909,6 +915,10 @@ dependencies = [
  "ethrex-rlp",
  "ethrex-vm",
  "hex",
+ "libssz",
+ "libssz-derive",
+ "libssz-merkle",
+ "libssz-types",
  "rkyv",
  "serde",
  "serde_with",
@@ -917,8 +927,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-l2-common"
-version = "20.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
+version = "30.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v30.0.0#80b774a959c09148012a49f8cc293d9c988d0250"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -935,14 +945,15 @@ dependencies = [
 
 [[package]]
 name = "ethrex-levm"
-version = "20.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
+version = "30.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v30.0.0#80b774a959c09148012a49f8cc293d9c988d0250"
 dependencies = [
  "bytes",
  "derive_more",
  "ethrex-common",
  "ethrex-crypto",
  "ethrex-rlp",
+ "libssz",
  "malachite",
  "rustc-hash",
  "serde",
@@ -952,8 +963,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-rlp"
-version = "20.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
+version = "30.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v30.0.0#80b774a959c09148012a49f8cc293d9c988d0250"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -962,8 +973,8 @@ dependencies = [
 
 [[package]]
 name = "ethrex-trie"
-version = "20.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
+version = "30.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v30.0.0#80b774a959c09148012a49f8cc293d9c988d0250"
 dependencies = [
  "anyhow",
  "bytes",
@@ -971,18 +982,19 @@ dependencies = [
  "ethereum-types",
  "ethrex-crypto",
  "ethrex-rlp",
- "lazy_static",
+ "hashbrown 0.15.5",
  "rayon",
  "rkyv",
  "rustc-hash",
  "serde",
+ "spin",
  "thiserror",
 ]
 
 [[package]]
 name = "ethrex-vm"
-version = "20.0.0"
-source = "git+https://github.com/lambdaclass/ethrex.git?tag=v20.0.0#7d23d3bf19f9982dd94ce207c405141932b2562a"
+version = "30.0.0"
+source = "git+https://github.com/lambdaclass/ethrex.git?tag=v30.0.0#80b774a959c09148012a49f8cc293d9c988d0250"
 dependencies = [
  "bytes",
  "derive_more",
@@ -1467,6 +1479,47 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
 
 [[package]]
+name = "libssz"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4bdd6d63ed811ae164966de20810be780e07de784a4834ccfe6be90480c369e"
+dependencies = [
+ "smallvec",
+]
+
+[[package]]
+name = "libssz-derive"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aeee1b9ac9200429f7e9830492765445989ea61c3fb9028ad5a96e1dd5f5e913"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "libssz-merkle"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "863eca32d1a43e5ec41106a515552efa8307768d37c68d26b7f21ff13cfee1a7"
+dependencies = [
+ "libssz",
+ "sha2",
+]
+
+[[package]]
+name = "libssz-types"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4231ac301726840a3fe111f11bd4619d3c97ed155cb94c88dbf92b70e04e017"
+dependencies = [
+ "libssz",
+ "libssz-merkle",
+ "smallvec",
+]
+
+[[package]]
 name = "lock_api"
 version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1842,39 +1895,20 @@ dependencies = [
 
 [[package]]
 name = "proofman-fields"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5f97afb3a6383aee3ad8e335591564ec4c0904c591536c41fdd5ec5d666a81b"
+version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#51173b5504a6a82bae629e45bef90ef4d9093067"
 dependencies = [
  "blake3",
  "cfg-if",
  "num-bigint",
  "paste",
- "proofman-starks-lib-c",
  "serde",
 ]
 
 [[package]]
-name = "proofman-starks-lib-c"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "727e567d696fd28129f87693f51f01c7e1dda6cb4baa4348881262cc7be3285c"
-dependencies = [
- "crossbeam-channel",
- "proofman-starks-src",
-]
-
-[[package]]
-name = "proofman-starks-src"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "824a7f69aeb6ca119fc330533dbf65adc9daad4b7de416f940546cd35a897710"
-
-[[package]]
 name = "proofman-verifier"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c28c5df32f6465a106d6125ec4ab6a544a739027bd1f668df9a14a92658ce16b"
+version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#51173b5504a6a82bae629e45bef90ef4d9093067"
 dependencies = [
  "num-traits",
  "proofman-fields",
@@ -2388,6 +2422,12 @@ dependencies = [
  "libc",
  "windows-sys",
 ]
+
+[[package]]
+name = "spin"
+version = "0.9.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3763264f6b73151db08c50ff20d7d8a0b8796e021cdea7ceedad07b80155fa0e"
 
 [[package]]
 name = "spki"
@@ -2915,27 +2955,23 @@ dependencies = [
 
 [[package]]
 name = "zisk-circuit"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42e4d1502e50e58c2b147f0c3952626ee593f256b10300e6a5f6dd94a344d5ca"
+version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
 
 [[package]]
 name = "zisk-definitions"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ea4b2d4e147c2cc6fcce71db51c9938404b2dde4db0f0412fa554aac77a0c96"
+version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
 
 [[package]]
 name = "zisk-lib-c"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80e05059b14e147657843734baea28a453d933bcfeb304d8f859bb31e0e435b5"
+version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
 
 [[package]]
 name = "zisk-precomp-helpers"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46e774e82c7777f62d1307e45a1a45712340bce358ee5541d2a709a46fa1c989"
+version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -2952,9 +2988,8 @@ dependencies = [
 
 [[package]]
 name = "zisk-stream"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "448d882c792a2dda645a0769ca9bcc539b42192a6dd79bf687fb0971f5433dac"
+version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
 dependencies = [
  "libc",
  "thiserror",
@@ -2963,9 +2998,8 @@ dependencies = [
 
 [[package]]
 name = "zisk-verifier"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b82ed5753de5f9201277a60d0fb9459a0fcd4c28fe991cb8e93a951d75269bd6"
+version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
 dependencies = [
  "proofman-fields",
  "proofman-verifier",
@@ -2973,18 +3007,16 @@ dependencies = [
 
 [[package]]
 name = "zisk-zkvm-interface"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee41fd38bb3b08b74c2bbe14d5062d4863cf7f2e90093a791348032e6630eec4"
+version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
 dependencies = [
  "bindgen",
 ]
 
 [[package]]
 name = "ziskos"
-version = "1.3.2-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b33bb1b184e0145e8c2d5233ab2b7c83c0e7d6b3b77cdd957132c772ccc14e1e"
+version = "1.4.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
 dependencies = [
  "anyhow",
  "ark-bn254",

@@ -5,10 +5,12 @@ use tracing::info;
 use zisk_sdk::VerboseMode;
 
 use host::benchmark::BenchmarkRunner;
-use host::cli::{Cli, GuestProgramCommand};
 #[cfg(feature = "ziskethone")]
-use host::elfs::ELF_ZISKETHONE;
+use host::cli::Chain;
+use host::cli::{Cli, GuestProgramCommand};
 use host::elfs::{ELF_ETHREX, ELF_RETH};
+#[cfg(feature = "ziskethone")]
+use host::elfs::{ELF_ZISKETHONE, ELF_ZISKETHONE_SEPOLIA};
 use input::Client;
 
 #[tokio::main]
@@ -35,17 +37,22 @@ async fn main() -> Result<()> {
             gen_hints,
             hints_out,
             client,
+            chain,
             include,
             exclude,
         } => {
             info!(" Client: {:?}", client);
+            info!(" Chain: {:?}", chain);
 
             // To add a client, see docs/adding-a-client.md.
             let elf = match client {
                 Client::Reth => ELF_RETH,
                 Client::Ethrex => ELF_ETHREX,
                 #[cfg(feature = "ziskethone")]
-                Client::ZiskEthOne => ELF_ZISKETHONE,
+                Client::ZiskEthOne => match chain {
+                    Chain::Mainnet => ELF_ZISKETHONE,
+                    Chain::Sepolia => ELF_ZISKETHONE_SEPOLIA,
+                },
             };
 
             info!(" ELF Name: {}", elf.name());
@@ -126,10 +133,12 @@ fn write_metadata(cli: &Cli) -> Result<()> {
             gen_hints,
             hints_out,
             client,
+            chain,
             include,
             exclude,
         } => {
             writeln!(file, "Client: {:?}", client)?;
+            writeln!(file, "Chain: {:?}", chain)?;
             if let Some(input_folder) = input_folder {
                 writeln!(file, "Input Folder: {}", input_folder.display())?;
             }

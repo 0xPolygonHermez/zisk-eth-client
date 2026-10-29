@@ -27,12 +27,12 @@ env:
   # Block inputs to test per client (graduated, less MGs to more MGs). All three
   # clients share the SAME block set for cross-client comparison; each block has
   # a committed input under bin/guests/stateless-validator-<client>/inputs/.
-  #   25431013 ~17.0M gas / 172 tx   (small)
-  #   25431039 ~25.0M gas / 325 tx   (medium)
-  #   25431055 ~55.7M gas / 712 tx   (large)
-  RETH_TEST_BLOCKS: "25431013 25431039 25431055"
-  ETHREX_TEST_BLOCKS: "25431013 25431039 25431055"
-  ZISKETHONE_TEST_BLOCKS: "25431013 25431039 25431055"
+  #   26235156  ~5.4M gas /  91 tx   (small)
+  #   26235168 ~29.1M gas / 260 tx   (medium)
+  #   26235159 ~57.7M gas / 532 tx   (large)
+  RETH_TEST_BLOCKS: "26235156 26235168 26235159"
+  ETHREX_TEST_BLOCKS: "26235156 26235168 26235159"
+  ZISKETHONE_TEST_BLOCKS: "26235156 26235168 26235159"
 
 jobs:
   fmt:

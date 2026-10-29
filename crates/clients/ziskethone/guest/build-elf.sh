@@ -4,7 +4,8 @@
 # Usage:
 #   ./crates/clients/ziskethone/guest/build-elf.sh [--clean] [--ziskethone=PATH]
 #                                           [--toolchain-prefix=PATH] [--march=STR]
-#                                           [--no-dma]
+#                                           [--no-dma] [--chain=mainnet|sepolia]
+#                                           [--out=FILE]
 #
 # The guest -march is pinned below (see ZISK_MARCH) so a plain rebuild
 # reproduces the committed ELF. ZISK_MARCH or --march= overrides it for an A/B;
@@ -18,7 +19,14 @@
 # this flag) still reach the precompiles. That is exactly why the marker count
 # alone cannot tell the two builds apart, and why this override exists.
 #
-# Output: <ziskethone>/cpp-guest/zisk/build/zisk_eth_guest.elf
+# --chain= (or ZEG_CHAIN) picks the chain the guest validates: its chain id and
+# fork schedule are compile-time constants, since the ZEG0 input carries neither.
+# Each chain builds in its own directory so switching does not reconfigure.
+# The chain also fixes the public output (see ZEG_PUBLIC_OUTPUT below).
+#
+# Output: <ziskethone>/cpp-guest/zisk/build/zisk_eth_guest.elf (mainnet)
+#         <ziskethone>/cpp-guest/zisk/build-<chain>/zisk_eth_guest.elf (otherwise)
+#         --out=FILE also copies it to FILE.
 
 set -euo pipefail
 
@@ -27,6 +35,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ZISKETHONE_DIR="${ZISKETHONE_DIR:-$(cd "$SCRIPT_DIR/../../../.." && pwd)/third_party/ziskethone}"
 CLEAN=0
+OUT=""
 # The march the committed ELF is built with. Pinned here rather than left to
 # ziskethone's toolchain.cmake default for the same reason ZEG_ZISK_DMA is
 # forced ON below: this repo owns the committed ELF, so a plain rebuild has to
@@ -47,6 +56,7 @@ ZISK_MARCH="${ZISK_MARCH-rv64ima_zicsr_zba_zbb_zbs_zbkb}"
 # ON unless asked otherwise: the committed ELF is a DMA build, so a plain run of
 # this script has to reproduce it.
 ZEG_ZISK_DMA="${ZEG_ZISK_DMA:-ON}"
+ZEG_CHAIN="${ZEG_CHAIN:-mainnet}"
 
 # `nproc` and `sha256sum` are GNU-only, and macOS has neither. Go through these
 # so a missing one doesn't take the whole script down.
@@ -87,6 +97,8 @@ for arg in "$@"; do
         --toolchain-prefix=*) TOOLCHAIN_PREFIX="${arg#*=}"; XPACK_EXPLICIT=1 ;;
         --march=*) ZISK_MARCH="${arg#*=}" ;;
         --no-dma) ZEG_ZISK_DMA=OFF ;;
+        --chain=*) ZEG_CHAIN="${arg#*=}" ;;
+        --out=*) OUT="${arg#*=}" ;;
         -h|--help)
             sed -n '2,/^$/p' "$0" | sed 's/^# \?//'
             exit 0
@@ -97,6 +109,17 @@ for arg in "$@"; do
             ;;
     esac
 done
+
+# The public output (ziskethone's ZEG_PUBLIC_OUTPUT). The mainnet ELF publishes
+# the execution block hash; the Sepolia one the EIP-8025
+# new_payload_request_root, so its proofs are the ones reth-zisk submits and the
+# proof engine verifies. Always passed, so a cached configure can't keep the
+# other output.
+case "$ZEG_CHAIN" in
+    mainnet) ZEG_PUBLIC_OUTPUT=block_hash ;;
+    sepolia) ZEG_PUBLIC_OUTPUT=npr ;;
+    *) echo "unknown chain: $ZEG_CHAIN (mainnet | sepolia)" >&2; exit 2 ;;
+esac
 
 GUEST_DIR="$ZISKETHONE_DIR/cpp-guest/zisk"
 [ -f "$GUEST_DIR/CMakeLists.txt" ] \
@@ -116,8 +139,8 @@ if [ ! -x "$TOOLCHAIN_PREFIX/riscv-none-elf-g++" ]; then
         || { echo "install-xpack.sh ran but $TOOLCHAIN_PREFIX is still empty" >&2; exit 1; }
 fi
 
-# The guest is always built with -mzisk-dma, which needs the patched GCC 14.3.0
-# built from ziskethone's cpp-guest/patches/gcc. build-toolchain.sh is
+# The guest is always built with -mzisk-dma, which needs the patched GCC built
+# from ziskethone's cpp-guest/patches/gcc, at the xPack's GCC release. build-toolchain.sh is
 # idempotent — it detects an installed compiler and returns in about a second —
 # so calling it unconditionally is cheap, and a warm prefix and a cold one
 # produce the same ELF. That is what makes the CI cache purely a speed
@@ -125,9 +148,11 @@ fi
 #
 # Mind the trailing component: ZISK_TOOLCHAIN_PREFIX is a bin/ directory,
 # ZISK_XPACK_DIR is its parent. The script reuses that xPack's C++ headers and
-# binutils, so its version must match GCC 14.3.0 exactly.
-DMA_GCC_PREFIX="${ZISK_DMA_GCC_PREFIX:-$HOME/.local/xPacks/zisk-dma-gcc-14.3.0}"
-echo "==> ensuring the patched GCC (-mzisk-dma) is installed"
+# binutils, so both are the same GCC release.
+GCC_VERSION="$("$SCRIPT_DIR/install-xpack.sh" --print-gcc-version)"
+DMA_GCC_PREFIX="${ZISK_DMA_GCC_PREFIX:-$HOME/.local/xPacks/zisk-dma-gcc-$GCC_VERSION}"
+echo "==> ensuring the patched GCC $GCC_VERSION (-mzisk-dma) is installed"
+ZISK_GCC_VERSION="$GCC_VERSION" \
 ZISK_DMA_GCC_PREFIX="$DMA_GCC_PREFIX" \
 ZISK_XPACK_DIR="${TOOLCHAIN_PREFIX%/bin}" \
 PATH="$TOOLCHAIN_PREFIX:$PATH" \
@@ -151,6 +176,7 @@ fi
 export PATH="$DMA_GCC_PREFIX/bin:$TOOLCHAIN_PREFIX:$PATH"
 
 BUILD_DIR="$GUEST_DIR/build"
+[ "$ZEG_CHAIN" = mainnet ] || BUILD_DIR="$GUEST_DIR/build-$ZEG_CHAIN"
 ELF_PATH="$BUILD_DIR/zisk_eth_guest.elf"
 
 if [ "$CLEAN" = 1 ]; then
@@ -179,7 +205,8 @@ HOST_DIR="$ZISKETHONE_DIR/cpp-guest"
 # stale Aug-4 _deps missed 05-evmone-zisk-jumpdest-precompile.patch and the
 # resulting guest died in ziskemu with an out-of-range write.
 #
-# So stamp the patch set itself and start clean whenever it moves.
+# So stamp the patch set itself, with the CMakeLists that fetches and patches
+# evmone, and start clean whenever either moves.
 PATCH_STAMP="$HOST_DIR/build-stub/.zec-patch-stamp"
 # Collect the patches explicitly rather than globbing straight into cat: with
 # `set -o pipefail`, an unmatched glob makes cat fail, the whole assignment
@@ -191,16 +218,24 @@ ZEG_PATCHES=("$HOST_DIR"/patches/*.patch)
 shopt -u nullglob
 [ ${#ZEG_PATCHES[@]} -gt 0 ] \
     || { echo "no evmone patches found in $HOST_DIR/patches" >&2; exit 1; }
-PATCH_NOW="$(cat "${ZEG_PATCHES[@]}" | _sha256 | cut -d' ' -f1)"
+PATCH_NOW="$(cat "${ZEG_PATCHES[@]}" "$HOST_DIR/CMakeLists.txt" | _sha256 | cut -d' ' -f1)"
 if [ -d "$HOST_DIR/build-stub" ] && \
    [ "$(cat "$PATCH_STAMP" 2>/dev/null)" != "$PATCH_NOW" ]; then
-    echo "==> evmone patch set changed; removing $HOST_DIR/build-stub"
+    echo "==> evmone patch set or CMakeLists changed; removing $HOST_DIR/build-stub"
     rm -rf "$HOST_DIR/build-stub"
 fi
 
-echo "==> host cmake configure (fetch evmone, apply patches)"
-cmake -S "$HOST_DIR" -B "$HOST_DIR/build-stub"
-printf '%s\n' "$PATCH_NOW" > "$PATCH_STAMP"
+# Configure only a fresh tree (a surviving one matches the stamp). The CMakeLists'
+# "already applied" test is `git apply --reverse --check` per patch, which fails
+# for a patch whose context a later one rewrote (12 after 13), so a second
+# configure of a patched tree dies.
+if [ -d "$HOST_DIR/build-stub/_deps/evmone-src" ]; then
+    echo "==> evmone already fetched and patched ($HOST_DIR/build-stub)"
+else
+    echo "==> host cmake configure (fetch evmone, apply patches)"
+    cmake -S "$HOST_DIR" -B "$HOST_DIR/build-stub"
+    printf '%s\n' "$PATCH_NOW" > "$PATCH_STAMP"
+fi
 
 # Unquoted on purpose: empty must expand to no argument at all, and an -march
 # string never contains whitespace. An array would need the
@@ -210,7 +245,7 @@ if [ -n "$ZISK_MARCH" ]; then
     MARCH_FLAG="-DZISK_MARCH=$ZISK_MARCH"
 fi
 
-echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA)"
+echo "==> configuring cmake (march: ${ZISK_MARCH:-toolchain.cmake default}, ZEG_ZISK_DMA=$ZEG_ZISK_DMA, ZEG_PUBLIC_OUTPUT=$ZEG_PUBLIC_OUTPUT, ZEG_CHAIN=$ZEG_CHAIN)"
 # shellcheck disable=SC2086
 cmake \
     -S "$GUEST_DIR" \
@@ -219,6 +254,8 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DEVMONE_SRC="$HOST_DIR/build-stub/_deps/evmone-src" \
     -DZEG_ZISK_DMA="$ZEG_ZISK_DMA" \
+    -DZEG_PUBLIC_OUTPUT="$ZEG_PUBLIC_OUTPUT" \
+    -DZEG_CHAIN="$ZEG_CHAIN" \
     $MARCH_FLAG \
     -G "Unix Makefiles"
 
@@ -257,6 +294,12 @@ case "$ZISK_MARCH" in
             || echo "WARNING: -march names zba but GCC emitted no Zba instruction." >&2
         ;;
 esac
+
+if [ -n "$OUT" ]; then
+    mkdir -p "$(dirname "$OUT")"
+    cp "$ELF_PATH" "$OUT"
+    echo "==> copied to $OUT"
+fi
 
 echo
 echo "ELF: $ELF_PATH"
