@@ -85,6 +85,12 @@ pub enum GuestProgramCommand {
         #[arg(short, long, default_value = "reth")]
         client: input::Client,
 
+        /// Chain of the inputs. Only selects the ziskethone ELF, whose chain id
+        /// and fork schedule are compile-time; reth and ethrex read the chain
+        /// from the input.
+        #[arg(long, value_enum, default_value = "mainnet")]
+        chain: Chain,
+
         /// Include only files containing the provided strings.
         #[arg(long)]
         include: Option<Vec<String>>,
@@ -94,6 +100,13 @@ pub enum GuestProgramCommand {
         exclude: Option<Vec<String>>,
     },
     // Add more guest programs here as needed
+}
+
+/// Chains with a ziskethone guest ELF.
+#[derive(ValueEnum, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Chain {
+    Mainnet,
+    Sepolia,
 }
 
 impl GuestProgramCommand {

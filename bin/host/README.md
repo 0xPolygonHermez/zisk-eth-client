@@ -40,7 +40,8 @@ host stateless-validator [OPTIONS]
 | Option | Description | Default |
 |--------|-------------|---------|
 | `-i, --input-folder <PATH>` | Input folder | Required unless `--hints` is given |
-| `-c, --client <CLIENT>` | Execution client: `reth`, `ethrex` | `reth` |
+| `-c, --client <CLIENT>` | Execution client: `reth`, `ethrex`, `ziskethone` (host built with `--features ziskethone`) | `reth` |
+| `--chain <CHAIN>` | Chain of the inputs: `mainnet`, `sepolia`. Selects the ziskethone ELF (its chain is compile-time); reth and ethrex read the chain from the input | `mainnet` |
 | `--include <PATTERN>` | Include only tests matching pattern (repeatable) | None |
 | `--exclude <PATTERN>` | Exclude tests matching pattern (repeatable) | None |
 | `--hints <PATH>` | Run against a pre-generated `.hints` file/folder (mutually exclusive with `--input-folder`) | None |
@@ -67,6 +68,9 @@ host stateless-validator -i /path/to/input/folder --exclude blob
 
 # Use ethrex client
 host stateless-validator -c ethrex -i /path/to/input/folder
+
+# Use the ziskethone client on Sepolia inputs (host built with --features ziskethone)
+host stateless-validator -c ziskethone --chain sepolia -i /path/to/input/folder
 
 # Verify constraints
 host -a verify-constraints stateless-validator -i /path/to/input/folder

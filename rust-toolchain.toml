@@ -1,0 +1,11 @@
+# Pinned until the ethrex v20.0.0 dependency can be bumped: its ethrex-crypto
+# `global_asm!` blocks (blake2f/x86_64.s, keccak) carry no `.text` directive, and
+# from rustc 1.99 the assembler leaves them in whatever section is current, which
+# is `.note.gnu.property`. The host binary then fails to link
+# ("`.note.gnu.property+0x20`: data is too short" with rust-lld). Fixed upstream
+# in lambdaclass/ethrex#7248 (commit ea39cbe55), not yet in a tag we depend on.
+# The guest ELFs are unaffected: cargo-zisk builds them with its own `zisk`
+# toolchain, and the ZisK checkout in CI carries its own rust-toolchain.toml.
+[toolchain]
+channel = "1.98.0"
+components = ["rustfmt", "clippy"]

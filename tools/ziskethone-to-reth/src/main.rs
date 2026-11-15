@@ -124,10 +124,8 @@ fn collect_inputs(path: &Path) -> Result<Vec<PathBuf>> {
 /// container is one `ZiskStdin` slice holding `schema_id || SSZ(StatelessInput)`.
 fn reth_witness_state(path: &Path) -> Result<Vec<Vec<u8>>> {
     let buf = fs::read(path).with_context(|| format!("reading {}", path.display()))?;
-    let slices = zeg0::reader::zisk_slices(&buf)?;
-    let stateless_input_bytes = slices
-        .first()
-        .with_context(|| format!("{} has no input slice", path.display()))?;
+    let stateless_input_bytes = input_core::first_frame(&buf)
+        .with_context(|| format!("{} has no input frame", path.display()))?;
     let (_, input) = StatelessInput::from_schema_prefixed_ssz(stateless_input_bytes)
         .map_err(|e| anyhow!("{} is not a stateless input: {e:?}", path.display()))?;
     Ok(input

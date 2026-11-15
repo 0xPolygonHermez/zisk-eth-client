@@ -263,8 +263,40 @@ fn build_ffi() {
         "cargo:rerun-if-changed={}",
         cpp_guest.join("CMakeLists.txt").display()
     );
+    // The evmone patches change the lib as much as the sources; the reset below
+    // reapplies them on the rerun.
+    println!(
+        "cargo:rerun-if-changed={}",
+        cpp_guest.join("patches").display()
+    );
 
+    // The chain is compile-time, as in the ELFs: ZEG_CHAIN picks it (default
+    // mainnet). The output stays the block hash whatever the chain, since that
+    // is what `run` returns.
+    println!("cargo:rerun-if-env-changed=ZEG_CHAIN");
+    let chain = std::env::var("ZEG_CHAIN").unwrap_or_else(|_| "mainnet".to_string());
+    assert!(
+        matches!(chain.as_str(), "mainnet" | "sepolia"),
+        "ZEG_CHAIN must be mainnet | sepolia (got {chain})"
+    );
+    // cmake-rs reconfigures on every rerun, and the CMakeLists' "already applied"
+    // patch test (`git apply --reverse --check`) fails for patch 12 once 13 is
+    // applied over it. Hand it the pristine evmone checkout it fetched instead.
+    let evmone = PathBuf::from(std::env::var("OUT_DIR").unwrap()).join("build/_deps/evmone-src");
+    if evmone.join(".git").exists() {
+        for args in [&["reset", "--hard", "-q"][..], &["clean", "-fdq"][..]] {
+            let ok = std::process::Command::new("git")
+                .arg("-C")
+                .arg(&evmone)
+                .args(args)
+                .status()
+                .is_ok_and(|s| s.success());
+            assert!(ok, "git {args:?} failed in {}", evmone.display());
+        }
+    }
     let dst = cmake::Config::new(&cpp_guest)
+        .define("ZEG_PUBLIC_OUTPUT", "block_hash")
+        .define("ZEG_CHAIN", &chain)
         .build_target("zeg_ffi")
         .build();
 
@@ -349,24 +381,25 @@ fn build_ffi() {
     println!("cargo:rustc-link-lib=dylib={cxx_runtime}");
 }
 
-/// Rebuild the guest ELF from the C++ sources (xPack RISC-V toolchain) and copy
-/// it into the committed location
-/// `bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf`. Only runs under the
+/// Rebuild the guest ELFs from the C++ sources (xPack RISC-V toolchain) and copy
+/// them into the committed locations
+/// `bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone{,-sepolia}.elf`, one per
+/// chain (the chain is a compile-time constant of the guest). Only runs under the
 /// `ziskethone-rebuild-guest` feature; the result is meant to be committed. `load_program!`
 /// embeds the committed file directly, so a normal build never calls this.
 fn regenerate_committed_elf() {
     let ziskethone_dir = ziskethone_dir();
     let cpp_guest = ziskethone_dir.join("cpp-guest");
-    let built_elf = cpp_guest
-        .join("zisk")
-        .join("build")
-        .join("zisk_eth_guest.elf");
     let script = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("build-elf.sh");
     // Renamed on copy: the CMake target inside the submodule is
     // `zisk_eth_guest.elf`, but the committed artifact follows the sibling guests'
     // convention (`zec-reth.elf`, `zec-ethrex.elf`).
-    let committed_elf = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../../bin/guests/stateless-validator-ziskethone/elf/zec-ziskethone.elf");
+    let elf_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../../bin/guests/stateless-validator-ziskethone/elf");
+    let chains = [
+        ("mainnet", "zec-ziskethone.elf"),
+        ("sepolia", "zec-ziskethone-sepolia.elf"),
+    ];
 
     // Rerun the regeneration when the C++ guest sources or the build driver
     // change, so an edited guest doesn't leave a stale committed ELF behind.
@@ -391,8 +424,8 @@ fn regenerate_committed_elf() {
     );
     if let Ok(entries) = std::fs::read_dir(&guest_src) {
         for entry in entries.flatten() {
-            // Skip the CMake output dir; watch every other source entry.
-            if entry.file_name() == "build" {
+            // Skip the CMake output dirs; watch every other source entry.
+            if entry.file_name().to_string_lossy().starts_with("build") {
                 continue;
             }
             println!("cargo:rerun-if-changed={}", entry.path().display());
@@ -414,35 +447,30 @@ fn regenerate_committed_elf() {
     // no idea the file it asked us to produce went away: none of the inputs above
     // changed, so this script never re-runs and the reverted ELF survives no
     // matter how many times you rebuild.
-    println!("cargo:rerun-if-changed={}", committed_elf.display());
+    for (_, name) in chains {
+        println!("cargo:rerun-if-changed={}", elf_dir.join(name).display());
+    }
 
     // No toolchain preflight here: build-elf.sh installs the pinned xPack itself
     // when ZISK_TOOLCHAIN_PREFIX is unset, and reports the mismatch when it is
     // set but empty. A check in front of it could only refuse a build that would
     // otherwise have fixed itself.
 
-    let status = std::process::Command::new("bash")
-        .arg(&script)
-        .arg(format!("--ziskethone={}", ziskethone_dir.display()))
-        .status()
-        .unwrap_or_else(|e| panic!("failed to invoke {}: {e}", script.display()));
-    assert!(status.success(), "ziskethone guest build failed");
-
-    if let Some(parent) = committed_elf.parent() {
-        std::fs::create_dir_all(parent)
-            .unwrap_or_else(|e| panic!("failed to create {}: {e}", parent.display()));
-    }
-    std::fs::copy(&built_elf, &committed_elf).unwrap_or_else(|e| {
-        panic!(
-            "failed to copy {} -> {}: {e}",
-            built_elf.display(),
+    for (chain, name) in chains {
+        let committed_elf = elf_dir.join(name);
+        let status = std::process::Command::new("bash")
+            .arg(&script)
+            .arg(format!("--ziskethone={}", ziskethone_dir.display()))
+            .arg(format!("--chain={chain}"))
+            .arg(format!("--out={}", committed_elf.display()))
+            .status()
+            .unwrap_or_else(|e| panic!("failed to invoke {}: {e}", script.display()));
+        assert!(status.success(), "ziskethone guest build failed ({chain})");
+        println!(
+            "cargo:warning=Regenerated committed ELF at {} — commit this file.",
             committed_elf.display()
-        )
-    });
-    println!(
-        "cargo:warning=Regenerated committed ELF at {} — commit this file.",
-        committed_elf.display()
-    );
+        );
+    }
 }
 
 fn ziskethone_dir() -> PathBuf {

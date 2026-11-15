@@ -1,0 +1,20 @@
+[package]
+name = "reth-to-ethrex"
+description = "Transcode reth stateless-validator inputs into ethrex inputs (offline)"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+input-reth.workspace = true
+guest-ethrex.workspace = true
+zisk-sdk.workspace = true
+
+alloy-rlp.workspace = true
+
+ethrex-common.workspace = true
+ethrex-config.workspace = true
+ethrex-rlp = { git = "https://github.com/lambdaclass/ethrex.git", tag = "v30.0.0" }
+
+anyhow.workspace = true
+clap.workspace = true

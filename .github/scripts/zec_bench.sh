@@ -86,7 +86,14 @@ for client in reth ethrex ziskethone; do
     fi
     echo "::group::Emulate ${client} ${block}"
     # -X prints the REPORT SUMMARY (STEPS + COST DISTRIBUTION) to stdout.
-    "$ZISKEMU" -e "$elf" -i "$input" -X | tee "$OUTDIR/${client}_${block}.txt"
+    # Tolerate failure like the build above: the base branch's guest may not run
+    # on the PR's emulator at all (e.g. a precompile ABI or memory-map change in
+    # ZisK that the base tree predates), and the diff renders a missing side as
+    # N/A rather than aborting the whole comparison.
+    if ! "$ZISKEMU" -e "$elf" -i "$input" -X | tee "$OUTDIR/${client}_${block}.txt"; then
+      echo "WARNING: emulation failed for ${client} block ${block}; skipping" >&2
+      rm -f "$OUTDIR/${client}_${block}.txt"
+    fi
     echo "::endgroup::"
   done
 done
