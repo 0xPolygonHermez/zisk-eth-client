@@ -1,6 +1,6 @@
 //! Block input construction.
 //!
-//! Builds the execution-specs (tests-zkevm v21.0.1) stateless input for a
+//! Builds the execution-specs (tests-zkevm v21.0.7) stateless input for a
 //! block from consensus-layer-independent data: the block itself, its execution
 //! witness, and (from Prague on) the EIP-7685 execution requests, which the
 //! block does not carry and must come from a consensus-layer node. The schema
@@ -246,13 +246,14 @@ fn new_payload_request(
                 .collect::<Vec<_>>(),
         ))
     };
-    let versioned_hashes = || {
-        VersionedHashes::from(
+    let versioned_hashes = || -> Result<VersionedHashes> {
+        VersionedHashes::try_from(
             txs.iter()
                 .flat_map(|tx| tx.blob_versioned_hashes().unwrap_or_default().to_vec())
                 .map(|hash| hash.0)
                 .collect::<Vec<_>>(),
         )
+        .map_err(|e| anyhow::anyhow!("too many blob versioned hashes: {e:?}"))
     };
     let blob_gas_used = || {
         header
@@ -316,7 +317,7 @@ fn new_payload_request(
                     blob_gas_used: blob_gas_used()?,
                     excess_blob_gas: excess_blob_gas()?,
                 ),
-                versioned_hashes: versioned_hashes(),
+                versioned_hashes: versioned_hashes()?,
                 parent_beacon_block_root: parent_beacon_block_root()?,
             })
         }
@@ -334,7 +335,7 @@ fn new_payload_request(
                     blob_gas_used: blob_gas_used()?,
                     excess_blob_gas: excess_blob_gas()?,
                 ),
-                versioned_hashes: versioned_hashes(),
+                versioned_hashes: versioned_hashes()?,
                 parent_beacon_block_root: parent_beacon_block_root()?,
                 execution_requests: ExecutionRequestsElectraFulu {
                     deposits: requests.deposits,
@@ -360,7 +361,7 @@ fn new_payload_request(
                     block_access_list: ProgressiveList::from(block_access_list.to_vec()),
                     slot_number: slot_number,
                 ),
-                versioned_hashes: versioned_hashes(),
+                versioned_hashes: versioned_hashes()?,
                 parent_beacon_block_root: parent_beacon_block_root()?,
                 execution_requests: requests,
             })

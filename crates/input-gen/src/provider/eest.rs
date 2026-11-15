@@ -11,7 +11,7 @@ const FIXTURES_ARCHIVE: &str = "fixtures_zkevm.tar.gz";
 
 #[derive(Debug, Clone, Args)]
 pub struct EestProvider {
-    /// tests-zkevm release tag to download fixtures from (e.g. "v21.0.1").
+    /// tests-zkevm release tag to download fixtures from (e.g. "v21.0.7").
     #[arg(short, long, conflicts_with = "eest_fixtures_path")]
     tag: Option<String>,
 

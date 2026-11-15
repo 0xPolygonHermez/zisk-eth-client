@@ -1,7 +1,7 @@
 //! ZisK guest for the reth stateless validator.
 //!
 //! The guest speaks the execution-specs stateless format
-//! (tests-zkevm v21.0.1): the input is a 2-byte big-endian schema id (fork and
+//! (tests-zkevm v21.0.7): the input is a 2-byte big-endian schema id (fork and
 //! revision) followed by the SSZ-encoded [`StatelessInput`], and the output is
 //! the plain SSZ [`StatelessValidationResult`] (43 bytes). Validation itself is
 //! `stateless_validator_reth::guest::run_stateless_guest`; this crate adds the

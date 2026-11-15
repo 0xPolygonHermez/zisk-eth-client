@@ -2828,8 +2828,8 @@ checksum = "00d174d5400e5e8fd687ad1049e2f578285fa914201b1af7e8b112a4546bd826"
 
 [[package]]
 name = "ere-platform-core"
-version = "0.18.1"
-source = "git+https://github.com/eth-act/ere?tag=v0.18.1#20e87aa7bcc09a8eac3bee2c941d8bfcf447e5ba"
+version = "0.20.0"
+source = "git+https://github.com/eth-act/ere?tag=v0.20.0#a1bf10e04a54476e85dc8507028d2767e3a47c60"
 
 [[package]]
 name = "errno"
@@ -3999,7 +3999,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.61.2",
+ "windows-core 0.62.2",
 ]
 
 [[package]]
@@ -8231,7 +8231,7 @@ dependencies = [
 [[package]]
 name = "stateless"
 version = "0.1.0"
-source = "git+https://github.com/paradigmxyz/stateless?rev=77293e0349d12326eda436f0d2f7e13c1e400421#77293e0349d12326eda436f0d2f7e13c1e400421"
+source = "git+https://github.com/paradigmxyz/stateless?rev=e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24#e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -8260,7 +8260,7 @@ dependencies = [
 [[package]]
 name = "stateless-validator-common"
 version = "0.1.0"
-source = "git+https://github.com/paradigmxyz/stateless?rev=77293e0349d12326eda436f0d2f7e13c1e400421#77293e0349d12326eda436f0d2f7e13c1e400421"
+source = "git+https://github.com/paradigmxyz/stateless?rev=e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24#e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24"
 dependencies = [
  "libssz",
  "libssz-derive",
@@ -8273,7 +8273,7 @@ dependencies = [
 [[package]]
 name = "stateless-validator-reth"
 version = "0.1.0"
-source = "git+https://github.com/paradigmxyz/stateless?rev=77293e0349d12326eda436f0d2f7e13c1e400421#77293e0349d12326eda436f0d2f7e13c1e400421"
+source = "git+https://github.com/paradigmxyz/stateless?rev=e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24#e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -9092,7 +9092,7 @@ dependencies = [
 [[package]]
 name = "tries"
 version = "0.1.0"
-source = "git+https://github.com/paradigmxyz/stateless?rev=77293e0349d12326eda436f0d2f7e13c1e400421#77293e0349d12326eda436f0d2f7e13c1e400421"
+source = "git+https://github.com/paradigmxyz/stateless?rev=e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24#e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -10056,7 +10056,7 @@ dependencies = [
 [[package]]
 name = "zeth-mpt"
 version = "0.1.0"
-source = "git+https://github.com/paradigmxyz/stateless?rev=77293e0349d12326eda436f0d2f7e13c1e400421#77293e0349d12326eda436f0d2f7e13c1e400421"
+source = "git+https://github.com/paradigmxyz/stateless?rev=e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24#e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",

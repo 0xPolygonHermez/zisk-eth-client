@@ -1,7 +1,7 @@
 //! Host-side input handling for the reth guest.
 //!
 //! The guest consumes the execution-specs stateless input
-//! (`schema_id || SSZ(StatelessInput)`, tests-zkevm v21.0.1) as a single
+//! (`schema_id || SSZ(StatelessInput)`, tests-zkevm v21.0.7) as a single
 //! `ZiskStdin` frame, and writes the `StatelessValidationResult`.
 //! [`block_input`] builds such inputs from block data, [`rpc`] fetches that data
 //! from an execution-layer node (re-executing natively when the EIP-7685

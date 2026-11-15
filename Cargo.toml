@@ -74,17 +74,17 @@ alloy-rpc-types-debug = "2.5.0"
 # reth stateless validator (paradigmxyz/stateless). All reth-* crates enter the
 # graph through these two, pinned to the reth rev that stateless itself pins, so
 # the guest never sees two copies of reth. The input/output format is the
-# execution-specs one (tests-zkevm v21.0.1): schema-prefixed SSZ
+# execution-specs one (tests-zkevm v21.0.7): schema-prefixed SSZ
 # `StatelessInput` in, plain SSZ `StatelessValidationResult` out.
-stateless-validator-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", default-features = false }
-stateless-validator-common = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", default-features = false }
+stateless-validator-reth = { git = "https://github.com/paradigmxyz/stateless", rev = "e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24", default-features = false }
+stateless-validator-common = { git = "https://github.com/paradigmxyz/stateless", rev = "e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24", default-features = false }
 # Fork activation timestamps per network, used to pick the input schema fork.
 alloy-hardforks = "0.4.9"
 # Host-side native block execution (offline input generation re-executes a
 # block to recover its EIP-7685 requests). Same stateless rev as the guest, and
 # the reth crates at the exact rev stateless pins, so the graph stays unified.
-stateless = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", default-features = false }
-stateless-tries = { git = "https://github.com/paradigmxyz/stateless", rev = "77293e0349d12326eda436f0d2f7e13c1e400421", package = "tries", default-features = false }
+stateless = { git = "https://github.com/paradigmxyz/stateless", rev = "e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24", default-features = false }
+stateless-tries = { git = "https://github.com/paradigmxyz/stateless", rev = "e5837d7c7ca5f40cf7b8b19cc9e640e49d5fbf24", package = "tries", default-features = false }
 reth-chainspec = { git = "https://github.com/paradigmxyz/reth", rev = "db702b511a9dfe5a80ef76685dd93652ffe37cc5", default-features = false }
 reth-ethereum-primitives = { git = "https://github.com/paradigmxyz/reth", rev = "db702b511a9dfe5a80ef76685dd93652ffe37cc5", default-features = false }
 reth-evm-ethereum = { git = "https://github.com/paradigmxyz/reth", rev = "db702b511a9dfe5a80ef76685dd93652ffe37cc5", default-features = false }
