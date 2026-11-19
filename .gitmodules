@@ -1,6 +1,6 @@
 [submodule "third_party/ziskethone"]
 	path = third_party/ziskethone
 	url = https://github.com/0xPolygonHermez/ziskethone.git
-	# Tracks develop (ZisK 1.4.0, audit fixes, block-hash public output).
+	# Tracks feat/addr-33-bits: develop on ZisK's 33-bit memory map (2 GB RAM at 0xC000_0000).
 	# Init with `git submodule update --init --recursive`.
-	branch = develop
+	branch = feat/addr-33-bits

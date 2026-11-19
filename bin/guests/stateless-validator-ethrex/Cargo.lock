@@ -1140,14 +1140,14 @@ dependencies = [
 
 [[package]]
 name = "guest-common"
-version = "0.10.0"
+version = "0.14.0"
 dependencies = [
  "zisk-zkvm-interface",
 ]
 
 [[package]]
 name = "guest-ethrex"
-version = "0.10.0"
+version = "0.14.0"
 dependencies = [
  "anyhow",
  "bincode",
@@ -1896,7 +1896,8 @@ dependencies = [
 [[package]]
 name = "proofman-fields"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#51173b5504a6a82bae629e45bef90ef4d9093067"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5437c76a4057e306207e86b3b541fe22b4bc09b38d1f31d476a6a71fb7c210fd"
 dependencies = [
  "blake3",
  "cfg-if",
@@ -1908,7 +1909,8 @@ dependencies = [
 [[package]]
 name = "proofman-verifier"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=pre-develop-1.4.0-alpha#51173b5504a6a82bae629e45bef90ef4d9093067"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e010f8abe6954a7abebebbeae918684cdf602027983c549f594d34b72a317b4b"
 dependencies = [
  "num-traits",
  "proofman-fields",
@@ -2956,22 +2958,22 @@ dependencies = [
 [[package]]
 name = "zisk-circuit"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
 
 [[package]]
 name = "zisk-definitions"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
 
 [[package]]
 name = "zisk-lib-c"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
 
 [[package]]
 name = "zisk-precomp-helpers"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -2989,7 +2991,7 @@ dependencies = [
 [[package]]
 name = "zisk-stream"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
 dependencies = [
  "libc",
  "thiserror",
@@ -2999,7 +3001,7 @@ dependencies = [
 [[package]]
 name = "zisk-verifier"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
 dependencies = [
  "proofman-fields",
  "proofman-verifier",
@@ -3008,7 +3010,7 @@ dependencies = [
 [[package]]
 name = "zisk-zkvm-interface"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
 dependencies = [
  "bindgen",
 ]
@@ -3016,7 +3018,7 @@ dependencies = [
 [[package]]
 name = "ziskos"
 version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=pre-develop-1.4.0-alpha#4816d01f2921081b61fef9ef3a442f54a08da0f2"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
 dependencies = [
  "anyhow",
  "ark-bn254",
