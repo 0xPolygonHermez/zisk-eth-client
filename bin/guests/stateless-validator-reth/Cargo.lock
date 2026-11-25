@@ -970,7 +970,7 @@ dependencies = [
  "bitflags",
  "cexpr",
  "clang-sys",
- "itertools 0.13.0",
+ "itertools 0.10.5",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -2748,9 +2748,8 @@ dependencies = [
 
 [[package]]
 name = "proofman-fields"
-version = "1.4.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5437c76a4057e306207e86b3b541fe22b4bc09b38d1f31d476a6a71fb7c210fd"
+version = "1.5.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=update-version-1.5.0-alpha#baebadc1f9f1bad5fc6cfbbd31d9946c6ac0d07b"
 dependencies = [
  "blake3",
  "cfg-if",
@@ -2761,9 +2760,8 @@ dependencies = [
 
 [[package]]
 name = "proofman-verifier"
-version = "1.4.0-alpha"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e010f8abe6954a7abebebbeae918684cdf602027983c549f594d34b72a317b4b"
+version = "1.5.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/pil2-proofman.git?branch=update-version-1.5.0-alpha#baebadc1f9f1bad5fc6cfbbd31d9946c6ac0d07b"
 dependencies = [
  "num-traits",
  "proofman-fields",
@@ -4813,23 +4811,23 @@ dependencies = [
 
 [[package]]
 name = "zisk-circuit"
-version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
+version = "1.5.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#b6c19bd5179de1891d3368fd031c324141c4c5b3"
 
 [[package]]
 name = "zisk-definitions"
-version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
+version = "1.5.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#b6c19bd5179de1891d3368fd031c324141c4c5b3"
 
 [[package]]
 name = "zisk-lib-c"
-version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
+version = "1.5.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#b6c19bd5179de1891d3368fd031c324141c4c5b3"
 
 [[package]]
 name = "zisk-precomp-helpers"
-version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
+version = "1.5.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#b6c19bd5179de1891d3368fd031c324141c4c5b3"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -4846,8 +4844,8 @@ dependencies = [
 
 [[package]]
 name = "zisk-stream"
-version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
+version = "1.5.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#b6c19bd5179de1891d3368fd031c324141c4c5b3"
 dependencies = [
  "libc",
  "thiserror",
@@ -4856,8 +4854,8 @@ dependencies = [
 
 [[package]]
 name = "zisk-verifier"
-version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
+version = "1.5.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#b6c19bd5179de1891d3368fd031c324141c4c5b3"
 dependencies = [
  "proofman-fields",
  "proofman-verifier",
@@ -4865,16 +4863,16 @@ dependencies = [
 
 [[package]]
 name = "zisk-zkvm-interface"
-version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
+version = "1.5.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#b6c19bd5179de1891d3368fd031c324141c4c5b3"
 dependencies = [
  "bindgen",
 ]
 
 [[package]]
 name = "ziskos"
-version = "1.4.0-alpha"
-source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#45c5195d6d3f7f369efd35dbf274b9f7898ee43e"
+version = "1.5.0-alpha"
+source = "git+https://github.com/0xPolygonHermez/zisk.git?branch=feat%2Faddr-33-bits#b6c19bd5179de1891d3368fd031c324141c4c5b3"
 dependencies = [
  "anyhow",
  "ark-bn254",
